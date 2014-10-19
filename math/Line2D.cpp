@@ -1,0 +1,56 @@
+#include <iostream>
+#include "Point2D.h"
+#include "Line2D.h"
+
+const Point2D Line2D::getIntersectingPoint(const Line2D &i_line2D) const
+{
+  
+  Point2D startPoint=i_line2D.getStartPoint();
+  Point2D endPoint=i_line2D.getEndPoint();
+  
+  float xTeller;
+  float yTeller;
+  float denominator;
+
+  xTeller=(
+	   (m_startPoint.x*m_endPoint.y-m_startPoint.y*m_endPoint.x)*(startPoint.x-endPoint.x)-
+	   (startPoint.x  *endPoint.y  -startPoint.y  *endPoint.x)  *(m_startPoint.x-m_endPoint.x)
+	   );
+
+  yTeller=(
+	   (m_startPoint.x*m_endPoint.y-m_startPoint.y*m_endPoint.x)*(startPoint.y-endPoint.y)-
+	   (m_startPoint.y-m_endPoint.y)*(startPoint.x*endPoint.y-startPoint.y*endPoint.x)
+	   );
+
+  denominator=(
+	   (m_startPoint.x-m_endPoint.x)*(startPoint.y-endPoint.y)-(m_startPoint.y-m_endPoint.y)*(startPoint.x-endPoint.x)
+	   );
+  
+  Point2D intersectingPoint;
+  
+  if(denominator==0)
+    {
+      std::cout<<"No intersection!!!"<<std::endl;
+      throw 101;
+    }
+  else
+    {
+
+      intersectingPoint.x=xTeller/denominator;
+      intersectingPoint.y=yTeller/denominator;
+    }
+  
+  return intersectingPoint;
+
+}
+
+
+const Point2D Line2D::getIntersectingPoint(const Point2D &i_point) const
+{
+  Line2D line(Point2D(0,0),i_point);
+  return getIntersectingPoint(line);
+}
+const float Line2D::getLength()
+{
+  return Magnitude(m_endPoint-m_startPoint);
+}
