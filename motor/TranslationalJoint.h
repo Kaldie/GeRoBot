@@ -104,13 +104,13 @@ void TranslationalJoint<ActuatorType>::predictSteps(Point2D& o_position,
 						    const std::string& i_directionString,
 						    const int& i_numberOfSteps)
 {
-    float currentAngle=o_position.getAlpha();
-    float newLength=Magnitude(o_position)+getMovementPerStep()*
-	getPositionModifier(i_directionString)*i_numberOfSteps;  
+  double currentAngle=o_position.getAlpha();
+  double newLength=Magnitude(o_position)+getMovementPerStep()*
+    getPositionModifier(i_directionString)*i_numberOfSteps;  
   
-    o_position.x=cos(currentAngle)*newLength;
-    o_position.y=sin(currentAngle)*newLength;
-    LOG_INFO("Position after translation is: "<<o_position.x<<", "<<o_position.y);
+  o_position.x=cos(currentAngle)*newLength;
+  o_position.y=sin(currentAngle)*newLength;
+  LOG_INFO("Position after translation is: "<<o_position.x<<", "<<o_position.y);
 }
 
 

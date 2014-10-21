@@ -1,7 +1,6 @@
 #ifndef Joint_h
 #define Joint_h
 
-#include <ActuatorDefinitions.h>
 #include <macroHeader.h>
 #include <memory>
 #include <vector>
@@ -21,7 +20,7 @@ class BaseJoint
 
  protected:
     GETSET(float,m_currentPosition,Position);
-    GETSET(float,m_movementPerStep,MovementPerStep);
+    GETSET(double,m_movementPerStep,MovementPerStep);
     GET(std::vector<float>, m_range,Range);
     GETSET(MovementType,m_movementType,MovementType);
     GETSET(DirectionConversionMap,m_directionConversion,DirectionConversionMap);

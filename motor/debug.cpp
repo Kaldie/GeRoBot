@@ -120,7 +120,7 @@ void testPinState()
 
     pinState.update(2,1);
     assert(pinState.getNumericValue()==4);
-    
+   
     //assert pin update via pin state and appending multiple pins with it
     PinState testState;
 
@@ -329,7 +329,7 @@ JointController testJointController(std::vector<std::shared_ptr<BaseJoint>> i_jo
 	{
 	    jointController.getJoint(Translational)->convertDirection("CCW");	
 	} 
-    catch (int e)
+    catch (std::runtime_error)
 	{
 	    hasThrown=true;	
 	}
@@ -435,11 +435,11 @@ void testTraceCalculation(JointController& i_jointController)
     i_jointController.getJoint(Rotational)->getMotor()->setHoldMotor(true);
     
     LineTraceCalculator lineTraceCalculator(&i_jointController);
-    lineTraceCalculator.setWriteLog(false);
+    lineTraceCalculator.setWriteLog(true);
     lineTraceCalculator.calculateTrace(&trace,startPoint);
     
     cout<<i_jointController.getPinStateSequence().size();
-    assert(296651==i_jointController.getPinStateSequence().size());
+    assert(297458==i_jointController.getPinStateSequence().size());
 
     JointPointer rotationalJoint=i_jointController.getJoints(Rotational)[0];
     JointPointer translationalJoint=i_jointController.getJoints(Translational)[0];

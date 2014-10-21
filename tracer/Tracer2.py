@@ -2,7 +2,7 @@ import numpy
 import copy
 
 PRINT_MSG=False
-PRINT_TO_FILE=True
+PRINT_TO_FILE=False
 
 def DBG_MSG(i_message):
         if PRINT_MSG:
@@ -143,15 +143,13 @@ class Trace (object) :
 	translationDirections=["IN","OUT"]
 	FILE_MSG("Current position: %0.5f, %0.5f." % (self.__currentPosition[0], self.__currentPosition[1]))
 	if i_direction.upper() in rotationDirections:
-	  for i in range(i_numberOfSteps):	
-            self.__doRotationStep(i_direction)
+          self.__doRotationStep(i_direction,i_numberOfSteps)
 	elif i_direction.upper() in translationDirections:
-	  for i in range(i_numberOfSteps):
-            self.__doTranslationStep(i_direction)
+            self.__doTranslationStep(i_direction,i_numberOfSteps)
         else:
             raise ValueError("Unknown direction")
 
-    def __doTranslationStep(self,i_direction):
+    def __doTranslationStep(self,i_direction,i_numberOfSteps):
             
       if i_direction=="IN":
           translationPolarity=-1.0
@@ -161,37 +159,41 @@ class Trace (object) :
           raise ValueError("Direction should be in 'IN' or 'OUT'")
 
       DBG_MSG( "Starting translation")
-      deltaPosition = numpy.ones(2)
       DBG_MSG (self.__currentRotation)
       unitTranslation = numpy.array([numpy.cos(self.__currentRotation * (numpy.pi / 180)), 
                                      numpy.sin(self.__currentRotation * (numpy.pi / 180))])
 
-      deltaPosition *= numpy.array(unitTranslation) * self.__transStep * translationPolarity
-      self.__currentExtension += self.__transStep*translationPolarity
+      self.__currentExtension += self.__transStep * translationPolarity * i_numberOfSteps
       
+      self.__currentPosition =unitTranslation * self.__currentExtension
 
-      self.__currentPosition =unitTranslation*self.__currentExtension
       DBG_MSG("moved robot x: %0.2f and y: %0.2f." % (self.__currentPosition[0], self.__currentPosition[1]))
       self.__addPositionToTrace()
 
-    def __doRotationStep(self, i_direction):
+    def __doRotationStep(self, i_direction,i_numberOfSteps):
       DBG_MSG ("starting rotation")
       if i_direction=="CW":
-          rotationPolarity=-1.0
+        rotationPolarity=-1.0
       elif i_direction=="CCW":
-              rotationPolarity=1.0
+        rotationPolarity=1.0
           
-      self.__currentRotation += self.__rotStep * rotationPolarity
+      self.__currentRotation += self.__rotStep * rotationPolarity * i_numberOfSteps
       
       DBG_MSG ("Rotated the robot to %0.3f" % self.__currentRotation)
 
-      currentPosition = [self.__currentPosition[0], self.__currentPosition[1]]
-      rotation = self.__rotStep * (numpy.pi / 180.)*rotationPolarity
-      self.__currentPosition[0] = numpy.cos(rotation) * currentPosition[0] - numpy.sin(rotation) * currentPosition[1]
-      self.__currentPosition[1] = numpy.sin(rotation) * currentPosition[0] + numpy.cos(rotation) * currentPosition[1]
+      currentX=numpy.copy(self.__currentPosition[0])
+      currentY=numpy.copy(self.__currentPosition[1])
+
+      rotation = self.__rotStep * (numpy.pi / 180.) * rotationPolarity * i_numberOfSteps
+      print "%0.20f" % self.__rotStep
+      
+      self.__currentPosition[0] = numpy.cos(rotation) * currentX - numpy.sin(rotation) * currentY
+      self.__currentPosition[1] = numpy.sin(rotation) * currentX + numpy.cos(rotation) * currentY
+
       self.__addPositionToTrace()
 
-      DBG_MSG( "Moved Robot to: x: {x:0.2f}, y: {y:0.2f}.".format(x = self.__currentPosition[0], y = self.__currentPosition[1]))
+      DBG_MSG( "Moved Robot to: x: {x:0.2f}, y: {y:0.2f}.".format(x = self.__currentPosition[0],
+                                                                  y = self.__currentPosition[1]))
 
 
     def __addPositionToTrace(self):

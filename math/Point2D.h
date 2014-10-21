@@ -10,7 +10,7 @@ public:
   //construtor
   Point2D() {};
 
-  Point2D(float r, float s) : Vector2D(r, s) {};
+  Point2D(double r, double s) : Vector2D(r, s) {};
 
   Point2D& operator =(const Vector2D& v)
   {
@@ -19,16 +19,16 @@ public:
     return (*this);
   };
 
-  Point2D& operator *=(float t)
+  Point2D& operator *=(double t)
   {
     x *= t;
     y *= t;
     return (*this);
   };
 
-  Point2D& operator /=(float t)
+  Point2D& operator /=(double t)
   {
-    float f = 1.0F / t;
+    double f = 1.0/ t;
     x *= f;
     y *= f;
     return (*this);
@@ -54,48 +54,48 @@ public:
     return (Vector2D(x - p.x, y - p.y));
   };
 
-  Point2D operator *(float t) const
+  Point2D operator *(double t) const
   {
     return (Point2D(x * t, y * t));
   };
   
-  Point2D operator /(float t) const
+  Point2D operator /(double t) const
   {
-    float f = 1.0F / t;
+    double f = 1.0/ t;
     return (Point2D(x * f, y * f));
   };
 
-  const float getAngleBetweenPoints(const Point2D&) const;
-  const float getAngleToOrigin();
+  const double getAngleBetweenPoints(const Point2D&) const;
+  const double getAngleToOrigin();
 };
 
 
-inline Vector2D operator *(float t, const Vector2D& v)
+inline Vector2D operator *(double t, const Vector2D& v)
 {
   return (Vector2D(t * v.x, t * v.y));
 }
 
-inline Point2D operator *(float t, const Point2D& p)
+inline Point2D operator *(double t, const Point2D& p)
 {
   return (Point2D(t * p.x, t * p.y));
 }
 
-inline float Dot(const Vector2D& v1, const Vector2D& v2)
+inline double Dot(const Vector2D& v1, const Vector2D& v2)
 {
   return (v1 * v2);
 }
 
-inline float Magnitude(const Vector2D& v)
+inline double Magnitude(const Vector2D& v)
 {
   return (sqrtf(v.x * v.x + v.y * v.y));
 }
 
-inline float InverseMag(const Vector2D& v)
+inline double InverseMag(const Vector2D& v)
 {
-  return (1.0F / sqrtf(v.x * v.x + v.y * v.y));
+  return (1.0 / sqrtf(v.x * v.x + v.y * v.y));
 }
 
-inline float SquaredMag(const Vector2D& v)
+inline double SquaredMag(const Vector2D& v)
 {
   return (v.x * v.x + v.y * v.y);
 }

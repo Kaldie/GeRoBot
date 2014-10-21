@@ -2,7 +2,6 @@
 #define JointController_H
 
 #include <memory>
-#include <ActuatorDefinitions.h>
 #include <macroHeader.h>
 #include <vector>
 #include <ArduinoMotorDriver.h>

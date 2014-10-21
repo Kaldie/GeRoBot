@@ -1,7 +1,6 @@
 #ifndef BaseTraceCalculator_H
 #define BaseTraceCalculator_H
 
-#include <ActuatorDefinitions.h>
 #include <macroHeader.h>
 #include <Point2D.h>
 #include <Trace.h>

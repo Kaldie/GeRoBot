@@ -11,7 +11,6 @@
 #include <vector>
 #include <map>
 #include <PinState.h>
-#include "ActuatorDefinitions.h"
 #include <macroHeader.h>
 
 //Pin definitions

@@ -3,7 +3,6 @@
 
 #include <string>
 #include <macroHeader.h>
-#include <ActuatorDefinitions.h>
 #include <Point2D.h>
 #include <Line2D.h>
 
@@ -14,13 +13,13 @@ class Trace
 {
  private:
 
-  TRACE_TYPE m_traceType; 
-  Point2D m_startPosition;
-  Point2D m_endPosition;
+  GETSET(TRACE_TYPE,m_traceType,TraceType); 
+  GETSET(Point2D,m_startPosition,StartPosition);
+  GETSET(Point2D,m_endPosition,EndPosition);
 
-  float m_translationTolerance;
-  float m_rotationTolerance;
-      
+  GETSET(float,m_rotationTolerance,RotationTolerance);
+  GETSET(float,m_translationTolerance,TranslationTolerance);
+
 
   bool isValidStartAndEndPosition(const Point2D*,
 				  const Point2D*);
@@ -32,29 +31,13 @@ class Trace
   
   //constructors
   Trace();
-  Trace(const Point2D&,
-	const Point2D&);
+  Trace(const Point2D&,  //Start Point
+	const Point2D&); //End point
 
-  Trace(const Point2D&,
-	const Point2D&,
+  Trace(const Point2D&,  //Start point
+	const Point2D&,  //End point
 	const TRACE_TYPE&);
   
-  //Getters and setters
-  const Point2D& getStartPosition() const {return m_startPosition;};
-  void setStartPosition(const Point2D& i_point2D){m_startPosition=i_point2D;};
-
-  const Point2D& getEndPosition() const {return m_endPosition;};
-  void setEndPosition(const Point2D& i_point2D){m_endPosition=i_point2D;};
-
-  const TRACE_TYPE& getType() const {return m_traceType;};
-  void setTraceType(const TRACE_TYPE &i_type){m_traceType=i_type;};
-
-  const float& getRotationTolerance()const{return m_rotationTolerance;};
-  void setRotationTolerance(const float& i_value){m_rotationTolerance=i_value;};
-
-  const float& getTranslationTolerance() const {return m_translationTolerance;};
-  void setTranslationTolerance(const float& i_value){m_translationTolerance=i_value;};
-
   //Actual methods
   const Line2D getTraceLine() const;
   

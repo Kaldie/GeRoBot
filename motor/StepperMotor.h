@@ -7,7 +7,6 @@
 
 #include <string>
 #include <vector>
-#include "ActuatorDefinitions.h"
 #include "BaseMotor.h"
 
 

@@ -1,13 +1,13 @@
 #include "Vector2D.h"
-#include <ActuatorDefinitions.h>
+#include <macroHeader.h>
 
-Vector2D& Vector2D::rotate(float angle)
+Vector2D& Vector2D::rotate(double angle)
 {
-    float s = sinf(angle);
-    float c = cosf(angle);
+    double s = sinf(angle);
+    double c = cosf(angle);
     
-    float nx = c * x - s * y;
-    float ny = s * x + c * y;
+    double nx = c * x - s * y;
+    double ny = s * x + c * y;
     
     x = nx;
     y = ny;
@@ -15,13 +15,13 @@ Vector2D& Vector2D::rotate(float angle)
     return (*this);
 }
 
-const float Vector2D::getAlpha() const
+const double Vector2D::getAlpha() const
 {
   /* the domein of the atan is slighly different then we want it to be.
      So given the quadrant of the vector, add a value to put it in our wanted domein
   */    
   
-  float angle=atan2((float)y,(float)x);
+  double angle=atan2(y,x);
   if(angle<0)
     angle+=2*PI;
 

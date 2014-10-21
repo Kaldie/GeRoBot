@@ -6,9 +6,11 @@
 
 
 Trace::Trace():
-    m_traceType(Line), 
-    m_startPosition{0,0},
-    m_endPosition{0,1}
+  m_traceType(Line), 
+  m_startPosition{0,0},
+  m_endPosition{0,1},
+  m_rotationTolerance(0.1),
+  m_translationTolerance(0.1)
 {
     LOG_INFO("Created Trace");
 }
@@ -18,7 +20,9 @@ Trace::Trace(const Point2D& i_startPosition,
 	     const Point2D& i_endPosition):
     m_traceType(Line),
     m_startPosition(i_startPosition),
-    m_endPosition(i_endPosition)
+    m_endPosition(i_endPosition),
+    m_rotationTolerance(0.1),
+    m_translationTolerance(0.1)
 {
   if (!isValidStartAndEndPosition(&i_startPosition,&i_endPosition))
     {
@@ -33,7 +37,10 @@ Trace::Trace(const Point2D& i_startPosition,
 	     const TRACE_TYPE& i_traceType):
     m_traceType(i_traceType),
     m_startPosition(i_startPosition),
-    m_endPosition(i_endPosition)
+    m_endPosition(i_endPosition),
+    m_rotationTolerance(0.1),
+    m_translationTolerance(0.1)    
+
 {
   if (!isValidStartAndEndPosition(&i_startPosition,&
 				  i_endPosition))
@@ -107,10 +114,10 @@ const bool Trace::isWithinBeginRange(const Point2D &i_point2D) const
 
 const std::string Trace::getRotationDirectionToEndPoint(Point2D const &i_point2D) const
 {
-
- 
+  #ifndef NDEBUG  
   float pointAngle=i_point2D.getAlpha()*180/PI;
   float endPositionAngle=m_endPosition.getAlpha()*180/PI;
+  #endif
   LOG_INFO("robot angle: "<<pointAngle<<", endpoint angle: "<<endPositionAngle);  
   return getRotationDirection(i_point2D,
 			      m_endPosition);
@@ -132,8 +139,10 @@ const std::string Trace::getRotationDirection(Point2D const &i_currentPosition,
 
 const std::string Trace::getTranslationDirectionToEndPoint(Point2D const &i_point2D) const
 {
+  #ifndef NDEBUG
   float currentPointMagnitude=Magnitude(i_point2D);
   float endPointMagnitude=Magnitude(m_endPosition);
+  #endif
   LOG_INFO("Current magnitude:" <<currentPointMagnitude);
   LOG_INFO("desired magnitude: "<<endPointMagnitude);
   

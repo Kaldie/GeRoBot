@@ -53,6 +53,10 @@ class XMLBuilder{
 
     pugi::xml_node loadXMLFile();
 
+    pugi::xml_node getNodeFromPath(const pugi::xml_node&,
+				   const std::string&) const;
+
+    pugi::xml_node getNodeFromPath(const std::string&) const;
 
     XMLBuilder(const std::string&);
     XMLBuilder(const pugi::xml_node&);

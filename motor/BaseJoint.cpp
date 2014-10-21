@@ -3,7 +3,6 @@
 #include <iostream>
 #include <memory>
 #include <string>
-#include <ActuatorDefinitions.h>
 #include "BaseJoint.h"
 
 
@@ -44,9 +43,9 @@ const std::string BaseJoint::convertDirection(const std::string i_direction) con
 {
     DirectionConversionMap::const_iterator itr = m_directionConversion.find(i_direction);
     if(itr==m_directionConversion.end())
-	    LOG_ERROR("Could not find a conversion for the direction: "<<i_direction);
+      LOG_ERROR("Could not find a conversion for the direction: "<<i_direction);
     else
-	    return itr->second;
+      return itr->second;
 }
 
 

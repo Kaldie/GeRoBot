@@ -107,52 +107,65 @@ const std::vector<int> BaseTraceCalculator::getNumberOfSteps(const Trace& i_trac
 
 
 void BaseTraceCalculator::writeToStepLog(const std::string i_direction,
-					 const int i_numberOfSteps) const
-{
-    std::ofstream stepLogFile(m_logFileName,std::ios::app);
-    if (stepLogFile.good())
-	stepLogFile<<i_direction<<", "<<i_numberOfSteps<<std::endl;
+					 const int i_numberOfSteps) const{
+  std::ofstream stepLogFile(m_logFileName,std::ios::app);
+  if (stepLogFile.good())
+    stepLogFile<<i_direction<<", "<<i_numberOfSteps<<std::endl;
 }
 
 const bool BaseTraceCalculator::shouldTranslate(const Trace& i_trace,
-						const Point2D &i_point2D) const
-{
+						const Point2D &i_point2D) const{
   float pointMagnitude=Magnitude(i_point2D);
   float endPositionMagnitude=Magnitude(i_trace.getEndPosition());
   float difference=pointMagnitude-endPositionMagnitude;
-  if(std::abs(difference)>m_translationTolerance)
-    return true;
+  
+  bool shouldTranslate;
+  
+  if(pointMagnitude>endPositionMagnitude)
+    shouldTranslate = false;
+  else if(std::abs(difference)>m_translationTolerance)
+    shouldTranslate = true;
   else if( std::abs(difference+m_jointController->getJoint(Translational)->getMovementPerStep())<std::abs(difference))
-      return true;
+      shouldTranslate = true;
   else
     {
+      shouldTranslate = false;
+    }
+
+  if(!shouldTranslate){
 	LOG_INFO("Not translating!! ");
 	LOG_INFO("Current magnitude: "<<pointMagnitude<<". ");
 	LOG_INFO("Wanted magnitude: "<<endPositionMagnitude);
 	LOG_INFO("diff: "<<std::abs(pointMagnitude-endPositionMagnitude));
-      return false;
-    }
+  }
+
+  return shouldTranslate;
 }
 
 const bool BaseTraceCalculator::shouldRotate(const Trace& i_trace,
-					     const Point2D &i_point2D) const
-{
+					     const Point2D &i_point2D) const{
   float pointAngle=i_point2D.getAlpha()*180/PI;
   float endPositionAngle=i_trace.getEndPosition().getAlpha()*180/PI;
   float difference=pointAngle-endPositionAngle;
-  
-  if(std::abs(difference)>m_rotationTolerance)
-      return true;
+
+  bool shouldRotate;
+  if(pointAngle>endPositionAngle)
+    shouldRotate=false;
+  else if(std::abs(difference)>m_rotationTolerance)
+      shouldRotate=true;
   else if( std::abs(difference+m_jointController->getJoint(Rotational)->getMovementPerStep())<std::abs(difference))
-      return true;
+      shouldRotate=true;
   else
-      {
-	  LOG_INFO("Not rotating!!");
-	  LOG_INFO("current angle: "<<pointAngle<<" ");
-	  LOG_INFO("wanted angle: "<<endPositionAngle);
-	  LOG_INFO("diff: "<<difference);
-	  return false;
-      }
+    shouldRotate=false;
+    
+  if(!shouldRotate){
+    LOG_INFO("Not rotating!!");
+    LOG_INFO("current angle: "<<pointAngle<<" ");
+    LOG_INFO("wanted angle: "<<endPositionAngle);
+    LOG_INFO("diff: "<<difference);
+  }
+    
+    return shouldRotate;
 }
 	    
 

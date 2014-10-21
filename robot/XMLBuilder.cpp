@@ -21,8 +21,12 @@ XMLBuilder::XMLBuilder(const pugi::xml_node& i_node):
 
 XMLBuilder::~XMLBuilder()
 {
-  if(m_hasLoaded)
+  if(m_hasLoaded){
     delete m_documentPointer;
+    LOG_DEBUG("Deleted document pointer!");
+  }
+  else
+    LOG_DEBUG("No document to be deleted!");
 }
 
 void XMLBuilder::build()
@@ -54,7 +58,26 @@ pugi::xml_node XMLBuilder::loadXMLFile()
   if(std::string(m_documentPointer->first_child().name())!="ROBOTBUILDER")
     LOG_ERROR("Not a Robot builder xml file!");
   
+  m_hasLoaded=true;
   return m_documentPointer->first_child();
+}
+
+
+pugi::xml_node XMLBuilder::getNodeFromPath(const pugi::xml_node& parrentNode,
+					   const std::string& i_path) const{
+  
+  pugi::xml_node childNode=parrentNode.first_element_by_path(i_path.c_str());
+  LOG_DEBUG(childNode.name());
+
+  if(childNode)
+    return childNode;
+  else
+    LOG_ERROR("Could not find a child node from: "<<i_path<<" starting at node: "<<parrentNode.name());
+
+}
+
+pugi::xml_node XMLBuilder::getNodeFromPath(const std::string& i_path) const{
+  return getNodeFromPath(m_node,i_path);
 }
 
 

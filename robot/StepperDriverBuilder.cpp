@@ -12,11 +12,11 @@ void StepperDriverBuilder::build()
 					3);
 				
   StepperDriver step(pinVector);
-  step.setDefaultDirection(getNode().first_element_by_path("./DEFAULT_DIRECTION").text().as_string());
+  step.setDefaultDirection(getNodeFromPath("./DEFAULT_DIRECTION").text().as_string());
   
   LOG_DEBUG("Default direction is: "<<step.getDefaultDirection());
   
-  step.setHoldMotor(getNode().first_element_by_path("./HOLD_MOTOR").text().as_bool());
+  step.setHoldMotor(getNodeFromPath("./HOLD_MOTOR").text().as_bool());
   
   LOG_DEBUG("Hold motor: "<<step.getHoldMotor());
   

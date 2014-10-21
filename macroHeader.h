@@ -1,10 +1,25 @@
 #ifndef macroHeader_H
 #define macroHeader_H
 
-#include <iostream>
-#include <stdio.h>
-#include <errno.h>
+#include <fstream>
+#include <stdexcept>
+#include <sstream>
 #include <string.h>
+
+#define PIN_HIGH 1
+#define PIN_LOW 0
+
+#define DEFAULT_STATE PIN_HIGH
+
+#define DELAY_BETWEEN_STEP_MICROSECONDS 250
+#define HAS_RPI false
+
+#define PI 3.1415926535897932384626433
+#define TOLERANCE 0.1
+
+//#define DEBUG
+
+//make #define DEBUG_FILE
 
 //Create getter and setter for properties of a class
 #define GETSET(type, varName, property)		\
@@ -65,15 +80,24 @@ public:						\
 
 
 //Create debug messages
+#if defined(DEBUG) 
+#define DEBUG_MSG(message) do {std::cerr << message << std::endl;} while(false)
 
-//#define NDEBUG
-#ifdef NDEBUG
+#elif defined(DEBUG_FILE)				
+#define DEBUG_MSG(message) do {				\
+  std::ofstream thisStream;					\
+  thisStream.open("Debug.save",std::ios_base::app);			\
+  thisStream<<message<<std::endl;						\
+  thisStream.close();				\
+  } while(false)
+#else						
 #define DEBUG_MSG(message)
-#else
-#define DEBUG_MSG(message) std::cerr << message << std::endl
 #endif
 
-#define LOG_ERROR(message) do {DEBUG_MSG("[ERROR] ("<<__FILE__<<":"<<__LINE__<<"): "<<message); throw 100;} while(false)
+#define LOG_ERROR(message) do {						\
+    std::stringstream stream;						\
+    stream<<std::endl<<"("<<__FILE__<<":"<<__LINE__<<"): "<<message;		\
+    throw std::runtime_error(stream.str());} while(false)
 
 #define LOG_WARNING(message) do {DEBUG_MSG("[WARN]("<<__FILE__<<":"<<__LINE__<<"): "<<message);} while(false)
 
@@ -81,4 +105,4 @@ public:						\
 
 #define LOG_INFO(message) do {DEBUG_MSG("[INFO] ("<<__FILE__<<":"<<__LINE__<<"): "<<message);} while(false)
 
-#endif // macro
+#endif // macroHeader

@@ -106,10 +106,10 @@ void RotationalJoint<ActuatorType>::predictSteps(Point2D& o_position,
 						 const int& i_numberOfSteps)
 {
     int positionModifier=getPositionModifier(i_directionString);
-    float newPosition=getPosition()+(getMovementPerStep()*positionModifier*i_numberOfSteps);
+    double newPosition=getPosition()+(getMovementPerStep()*positionModifier*i_numberOfSteps);
     LOG_INFO("Current Position: "<<getPosition()<<", going to position: "<<newPosition);
     isInRange(newPosition);
-    o_position.rotate(getMovementPerStep()*(PI/180.0)*float(positionModifier)*float(i_numberOfSteps));
+    o_position.rotate(getMovementPerStep()*(PI/180.0)*double(positionModifier)*double(i_numberOfSteps));
     setPosition(newPosition);
     LOG_INFO("Position after rotation is: "<<o_position.x<<", "<<o_position.y);
 }

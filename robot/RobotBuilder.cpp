@@ -13,7 +13,7 @@ void RobotBuilder::build(){
   LOG_DEBUG("Building a robot from file name: "<<getFileName());
   LOG_DEBUG("Root node is: "<<getNode().name());
   
-  m_robot.getJointController()=parseJointController(getNode().first_element_by_path("./ROBOT/JOINTCONTROLLER"));
+  m_robot.getJointController()=parseJointController(getNodeFromPath("./ROBOT/JOINTCONTROLLER"));
 }
 
     

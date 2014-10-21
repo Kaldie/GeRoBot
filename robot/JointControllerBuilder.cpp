@@ -8,18 +8,18 @@
 
 void JointControllerBuilder::build()
 {
-  const pugi::xml_node x=getNode();
+  const pugi::xml_node JointControllerNode=getNode();
   LOG_DEBUG("Building a Joint controller!");
-  LOG_DEBUG("Joint controller node: "<<std::string(x.name()));
-  LOG_DEBUG("Magic offset:"<<x.offset_debug());
+  LOG_DEBUG("Joint controller node: "<<std::string(JointControllerNode.name()));
+  LOG_DEBUG("Magic offset:"<<JointControllerNode.offset_debug());
 
-  addJoints(getNode().first_element_by_path("./JOINT"));
-  m_jointController.setActuator(parseActuator(getNode().first_element_by_path("./ACTUATOR")));
+  addJoints(getNodeFromPath("./JOINT"));
+  m_jointController.setActuator(parseActuator(getNodeFromPath("./ACTUATOR")));
 
   
 
-  LOG_DEBUG("Magic offset:"<<x.offset_debug());
-  LOG_DEBUG("Joint controller node: "<<std::string(x.parent().name()));
+  LOG_DEBUG("Magic offset:"<<JointControllerNode.offset_debug());
+  LOG_DEBUG("Joint controller node: "<<std::string(JointControllerNode.name()));
   
 }
 
@@ -54,9 +54,9 @@ void JointControllerBuilder::parseJoint(const pugi::xml_node& i_jointNode){
 
 ArduinoMotorDriver JointControllerBuilder::parseActuator(const pugi::xml_node& i_node)
 {
-  std::string serialExpression=i_node.first_element_by_path("./REGULAR_EXPRESSION").text().as_string();
+  std::string serialExpression=getNodeFromPath(i_node,"./REGULAR_EXPRESSION").text().as_string();
   LOG_DEBUG("Serial port regular expression is: "<<serialExpression);
-  bool hasReducedSpeed=i_node.first_element_by_path("./REDUCED_SPEED").text().as_bool();
+  bool hasReducedSpeed=getNodeFromPath(i_node,"./REDUCED_SPEED").text().as_bool();
   ArduinoMotorDriver arduinoMotorDriver(serialExpression);
   arduinoMotorDriver.setReducedSpeed(hasReducedSpeed);
   return arduinoMotorDriver;

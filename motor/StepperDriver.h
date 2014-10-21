@@ -5,8 +5,6 @@
 #include <map>
 #include "BaseMotor.h"
 #include <macroHeader.h>
-#include "ActuatorDefinitions.h"
-//#include "StepperMotor.h"
 
 class StepperDriver: public BaseMotor
 {

@@ -7,30 +7,30 @@ class Vector2D
 {
  public:
   
-  float   x;
-  float   y;
+  double   x;
+  double  y;
   
   Vector2D() {}
         
-  Vector2D(float r, float s)
+  Vector2D(double r, double s)
     {
       x = r;
       y = s;
     }
  
-  Vector2D& Set(float r, float s)
+  Vector2D& Set(double r, double s)
     {
       x = r;
       y = s;
       return (*this);
     }
   
-  float& operator [](long k)
+  double& operator [](long k)
   {
     return ((&x)[k]);
   }
   
-  const float& operator [](long k) const
+  const double& operator [](long k) const
   {
     return ((&x)[k]);
   }
@@ -49,16 +49,16 @@ class Vector2D
       return (*this);
     }
   
-  Vector2D& operator *=(float t)
+  Vector2D& operator *=(double t)
     {
       x *= t;
       y *= t;
       return (*this);
     }
   
-  Vector2D& operator /=(float t)
+  Vector2D& operator /=(double t)
     {
-      float f = 1.0F / t;
+      double f = 1.0F / t;
       x *= f;
       y *= f;
       return (*this);
@@ -86,18 +86,18 @@ class Vector2D
     return (Vector2D(x - v.x, y - v.y));
   }
   
-  Vector2D operator /(float t) const
+  Vector2D operator /(double t) const
   {
-    float f = 1.0F / t;
+    double f = 1.0F / t;
     return (Vector2D(x * f, y * f));
   }
 
-  Vector2D operator *(float t) const
+  Vector2D operator *(double t) const
     {
       return (Vector2D(x * t, y * t));
     }
   
-  float operator *(const Vector2D& v) const
+  double operator *(const Vector2D& v) const
   {
     return (x * v.x + y * v.y);
   }
@@ -122,8 +122,8 @@ class Vector2D
       return (*this /= sqrtf(x * x + y * y));
     }
       
-  Vector2D& rotate(float angle);
-  const float getAlpha() const;
+  Vector2D& rotate(double angle);
+  const double getAlpha() const;
 };
 
 #endif

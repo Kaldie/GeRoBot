@@ -1,9 +1,8 @@
-
+#include <iomanip>
 #include <iostream>
 #include <cmath>
 #include <algorithm>
 #include <vector>
-#include <ActuatorDefinitions.h>
 #include <Vector2D.h>
 #include <Point2D.h>
 #include <BaseJoint.h>
@@ -49,8 +48,7 @@ void LineTraceCalculator::calculateTrace(const Trace* i_trace,
 {
     //Setting the capacity of the vector to hold all the data
     std::vector<int> numberOfSteps=getNumberOfSteps(*i_trace,i_point);
-    std::vector<int>::iterator maximumNumberOfSteps=std::max_element(numberOfSteps.begin(),
-								     numberOfSteps.end());
+    std::vector<int>::iterator maximumNumberOfSteps=std::max_element(numberOfSteps.begin(),numberOfSteps.end());
     PinStateSequence pinStateSequencePointer=getJointController()->getPinStateSequence();
     LOG_INFO("Reserving: "<<pinStateSequencePointer.size()+*maximumNumberOfSteps);
     
@@ -60,10 +58,6 @@ void LineTraceCalculator::calculateTrace(const Trace* i_trace,
     bool hasStepped(true);
     do
 	{
-	    //resetting the hasrotated and has translated
-	    //      prepareNextStep();
-
-	    //	    LOG_INFO"Current position is: "<<i_point.x<<", "<< i_point.y;
 	    hasStepped=calculateStep(i_trace,i_point);
 	    i++;
 	}while(hasStepped);// and i<1000);
@@ -102,12 +96,10 @@ void LineTraceCalculator::prepareRotation(const Trace* i_trace,
     
     //See where we end up after rotation
     getJointController()->getJoint(Rotational)->predictStep(i_point2D,direction);
+
+    LOG_DEBUG(std::setprecision(20) << std::fixed <<
+    	      "Rotational movement per step: "<<getJointController()->getJoint(Rotational)->getMovementPerStep());
     
-    //test if we are finished with rotating, which means be gentle with correcting
-    bool hasOverShoot=(direction==i_trace->getRotationDirectionToEndPoint(i_point2D));
-    hasOverShoot|=!shouldRotate(*i_trace,i_point2D);
-
-
     if(getWriteLog())
 	writeToStepLog(direction,1);
 
@@ -116,12 +108,11 @@ void LineTraceCalculator::prepareRotation(const Trace* i_trace,
 
     //Correct the rotation
     bool hasCorrectionSteps=correctRotation(i_trace,
-					    i_point2D,
-					    hasOverShoot);
+					    i_point2D);
 
     getJointController()->moveStep(getJointController()->getJoint(Rotational),
-				direction,
-				hasCorrectionSteps);
+				   direction,
+				   hasCorrectionSteps);
 }
 
 void LineTraceCalculator::prepareTranslation(const Trace* i_trace,
@@ -133,66 +124,79 @@ void LineTraceCalculator::prepareTranslation(const Trace* i_trace,
   
     //Predict the step
     getJointController()->getJoint(Translational)->predictStep(i_point2D,direction);
-
-    bool hasOverShoot=(direction==i_trace->getTranslationDirectionToEndPoint(i_point2D));
-    hasOverShoot|=!shouldTranslate(*i_trace,i_point2D);
+    
+    LOG_DEBUG(std::setprecision(20) << std::fixed <<
+	      "Translational movement per step: "<<getJointController()->getJoint(Translational)->getMovementPerStep());
+    
     if(getWriteLog())
 	writeToStepLog(direction,1);
 
     LOG_INFO("Translating: "<<direction);
 
     //Correct the rotation, if nessesary!
-    bool hasCorrectionSteps=correctTranslation(i_trace,
-					       i_point2D,
-					       hasOverShoot);
+    bool hasCorrectionSteps=correctTranslation(i_trace,i_point2D);
 
     getJointController()->moveStep(getJointController()->getJoint(Translational),
-				direction,
-				hasCorrectionSteps);
+				   direction,
+				   hasCorrectionSteps);
 }
 
 
 const bool LineTraceCalculator::correctRotation(const Trace* i_trace,
-						Point2D& i_point2D,
-						bool& i_hasOverShoot) const
+						Point2D& i_point2D) const
 {
-    float movementPerStep=getJointController()->getJoint(Translational)->getMovementPerStep();
-
-    Point2D destinationPoint=i_trace->getTraceLine().getIntersectingPoint(i_point2D);
-    LOG_INFO("Desitnation point is: "<<destinationPoint.x<<", "<<destinationPoint.y);
-    float jointPositionDifference=Magnitude(destinationPoint)-Magnitude(i_point2D);
-    
+    float jointPositionDifference;
     float multiplicationFactor;
-    if(i_hasOverShoot)
-	multiplicationFactor=1.0;
-    else
-	multiplicationFactor=2.0;
+    const Point2D* destinationPoint;
+    Point2D intersectingPoint=i_trace->getTraceLine().getIntersectingPoint(i_point2D);
     
-    int numberOfSteps=std::floor((std::abs(jointPositionDifference)*multiplicationFactor)/movementPerStep);
-  
-    if(numberOfSteps>0)
-	{
-	    std::string translationDirection=i_trace->getTranslationDirection(i_point2D,
-									      destinationPoint);
-	    
-	    getJointController()->getJoint(Translational)->predictSteps(i_point2D,translationDirection,numberOfSteps);
-	    LOG_INFO("Number of correction steps: "<<numberOfSteps);
-	    getJointController()->moveSteps(getJointController()->getJoint(Translational),
-					 translationDirection,
-					 numberOfSteps);
-	    if(getWriteLog())
-		writeToStepLog(translationDirection,numberOfSteps);
+    /* 
+       if the translational distance of the interstecting point is bigger then then the end point set
+       the ideal magnitude to the endpoint distance!
+    */
+    LOG_DEBUG("Magnitude end position: "<<Magnitude(i_trace->getEndPosition()));
+    LOG_DEBUG("Magnitude intersectingPoint: "<<Magnitude(intersectingPoint));
+    if(Magnitude(i_trace->getEndPosition())<Magnitude(intersectingPoint)){
+      jointPositionDifference=Magnitude(i_trace->getEndPosition())-Magnitude(i_point2D);
+      destinationPoint=&(i_trace->getEndPosition());
+      multiplicationFactor=1.0;
+    }
+    else{
+      jointPositionDifference=Magnitude(intersectingPoint)-Magnitude(i_point2D);
+      destinationPoint=&intersectingPoint;
+      multiplicationFactor=2.0;
+    }
 
-	    return true;
-	}
-    return false;
+    LOG_INFO("Destination point is: "<<destinationPoint->x<<", "<<destinationPoint->y);
+
+    int numberOfSteps=std::floor((std::abs(jointPositionDifference)*multiplicationFactor)/
+				 getJointController()->getJoint(Translational)->getMovementPerStep());
+
+    LOG_DEBUG(std::setprecision(20) << std::fixed <<
+	      "Translational movement per step: "<<getJointController()->getJoint(Translational)->getMovementPerStep());
+
+    if(numberOfSteps>0){
+	std::string translationDirection=i_trace->getTranslationDirection(i_point2D, *destinationPoint);
+	getJointController()->getJoint(Translational)->predictSteps(i_point2D,translationDirection,numberOfSteps);
+	
+	getJointController()->moveSteps(getJointController()->getJoint(Translational),
+					translationDirection,
+					numberOfSteps);
+
+	LOG_INFO("Number of correction steps: "<<numberOfSteps<<" in the "<<translationDirection<<" direction");
+
+	if(getWriteLog())
+	  writeToStepLog(translationDirection,numberOfSteps);
+	
+	return true;
+      }
+    else
+      return false;
 }
 
 
 const bool LineTraceCalculator::correctTranslation(const Trace* i_trace,
-						   Point2D& i_point2D,
-						   bool& i_hasOverShoot)const
-{
+						   Point2D& i_point2D) const {
     float currentRotation=i_point2D.getAlpha();
 
     Point2D destinationPoint=i_trace->getTraceLine().getIntersectingPoint(i_point2D);
@@ -210,7 +214,7 @@ const bool LineTraceCalculator::correctTranslation(const Trace* i_trace,
     LOG_INFO("Joint angle difference: "<<jointAngleDifference*(PI/180));
 
     float multiplicationFactor;
-    if(i_hasOverShoot)
+    if(destinationPoint.getAlpha()>i_trace->getEndPosition().getAlpha())
 	multiplicationFactor=1.0;
     else
 	multiplicationFactor=2.0;

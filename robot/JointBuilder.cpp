@@ -17,7 +17,7 @@ void JointBuilder::build()
 
       JointPointer jointPointer;
 
-      std::string movementType=jointNode.first_element_by_path("./MOVEMENT_TYPE").text().as_string();
+      std::string movementType=getNodeFromPath(jointNode,"./MOVEMENT_TYPE").text().as_string();
 
       if(movementType=="ROTATIONAL"){
 	LOG_DEBUG("Building a rotational joint!");
@@ -37,14 +37,14 @@ void JointBuilder::build()
       
 
       
-      jointPointer->setMovementPerStep(jointNode.first_element_by_path("./MOVEMENT_PER_STEP").text().as_float());
-      jointPointer->setPosition(jointNode.first_element_by_path("./DEFAULT_POSITION").text().as_float());
+      jointPointer->setMovementPerStep(getNodeFromPath(jointNode,"./MOVEMENT_PER_STEP").text().as_float());
+      jointPointer->setPosition(getNodeFromPath(jointNode,"./DEFAULT_POSITION").text().as_float());
     
       LOG_DEBUG("Joint type: "<<jointPointer->getMovementType());
       LOG_DEBUG("Default position: "<<jointPointer->getPosition());
     
 
-      *(jointPointer->getMotor())=parseStepperDriver(jointNode.first_element_by_path("./ACTUATOR"));
+      *(jointPointer->getMotor())=parseStepperDriver(getNodeFromPath(jointNode,"./ACTUATOR"));
       
       LOG_DEBUG("hoi");
 
