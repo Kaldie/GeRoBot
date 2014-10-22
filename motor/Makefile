@@ -56,7 +56,7 @@ debug: $(OBJS) $(DOBJS)
 shared: $(OBJS)
 	@echo "creating shared object lib for actuators"
 	$(CC) $(CFLAGS) $(INCLUDES) -shared -o lib$(MAIN).so $(OBJS)  $(LFLAGS) $(SHAREDLDFLAGS) $(LIBS)
-	cd $(LIBFOLDER); ln -fsv $(CURRENTPATHFROMLIBFOLDER)/lib$(MAIN).so
+	cd $(LIBFOLDER); $(LINK) $(CURRENTPATHFROMLIBFOLDER)/lib$(MAIN).so
 
 clean: 
 	$(RM) *.o
@@ -72,7 +72,7 @@ clean:
 
 .cpp.o:
 	$(CC) $(CFLAGS) $(INCLUDES) -c $<  -o $@
-	ln -fv $@ $(OBJECTFOLDER)$@
+	$(LINK) $@ $(OBJECTFOLDER)$@
 
 depend: $(SRCS)
 	makedepend $(INCLUDES) $^

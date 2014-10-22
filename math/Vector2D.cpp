@@ -1,5 +1,5 @@
 #include "Vector2D.h"
-#include <ActuatorDefinitions.h>
+#include <macroHeader.h>
 
 Vector2D& Vector2D::rotate(float angle)
 {

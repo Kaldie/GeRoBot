@@ -6,38 +6,24 @@
 
 # Main math makefile
 
-PROG = math
-TRGTS = MATH ARDUINO ARDUINOSKETCH MOTOR PUGIXML ROBOT
+SHAREDFOLDERS = ./math ./arduino ./motor ./pugixml-1.4  ./robot
+UPLOADEDFOLDERS = ./arduinosketch
 
-$(PROG): $(TRGTS)
+all: SHAREDTARGET UPLOADEDTARGET
 
-all: $(TRGTS)
+INCLUDEDIR:
+	$(foreach FOLDER,$(FOLDERS), cd $(FOLDER); make include; )
+  
+SHAREDTARGET:
+	$(foreach FOLDER,$(SHAREDFOLDERS), cd $(FOLDER); make shared;)
 
-MATH:
-	cd ./math ; make shared
-
-MOTOR:
-	cd ./motor ; make shared
-
-ARDUINO:
-	cd ./arduino ; make shared
-
-ARDUINOSKETCH:
-	cd ./arduinosketch ; make -i upload
-
-ROBOT:
-	cd ./robot ; make shared
-
-PUGIXML:
-	cd ./pugixml-1.4 ; make shared
-
+UPLOADEDTARGET:
+	$(foreach FOLDER,$(UPLOADEDFOLDERS), cd $(FOLDER); make -i upload; )
+  
 clean:
 	rm -f *.o *~
-	cd ./motor ; make clean
-	cd ./math ; make clean
-	cd ./arduino ; make clean
-	cd ./arduinosketch ; make clean
-	cd ./robot ; make clean
+	$(foreach FOLDER,$(UPLOADEDFOLDERS), cd $(FOLDER); make clean;)
+	$(foreach FOLDER,$(SHAREDFOLDERS), cd $(FOLDER); make clean;)
 
 # End of the main math makefile
 

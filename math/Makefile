@@ -49,7 +49,7 @@ debug: $(OBJS) $(DOBJS)
 shared: $(OBJS)
 	@echo "creating shared object lib for actuators"
 	$(CC) $(CFLAGS) $(INCLUDES) -shared -o lib$(MAIN).so $(OBJS)  $(LFLAGS) $(LIBS)
-	cd $(LIBFOLDER); ln -fsv $(CURRENTPATHFROMLIBFOLDER)/lib$(MAIN).so
+	cd $(LIBFOLDER); $(LINK) $(CURRENTPATHFROMLIBFOLDER)/lib$(MAIN).so
 
 clean:
 	$(RM) *.o
@@ -65,7 +65,7 @@ clean:
 # (see the gnu make manual section about automatic variables)
 .cpp.o:
 	$(CC) $(CFLAGS) $(INCLUDES) -c $<  -o $@
-	ln -fv $@ $(OBJECTFOLDER)$@
+	$(LINK) $@ $(OBJECTFOLDER)$@
 
 depend: $(SRCS)
 	makedepend $(INCLUDES) $^
