@@ -4,12 +4,12 @@
 # 'make clean'  removes all .o and executable files
 #
 
-include Makefile.config
+
 
 # Main math makefile
 
-SHAREDFOLDERS = ./math /arduino ./motor ./robot
-UPLOADEDFOLDERS = /arduinosketch
+SHAREDFOLDERS = ./math ./arduino ./motor ./robot
+UPLOADEDFOLDERS = ./arduinosketch
 
 .PHONY: CLEAN ALL INSTALL CREATENECESSERYFOLDERS LINKHEADERS
 
@@ -34,10 +34,11 @@ SHAREDTARGET:
 UPLOADEDTARGET:
 	$(foreach FOLDER,$(UPLOADEDFOLDERS), cd $(FOLDER); make -i upload; cd ..; )
   
-clean:
-	rm -f *.o *~
+CLEAN:
 	$(foreach FOLDER,$(UPLOADEDFOLDERS), cd $(FOLDER); make clean; cd ..;)
 	$(foreach FOLDER,$(SHAREDFOLDERS), cd $(FOLDER); make clean; cd ..;)
+
+include Makefile.config
 
 # End of the main math makefile
 
