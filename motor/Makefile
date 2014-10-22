@@ -18,8 +18,6 @@ DSRCS= debug.cpp
 
 LIBS=-lMathInterface -lArduinoInterface
 
-
-
 # define the executable file 
 MAIN = MotorInterface
 DEBUG = debug
