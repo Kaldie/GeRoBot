@@ -4,40 +4,41 @@
 # 'make clean'  removes all .o and executable files
 #
 
+
+
 # Main math makefile
 
-PROG = math
-TRGTS = MATH ARDUINO ARDUINOSKETCH MOTOR PUGIXML ROBOT
+SHAREDFOLDERS = ./math ./arduino ./motor ./robot
+UPLOADEDFOLDERS = ./arduinosketch
 
-$(PROG): $(TRGTS)
+.PHONY: CLEAN ALL INSTALL CREATENECESSERYFOLDERS LINKHEADERS
 
-all: $(TRGTS)
 
-MATH:
-	cd ./math ; make shared
+ALL: SHAREDTARGET UPLOADEDTARGET
 
-MOTOR:
-	cd ./motor ; make shared
+INSTALL: CREATENECESSERYFOLDERS LINKHEADERS SHAREDTARGET UPLOADEDTARGET
 
-ARDUINO:
-	cd ./arduino ; make shared
+CREATENECESSERYFOLDERS:
+	@echo "Creating folders for objects and shared libs"
+	$(MKDIR_P) $(INCLUDEFOLDER)
+	$(MKDIR_P) $(OBJECTFOLDER)
+	$(MKDIR_P) $(LIBFOLDER)
 
-ARDUINOSKETCH:
-	cd ./arduinosketch ; make -i upload
+LINKHEADERS:
+	@echo "Creating symbolic links for all .h files in the project"
+	$(foreach FOLDER,$(SHAREDFOLDERS), $(foreach HFILE,$(wildcard $(FOLDER)/*.h),$(LINK) .$(HFILE) $(INCLUDEFOLDER); ))
 
-ROBOT:
-	cd ./robot ; make shared
+SHAREDTARGET:
+	$(foreach FOLDER,$(SHAREDFOLDERS), cd $(FOLDER); make shared; cd ..; )
 
-PUGIXML:
-	cd ./pugixml-1.4 ; make shared
+UPLOADEDTARGET:
+	$(foreach FOLDER,$(UPLOADEDFOLDERS), cd $(FOLDER); make -i upload; cd ..; )
+  
+CLEAN:
+	$(foreach FOLDER,$(UPLOADEDFOLDERS), cd $(FOLDER); make clean; cd ..;)
+	$(foreach FOLDER,$(SHAREDFOLDERS), cd $(FOLDER); make clean; cd ..;)
 
-clean:
-	rm -f *.o *~
-	cd ./motor ; make clean
-	cd ./math ; make clean
-	cd ./arduino ; make clean
-	cd ./arduinosketch ; make clean
-	cd ./robot ; make clean
+include Makefile.config
 
 # End of the main math makefile
 

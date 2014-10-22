@@ -80,17 +80,17 @@ public:						\
 
 
 //Create debug messages
-#if defined(DEBUG) 
+#if defined(DEBUG)
 #define DEBUG_MSG(message) do {std::cerr << message << std::endl;} while(false)
 
-#elif defined(DEBUG_FILE)				
+#elif defined(DEBUG_FILE)
 #define DEBUG_MSG(message) do {				\
   std::ofstream thisStream;					\
   thisStream.open("Debug.save",std::ios_base::app);			\
   thisStream<<message<<std::endl;						\
   thisStream.close();				\
   } while(false)
-#else						
+#else
 #define DEBUG_MSG(message)
 #endif
 
