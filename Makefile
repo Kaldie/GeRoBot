@@ -11,7 +11,7 @@
 SHAREDFOLDERS = ./math ./arduino ./motor ./robot
 UPLOADEDFOLDERS = ./arduinosketch
 
-.PHONY: CLEAN ALL INSTALL CREATENECESSERYFOLDERS LINKHEADERS
+.PHONY: CLEAN ALL INSTALL CREATENECESSERYFOLDERS LINKHEADERS clean
 
 
 ALL: SHAREDTARGET UPLOADEDTARGET
@@ -39,6 +39,9 @@ CLEAN:
 	$(foreach FOLDER,$(SHAREDFOLDERS), cd $(FOLDER); make clean; cd ..;)
 
 include Makefile.config
+
+clean:
+	@echo "Dumb fuck...no clean in the root or it will be like realy clean!"
 
 # End of the main math makefile
 
