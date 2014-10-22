@@ -17,4 +17,4 @@ LIBS=-lMathInterface -lMotorInterface -lArduinoInterface -lPugiXML
 MAIN = RobotInterface
 DEBUG = debug
 
-include ./../Makefile.config
+include ../Makefile.config
