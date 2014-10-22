@@ -82,7 +82,6 @@ ARDUINO_PORT = /dev/ttyUSB0
 #
 include Makefile.Master
 
-
 #
 # Hopefully these will be self-explanatory but in case they're not:
 #

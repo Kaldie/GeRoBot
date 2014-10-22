@@ -6,10 +6,7 @@
 #include <iostream>
 #include <assert.h>
 #include <vector>
-#include <wiringPi.h>
-
-//#include "PiActuator.h"
-#include "StepperDriver.h"
+#include <StepperDriver.h>
 
 
 //Constructor

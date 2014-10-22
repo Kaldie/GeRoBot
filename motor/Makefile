@@ -33,18 +33,17 @@ SHAREDLIBFLAGS=wl,
 
 LIBS=-lMathInterface -lArduinoInterface
 
-unexport OBJECTFOLDER LIBFOLDER
-
 # define the executable file 
 MAIN = MotorInterface
 DEBUG = debug
+
 #	
 # The following part of the makefile is generic; it can be used to 
 # build any executable just by changing the definitions above and by
 # deleting dependencies appended to the file from 'make depend'
 #
 
-.PHONY: depend clean all debug shared
+.PHONY: depend all debug shared
 
 all:    $(OBJS)
 	@echo "Compiling all object files for this dir!"
@@ -58,21 +57,10 @@ shared: $(OBJS)
 	$(CC) $(CFLAGS) $(INCLUDES) -shared -o lib$(MAIN).so $(OBJS)  $(LFLAGS) $(SHAREDLDFLAGS) $(LIBS)
 	cd $(LIBFOLDER); $(LINK) $(CURRENTPATHFROMLIBFOLDER)/lib$(MAIN).so
 
-clean: 
-	$(RM) *.o
-	$(RM) *.so
-	$(RM) *$(MAIN)*
-	$(RM) $(DEBUG)
-	$(RM) $(addprefix $(OBJECTFOLDER),$(OBJS))
-	$(RM) $(addprefix $(LIBFOLDER),*$(MAIN)*)
 # this is a suffix replacement rule for building .o's from .c's
 # it uses automatic variables $<: the name of the prerequisite of
 # the rule(a .c file) and $@: the name of the target of the rule (a .o file) 
 # (see the gnu make manual section about automatic variables)
-
-.cpp.o:
-	$(CC) $(CFLAGS) $(INCLUDES) -c $<  -o $@
-	$(LINK) $@ $(OBJECTFOLDER)$@
 
 depend: $(SRCS)
 	makedepend $(INCLUDES) $^

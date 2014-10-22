@@ -6,6 +6,17 @@
 #include <errno.h>
 #include <string.h>
 
+#define PIN_HIGH 1
+#define PIN_LOW 0
+
+#define DEFAULT_STATE PIN_HIGH
+
+#define DELAY_BETWEEN_STEP_MICROSECONDS 250
+#define HAS_RPI false
+
+#define PI 3.1415926535897932384626433
+#define TOLERANCE 0.1
+
 //Create getter and setter for properties of a class
 #define GETSET(type, varName, property)		\
 private:					\
