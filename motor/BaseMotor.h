@@ -26,7 +26,6 @@ typedef std::vector<PinState> PinStateSequence; //An array of set pins
 
 class BaseMotor
 {
- protected:
     //State in which the pins currently resides
     GETSET(PinState, m_currentPinState,CurrentPinState);
     
@@ -38,17 +37,18 @@ class BaseMotor
     
  public:
 
+		PinState* getPinStatePointer(){return &m_currentPinState;};
     virtual void setPins(const PinVector&);
-    virtual const PinVector getPins() const {return m_currentPinState.getPinVector();};
-
+    virtual PinVector getPins() const {return m_currentPinState.getPinVector();};
+		
     //Move steps
     virtual void moveStep(const std::string&,
-			  PinStateSequence&) =0;
+													PinStateSequence&) =0;
 
     virtual void moveSteps(const std::vector<std::string>*,
-			   PinStateSequence&) =0;
+													 PinStateSequence&) =0;
 
-    virtual const int numberOfStatesPerStep() const =0;
+    virtual int numberOfStatesPerStep() const =0;
 
     //Print pin states
     virtual void displayPinState()const;

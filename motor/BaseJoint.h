@@ -10,20 +10,25 @@
 //Type independend code!
 //Joint definitions
 enum MovementType {None,Rotational,Translational}; 
+
+class BaseJoint; //forward declare the class so we can create a type def JointPointer
+typedef std::shared_ptr<BaseJoint> JointPointer;
+
+
 typedef std::map<std::string,std::string> DirectionConversionMap;
 
 class BaseJoint
 {
  private:
     //Pure virtual call!
-    virtual const int getPositionModifier(const std::string&) const =0;
+    virtual int getPositionModifier(const std::string&) const =0;
 
  protected:
-    GETSET(float,m_currentPosition,Position);
-    GETSET(double,m_movementPerStep,MovementPerStep);
-    GET(std::vector<float>, m_range,Range);
-    GETSET(MovementType,m_movementType,MovementType);
-    GETSET(DirectionConversionMap,m_directionConversion,DirectionConversionMap);
+    GETSET(float,m_currentPosition,Position)
+    GETSET(double,m_movementPerStep,MovementPerStep)
+    GET(std::vector<float>, m_range,Range)
+    GETSET(MovementType,m_movementType,MovementType)
+    GETSET(DirectionConversionMap,m_directionConversion,DirectionConversionMap)
 
     virtual BaseJoint* cloneImpl() const = 0;
     void isInRange(float);
@@ -66,5 +71,4 @@ class BaseJoint
     
     virtual ~BaseJoint(){};
 };
-
 #endif

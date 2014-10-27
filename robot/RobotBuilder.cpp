@@ -2,9 +2,10 @@
 #include "JointControllerBuilder.h"
 
 RobotBuilder::RobotBuilder(const std::string& i_fileName):
-  XMLBuilder(i_fileName),
-  m_robot()  
-{}
+  XMLBuilder(i_fileName)
+{
+	m_robotPointer.reset(new Robot);
+}
 
 
 void RobotBuilder::build(){
@@ -13,7 +14,7 @@ void RobotBuilder::build(){
   LOG_DEBUG("Building a robot from file name: "<<getFileName());
   LOG_DEBUG("Root node is: "<<getNode().name());
   
-  m_robot.getJointController()=parseJointController(getNodeFromPath("./ROBOT/JOINTCONTROLLER"));
+  m_robotPointer->setJointController(parseJointController(getNodeFromPath("./ROBOT/JOINTCONTROLLER")));
 }
 
     
@@ -41,4 +42,9 @@ void RobotBuilder::displayTree(){
     LOG_DEBUG(tool.child_value());
     //std::cout<<tool.path()<<std::endl;
     }
+}
+
+
+void RobotBuilder::setRobotPointer(Robot* i_robotPointer){
+	m_robotPointer.reset(i_robotPointer);
 }

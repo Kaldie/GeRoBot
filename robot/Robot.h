@@ -8,6 +8,9 @@
 #include <JointController.h>
 #include <Trace.h>
 
+class Robot; //forward declare so we can typedef the shared pointer!
+typedef std::shared_ptr<Robot> RobotPointer;
+
 class Robot
 {
  private:
@@ -15,7 +18,7 @@ class Robot
     GETSET(float,m_speed,Speed);
 
     //Position of the head of the robot
-    GETSET(Point2D,m_currentPosition,CurrentPosition);
+    GETSET(Point2D,m_currentPosition,Position);
 
     //Handles the joints and can update the position after a step
     GETSET_NO_CONST(JointController,m_jointController,JointController);

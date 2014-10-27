@@ -2,7 +2,20 @@
 #include "Point2D.h"
 #include "Line2D.h"
 
-const Point2D Line2D::getIntersectingPoint(const Line2D &i_line2D) const
+Line2D::Line2D()
+{
+	m_startPoint=Point2D(0,0);
+	m_endPoint=Point2D(0,0);
+};
+
+Line2D::Line2D(Point2D i_startPoint, Point2D i_endPoint)
+{
+	m_startPoint=i_startPoint;
+	m_endPoint=i_endPoint;
+};
+
+
+Point2D Line2D::getIntersectingPoint(const Line2D &i_line2D) const
 {
   
   Point2D startPoint=i_line2D.getStartPoint();
@@ -45,12 +58,13 @@ const Point2D Line2D::getIntersectingPoint(const Line2D &i_line2D) const
 }
 
 
-const Point2D Line2D::getIntersectingPoint(const Point2D &i_point) const
+Point2D Line2D::getIntersectingPoint(const Point2D &i_point) const
 {
   Line2D line(Point2D(0,0),i_point);
   return getIntersectingPoint(line);
 }
-const float Line2D::getLength()
+
+float Line2D::getLength()
 {
   return Magnitude(m_endPoint-m_startPoint);
 }

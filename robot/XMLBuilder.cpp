@@ -83,9 +83,9 @@ pugi::xml_node XMLBuilder::getNodeFromPath(const std::string& i_path) const{
 
 template<class T>
 std::vector<T> XMLBuilder::getList(const pugi::xml_node& i_node,
-				     const std::string& i_path,
-				     const int& i_expectedNumberOfValues,
-				     T (XMLBuilder::*f)(const pugi::xml_text&)const) const
+																	 const std::string& i_path,
+																	 const int& i_expectedNumberOfValues,
+																	 T (XMLBuilder::*f)(const pugi::xml_text&)const) const
 {
   std::vector<T> list;
   
@@ -108,8 +108,8 @@ std::vector<T> XMLBuilder::getList(const pugi::xml_node& i_node,
 
 
 std::vector<int> XMLBuilder::getIntList(const pugi::xml_node& i_node,
-					  const std::string& i_xmlPath,
-					  const int& i_numberOfEntries) const
+																				const std::string& i_xmlPath,
+																				const int& i_numberOfEntries) const
 {
   return getList<int>(i_node,i_xmlPath,i_numberOfEntries,&XMLBuilder::as_int);
 }

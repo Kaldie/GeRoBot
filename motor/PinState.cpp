@@ -82,13 +82,13 @@ void PinState::update(const PinState& i_pinState)
 }
 
 
-const int PinState::getNumericPinValue(const int& i_pinNumber)const
+int PinState::getNumericPinValue(const int& i_pinNumber)const
 {
     return 1<<i_pinNumber;
 }
 
 
-const int PinState::getPinState(const int& i_pinNumber)const
+int PinState::getPinState(const int& i_pinNumber)const
 {
     PinVector::const_iterator itr=std::find(m_pinVector.begin(), m_pinVector.end(), i_pinNumber);
     

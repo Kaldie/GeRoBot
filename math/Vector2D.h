@@ -123,7 +123,7 @@ class Vector2D
     }
       
   Vector2D& rotate(double angle);
-  const double getAlpha() const;
+  double getAlpha() const;
 };
 
 #endif

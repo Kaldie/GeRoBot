@@ -8,8 +8,10 @@ void testRobot()
 void testRobotBuilder()
 {
     std::cout<<"lol";
-    RobotBuilder robotBuilder("tmp.xml");
-    robotBuilder.build();
+    RobotBuilder robotBuilder("/home/ruud/tmp.xml");
+		robotBuilder.build();
+		RobotPointer robotPointer = robotBuilder.getRobotPointer();
+		LOG_INFO(robotPointer->getJointController().getNumberOfJoints());
 }    
 
 int main()

@@ -1,12 +1,12 @@
 #include "Point2D.h"
 #include <math.h>
 
-const double Point2D::getAngleToOrigin()
+double Point2D::getAngleToOrigin()
 {
   return getAlpha();
 }
 
-const double Point2D::getAngleBetweenPoints(const Point2D &i_point2D) const
+double Point2D::getAngleBetweenPoints(const Point2D &i_point2D) const
 {
   return ((*this) -i_point2D).getAlpha();
 }

@@ -16,7 +16,6 @@
 
 
 //Joint controller type definitions
-typedef std::shared_ptr<BaseJoint> JointPointer;
 typedef std::vector<JointPointer> JointPointerVector;
 
 // due to the fact that the base actuator is not yet implemented, it is typedefed to make this compile
@@ -34,17 +33,19 @@ class JointController
     //Vector which all the pin settins are given!
     GETSET(PinStateSequence,m_pinStateSequence,PinStateSequence);
 
-    const bool validateJoint(const JointPointer&) const;
-    const bool validateJointVector(const JointPointerVector&) const;
+		int getNumberOfJoints(){return m_jointPointerVector.size();};
 
-    const bool hasJoint(const JointPointer&) const;
+    bool validateJoint(const JointPointer&) const;
+
+    bool validateJointVector(const JointPointerVector&) const;
+
+    bool hasJoint(const JointPointer&) const;
 
     JointPointerVector& getJoints(){return m_jointPointerVector;};
 
     void addEmptyPinStatesToSequence(const int&);
-    void addStepToPrevious(const JointPointer&, const std::string&);
 
-    void getUndefinedPins(PinState&, const JointPointer&) const;
+    void addStepToPrevious(const JointPointer&, const std::string&);
 
     void appendPinStateSequence(const PinStateSequence&,
 				const bool&);
@@ -57,16 +58,16 @@ class JointController
 
     void addJoint(const JointPointer&);
 
-    void moveStep(JointPointer&,       //which joint?
-		 const std::string&,   //which direction
-		 const bool&);         //Append to previous
-
-
-    void moveSteps(JointPointer&,      //which joint?
-		  const std::string&,  //which direction
-		  const int&);         //how manny steps?
+    void moveStep(JointPointer& jointPointer,
+									const std::string& direction, 
+									const bool& appendToPrevious);
+		
+		
+    void moveSteps(JointPointer& jointPointer,  
+									 const std::string& direction,
+									 const int& numberOfSteps);   
     
-	
+		
     //Methods to retrieve the joint(s) of a specific type
     JointPointerVector getJoints(const MovementType&);
     JointPointer& getJoint(const MovementType&);

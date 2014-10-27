@@ -25,22 +25,22 @@ StepperDriver::StepperDriver(const PinVector& i_pinVector,
 {}
 
 
-const bool StepperDriver::setEnable(const bool& i_setEnable)
+bool StepperDriver::setEnable(const bool& i_setEnable)
 {
     PinState pinState= getCurrentPinState();
     int newState;
     if(i_setEnable)
-	newState=!DEFAULT_STATE;
+			newState=!DEFAULT_STATE;
     else
-	newState=DEFAULT_STATE;
+			newState=DEFAULT_STATE;
     
     if(newState!=pinState.getPinState(enablePin())){
-	pinState.update(enablePin(),newState);
-	setCurrentPinState(pinState);
-	return true;
+			pinState.update(enablePin(),newState);
+			setCurrentPinState(pinState);
+			return true;
     }
     else
-	return false;
+			return false;
 }
 
 

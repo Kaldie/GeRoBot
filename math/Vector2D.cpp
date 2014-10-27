@@ -15,7 +15,7 @@ Vector2D& Vector2D::rotate(double angle)
     return (*this);
 }
 
-const double Vector2D::getAlpha() const
+double Vector2D::getAlpha() const
 {
   /* the domein of the atan is slighly different then we want it to be.
      So given the quadrant of the vector, add a value to put it in our wanted domein

@@ -12,12 +12,10 @@ class XMLBuilder{
     GETSET(bool,m_hasLoaded,HasLoaded);
     GETSET(pugi::xml_node,m_node,Node);
 
-
-
     pugi::xml_document* m_documentPointer;
 
     template<class T>
-    std::vector<T> getList(const pugi::xml_node&,
+		std::vector<T> getList(const pugi::xml_node&,
 			   const std::string&,
 			   const int&,
 			   T (XMLBuilder::*f)(const pugi::xml_text&)const) const;
@@ -36,25 +34,25 @@ class XMLBuilder{
 
     //Get value lists    
     std::vector<int> getIntList(const pugi::xml_node& i_node,
-				   const std::string& i_xmlPath,
-				   const int& i_numberOfEntries) const;
-													   
+																const std::string& i_xmlPath,
+																const int& i_numberOfEntries) const;
+		
     std::vector<float> getFloatList(const pugi::xml_node& i_node,
-				   const std::string& i_xmlPath,
-				   const int& i_numberOfEntries) const;
-
+																		const std::string& i_xmlPath,
+																		const int& i_numberOfEntries) const;
+		
     std::vector<std::string> getStringList(const pugi::xml_node& i_node,
-					   const std::string& i_xmlPath,
-					   const int& i_numberOfEntries) const;
+																					 const std::string& i_xmlPath,
+																					 const int& i_numberOfEntries) const;
     
     std::vector<bool> getBoolList(const pugi::xml_node& i_node,
-				  const std::string& i_xmlPath,
-				  const int& i_numberOfEntries) const;
-
+																	const std::string& i_xmlPath,
+																	const int& i_numberOfEntries) const;
+		
     pugi::xml_node loadXMLFile();
 
     pugi::xml_node getNodeFromPath(const pugi::xml_node&,
-				   const std::string&) const;
+																	 const std::string&) const;
 
     pugi::xml_node getNodeFromPath(const std::string&) const;
 

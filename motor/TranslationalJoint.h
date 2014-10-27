@@ -8,7 +8,7 @@ class TranslationalJoint: public BaseJoint
 {
  private:
     ActuatorType m_actuator;
-    virtual const int getPositionModifier(const std::string&) const;
+    virtual int getPositionModifier(const std::string&) const;
 
  protected:
     virtual TranslationalJoint<ActuatorType>* cloneImpl() const;
@@ -85,7 +85,7 @@ BaseJoint(i_currentPosition,
 
 //Actual methods
 template <class ActuatorType>
-const int TranslationalJoint<ActuatorType>::getPositionModifier(const std::string& i_direction) const
+int TranslationalJoint<ActuatorType>::getPositionModifier(const std::string& i_direction) const
 {
     if(i_direction=="OUT")
 	return 1;

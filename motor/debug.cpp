@@ -435,7 +435,7 @@ void testTraceCalculation(JointController& i_jointController)
     i_jointController.getJoint(Rotational)->getMotor()->setHoldMotor(true);
     
     LineTraceCalculator lineTraceCalculator(&i_jointController);
-    lineTraceCalculator.setWriteLog(true);
+    lineTraceCalculator.setWriteLog(false);
     lineTraceCalculator.calculateTrace(&trace,startPoint);
     
     cout<<i_jointController.getPinStateSequence().size();

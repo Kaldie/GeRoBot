@@ -24,31 +24,31 @@ class Trace
   bool isValidStartAndEndPosition(const Point2D*,
 				  const Point2D*);
 
-  const bool isWithinRange(const Point2D&, const Point2D&) const;
-  const bool isWithinRange(const float&, const float&) const;
+	bool isWithinRange(const Point2D&, const Point2D&) const;
+  bool isWithinRange(const float&, const float&) const;
   
  public:
   
   //constructors
   Trace();
   Trace(const Point2D&,  //Start Point
-	const Point2D&); //End point
+				const Point2D&); //End point
 
   Trace(const Point2D&,  //Start point
-	const Point2D&,  //End point
-	const TRACE_TYPE&);
+				const Point2D&,  //End point
+				const TRACE_TYPE&);
   
   //Actual methods
-  const Line2D getTraceLine() const;
+  Line2D getTraceLine() const;
   
-  const bool isWithinEndRange(const Point2D&) const;
-  const bool isWithinBeginRange(const Point2D&) const;
+  bool isWithinEndRange(const Point2D&) const;
+	bool isWithinBeginRange(const Point2D&) const;
   
-  const std::string getRotationDirectionToEndPoint(const Point2D&) const;
-  const std::string getRotationDirection(const Point2D&, const Point2D&) const;
+  std::string getRotationDirectionToEndPoint(const Point2D&) const;
+	std::string getRotationDirection(const Point2D&, const Point2D&) const;
 
-  const std::string getTranslationDirectionToEndPoint(const Point2D&) const;
-  const std::string getTranslationDirection(const Point2D&, const Point2D&) const;
+	std::string getTranslationDirectionToEndPoint(const Point2D&) const;
+	std::string getTranslationDirection(const Point2D&, const Point2D&) const;
 };
 
 #endif

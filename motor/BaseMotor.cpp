@@ -20,7 +20,7 @@ BaseMotor::BaseMotor(const PinVector& i_pins)
 }
 
 BaseMotor::BaseMotor(const PinVector& i_pins,
-		     const std::string& i_defaultDirection)
+										 const std::string& i_defaultDirection)
     :
     m_defaultDirection(i_defaultDirection),
     m_holdMotor(false)

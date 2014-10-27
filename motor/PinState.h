@@ -15,8 +15,8 @@ class PinState
     GETSET(PinVector,m_pinVector,PinVector);
     GETSET(int,m_numericValue,NumericValue);       
     
-    const int getPinValue(const int&); //represents the integer value of a pin, where the pin number is the position of the bit
-    const int getNumericPinValue(const int&)const;
+		int getPinValue(const int&); //represents the integer value of a pin, where the pin number is the position of the bit
+    int getNumericPinValue(const int&)const;
     
   public:
 
@@ -27,7 +27,7 @@ class PinState
     void update(const PinStateMap&);
     void update(const PinState&);
 
-    const int getPinState(const int&)const; //get the set of a specific pin
+		int getPinState(const int&)const; //get the set of a specific pin
 
     //    const int getNumericValue() const;
 
