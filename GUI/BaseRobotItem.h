@@ -37,7 +37,7 @@ class BaseRobotItem
 	int childNumber() const;
 	
 	//Number of rows is given by the name of the object and the properties it represents.
-	virtual int rowCount(){return m_numberOfPropeties;};
+	virtual int rowCount();
 	
 	//normaly there will be only 2 columns
 	virtual int columnCount(){return 2;};

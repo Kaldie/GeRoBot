@@ -77,6 +77,7 @@ void RobotItem::setRobotPointer(RobotPointer i_robotPointer){
 
 
 bool RobotItem::construct(){
+	LOG_DEBUG("Adding new Joint controller!");
 	return addJointControllerItem();
 }
 

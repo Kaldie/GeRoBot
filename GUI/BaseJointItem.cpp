@@ -8,6 +8,7 @@ BaseJointItem::BaseJointItem(BaseRobotItem* i_parent,
 	m_jointPointer(i_joint)
 {
 	setNumberOfProperties(6);
+	LOG_DEBUG("Current position: "<<m_jointPointer->getPosition());
 }
 
 
@@ -111,9 +112,10 @@ bool BaseJointItem::construct(){
 }
 
 bool BaseJointItem::addBaseMotor(){
-	if(m_jointPointer)
+	if(!m_jointPointer)
 		return false;
-	
+
+	LOG_DEBUG("Add base motor child");
 	//Create a base motor item with this as the parent
 	BaseMotorItem* baseMotorItem= new BaseMotorItem(this,(m_jointPointer->getMotor()));
 	baseMotorItem->construct();

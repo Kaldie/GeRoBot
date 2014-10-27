@@ -35,6 +35,10 @@ int BaseRobotItem::childNumber() const{
 	return 0;
 }
 
+int BaseRobotItem::rowCount(){
+	LOG_DEBUG("Number of rows: "<<m_numberOfPropeties+ childCount());
+	return m_numberOfPropeties+ childCount();
+}
 
 QVariant BaseRobotItem::data(int row, int column) const{
 	if(row==0 and column==0)
@@ -56,10 +60,13 @@ bool BaseRobotItem::setData(int row,int column,const QVariant& i_data){
 
 
 bool BaseRobotItem::insertChild(int position, BaseRobotItem* i_child){
-	if (position < 0 || position > m_childItems.size())
+	if (position < 0 || position > m_childItems.size()){
 		return false;
-	
+		LOG_DEBUG("Could not insert child due to stuff");
+	}
 	m_childItems.insert(position, i_child);
+	
+	LOG_DEBUG("Insert child");
 	return true;
 }
 

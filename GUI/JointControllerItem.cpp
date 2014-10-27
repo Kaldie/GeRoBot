@@ -7,7 +7,7 @@ JointControllerItem::JointControllerItem(BaseRobotItem* parent,
 	BaseRobotItem("JointController",parent),
 	m_jointController(jointController)
 {
-	setNumberOfProperties(1);
+	setNumberOfProperties(5);
 }
 
 
@@ -15,7 +15,7 @@ QVariant JointControllerItem::data(int i_row,
 														 int i_column) const {
 	if(i_row==static_cast<int>(JointControllerProperty::ElementName))
 		return BaseRobotItem::data(i_row,i_column);
-
+	
 	else
 		return QVariant();
 	
@@ -23,8 +23,8 @@ QVariant JointControllerItem::data(int i_row,
 
 
 bool JointControllerItem::setData(int i_row,
-														int i_column,
-														const QVariant& i_value){
+																	int i_column,
+																	const QVariant& i_value){
 	if(!m_jointController)
 		return false;
 
@@ -36,7 +36,7 @@ bool JointControllerItem::setData(int i_row,
 }
 
 bool JointControllerItem::construct(){
-	bool worked(false);
+	bool worked(true);
 	std::vector<MovementType> movementTypes{Rotational,Translational};
 	for(int outerIndex=0;
 			outerIndex<2;
@@ -45,8 +45,14 @@ bool JointControllerItem::construct(){
 		for(JointPointerVector::iterator iter=baseJointVector.begin();
 				iter!=baseJointVector.end();
 				iter++){
-			BaseJointItem* child = new BaseJointItem(this,*iter);
+			LOG_DEBUG("Insert a join child");
+			
+			LOG_DEBUG((*iter)->getPosition());
+
+			BaseJointItem* child = new BaseJointItem(this,(*iter));
 			worked&=child->construct();
+			if(!worked)
+				LOG_WARNING("Joint child was not constructed well!");
 			insertChild(0,child);
 		}
 	}

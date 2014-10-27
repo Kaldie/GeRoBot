@@ -159,7 +159,7 @@ int RobotTreeModel::rowCount(const QModelIndex &parent) const
 {
 	BaseRobotItem *parentItem = getItem(parent);
 
-	return parentItem->childCount();
+	return parentItem->rowCount();
 }
 
 bool RobotTreeModel::setData(const QModelIndex &index, const QVariant &value,

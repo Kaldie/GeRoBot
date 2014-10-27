@@ -16,6 +16,7 @@ MainWindow::MainWindow(RobotPointer robot,QWidget* parent/*=0*/)
  #endif
 
 		 RobotItem* robotItem = new RobotItem(0,robot);
+		 robotItem->construct();
      RobotTreeModel *model = new RobotTreeModel(robotItem);
 
      view->setModel(model);
