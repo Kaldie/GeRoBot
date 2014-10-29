@@ -1,20 +1,22 @@
 #include "RobotItem.h"
 #include <Point2D.h>
 #include "JointControllerItem.h"
+#include "BasePropertyItem.h"
 
 RobotItem::RobotItem(BaseRobotItem* i_parent,
 										 RobotPointer i_robotPointer):
 	BaseRobotItem("Robot",i_parent)
 {
+	LOG_DEBUG(getElementName().toStdString());
 	m_robotPointer = i_robotPointer;
-	setNumberOfProperties(4);
+	setNumberOfProperties(5);
 }
 
 QVariant RobotItem::data(int i_row,int i_column) const {
-	
-	if(i_row==static_cast<int>(RobotProperty::ElementName))
-		return BaseRobotItem::data(i_row,i_column);
-	
+
+	//	if(i_row==0 and i_column==0)
+	//return BaseRobotItem::data(i_row,i_column);	
+
 	if(i_row==static_cast<int>(RobotProperty::Speed)){
 		if(i_column==1)
 			return QVariant(m_robotPointer->getSpeed());
@@ -42,8 +44,8 @@ QVariant RobotItem::data(int i_row,int i_column) const {
 
 bool RobotItem::setData(int i_row,int i_column,const QVariant& i_data){
 
-	if(i_row==static_cast<int>(RobotProperty::ElementName))
-		return BaseRobotItem::setData(i_row,i_column,i_data);
+	//	if(i_row==static_cast<int>(RobotProperty::ElementName))
+	//return BaseRobotItem::setData(i_row,i_column,i_data);
 	
 	if(i_column!=1)
 		return false;
@@ -65,9 +67,7 @@ bool RobotItem::setData(int i_row,int i_column,const QVariant& i_data){
 		m_robotPointer->setPosition(point);
 		return true;
 	}
-	
 	return false;
-
 }
 
 
@@ -77,6 +77,14 @@ void RobotItem::setRobotPointer(RobotPointer i_robotPointer){
 
 
 bool RobotItem::construct(){
+	QStringList properties;
+	properties<<"xx"<<"Speed"<<"CurrentPosition X"<<"CurrentPosition Y";
+	
+	foreach (const QString &str,properties){
+		BasePropertyItem* property = new BasePropertyItem(str,this);
+		insertChild(0,property);
+	}
+	
 	LOG_DEBUG("Adding new Joint controller!");
 	return addJointControllerItem();
 }
@@ -84,5 +92,5 @@ bool RobotItem::construct(){
 bool RobotItem::addJointControllerItem(){
 	JointControllerItem* child = new JointControllerItem(this,&m_robotPointer->getJointController());
 	child->construct();
-	return insertChild(0,child);
+	return insertChild(childCount(),child);
 }

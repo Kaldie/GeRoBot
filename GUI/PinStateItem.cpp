@@ -6,6 +6,7 @@ PinStateItem::PinStateItem(BaseRobotItem* i_parent,
 	BaseRobotItem("PinState",i_parent),
 	m_pinState(i_pinState)
 {
+	LOG_DEBUG(getElementName().toStdString());
 	setNumberOfProperties(2);
 }
 

@@ -3,6 +3,7 @@
 #include "MainWindow.h"
 #include "RobotTreeModel.h"
 #include "RobotItem.h"
+#include "BasePropertyItem.h"
 #include <Robot.h>
 
 MainWindow::MainWindow(RobotPointer robot,QWidget* parent/*=0*/)
@@ -15,13 +16,20 @@ MainWindow::MainWindow(RobotPointer robot,QWidget* parent/*=0*/)
      view->setAlternatingRowColors(false);
  #endif
 
-		 RobotItem* robotItem = new RobotItem(0,robot);
+		 BasePropertyItem* rootItem= new BasePropertyItem("root",0);
+		 RobotItem* robotItem = new RobotItem(rootItem,robot);
+		 RobotItem* robotItem2 = new RobotItem(rootItem,robot);
 		 robotItem->construct();
-     RobotTreeModel *model = new RobotTreeModel(robotItem);
+		 robotItem2->construct();
+		 rootItem->insertChild(0,robotItem);
+		 rootItem->insertChild(0,robotItem2);
+		 //		 robotItem->construct();
+		 LOG_DEBUG(rootItem->parent());
+     RobotTreeModel *model = new RobotTreeModel(rootItem);
+		 
+		 view->setModel(model);
 
-     view->setModel(model);
-
-     for (int column = 0; column < model->columnCount(); ++column)
+		 /*     for (int column = 0; column < model->columnCount(); ++column)
          view->resizeColumnToContents(column);
 
      connect(exitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
@@ -38,12 +46,12 @@ MainWindow::MainWindow(RobotPointer robot,QWidget* parent/*=0*/)
      connect(removeColumnAction, SIGNAL(triggered()), this, SLOT(removeColumn()));
      connect(insertChildAction, SIGNAL(triggered()), this, SLOT(insertChild()));
 
-     updateActions();
+     updateActions();*/
  }
 
  void MainWindow::insertChild()
  {
-     QModelIndex index = view->selectionModel()->currentIndex();
+	 /*     QModelIndex index = view->selectionModel()->currentIndex();
      QAbstractItemModel *model = view->model();
 
      if (model->columnCount(index) == 0) {
@@ -64,12 +72,13 @@ MainWindow::MainWindow(RobotPointer robot,QWidget* parent/*=0*/)
 
      view->selectionModel()->setCurrentIndex(model->index(0, 0, index),
                                              QItemSelectionModel::ClearAndSelect);
-     updateActions();
+																						 updateActions();
+	 */
  }
 
  bool MainWindow::insertColumn(const QModelIndex &parent)
  {
-     QAbstractItemModel *model = view->model();
+   /*  QAbstractItemModel *model = view->model();
      int column = view->selectionModel()->currentIndex().column();
 
      // Insert a column in the parent item.
@@ -81,11 +90,14 @@ MainWindow::MainWindow(RobotPointer robot,QWidget* parent/*=0*/)
      updateActions();
 
      return changed;
+	 */
+	 return false;
  }
 
  void MainWindow::insertRow()
  {
-     QModelIndex index = view->selectionModel()->currentIndex();
+	 /*
+		 QModelIndex index = view->selectionModel()->currentIndex();
      QAbstractItemModel *model = view->model();
 
      if (!model->insertRow(index.row()+1, index.parent()))
@@ -97,10 +109,12 @@ MainWindow::MainWindow(RobotPointer robot,QWidget* parent/*=0*/)
          QModelIndex child = model->index(index.row()+1, column, index.parent());
          model->setData(child, QVariant("[No data]"), Qt::EditRole);
      }
+	 */
  }
 
  bool MainWindow::removeColumn(const QModelIndex &parent)
  {
+	 /*
      QAbstractItemModel *model = view->model();
      int column = view->selectionModel()->currentIndex().column();
 
@@ -111,18 +125,23 @@ MainWindow::MainWindow(RobotPointer robot,QWidget* parent/*=0*/)
          updateActions();
 
      return changed;
+	 */
+     return false;
  }
 
  void MainWindow::removeRow()
  {
+	 /*
      QModelIndex index = view->selectionModel()->currentIndex();
      QAbstractItemModel *model = view->model();
      if (model->removeRow(index.row(), index.parent()))
          updateActions();
+	 */
  }
 
  void MainWindow::updateActions()
  {
+	 /*
      bool hasSelection = !view->selectionModel()->selection().isEmpty();
      removeRowAction->setEnabled(hasSelection);
      removeColumnAction->setEnabled(hasSelection);
@@ -141,4 +160,5 @@ MainWindow::MainWindow(RobotPointer robot,QWidget* parent/*=0*/)
          else
              statusBar()->showMessage(tr("Position: (%1,%2) in top level").arg(row).arg(column));
      }
+	 */
  }

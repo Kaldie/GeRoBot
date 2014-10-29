@@ -7,6 +7,7 @@ JointControllerItem::JointControllerItem(BaseRobotItem* parent,
 	BaseRobotItem("JointController",parent),
 	m_jointController(jointController)
 {
+	LOG_DEBUG(getElementName().toStdString());
 	setNumberOfProperties(5);
 }
 

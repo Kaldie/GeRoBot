@@ -6,6 +6,7 @@ BaseMotorItem::BaseMotorItem(BaseRobotItem* i_parent,
 	BaseRobotItem("BaseMotor",i_parent),
 	m_baseMotor(i_baseMotor)
 {
+	LOG_DEBUG(getElementName().toStdString());
 	setNumberOfProperties(3);
 }
 
@@ -66,6 +67,7 @@ bool BaseMotorItem::addPinStateItem(){
 	if(!m_baseMotor)
 		return false;
 	
+	LOG_DEBUG("Create pin state and add to child!");
 	//Create a pin state item with this as the parent
 	PinStateItem* pinStateItemPointer = new PinStateItem(this,m_baseMotor->getPinStatePointer());
 	pinStateItemPointer->construct();

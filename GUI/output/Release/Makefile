@@ -17,8 +17,8 @@ CFLAGS        = -pipe -O2 -D_REENTRANT -Wall -W -fPIE $(DEFINES)
 CXXFLAGS      = -pipe -Wfatal-errors -O2 -std=c++0x -D_REENTRANT -Wall -W -fPIE $(DEFINES)
 INCPATH       = -I/home/ruud/Qt/5.3/gcc/mkspecs/linux-g++ -I../../../GUI -I../../../include -I/home/ruud/Qt/5.3/gcc/include -I/home/ruud/Qt/5.3/gcc/include/QtWidgets -I/home/ruud/Qt/5.3/gcc/include/QtGui -I/home/ruud/Qt/5.3/gcc/include/QtCore -I. -I. -I.
 LINK          = g++
-LFLAGS        = -Wl,-O1 -Wl,-rpath,/home/ruud/Qt/5.3/gcc -Wl,-rpath,/home/ruud/Qt/5.3/gcc/lib
-LIBS          = $(SUBLIBS) ../bin/lib/libArduinoInterface.so ../bin/lib/libMathInterface.so ../bin/lib/libMotorInterface.so ../bin/lib/libPugiXML.so* ../bin/lib/libRobotInterface.so* -L/home/ruud/Qt/5.3/gcc/lib -lQt5Widgets -lQt5Gui -lQt5Core -lGL -lpthread 
+LFLAGS        = -Wl,-O1 -Wl,-rpath,/home/ruud/Qt/5.3/gcc -Wl,-rpath,/home/ruud/Projects/GeRoArm/bin/lib/ -Wl,-rpath,/home/ruud/Qt/5.3/gcc/lib
+LIBS          = $(SUBLIBS) /home/ruud/Projects/GeRoArm/bin/lib/libArduinoInterface.so /home/ruud/Projects/GeRoArm/bin/lib/libMathInterface.so /home/ruud/Projects/GeRoArm/bin/lib/libMotorInterface.so /home/ruud/Projects/GeRoArm/bin/lib/libPugiXML.so /home/ruud/Projects/GeRoArm/bin/lib/libRobotInterface.so -L/home/ruud/Qt/5.3/gcc/lib -lQt5Widgets -lQt5Gui -lQt5Core -lGL -lpthread 
 AR            = ar cqs
 RANLIB        = 
 QMAKE         = /home/ruud/Qt/5.3/gcc/bin/qmake

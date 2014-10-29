@@ -7,6 +7,7 @@ BaseJointItem::BaseJointItem(BaseRobotItem* i_parent,
 	BaseRobotItem("BaseJoint",i_parent),
 	m_jointPointer(i_joint)
 {
+	LOG_DEBUG(getElementName().toStdString());
 	setNumberOfProperties(6);
 	LOG_DEBUG("Current position: "<<m_jointPointer->getPosition());
 }

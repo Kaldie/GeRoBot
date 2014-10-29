@@ -4,7 +4,7 @@
 #include "BaseRobotItem.h"
 #include <Robot.h>
 
-enum class RobotProperty{ElementName,Speed,CurrentPositionX,CurrentPositionY};
+enum class RobotProperty{Speed,CurrentPositionX,CurrentPositionY};
 
 class RobotItem:public BaseRobotItem
 {

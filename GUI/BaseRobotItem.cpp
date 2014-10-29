@@ -36,8 +36,8 @@ int BaseRobotItem::childNumber() const{
 }
 
 int BaseRobotItem::rowCount(){
-	LOG_DEBUG("Number of rows: "<<m_numberOfPropeties+ childCount());
-	return m_numberOfPropeties+ childCount();
+	LOG_DEBUG("Number of rows: "<<childCount());
+	return childCount();
 }
 
 QVariant BaseRobotItem::data(int row, int column) const{

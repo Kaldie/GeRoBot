@@ -46,7 +46,7 @@ class BaseRobotItem
 	bool setName(const QString&);
 	
 	//responsible for setting and getting the element name.
-  virtual QVariant data(int row,int column) const; 
+    virtual QVariant data(int row,int column) const;
 	virtual bool setData(int row,int column, const QVariant &value);
 
 	virtual bool construct() = 0;

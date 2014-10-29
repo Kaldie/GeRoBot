@@ -7,6 +7,7 @@
                JointControllerItem.h    \
                RobotItem.h              \
                RobotTreeModel.h         \
+               BasePropertyItem.h       \
                MainWindow.h
 
  RESOURCES   = RobotTreeResources.qrc
@@ -19,6 +20,7 @@
                RobotItem.cpp            \
                RobotTreeModel.cpp       \
                MainWindow.cpp           \
+               BasePropertyItem.cpp     \
                main.cpp
 
  CONFIG  += qt
@@ -30,13 +32,13 @@
 
  INCLUDEPATH += /home/ruud/Dropbox/Projects/GeRoArm/include/
 
- LIBS += ../bin/lib/libArduinoInterface.so
- LIBS += ../bin/lib/libMathInterface.so
- LIBS += ../bin/lib/libMotorInterface.so
- LIBS += ../bin/lib/libPugiXML.so*
- LIBS += ../bin/lib/libRobotInterface.so*
+ LIBS += /home/ruud/Projects/GeRoArm/bin/lib/libArduinoInterface.so
+ LIBS += /home/ruud/Projects/GeRoArm/bin/lib/libMathInterface.so
+ LIBS += /home/ruud/Projects/GeRoArm/bin/lib/libMotorInterface.so
+ LIBS += /home/ruud/Projects/GeRoArm/bin/lib/libPugiXML.so
+ LIBS += /home/ruud/Projects/GeRoArm/bin/lib/libRobotInterface.so
 
-
+ QMAKE_RPATHDIR += /home/ruud/Projects/GeRoArm/bin/lib/
 
  # install
  target.path = /home/ruud/Dropbox/Projects/GeRoArm/GUI/output

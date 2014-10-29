@@ -17,8 +17,8 @@ CFLAGS        = -pipe -O2 -D_REENTRANT -Wall -W -fPIE $(DEFINES)
 CXXFLAGS      = -pipe -Wfatal-errors -O2 -std=c++0x -D_REENTRANT -Wall -W -fPIE $(DEFINES)
 INCPATH       = -I../../../../Qt/5.3/gcc/mkspecs/linux-g++ -I. -I../include -I../../../../Qt/5.3/gcc/include -I../../../../Qt/5.3/gcc/include/QtWidgets -I../../../../Qt/5.3/gcc/include/QtGui -I../../../../Qt/5.3/gcc/include/QtCore -I. -I.
 LINK          = g++
-LFLAGS        = -Wl,-O1 -Wl,-rpath,/home/ruud/Qt/5.3/gcc -Wl,-rpath,/home/ruud/Qt/5.3/gcc/lib
-LIBS          = $(SUBLIBS) ../bin/lib/libArduinoInterface.so ../bin/lib/libMathInterface.so ../bin/lib/libMotorInterface.so ../bin/lib/libPugiXML.so* ../bin/lib/libRobotInterface.so* -L/home/ruud/Qt/5.3/gcc/lib -lQt5Widgets -lQt5Gui -lQt5Core -lGL -lpthread 
+LFLAGS        = -Wl,-O1 -Wl,-rpath,/home/ruud/Qt/5.3/gcc -Wl,-rpath,/home/ruud/Projects/GeRoArm/bin/lib/ -Wl,-rpath,/home/ruud/Qt/5.3/gcc/lib
+LIBS          = $(SUBLIBS) /home/ruud/Projects/GeRoArm/bin/lib/libArduinoInterface.so /home/ruud/Projects/GeRoArm/bin/lib/libMathInterface.so /home/ruud/Projects/GeRoArm/bin/lib/libMotorInterface.so /home/ruud/Projects/GeRoArm/bin/lib/libPugiXML.so /home/ruud/Projects/GeRoArm/bin/lib/libRobotInterface.so -L/home/ruud/Qt/5.3/gcc/lib -lQt5Widgets -lQt5Gui -lQt5Core -lGL -lpthread 
 AR            = ar cqs
 RANLIB        = 
 QMAKE         = /bin/qmake
@@ -53,6 +53,7 @@ SOURCES       = BaseRobotItem.cpp \
 		RobotItem.cpp \
 		RobotTreeModel.cpp \
 		MainWindow.cpp \
+		BasePropertyItem.cpp \
 		main.cpp qrc_RobotTreeResources.cpp \
 		moc_RobotTreeModel.cpp \
 		moc_MainWindow.cpp
@@ -64,6 +65,7 @@ OBJECTS       = BaseRobotItem.o \
 		RobotItem.o \
 		RobotTreeModel.o \
 		MainWindow.o \
+		BasePropertyItem.o \
 		main.o \
 		qrc_RobotTreeResources.o \
 		moc_RobotTreeModel.o \
@@ -184,6 +186,7 @@ DIST          = ../../../../Qt/5.3/gcc/mkspecs/features/spec_pre.prf \
 		RobotItem.cpp \
 		RobotTreeModel.cpp \
 		MainWindow.cpp \
+		BasePropertyItem.cpp \
 		main.cpp
 QMAKE_TARGET  = RobotTreeModel
 DESTDIR       = #avoid trailing-slash linebreak
@@ -451,7 +454,7 @@ qmake_all: FORCE
 
 dist: 
 	@test -d .tmp/RobotTreeModel1.0.0 || mkdir -p .tmp/RobotTreeModel1.0.0
-	$(COPY_FILE) --parents $(DIST) .tmp/RobotTreeModel1.0.0/ && $(COPY_FILE) --parents RobotTreeResources.qrc .tmp/RobotTreeModel1.0.0/ && $(COPY_FILE) --parents BaseRobotItem.h BaseMotorItem.h PinStateItem.h BaseJointItem.h JointControllerItem.h RobotItem.h RobotTreeModel.h MainWindow.h .tmp/RobotTreeModel1.0.0/ && $(COPY_FILE) --parents BaseRobotItem.cpp BaseMotorItem.cpp PinStateItem.cpp BaseJointItem.cpp JointControllerItem.cpp RobotItem.cpp RobotTreeModel.cpp MainWindow.cpp main.cpp .tmp/RobotTreeModel1.0.0/ && $(COPY_FILE) --parents MainWindow.ui .tmp/RobotTreeModel1.0.0/ && (cd `dirname .tmp/RobotTreeModel1.0.0` && $(TAR) RobotTreeModel1.0.0.tar RobotTreeModel1.0.0 && $(COMPRESS) RobotTreeModel1.0.0.tar) && $(MOVE) `dirname .tmp/RobotTreeModel1.0.0`/RobotTreeModel1.0.0.tar.gz . && $(DEL_FILE) -r .tmp/RobotTreeModel1.0.0
+	$(COPY_FILE) --parents $(DIST) .tmp/RobotTreeModel1.0.0/ && $(COPY_FILE) --parents RobotTreeResources.qrc .tmp/RobotTreeModel1.0.0/ && $(COPY_FILE) --parents BaseRobotItem.h BaseMotorItem.h PinStateItem.h BaseJointItem.h JointControllerItem.h RobotItem.h RobotTreeModel.h BasePropertyItem.h MainWindow.h .tmp/RobotTreeModel1.0.0/ && $(COPY_FILE) --parents BaseRobotItem.cpp BaseMotorItem.cpp PinStateItem.cpp BaseJointItem.cpp JointControllerItem.cpp RobotItem.cpp RobotTreeModel.cpp MainWindow.cpp BasePropertyItem.cpp main.cpp .tmp/RobotTreeModel1.0.0/ && $(COPY_FILE) --parents MainWindow.ui .tmp/RobotTreeModel1.0.0/ && (cd `dirname .tmp/RobotTreeModel1.0.0` && $(TAR) RobotTreeModel1.0.0.tar RobotTreeModel1.0.0 && $(COMPRESS) RobotTreeModel1.0.0.tar) && $(MOVE) `dirname .tmp/RobotTreeModel1.0.0`/RobotTreeModel1.0.0.tar.gz . && $(DEL_FILE) -r .tmp/RobotTreeModel1.0.0
 
 
 clean:compiler_clean 
@@ -1206,7 +1209,8 @@ RobotItem.o: RobotItem.cpp RobotItem.h \
 		../include/PinState.h \
 		../include/Trace.h \
 		../include/Line2D.h \
-		JointControllerItem.h
+		JointControllerItem.h \
+		BasePropertyItem.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o RobotItem.o RobotItem.cpp
 
 RobotTreeModel.o: RobotTreeModel.cpp ../../../../Qt/5.3/gcc/include/QtGui/QtGui \
@@ -1867,6 +1871,9 @@ MainWindow.o: MainWindow.cpp ../../../../Qt/5.3/gcc/include/QtGui/QtGui \
 		../../../../Qt/5.3/gcc/include/QtCore/QAbstractItemModel
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o MainWindow.o MainWindow.cpp
 
+BasePropertyItem.o: BasePropertyItem.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o BasePropertyItem.o BasePropertyItem.cpp
+
 main.o: main.cpp ../../../../Qt/5.3/gcc/include/QtGui/QtGui \
 		../../../../Qt/5.3/gcc/include/QtGui/QtGuiDepends \
 		../../../../Qt/5.3/gcc/include/QtCore/QtCore \
@@ -2256,6 +2263,7 @@ install_sources: first FORCE
 	-$(INSTALL_FILE) /home/ruud/Dropbox/Projects/GeRoArm/GUI/JointControllerItem.h $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/
 	-$(INSTALL_FILE) /home/ruud/Dropbox/Projects/GeRoArm/GUI/RobotItem.h $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/
 	-$(INSTALL_FILE) /home/ruud/Dropbox/Projects/GeRoArm/GUI/RobotTreeModel.h $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/
+	-$(INSTALL_FILE) /home/ruud/Dropbox/Projects/GeRoArm/GUI/BasePropertyItem.h $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/
 	-$(INSTALL_FILE) /home/ruud/Dropbox/Projects/GeRoArm/GUI/MainWindow.h $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/
 	-$(INSTALL_FILE) /home/ruud/Dropbox/Projects/GeRoArm/GUI/RobotTreeResources.qrc $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/
 	-$(INSTALL_FILE) /home/ruud/Dropbox/Projects/GeRoArm/GUI/BaseRobotItem.cpp $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/
@@ -2266,6 +2274,7 @@ install_sources: first FORCE
 	-$(INSTALL_FILE) /home/ruud/Dropbox/Projects/GeRoArm/GUI/RobotItem.cpp $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/
 	-$(INSTALL_FILE) /home/ruud/Dropbox/Projects/GeRoArm/GUI/RobotTreeModel.cpp $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/
 	-$(INSTALL_FILE) /home/ruud/Dropbox/Projects/GeRoArm/GUI/MainWindow.cpp $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/
+	-$(INSTALL_FILE) /home/ruud/Dropbox/Projects/GeRoArm/GUI/BasePropertyItem.cpp $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/
 	-$(INSTALL_FILE) /home/ruud/Dropbox/Projects/GeRoArm/GUI/main.cpp $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/
 	-$(INSTALL_FILE) /home/ruud/Dropbox/Projects/GeRoArm/GUI/RobotTreeModel.pro $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/
 	-$(INSTALL_FILE) /home/ruud/Dropbox/Projects/GeRoArm/GUI/default.txt $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/
@@ -2274,6 +2283,7 @@ uninstall_sources: FORCE
 	-$(DEL_FILE) -r $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/default.txt
 	-$(DEL_FILE) -r $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/RobotTreeModel.pro
 	-$(DEL_FILE) -r $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/main.cpp
+	-$(DEL_FILE) -r $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/BasePropertyItem.cpp
 	-$(DEL_FILE) -r $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/MainWindow.cpp
 	-$(DEL_FILE) -r $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/RobotTreeModel.cpp
 	-$(DEL_FILE) -r $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/RobotItem.cpp
@@ -2284,6 +2294,7 @@ uninstall_sources: FORCE
 	-$(DEL_FILE) -r $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/BaseRobotItem.cpp
 	-$(DEL_FILE) -r $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/RobotTreeResources.qrc
 	-$(DEL_FILE) -r $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/MainWindow.h
+	-$(DEL_FILE) -r $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/BasePropertyItem.h
 	-$(DEL_FILE) -r $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/RobotTreeModel.h
 	-$(DEL_FILE) -r $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/RobotItem.h
 	-$(DEL_FILE) -r $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/JointControllerItem.h
