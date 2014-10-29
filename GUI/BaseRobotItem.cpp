@@ -41,21 +41,44 @@ int BaseRobotItem::rowCount(){
 }
 
 QVariant BaseRobotItem::data(int row, int column) const{
-	if(row==0 and column==0)
-		return QVariant(QString(getElementName()));
-	else
-		return QVariant();
+  if(!m_parent){
+    //if I'm root, I don't hold any data
+    return QVariant();  
+  }
+  
+  if(childCount() == 0){
+    //I'm a property of my parent, route this call to the parent!
+    return m_parent.getPropertyData(row,column,i_data); 
+  }
+  
+  else{
+   //I'm a parent node, set my name if column is 0
+    if(column == 0){
+      return getElementName(i_data.toString());
+    }
+  }
 }
 
 
 bool BaseRobotItem::setData(int row,int column,const QVariant& i_data){
 	
-	if(row==0 and column==0){
-		setElementName(i_data.toString());
-		return true;
-	}
-	else
-		return false;
+  if(!m_parent){
+    //if I'm root, I don't hold any data
+    return false;  
+  }
+  
+  else if(childCount()==0){
+    //I'm a property of my parent, route this call to the parent!
+    return m_parent.setPropertyData(row,column,i_data); 
+  }
+  
+  else{
+   //I'm a parent node myself however not the root, set my name if column is 0 or other parent magic
+    if(column==0){
+      setElementName(i_data.toString());
+      return true;
+    }
+  }
 }
 
 

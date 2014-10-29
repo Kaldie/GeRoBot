@@ -9,29 +9,26 @@ RobotItem::RobotItem(BaseRobotItem* i_parent,
 {
 	LOG_DEBUG(getElementName().toStdString());
 	m_robotPointer = i_robotPointer;
-	setNumberOfProperties(5);
+	setNumberOfProperties(3);
 }
 
-QVariant RobotItem::data(int i_row,int i_column) const {
+QVariant RobotItem::getPropertyData(int i_row,int i_column) const { 
 
-	//	if(i_row==0 and i_column==0)
-	//return BaseRobotItem::data(i_row,i_column);	
-
-	if(i_row==static_cast<int>(RobotProperty::Speed)){
+  if(i_row==RobotItem::propertyList.indexOf("Speed")){
 		if(i_column==1)
 			return QVariant(m_robotPointer->getSpeed());
 		else
 			return QVariant(QString("Speed"));
 	}
 	
-	else 	if(i_row==static_cast<int>(RobotProperty::CurrentPositionX)){
+	else 	if(i_row==RobotItem::propertyList.indexOf("CurrentPositionX")){
 		if(i_column==1)
 			return QVariant(m_robotPointer->getPosition().x);
 		else
 			return QVariant(QString("Current x position"));
 	}
 	
-	else 	if(i_row==static_cast<int>(RobotProperty::CurrentPositionY)){
+	else 	if(i_row==RobotItem::propertyList.indexOf("CurrentPositionY")){
 		if(i_column==1)
 			return QVariant(m_robotPointer->getPosition().y);
 		else
@@ -42,26 +39,22 @@ QVariant RobotItem::data(int i_row,int i_column) const {
 }
 
 
-bool RobotItem::setData(int i_row,int i_column,const QVariant& i_data){
-
-	//	if(i_row==static_cast<int>(RobotProperty::ElementName))
-	//return BaseRobotItem::setData(i_row,i_column,i_data);
-	
+bool RobotItem::setPropertyData(int i_row,int i_column,const QVariant& i_data){
 	if(i_column!=1)
 		return false;
 
-	if(i_row==static_cast<int>(RobotProperty::Speed)){
+	if(i_row==RobotItem::propertyList.indexOf("Speed")){
 		m_robotPointer->setSpeed(i_data.toFloat());
 		return true;
 	}
 	
-	else 	if(i_row==static_cast<int>(RobotProperty::CurrentPositionX)){
+	else 	if(i_row==RobotItem::propertyList.indexOf("CurrentPositionX")){
 		Point2D point=m_robotPointer->getPosition();
 		point.x=i_data.toDouble();
 		m_robotPointer->setPosition(point);
 		return true;
 	}	
-	else 	if(i_row==static_cast<int>(RobotProperty::CurrentPositionY)){
+	else 	if(i_row===RobotItem::propertyList.indexOf("CurrentPositionY")){
 	Point2D point=m_robotPointer->getPosition();
 		point.y=i_data.toDouble();
 		m_robotPointer->setPosition(point);
