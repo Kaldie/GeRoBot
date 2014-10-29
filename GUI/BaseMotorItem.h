@@ -4,8 +4,6 @@
 #include <BaseMotor.h>
 #include "BaseRobotItem.h"
 
-enum class BaseMotorProperty{ElementName,DefaultDirection,HoldMotor};
-
 class BaseMotorItem:
 public BaseRobotItem
 {
@@ -15,15 +13,18 @@ public BaseRobotItem
 	//No default constructor!
 	BaseMotorItem();
 	bool addPinStateItem();
-	
+	static const QList<QString> propertyList;
+
  public:
 	BaseMotorItem(BaseRobotItem* i_parrentItem,
 								BaseMotor* motorPointer);
 	
-	virtual QVariant data(int row,int column) const;
-	virtual bool setData(int row,int column, const QVariant& value);	
+	virtual QVariant getPropertyData(int row,int column) const;
+	virtual bool setPropertyData(int row,int column, const QVariant& value);	
 	
 	virtual bool construct();
 };
+
+
 
 #endif // BaseMotorItem

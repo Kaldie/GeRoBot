@@ -46,26 +46,26 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = BaseRobotItem.cpp \
+		BasePropertyItem.cpp \
+		RobotItem.cpp \
+		JointControllerItem.cpp \
 		BaseMotorItem.cpp \
 		PinStateItem.cpp \
 		BaseJointItem.cpp \
-		JointControllerItem.cpp \
-		RobotItem.cpp \
 		RobotTreeModel.cpp \
 		MainWindow.cpp \
-		BasePropertyItem.cpp \
 		main.cpp qrc_RobotTreeResources.cpp \
 		moc_RobotTreeModel.cpp \
 		moc_MainWindow.cpp
 OBJECTS       = BaseRobotItem.o \
+		BasePropertyItem.o \
+		RobotItem.o \
+		JointControllerItem.o \
 		BaseMotorItem.o \
 		PinStateItem.o \
 		BaseJointItem.o \
-		JointControllerItem.o \
-		RobotItem.o \
 		RobotTreeModel.o \
 		MainWindow.o \
-		BasePropertyItem.o \
 		main.o \
 		qrc_RobotTreeResources.o \
 		moc_RobotTreeModel.o \
@@ -179,14 +179,14 @@ DIST          = ../../../../Qt/5.3/gcc/mkspecs/features/spec_pre.prf \
 		../../../../Qt/5.3/gcc/mkspecs/features/yacc.prf \
 		../../../../Qt/5.3/gcc/mkspecs/features/lex.prf \
 		RobotTreeModel.pro BaseRobotItem.cpp \
+		BasePropertyItem.cpp \
+		RobotItem.cpp \
+		JointControllerItem.cpp \
 		BaseMotorItem.cpp \
 		PinStateItem.cpp \
 		BaseJointItem.cpp \
-		JointControllerItem.cpp \
-		RobotItem.cpp \
 		RobotTreeModel.cpp \
 		MainWindow.cpp \
-		BasePropertyItem.cpp \
 		main.cpp
 QMAKE_TARGET  = RobotTreeModel
 DESTDIR       = #avoid trailing-slash linebreak
@@ -454,7 +454,7 @@ qmake_all: FORCE
 
 dist: 
 	@test -d .tmp/RobotTreeModel1.0.0 || mkdir -p .tmp/RobotTreeModel1.0.0
-	$(COPY_FILE) --parents $(DIST) .tmp/RobotTreeModel1.0.0/ && $(COPY_FILE) --parents RobotTreeResources.qrc .tmp/RobotTreeModel1.0.0/ && $(COPY_FILE) --parents BaseRobotItem.h BaseMotorItem.h PinStateItem.h BaseJointItem.h JointControllerItem.h RobotItem.h RobotTreeModel.h BasePropertyItem.h MainWindow.h .tmp/RobotTreeModel1.0.0/ && $(COPY_FILE) --parents BaseRobotItem.cpp BaseMotorItem.cpp PinStateItem.cpp BaseJointItem.cpp JointControllerItem.cpp RobotItem.cpp RobotTreeModel.cpp MainWindow.cpp BasePropertyItem.cpp main.cpp .tmp/RobotTreeModel1.0.0/ && $(COPY_FILE) --parents MainWindow.ui .tmp/RobotTreeModel1.0.0/ && (cd `dirname .tmp/RobotTreeModel1.0.0` && $(TAR) RobotTreeModel1.0.0.tar RobotTreeModel1.0.0 && $(COMPRESS) RobotTreeModel1.0.0.tar) && $(MOVE) `dirname .tmp/RobotTreeModel1.0.0`/RobotTreeModel1.0.0.tar.gz . && $(DEL_FILE) -r .tmp/RobotTreeModel1.0.0
+	$(COPY_FILE) --parents $(DIST) .tmp/RobotTreeModel1.0.0/ && $(COPY_FILE) --parents RobotTreeResources.qrc .tmp/RobotTreeModel1.0.0/ && $(COPY_FILE) --parents BaseRobotItem.h BaseMotorItem.h PinStateItem.h BaseJointItem.h JointControllerItem.h RobotItem.h RobotTreeModel.h BasePropertyItem.h MainWindow.h .tmp/RobotTreeModel1.0.0/ && $(COPY_FILE) --parents BaseRobotItem.cpp BasePropertyItem.cpp RobotItem.cpp JointControllerItem.cpp BaseMotorItem.cpp PinStateItem.cpp BaseJointItem.cpp RobotTreeModel.cpp MainWindow.cpp main.cpp .tmp/RobotTreeModel1.0.0/ && $(COPY_FILE) --parents MainWindow.ui .tmp/RobotTreeModel1.0.0/ && (cd `dirname .tmp/RobotTreeModel1.0.0` && $(TAR) RobotTreeModel1.0.0.tar RobotTreeModel1.0.0 && $(COMPRESS) RobotTreeModel1.0.0.tar) && $(MOVE) `dirname .tmp/RobotTreeModel1.0.0`/RobotTreeModel1.0.0.tar.gz . && $(DEL_FILE) -r .tmp/RobotTreeModel1.0.0
 
 
 clean:compiler_clean 
@@ -813,8 +813,250 @@ BaseRobotItem.o: BaseRobotItem.cpp ../../../../Qt/5.3/gcc/include/QtCore/QString
 		../../../../Qt/5.3/gcc/include/QtCore/qpoint.h \
 		../../../../Qt/5.3/gcc/include/QtCore/qset.h \
 		../../../../Qt/5.3/gcc/include/QtCore/qcontiguouscache.h \
-		../../../../Qt/5.3/gcc/include/QtCore/QString
+		../../../../Qt/5.3/gcc/include/QtCore/QString \
+		BasePropertyItem.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o BaseRobotItem.o BaseRobotItem.cpp
+
+BasePropertyItem.o: BasePropertyItem.cpp BasePropertyItem.h \
+		BaseRobotItem.h \
+		../include/macroHeader.h \
+		../../../../Qt/5.3/gcc/include/QtCore/QList \
+		../../../../Qt/5.3/gcc/include/QtCore/qlist.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qalgorithms.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qglobal.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qconfig.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qfeatures.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qsystemdetection.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qprocessordetection.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qcompilerdetection.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qtypeinfo.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qtypetraits.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qsysinfo.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qlogging.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qflags.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qatomic.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qbasicatomic.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qatomic_bootstrap.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qgenericatomic.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qatomic_msvc.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qatomic_armv7.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qatomic_armv6.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qatomic_armv5.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qatomic_ia64.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qatomic_mips.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qatomic_x86.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qatomic_cxx11.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qatomic_gcc.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qatomic_unix.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qglobalstatic.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qmutex.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qnumeric.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qiterator.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qrefcount.h \
+		../../../../Qt/5.3/gcc/include/QtCore/QVariant \
+		../../../../Qt/5.3/gcc/include/QtCore/qvariant.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qbytearray.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qnamespace.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qarraydata.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qstring.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qchar.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qstringbuilder.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qmetatype.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qvarlengtharray.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qcontainerfwd.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qisenum.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qobjectdefs.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qobjectdefs_impl.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qmap.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qpair.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qdebug.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qhash.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qtextstream.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qiodevice.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qobject.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qcoreevent.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qscopedpointer.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qobject_impl.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qlocale.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qshareddata.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qvector.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qpoint.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qset.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qcontiguouscache.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qstringlist.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qdatastream.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qregexp.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qstringmatcher.h \
+		../../../../Qt/5.3/gcc/include/QtCore/QString
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o BasePropertyItem.o BasePropertyItem.cpp
+
+RobotItem.o: RobotItem.cpp RobotItem.h \
+		BaseRobotItem.h \
+		../include/macroHeader.h \
+		../../../../Qt/5.3/gcc/include/QtCore/QList \
+		../../../../Qt/5.3/gcc/include/QtCore/qlist.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qalgorithms.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qglobal.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qconfig.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qfeatures.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qsystemdetection.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qprocessordetection.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qcompilerdetection.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qtypeinfo.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qtypetraits.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qsysinfo.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qlogging.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qflags.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qatomic.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qbasicatomic.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qatomic_bootstrap.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qgenericatomic.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qatomic_msvc.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qatomic_armv7.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qatomic_armv6.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qatomic_armv5.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qatomic_ia64.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qatomic_mips.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qatomic_x86.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qatomic_cxx11.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qatomic_gcc.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qatomic_unix.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qglobalstatic.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qmutex.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qnumeric.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qiterator.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qrefcount.h \
+		../../../../Qt/5.3/gcc/include/QtCore/QVariant \
+		../../../../Qt/5.3/gcc/include/QtCore/qvariant.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qbytearray.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qnamespace.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qarraydata.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qstring.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qchar.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qstringbuilder.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qmetatype.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qvarlengtharray.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qcontainerfwd.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qisenum.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qobjectdefs.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qobjectdefs_impl.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qmap.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qpair.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qdebug.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qhash.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qtextstream.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qiodevice.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qobject.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qcoreevent.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qscopedpointer.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qobject_impl.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qlocale.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qshareddata.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qvector.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qpoint.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qset.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qcontiguouscache.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qstringlist.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qdatastream.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qregexp.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qstringmatcher.h \
+		../../../../Qt/5.3/gcc/include/QtCore/QString \
+		../include/Robot.h \
+		../include/Point2D.h \
+		../math/Vector2D.h \
+		../include/JointController.h \
+		../include/ArduinoMotorDriver.h \
+		../arduino/ArduinoSerialConnection.h \
+		../include/BaseJoint.h \
+		../include/BaseMotor.h \
+		../include/PinState.h \
+		../include/Trace.h \
+		../include/Line2D.h \
+		JointControllerItem.h \
+		BasePropertyItem.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o RobotItem.o RobotItem.cpp
+
+JointControllerItem.o: JointControllerItem.cpp ../include/JointController.h \
+		../include/macroHeader.h \
+		../include/ArduinoMotorDriver.h \
+		../arduino/ArduinoSerialConnection.h \
+		../include/BaseJoint.h \
+		../include/Point2D.h \
+		../math/Vector2D.h \
+		../include/BaseMotor.h \
+		../include/PinState.h \
+		JointControllerItem.h \
+		BaseRobotItem.h \
+		../../../../Qt/5.3/gcc/include/QtCore/QList \
+		../../../../Qt/5.3/gcc/include/QtCore/qlist.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qalgorithms.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qglobal.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qconfig.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qfeatures.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qsystemdetection.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qprocessordetection.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qcompilerdetection.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qtypeinfo.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qtypetraits.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qsysinfo.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qlogging.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qflags.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qatomic.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qbasicatomic.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qatomic_bootstrap.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qgenericatomic.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qatomic_msvc.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qatomic_armv7.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qatomic_armv6.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qatomic_armv5.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qatomic_ia64.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qatomic_mips.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qatomic_x86.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qatomic_cxx11.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qatomic_gcc.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qatomic_unix.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qglobalstatic.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qmutex.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qnumeric.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qiterator.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qrefcount.h \
+		../../../../Qt/5.3/gcc/include/QtCore/QVariant \
+		../../../../Qt/5.3/gcc/include/QtCore/qvariant.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qbytearray.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qnamespace.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qarraydata.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qstring.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qchar.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qstringbuilder.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qmetatype.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qvarlengtharray.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qcontainerfwd.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qisenum.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qobjectdefs.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qobjectdefs_impl.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qmap.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qpair.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qdebug.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qhash.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qtextstream.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qiodevice.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qobject.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qcoreevent.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qscopedpointer.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qobject_impl.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qlocale.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qshareddata.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qvector.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qpoint.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qset.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qcontiguouscache.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qstringlist.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qdatastream.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qregexp.h \
+		../../../../Qt/5.3/gcc/include/QtCore/qstringmatcher.h \
+		../../../../Qt/5.3/gcc/include/QtCore/QString \
+		BaseJointItem.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o JointControllerItem.o JointControllerItem.cpp
 
 BaseMotorItem.o: BaseMotorItem.cpp BaseMotorItem.h \
 		../include/BaseMotor.h \
@@ -1044,174 +1286,6 @@ BaseJointItem.o: BaseJointItem.cpp BaseJointItem.h \
 		../include/Point2D.h \
 		../math/Vector2D.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o BaseJointItem.o BaseJointItem.cpp
-
-JointControllerItem.o: JointControllerItem.cpp ../include/JointController.h \
-		../include/macroHeader.h \
-		../include/ArduinoMotorDriver.h \
-		../arduino/ArduinoSerialConnection.h \
-		../include/BaseJoint.h \
-		../include/Point2D.h \
-		../math/Vector2D.h \
-		../include/BaseMotor.h \
-		../include/PinState.h \
-		JointControllerItem.h \
-		BaseRobotItem.h \
-		../../../../Qt/5.3/gcc/include/QtCore/QList \
-		../../../../Qt/5.3/gcc/include/QtCore/qlist.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qalgorithms.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qglobal.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qconfig.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qfeatures.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qsystemdetection.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qprocessordetection.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qcompilerdetection.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qtypeinfo.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qtypetraits.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qsysinfo.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qlogging.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qflags.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qatomic.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qbasicatomic.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qatomic_bootstrap.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qgenericatomic.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qatomic_msvc.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qatomic_armv7.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qatomic_armv6.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qatomic_armv5.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qatomic_ia64.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qatomic_mips.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qatomic_x86.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qatomic_cxx11.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qatomic_gcc.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qatomic_unix.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qglobalstatic.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qmutex.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qnumeric.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qiterator.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qrefcount.h \
-		../../../../Qt/5.3/gcc/include/QtCore/QVariant \
-		../../../../Qt/5.3/gcc/include/QtCore/qvariant.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qbytearray.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qnamespace.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qarraydata.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qstring.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qchar.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qstringbuilder.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qmetatype.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qvarlengtharray.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qcontainerfwd.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qisenum.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qobjectdefs.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qobjectdefs_impl.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qmap.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qpair.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qdebug.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qhash.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qtextstream.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qiodevice.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qobject.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qcoreevent.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qscopedpointer.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qobject_impl.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qlocale.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qshareddata.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qvector.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qpoint.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qset.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qcontiguouscache.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qstringlist.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qdatastream.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qregexp.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qstringmatcher.h \
-		../../../../Qt/5.3/gcc/include/QtCore/QString \
-		BaseJointItem.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o JointControllerItem.o JointControllerItem.cpp
-
-RobotItem.o: RobotItem.cpp RobotItem.h \
-		BaseRobotItem.h \
-		../include/macroHeader.h \
-		../../../../Qt/5.3/gcc/include/QtCore/QList \
-		../../../../Qt/5.3/gcc/include/QtCore/qlist.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qalgorithms.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qglobal.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qconfig.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qfeatures.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qsystemdetection.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qprocessordetection.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qcompilerdetection.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qtypeinfo.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qtypetraits.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qsysinfo.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qlogging.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qflags.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qatomic.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qbasicatomic.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qatomic_bootstrap.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qgenericatomic.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qatomic_msvc.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qatomic_armv7.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qatomic_armv6.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qatomic_armv5.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qatomic_ia64.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qatomic_mips.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qatomic_x86.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qatomic_cxx11.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qatomic_gcc.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qatomic_unix.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qglobalstatic.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qmutex.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qnumeric.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qiterator.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qrefcount.h \
-		../../../../Qt/5.3/gcc/include/QtCore/QVariant \
-		../../../../Qt/5.3/gcc/include/QtCore/qvariant.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qbytearray.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qnamespace.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qarraydata.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qstring.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qchar.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qstringbuilder.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qmetatype.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qvarlengtharray.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qcontainerfwd.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qisenum.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qobjectdefs.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qobjectdefs_impl.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qmap.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qpair.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qdebug.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qhash.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qtextstream.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qiodevice.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qobject.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qcoreevent.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qscopedpointer.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qobject_impl.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qlocale.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qshareddata.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qvector.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qpoint.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qset.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qcontiguouscache.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qstringlist.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qdatastream.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qregexp.h \
-		../../../../Qt/5.3/gcc/include/QtCore/qstringmatcher.h \
-		../../../../Qt/5.3/gcc/include/QtCore/QString \
-		../include/Robot.h \
-		../include/Point2D.h \
-		../math/Vector2D.h \
-		../include/JointController.h \
-		../include/ArduinoMotorDriver.h \
-		../arduino/ArduinoSerialConnection.h \
-		../include/BaseJoint.h \
-		../include/BaseMotor.h \
-		../include/PinState.h \
-		../include/Trace.h \
-		../include/Line2D.h \
-		JointControllerItem.h \
-		BasePropertyItem.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o RobotItem.o RobotItem.cpp
 
 RobotTreeModel.o: RobotTreeModel.cpp ../../../../Qt/5.3/gcc/include/QtGui/QtGui \
 		../../../../Qt/5.3/gcc/include/QtGui/QtGuiDepends \
@@ -1868,11 +1942,9 @@ MainWindow.o: MainWindow.cpp ../../../../Qt/5.3/gcc/include/QtGui/QtGui \
 		../../../../Qt/5.3/gcc/include/QtWidgets/qgridlayout.h \
 		../../../../Qt/5.3/gcc/include/QtWidgets/QWidget \
 		RobotTreeModel.h \
-		../../../../Qt/5.3/gcc/include/QtCore/QAbstractItemModel
+		../../../../Qt/5.3/gcc/include/QtCore/QAbstractItemModel \
+		BasePropertyItem.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o MainWindow.o MainWindow.cpp
-
-BasePropertyItem.o: BasePropertyItem.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o BasePropertyItem.o BasePropertyItem.cpp
 
 main.o: main.cpp ../../../../Qt/5.3/gcc/include/QtGui/QtGui \
 		../../../../Qt/5.3/gcc/include/QtGui/QtGuiDepends \
@@ -2267,14 +2339,14 @@ install_sources: first FORCE
 	-$(INSTALL_FILE) /home/ruud/Dropbox/Projects/GeRoArm/GUI/MainWindow.h $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/
 	-$(INSTALL_FILE) /home/ruud/Dropbox/Projects/GeRoArm/GUI/RobotTreeResources.qrc $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/
 	-$(INSTALL_FILE) /home/ruud/Dropbox/Projects/GeRoArm/GUI/BaseRobotItem.cpp $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/
+	-$(INSTALL_FILE) /home/ruud/Dropbox/Projects/GeRoArm/GUI/BasePropertyItem.cpp $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/
+	-$(INSTALL_FILE) /home/ruud/Dropbox/Projects/GeRoArm/GUI/RobotItem.cpp $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/
+	-$(INSTALL_FILE) /home/ruud/Dropbox/Projects/GeRoArm/GUI/JointControllerItem.cpp $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/
 	-$(INSTALL_FILE) /home/ruud/Dropbox/Projects/GeRoArm/GUI/BaseMotorItem.cpp $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/
 	-$(INSTALL_FILE) /home/ruud/Dropbox/Projects/GeRoArm/GUI/PinStateItem.cpp $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/
 	-$(INSTALL_FILE) /home/ruud/Dropbox/Projects/GeRoArm/GUI/BaseJointItem.cpp $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/
-	-$(INSTALL_FILE) /home/ruud/Dropbox/Projects/GeRoArm/GUI/JointControllerItem.cpp $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/
-	-$(INSTALL_FILE) /home/ruud/Dropbox/Projects/GeRoArm/GUI/RobotItem.cpp $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/
 	-$(INSTALL_FILE) /home/ruud/Dropbox/Projects/GeRoArm/GUI/RobotTreeModel.cpp $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/
 	-$(INSTALL_FILE) /home/ruud/Dropbox/Projects/GeRoArm/GUI/MainWindow.cpp $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/
-	-$(INSTALL_FILE) /home/ruud/Dropbox/Projects/GeRoArm/GUI/BasePropertyItem.cpp $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/
 	-$(INSTALL_FILE) /home/ruud/Dropbox/Projects/GeRoArm/GUI/main.cpp $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/
 	-$(INSTALL_FILE) /home/ruud/Dropbox/Projects/GeRoArm/GUI/RobotTreeModel.pro $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/
 	-$(INSTALL_FILE) /home/ruud/Dropbox/Projects/GeRoArm/GUI/default.txt $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/
@@ -2283,14 +2355,14 @@ uninstall_sources: FORCE
 	-$(DEL_FILE) -r $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/default.txt
 	-$(DEL_FILE) -r $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/RobotTreeModel.pro
 	-$(DEL_FILE) -r $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/main.cpp
-	-$(DEL_FILE) -r $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/BasePropertyItem.cpp
 	-$(DEL_FILE) -r $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/MainWindow.cpp
 	-$(DEL_FILE) -r $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/RobotTreeModel.cpp
-	-$(DEL_FILE) -r $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/RobotItem.cpp
-	-$(DEL_FILE) -r $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/JointControllerItem.cpp
 	-$(DEL_FILE) -r $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/BaseJointItem.cpp
 	-$(DEL_FILE) -r $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/PinStateItem.cpp
 	-$(DEL_FILE) -r $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/BaseMotorItem.cpp
+	-$(DEL_FILE) -r $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/JointControllerItem.cpp
+	-$(DEL_FILE) -r $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/RobotItem.cpp
+	-$(DEL_FILE) -r $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/BasePropertyItem.cpp
 	-$(DEL_FILE) -r $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/BaseRobotItem.cpp
 	-$(DEL_FILE) -r $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/RobotTreeResources.qrc
 	-$(DEL_FILE) -r $(INSTALL_ROOT)/home/ruud/Dropbox/Projects/GeRoArm/GUI/MainWindow.h

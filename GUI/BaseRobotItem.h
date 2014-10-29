@@ -45,13 +45,16 @@ class BaseRobotItem
 	BaseRobotItem* parent();
 	bool setName(const QString&);
 	
+	//Create childeren from a QList of QStrings
+	bool createChilderen(const QList<QString>& i_propertyList);
+
 	//responsible for setting and getting the element name.
-    virtual QVariant data(int row,int column) const;
+	virtual QVariant data(int row,int column) const;
 	virtual bool setData(int row,int column, const QVariant &value);
 
 	virtual bool construct() = 0;
-  virtual getPropertyData(int row,int column) const = 0;
-  virtual setPropertyData(int row,int column, const QVariant &value) const = 0;
+  virtual QVariant getPropertyData(int row,int column) const =0;
+  virtual bool setPropertyData(int row,int column, const QVariant &value) =0;
 };
 
 #endif

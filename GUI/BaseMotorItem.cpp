@@ -1,30 +1,29 @@
 #include "BaseMotorItem.h"
 #include "PinStateItem.h"
 
+const QList<QString> BaseMotorItem::propertyList({"DefaultDirection","HoldMotor"});
+
 BaseMotorItem::BaseMotorItem(BaseRobotItem* i_parent,
 														 BaseMotor* i_baseMotor):
 	BaseRobotItem("BaseMotor",i_parent),
 	m_baseMotor(i_baseMotor)
 {
 	LOG_DEBUG(getElementName().toStdString());
-	setNumberOfProperties(3);
+	setNumberOfProperties(2);
 }
 
-QVariant BaseMotorItem::data(int i_row,
+QVariant BaseMotorItem::getPropertyData(int i_row,
 														 int i_column) const {
-	if(i_row==static_cast<int>(BaseMotorProperty::ElementName))
-		return BaseRobotItem::data(i_row,i_column);
-
 	if(i_column>1)
 		return false;
 
-	else if(i_row==static_cast<int>(BaseMotorProperty::DefaultDirection))
+	else if(i_row==BaseMotorItem::propertyList.indexOf("DefaultDirection"))
 		if(i_column==0)
 			return QVariant(QString("Default Direction"));
 		else
 			return QVariant(QString(m_baseMotor->getDefaultDirection().c_str()));
 	
-	else if(i_row==static_cast<int>(BaseMotorProperty::HoldMotor))
+	else if(i_row==BaseMotorItem::propertyList.indexOf("HoldMotor"))
 		if(i_column==0)
 			return QVariant(QString("Hold Motor"));
 		else
@@ -35,26 +34,21 @@ QVariant BaseMotorItem::data(int i_row,
 	
 }
 
-bool BaseMotorItem::setData(int i_row,
-														int i_column,
-														const QVariant& i_value){
+bool BaseMotorItem::setPropertyData(int i_row,
+																		int i_column,
+																		const QVariant& i_value){
 	if(!m_baseMotor)
 		return false;
-
-	if(i_row==static_cast<int>(BaseMotorProperty::ElementName))
-		return BaseRobotItem::setData(i_row,i_column,i_value);
 
 	if(i_column==0)
 		return false;
 
-	if(i_column==1)
-		return false;
-
-	if(i_row==static_cast<int>(BaseMotorProperty::DefaultDirection)){
+	if(i_row==BaseMotorItem::propertyList.indexOf("DefaultDirection")){
+		LOG_DEBUG(i_value.toString().toStdString());
 		m_baseMotor->setDefaultDirection(i_value.toString().toStdString());
 		return true;
 	}
-		else if(i_row==static_cast<int>(BaseMotorProperty::HoldMotor)){
+		else if(i_row==BaseMotorItem::propertyList.indexOf("HoldMotor")){
 		m_baseMotor->setHoldMotor(i_value.toBool());
 		return true;
 	}
@@ -76,5 +70,5 @@ bool BaseMotorItem::addPinStateItem(){
 }
 
 bool BaseMotorItem::construct(){
-	return addPinStateItem();
+	return addPinStateItem() &&createChilderen(BaseMotorItem::propertyList); 
 }

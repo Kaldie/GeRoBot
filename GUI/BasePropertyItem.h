@@ -5,16 +5,15 @@
 
 class BasePropertyItem:public BaseRobotItem
 {
-	
+ private:
+	BasePropertyItem();
  public:
-	BasePropertyItem(const QString i_propertyName,
+	BasePropertyItem(const QString& i_propertyName,
 									 BaseRobotItem* i_parent=0);
 	
-	virtual QVariant data(int row,int column) const;
-	virtual bool setData(int row,int column, const QVariant &value);
-	
-	bool construct(){return true;};
-
+	virtual bool construct(){return true;};
+	virtual QVariant getPropertyData(int,int) const {return QVariant();};
+	virtual bool setPropertyData(int,int, const QVariant&){return false;};
 };
 
 #endif // BaseProperty

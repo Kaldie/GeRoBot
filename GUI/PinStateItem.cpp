@@ -1,5 +1,8 @@
 #include "PinStateItem.h"
 #include <PinState.h>
+#include "BasePropertyItem.h"
+
+const QList<QString> PinStateItem::propertyList{"NumericValue"};
 
 PinStateItem::PinStateItem(BaseRobotItem* i_parent,
 													 PinState* i_pinState):
@@ -7,21 +10,17 @@ PinStateItem::PinStateItem(BaseRobotItem* i_parent,
 	m_pinState(i_pinState)
 {
 	LOG_DEBUG(getElementName().toStdString());
-	setNumberOfProperties(2);
+	setNumberOfProperties(1);
 }
 
-bool PinStateItem::setData(int i_row,
-													 int i_column,
-													 const QVariant& i_data)
-{
+bool PinStateItem::setPropertyData(int i_row,
+																	 int i_column,
+																	 const QVariant& i_data){
 	if(!m_pinState)
 		return false;
 	
-	if(i_row==static_cast<int>(PinStateProperty::ElementName))
-		return BaseRobotItem::setData(i_row,i_column,i_data);
-	
 	//This property cannot be set!
-	else if(i_row==static_cast<int>(PinStateProperty::NumericValue))
+	else if(i_row==PinStateItem::propertyList.indexOf("NumericValue"))
 		return false;
 	
 	else if(i_row>(getNumberOfProperties()-1)){
@@ -30,40 +29,53 @@ bool PinStateItem::setData(int i_row,
 			return false;
 		else{
 			//Updating the state of the pin
-			int pinNumberEntry=i_row-(getNumberOfProperties()-1);
+			int pinNumberEntry=i_row-getNumberOfProperties();
 			int pinNumber=m_pinState->getPinVector()[pinNumberEntry];
+			LOG_DEBUG("Pin number entry: "<<pinNumberEntry<<" corrispond to: "<<pinNumber);
 			m_pinState->update(pinNumber,i_data.toInt());
 			return true;
 		}
 	}
-
 	return false;
 }
 
 
-QVariant PinStateItem::data(int i_row,
-														int i_column)
+QVariant PinStateItem::getPropertyData(int i_row,
+																			 int i_column)const
 {
-	if(i_row==static_cast<int>(PinStateProperty::ElementName))
-		return BaseRobotItem::data(i_row,i_column);
 	
-	//This property cannot be set!
-	else if(i_row==static_cast<int>(PinStateProperty::NumericValue))
-		return QVariant(m_pinState->getNumericValue());
+	if(i_row==PinStateItem::propertyList.indexOf("NumericValue"))
+		if(i_column==0)
+			return QVariant("Numerical Value");
+		else
+			return QVariant(m_pinState->getNumericValue());
 	
 	else if(i_row>(getNumberOfProperties()-1)){
-		int pinNumberEntry=i_row-(getNumberOfProperties()-1);
+		int pinNumberEntry=i_row-getNumberOfProperties();
 		if(i_column==0)
-			return QVariant(m_pinState->getPinVector()[pinNumberEntry]);
+			return QVariant(QString("State pin: ") + QString::number(m_pinState->getPinVector()[pinNumberEntry]));
 		else{
 			//Updating the state of the pin
 			int pinNumber=m_pinState->getPinVector()[pinNumberEntry];
+			LOG_DEBUG("Pin number entry: "<<pinNumberEntry<<" corrispond to: "<<pinNumber);
 			return QVariant(m_pinState->getPinState(pinNumber));
 		}
 	}
 	return false;
 }
 	
+bool PinStateItem::createPinChildItems(){
+	bool hasSucceeded(true);
+	
+	foreach (const int& pinNumber,m_pinState->getPinVector()){
+		LOG_DEBUG(pinNumber);
+		BasePropertyItem* pinItem = new BasePropertyItem(QString::number(pinNumber),this);
+		hasSucceeded&=insertChild(0,pinItem);
+	}
+	return hasSucceeded;
+}
+
 bool PinStateItem::construct(){
-	return true;
+	
+	return createChilderen(PinStateItem::propertyList) && createPinChildItems();
 }

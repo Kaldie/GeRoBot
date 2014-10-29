@@ -12,29 +12,17 @@ JointControllerItem::JointControllerItem(BaseRobotItem* parent,
 }
 
 
-QVariant JointControllerItem::data(int i_row,
-														 int i_column) const {
-	if(i_row==static_cast<int>(JointControllerProperty::ElementName))
-		return BaseRobotItem::data(i_row,i_column);
-	
-	else
-		return QVariant();
-	
+/*QVariant JointControllerItem::getPropertyData(int i_row,
+																							int i_column) const {
+	return QVariant();
 }
 
 
-bool JointControllerItem::setData(int i_row,
-																	int i_column,
-																	const QVariant& i_value){
-	if(!m_jointController)
-		return false;
-
-	if(i_row==static_cast<int>(JointControllerProperty::ElementName))
-		return BaseRobotItem::setData(i_row,i_column,i_value);
-
-	else
-		return false;
-}
+bool JointControllerItem::setPropertyData(int i_row,
+																					int i_column,
+																					const QVariant& i_value){
+	return false;
+	}*/
 
 bool JointControllerItem::construct(){
 	bool worked(true);

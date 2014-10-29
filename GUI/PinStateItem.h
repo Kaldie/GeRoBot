@@ -4,26 +4,24 @@
 #include "BaseRobotItem.h"
 
 class PinState;
-enum class PinStateProperty{ElementName,NumericValue};
 
-class PinStateItem:
-public BaseRobotItem
+class PinStateItem:public BaseRobotItem
 {
-
 	GETSETPOINTER(PinState,m_pinState,PinState);
 	
  private:
 	//No default contructor
 	PinStateItem();
-	
+	bool createPinChildItems();
+	static const QList<QString> propertyList;
+
  public:
 	PinStateItem(BaseRobotItem* i_parent,
 							 PinState* i_pinState);
-
-	QVariant data(int row,int column);
-	bool setData(int row,int column ,const QVariant& i_data);
 	
 	virtual bool construct();
+  virtual QVariant getPropertyData(int row,int column) const;
+  virtual bool setPropertyData(int row,int column, const QVariant &value);
 };
 
 

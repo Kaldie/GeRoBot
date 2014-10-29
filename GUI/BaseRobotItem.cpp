@@ -7,6 +7,7 @@
 
 #include <QStringList>
 #include "BaseRobotItem.h"
+#include "BasePropertyItem.h"
 
 BaseRobotItem::BaseRobotItem(const QString& i_elementName, BaseRobotItem *parent):
 	m_parentItem(parent),
@@ -36,40 +37,40 @@ int BaseRobotItem::childNumber() const{
 }
 
 int BaseRobotItem::rowCount(){
-	LOG_DEBUG("Number of rows: "<<childCount());
 	return childCount();
 }
 
 QVariant BaseRobotItem::data(int row, int column) const{
-  if(!m_parent){
+  if(!m_parentItem){
     //if I'm root, I don't hold any data
     return QVariant();  
   }
   
   if(childCount() == 0){
     //I'm a property of my parent, route this call to the parent!
-    return m_parent.getPropertyData(row,column,i_data); 
+    return m_parentItem->getPropertyData(row,column);
   }
   
   else{
-   //I'm a parent node, set my name if column is 0
+   //I'm a parent node, get my name if column is 0
     if(column == 0){
-      return getElementName(i_data.toString());
+      return getElementName();
     }
   }
+	return QVariant();
 }
 
 
 bool BaseRobotItem::setData(int row,int column,const QVariant& i_data){
 	
-  if(!m_parent){
+  if(!m_parentItem){
     //if I'm root, I don't hold any data
     return false;  
   }
   
   else if(childCount()==0){
     //I'm a property of my parent, route this call to the parent!
-    return m_parent.setPropertyData(row,column,i_data); 
+    return m_parentItem->setPropertyData(row,column,i_data); 
   }
   
   else{
@@ -79,8 +80,19 @@ bool BaseRobotItem::setData(int row,int column,const QVariant& i_data){
       return true;
     }
   }
+	return false;
 }
 
+
+bool BaseRobotItem::createChilderen(const QList<QString>& i_propertyList){
+	bool hasSucceeded(true);
+
+	foreach (const QString& propertyName,i_propertyList){
+		BasePropertyItem* property = new BasePropertyItem(propertyName,this);
+		hasSucceeded&=insertChild(0,property);
+	}
+	return hasSucceeded;
+}
 
 bool BaseRobotItem::insertChild(int position, BaseRobotItem* i_child){
 	if (position < 0 || position > m_childItems.size()){

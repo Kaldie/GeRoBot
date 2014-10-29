@@ -18,20 +18,17 @@ MainWindow::MainWindow(RobotPointer robot,QWidget* parent/*=0*/)
 
 		 BasePropertyItem* rootItem= new BasePropertyItem("root",0);
 		 RobotItem* robotItem = new RobotItem(rootItem,robot);
-		 RobotItem* robotItem2 = new RobotItem(rootItem,robot);
 		 robotItem->construct();
-		 robotItem2->construct();
 		 rootItem->insertChild(0,robotItem);
-		 rootItem->insertChild(0,robotItem2);
 		 //		 robotItem->construct();
 		 LOG_DEBUG(rootItem->parent());
      RobotTreeModel *model = new RobotTreeModel(rootItem);
 		 
 		 view->setModel(model);
 
-		 /*     for (int column = 0; column < model->columnCount(); ++column)
-         view->resizeColumnToContents(column);
-
+     for (int column = 0; column < model->columnCount(); ++column)
+			 view->resizeColumnToContents(column);
+		 
      connect(exitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
 
      connect(view->selectionModel(),
@@ -46,7 +43,7 @@ MainWindow::MainWindow(RobotPointer robot,QWidget* parent/*=0*/)
      connect(removeColumnAction, SIGNAL(triggered()), this, SLOT(removeColumn()));
      connect(insertChildAction, SIGNAL(triggered()), this, SLOT(insertChild()));
 
-     updateActions();*/
+     updateActions();
  }
 
  void MainWindow::insertChild()

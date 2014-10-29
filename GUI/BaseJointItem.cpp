@@ -2,6 +2,8 @@
 #include "BaseMotorItem.h"
 #include <BaseJoint.h>
 
+const QList<QString> BaseJointItem::propertyList({"Position","MovementPerStep","LowerRange","UpperRange","MovementType"});
+
 BaseJointItem::BaseJointItem(BaseRobotItem* i_parent,
 														 JointPointer i_joint):
 	BaseRobotItem("BaseJoint",i_parent),
@@ -13,39 +15,36 @@ BaseJointItem::BaseJointItem(BaseRobotItem* i_parent,
 }
 
 
-QVariant BaseJointItem::data(int i_row,int i_column) const {
-	if(i_row==static_cast<int>(BaseJointProperty::ElementName))
-		return BaseRobotItem::data(i_row,i_column);
-	
-	if(i_row==static_cast<int>(BaseJointProperty::Position)){
+QVariant BaseJointItem::getPropertyData(int i_row,int i_column) const {
+	if(i_row==BaseJointItem::propertyList.indexOf("Position")){
 		if(i_column==1)
 			return QVariant(m_jointPointer->getPosition());
 		else
 			return QVariant(QString("Position"));
 	}
 	
-	else if(i_row==static_cast<int>(BaseJointProperty::MovementPerStep)){
+	else if(i_row==BaseJointItem::propertyList.indexOf("MovementPerStep")){
 		if(i_column==1)
 			return QVariant(m_jointPointer->getMovementPerStep());
 		else
 			return QVariant(QString("Movment per step"));
 	}
 	
-	else if(i_row==static_cast<int>(BaseJointProperty::LowerRange)){
+	else if(i_row==BaseJointItem::propertyList.indexOf("LowerRange")){
 		if(i_column==1)
 			return QVariant(m_jointPointer->getRange()[0]);
 		else
 			return QVariant(QString("Lower position range"));
 	}
 
-	else if(i_row==static_cast<int>(BaseJointProperty::UpperRange)){
+	else if(i_row==BaseJointItem::propertyList.indexOf("UpperRange")){
 		if(i_column==1)
 			return QVariant(m_jointPointer->getRange()[1]);
 		else
 			return QVariant(QString("Upper position range"));
 	}
 	
-	else if(i_row==static_cast<int>(BaseJointProperty::MovementType)){
+	else if(i_row==BaseJointItem::propertyList.indexOf("MovementType")){
 		if(i_column==1){
 			MovementType movementType=m_jointPointer->getMovementType();
 			if(movementType==1)
@@ -63,34 +62,31 @@ QVariant BaseJointItem::data(int i_row,int i_column) const {
 		return QVariant();
 }		
 
-bool BaseJointItem::setData(int i_row,int i_column,const QVariant& i_data){
-	if(i_row==static_cast<int>(BaseJointProperty::ElementName))
-		return BaseRobotItem::setData(i_row,i_column,i_data);
-	
+bool BaseJointItem::setPropertyData(int i_row,int i_column,const QVariant& i_data){
 	if(i_column!=1)
 		return false;
 
 	bool isConverted=bool(false);
 	bool* hasConverted = &isConverted;
 	
-	if(i_row==static_cast<int>(BaseJointProperty::Position))
+	if(i_row==BaseJointItem::propertyList.indexOf("Position"))
 		m_jointPointer->setPosition(i_data.toDouble(hasConverted));
 
-	else if(i_row==static_cast<int>(BaseJointProperty::MovementPerStep))
+	else if(i_row==BaseJointItem::propertyList.indexOf("MovementPerStep"))
 		m_jointPointer->setMovementPerStep(i_data.toDouble(hasConverted));
 	
-	else if(i_row==static_cast<int>(BaseJointProperty::LowerRange)){
+	else if(i_row==BaseJointItem::propertyList.indexOf("LowerRange")){
 		float upperRange=m_jointPointer->getRange()[1];
 		float lowerRange=i_data.toDouble(hasConverted);
 		m_jointPointer->setRange({lowerRange,upperRange});
 	}
-	else if(i_row==static_cast<int>(BaseJointProperty::UpperRange)){
+	else if(i_row==BaseJointItem::propertyList.indexOf("UpperRange")){
 		float lowerRange=m_jointPointer->getRange()[0];
 		float upperRange=i_data.toDouble(hasConverted);
 		m_jointPointer->setRange({lowerRange,upperRange});
 	}
 
-	else if(i_row==static_cast<int>(BaseJointProperty::MovementType)){
+	else if(i_row==BaseJointItem::propertyList.indexOf("MovementType")){
 		MovementType movementType;
 		
 		if("Rotational"==i_data.toString().toStdString()){
@@ -109,7 +105,7 @@ bool BaseJointItem::setData(int i_row,int i_column,const QVariant& i_data){
 }		
 
 bool BaseJointItem::construct(){
-	return addBaseMotor();
+	return addBaseMotor() && createChilderen(BaseJointItem::propertyList);
 }
 
 bool BaseJointItem::addBaseMotor(){

@@ -4,13 +4,9 @@
 #include <BaseMotor.h>
 #include "BaseRobotItem.h"
 
-enum class JointControllerProperty{ElementName};
-
-class JointControllerItem:
-public BaseRobotItem
+class JointControllerItem:public BaseRobotItem
 {
 	GETSETPOINTER(JointController,m_jointController,JointController);
-
  private:
 	//No default constructor!
 	JointControllerItem();
@@ -20,9 +16,8 @@ public BaseRobotItem
 	JointControllerItem(BaseRobotItem* i_parrentItem,
 											JointController* motorPointer);
 	
-	virtual QVariant data(int row,int column) const;
-	virtual bool setData(int row,int column, const QVariant& value);	
-	
+	virtual QVariant getPropertyData(int,int) const {return QVariant();};
+	virtual bool setPropertyData(int,int, const QVariant&) {return false;};
 	virtual bool construct();
 };
 

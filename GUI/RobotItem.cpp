@@ -3,6 +3,8 @@
 #include "JointControllerItem.h"
 #include "BasePropertyItem.h"
 
+const QList<QString> RobotItem::propertyList({"Speed","CurrentPositionX","CurrentPositionY"});
+
 RobotItem::RobotItem(BaseRobotItem* i_parent,
 										 RobotPointer i_robotPointer):
 	BaseRobotItem("Robot",i_parent)
@@ -54,7 +56,7 @@ bool RobotItem::setPropertyData(int i_row,int i_column,const QVariant& i_data){
 		m_robotPointer->setPosition(point);
 		return true;
 	}	
-	else 	if(i_row===RobotItem::propertyList.indexOf("CurrentPositionY")){
+	else if(i_row==RobotItem::propertyList.indexOf("CurrentPositionY")){
 	Point2D point=m_robotPointer->getPosition();
 		point.y=i_data.toDouble();
 		m_robotPointer->setPosition(point);
@@ -70,14 +72,11 @@ void RobotItem::setRobotPointer(RobotPointer i_robotPointer){
 
 
 bool RobotItem::construct(){
-	QStringList properties;
-	properties<<"xx"<<"Speed"<<"CurrentPosition X"<<"CurrentPosition Y";
-	
-	foreach (const QString &str,properties){
-		BasePropertyItem* property = new BasePropertyItem(str,this);
-		insertChild(0,property);
-	}
-	
+	if(this->createChilderen(RobotItem::propertyList))
+		LOG_DEBUG("Property childeren are sucessfully created");
+	else
+		LOG_DEBUG("Creation of property childeren has failed");
+
 	LOG_DEBUG("Adding new Joint controller!");
 	return addJointControllerItem();
 }

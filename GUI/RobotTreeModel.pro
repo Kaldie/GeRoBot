@@ -13,14 +13,14 @@
  RESOURCES   = RobotTreeResources.qrc
 
  SOURCES     = BaseRobotItem.cpp        \
+               BasePropertyItem.cpp     \
+               RobotItem.cpp            \
+               JointControllerItem.cpp  \
                BaseMotorItem.cpp        \
                PinStateItem.cpp         \
                BaseJointItem.cpp        \
-               JointControllerItem.cpp  \
-               RobotItem.cpp            \
                RobotTreeModel.cpp       \
                MainWindow.cpp           \
-               BasePropertyItem.cpp     \
                main.cpp
 
  CONFIG  += qt
