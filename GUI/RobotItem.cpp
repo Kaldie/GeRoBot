@@ -7,15 +7,12 @@ RobotItem::RobotItem(BaseRobotItem* i_parent,
 	BaseRobotItem("Robot",i_parent)
 {
 	m_robotPointer = i_robotPointer;
-	setNumberOfProperties(4);
+	setNumberOfProperties(3);
 }
 
-QVariant RobotItem::data(int i_row,int i_column) const {
-	
-	if(i_row==static_cast<int>(RobotProperty::ElementName))
-		return BaseRobotItem::data(i_row,i_column);
-	
-	if(i_row==static_cast<int>(RobotProperty::Speed)){
+QVariant RobotItem::getPropertyData(int i_row,int i_column) const { 
+
+  if(i_row==static_cast<int>(RobotProperty::Speed)){
 		if(i_column==1)
 			return QVariant(m_robotPointer->getSpeed());
 		else
@@ -40,11 +37,8 @@ QVariant RobotItem::data(int i_row,int i_column) const {
 }
 
 
-bool RobotItem::setData(int i_row,int i_column,const QVariant& i_data){
+bool RobotItem::setPropertyData(int i_row,int i_column,const QVariant& i_data){
 
-	if(i_row==static_cast<int>(RobotProperty::ElementName))
-		return BaseRobotItem::setData(i_row,i_column,i_data);
-	
 	if(i_column!=1)
 		return false;
 
@@ -77,6 +71,7 @@ void RobotItem::setRobotPointer(RobotPointer i_robotPointer){
 
 
 bool RobotItem::construct(){
+  foreach(
 	LOG_DEBUG("Adding new Joint controller!");
 	return addJointControllerItem();
 }

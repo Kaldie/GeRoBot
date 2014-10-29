@@ -50,6 +50,8 @@ class BaseRobotItem
 	virtual bool setData(int row,int column, const QVariant &value);
 
 	virtual bool construct() = 0;
+  virtual getPropertyData(int row,int column) const = 0;
+  virtual setPropertyData(int row,int column, const QVariant &value) const = 0;
 };
 
 #endif
