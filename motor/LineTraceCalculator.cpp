@@ -138,7 +138,7 @@ const bool LineTraceCalculator::correctRotation(const Trace* i_trace,
 						Point2D& i_point2D) const
 {
   float jointPositionDifference;
-  Point2D* destinationPoint;
+  const Point2D* destinationPoint;
 
   Point2D intersectingPoint=i_trace->getTraceLine().getIntersectingPoint(i_point2D);
     
@@ -163,7 +163,7 @@ const bool LineTraceCalculator::correctRotation(const Trace* i_trace,
     */
     jointPositionDifference=distanceBeginPointIntersectingPoint;
     destinationPoint=&intersectingPoint;
-    jointPositionDifference*=2.0
+    jointPositionDifference*=2.0;
   }
 
     LOG_INFO("Destination point is: "<<destinationPoint->x<<", "<<destinationPoint->y);
