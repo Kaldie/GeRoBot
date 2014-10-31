@@ -1,5 +1,3 @@
-#include <iostream>
-#include <ios>
 #include <cmath>
 #include <algorithm>
 #include <vector>
@@ -97,8 +95,6 @@ void LineTraceCalculator::prepareRotation(const Trace* i_trace,
     //See where we end up after rotation
     getJointController()->getJoint(Rotational)->predictStep(i_point2D,direction);
 
-    LOG_DEBUG("Rotational movement per step: "<<getJointController()->getJoint(Rotational)->getMovementPerStep());
-    
     if(getWriteLog())
 	writeToStepLog(direction,1);
 
@@ -124,8 +120,6 @@ void LineTraceCalculator::prepareTranslation(const Trace* i_trace,
     //Predict the step
     getJointController()->getJoint(Translational)->predictStep(i_point2D,direction);
     
-    LOG_DEBUG("Translational movement per step: "<<getJointController()->getJoint(Translational)->getMovementPerStep());
-    
     if(getWriteLog())
 	writeToStepLog(direction,1);
 
@@ -135,8 +129,8 @@ void LineTraceCalculator::prepareTranslation(const Trace* i_trace,
     bool hasCorrectionSteps=correctTranslation(i_trace,i_point2D);
 
     getJointController()->moveStep(getJointController()->getJoint(Translational),
-				   direction,
-				   hasCorrectionSteps);
+				                           direction,
+				                           hasCorrectionSteps);
 }
 
 
@@ -144,47 +138,37 @@ const bool LineTraceCalculator::correctRotation(const Trace* i_trace,
 						Point2D& i_point2D) const
 {
   float jointPositionDifference;
-  float multiplicationFactor;
-  const Point2D* destinationPoint;
+  Point2D* destinationPoint;
 
   Point2D intersectingPoint=i_trace->getTraceLine().getIntersectingPoint(i_point2D);
     
-  /* 
-     if the translational distance of the interstecting point is bigger then then the end point set
-     the ideal magnitude to the endpoint distance!
-  */
-  
   /* The distance to the enpoint after the correction is applied*/
   double distenceEndPointIntersectingPoint=Magnitude(intersectingPoint-i_trace->getEndPosition());
     
   /* The distance traveled in this correction*/
   double distanceBeginPointIntersectingPoint=Magnitude(intersectingPoint-i_point2D);
     
-  LOG_DEBUG("Magnitude end position: "<<Magnitude(i_trace->getEndPosition()));
-  LOG_DEBUG("Magnitude intersectingPoint: "<<Magnitude(intersectingPoint));
-  
-  
-  
   if(distenceEndPointIntersectingPoint<distanceBeginPointIntersectingPoint){
-    /*if the distance needed in the next step is bigger then the distance we travel in this correction step
+    /*if the distance needed in the next step is smaller then the distance we travel in this correction step
       Don't overshoot
     */
-    jointPositionDifference=Magnitude(i_trace->getEndPosition())-Magnitude(i_point2D);
+    jointPositionDifference=Magnitude(i_trace->getEndPosition()-i_point2D);
     destinationPoint=&(i_trace->getEndPosition());
-    multiplicationFactor=1.0;
   }
   else{
-    jointPositionDifference=Magnitude(intersectingPoint)-Magnitude(i_point2D);
+    /*
+      Otherwise we assume that there is enough distance, 
+      so overshooting the correction decrease the absolute distance between the wanted and final result
+      This is done by spreading out the error over both the positive as negative side of the line
+    */
+    jointPositionDifference=distanceBeginPointIntersectingPoint;
     destinationPoint=&intersectingPoint;
-    multiplicationFactor=2.0;
+    jointPositionDifference*=2.0
   }
 
     LOG_INFO("Destination point is: "<<destinationPoint->x<<", "<<destinationPoint->y);
 
-    int numberOfSteps=std::floor((std::abs(jointPositionDifference)*multiplicationFactor)/
-				 getJointController()->getJoint(Translational)->getMovementPerStep());
-
-    LOG_DEBUG("Translational movement per step: "<<getJointController()->getJoint(Translational)->getMovementPerStep());
+    int numberOfSteps=std::floor((jointPositionDifference)/getJointController()->getJoint(Translational)->getMovementPerStep());
 
     
   if(numberOfSteps>0){
@@ -195,6 +179,7 @@ const bool LineTraceCalculator::correctRotation(const Trace* i_trace,
     getJointController()->moveSteps(getJointController()->getJoint(Translational),
                                     translationDirection,
                                     numberOfSteps);
+    
     LOG_INFO("Number of correction steps: "<<numberOfSteps<<" in the "<<translationDirection<<" direction");
   
 	
