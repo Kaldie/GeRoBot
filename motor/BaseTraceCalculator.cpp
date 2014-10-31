@@ -114,23 +114,21 @@ void BaseTraceCalculator::writeToStepLog(const std::string i_direction,
 }
 
 const bool BaseTraceCalculator::shouldTranslate(const Trace& i_trace,
-						const Point2D &i_point2D) const{
+					                                    	const Point2D &i_point2D) const{
   float pointMagnitude=Magnitude(i_point2D);
   float endPositionMagnitude=Magnitude(i_trace.getEndPosition());
-  float difference=pointMagnitude-endPositionMagnitude;
+  float difference=std::abs(pointMagnitude-endPositionMagnitude);
   
   bool shouldTranslate;
   
-  if(pointMagnitude>endPositionMagnitude)
-    shouldTranslate = false;
-  else if(std::abs(difference)>m_translationTolerance)
+  if(difference>m_translationTolerance)
     shouldTranslate = true;
-  else if( std::abs(difference+m_jointController->getJoint(Translational)->getMovementPerStep())<std::abs(difference))
-      shouldTranslate = true;
+  
+  else if(difference>(getJointController()->getJoint(Translational)->getMovementPerStep() / 2.0))
+    shouldTranslate=true;
+  
   else
-    {
-      shouldTranslate = false;
-    }
+    shouldTranslate = false;
 
   if(!shouldTranslate){
 	LOG_INFO("Not translating!! ");
@@ -143,18 +141,19 @@ const bool BaseTraceCalculator::shouldTranslate(const Trace& i_trace,
 }
 
 const bool BaseTraceCalculator::shouldRotate(const Trace& i_trace,
-					     const Point2D &i_point2D) const{
+					                                   const Point2D &i_point2D) const{
   float pointAngle=i_point2D.getAlpha()*180/PI;
   float endPositionAngle=i_trace.getEndPosition().getAlpha()*180/PI;
-  float difference=pointAngle-endPositionAngle;
+  float difference=std::abs(pointAngle-endPositionAngle);
 
   bool shouldRotate;
-  if(pointAngle>endPositionAngle)
-    shouldRotate=false;
-  else if(std::abs(difference)>m_rotationTolerance)
+  
+  if(difference>m_rotationTolerance)
       shouldRotate=true;
-  else if( std::abs(difference+m_jointController->getJoint(Rotational)->getMovementPerStep())<std::abs(difference))
-      shouldRotate=true;
+  
+  else if(difference>(getJointController()->getJoint(Rotational)->getMovementPerStep()/2.0))
+    shouldRotate=true;
+  
   else
     shouldRotate=false;
     
