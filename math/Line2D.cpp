@@ -68,3 +68,14 @@ float Line2D::getLength()
 {
   return Magnitude(m_endPoint-m_startPoint);
 }
+
+
+bool Line2D::operator==(const Line2D& i_rhs) const {
+	if(this->getStartPoint()!=i_rhs.getStartPoint())
+		return false;
+	
+	if(this->getEndPoint()!=i_rhs.getEndPoint())
+		return false;
+
+	return true;
+}

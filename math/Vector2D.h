@@ -1,7 +1,7 @@
 #ifndef Vector2D_h
 #define Vector2D_h
 
-#include <math.h>
+#include <cmath>
 
 class Vector2D
 {
@@ -119,7 +119,7 @@ class Vector2D
         
   Vector2D& normalize(void)
     {
-      return (*this /= sqrtf(x * x + y * y));
+      return (*this /= sqrt(x * x + y * y));
     }
       
   Vector2D& rotate(double angle);

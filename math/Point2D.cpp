@@ -8,7 +8,7 @@ double Point2D::getAngleToOrigin()
 
 double Point2D::getAngleBetweenPoints(const Point2D &i_point2D) const
 {
-  return ((*this) -i_point2D).getAlpha();
+	return this->getAlpha()-i_point2D.getAlpha();
 }
 
 //const float Point2D::get

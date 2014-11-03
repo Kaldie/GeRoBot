@@ -10,6 +10,8 @@ class Line2D
   GETSET(Point2D,m_endPoint,EndPoint);
   
  public:
+	bool operator==(const Line2D& i_rhs) const;
+	
   Line2D();
 	Line2D(Point2D i_startPoint, Point2D i_endPoint);
 	
