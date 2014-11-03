@@ -22,7 +22,12 @@
 //#include "JointController.h"
 
 #include <Trace.h>
+#include <RotationTrace.h>
 #include <LineTraceCalculator.h>
+
+#include <Line2D.h>
+#include <Point2D.h>
+#include <Vector2D.h>
 using namespace std;
 
 bool DISPLAY(true);
@@ -85,52 +90,52 @@ bool validateSequence(const PinStateSequence& i_toTest,
     std::vector<int>::const_iterator benchmarkIter=i_benchmark.begin();
     
     for(;
-	toTestIter!=i_toTest.end();
-	toTestIter++,benchmarkIter++)
-	{
-	    if(toTestIter->getNumericValue()!=*benchmarkIter)
-		hasPassed=false;
-	}
-
+				toTestIter!=i_toTest.end();
+				toTestIter++,benchmarkIter++)
+			{
+				if(toTestIter->getNumericValue()!=*benchmarkIter)
+					hasPassed=false;
+			}
+		
     return hasPassed;
 }
 
 
 void testPinState()
 {
-    PinState pinState;
+	PinState pinState;
 
-    assert(pinState.getNumericValue()==0);
+	assert(pinState.getNumericValue()==0);
+	
+	std::vector<int> pins{1,2,3};
+	pinState.setPins(pins);
+	
+	assert(pinState.getNumericValue()==14);
+	pinState.setPinsToDefault();
 
-    std::vector<int> pins{1,2,3};
-    pinState.setPins(pins);
+	assert(pinState.getPinState(3)==1);
+	//assert pin state map update
+	pinState.update(1,0);
+	pinState.update(2,0);
+	pinState.update(3,0);
+		
+	assert(pinState.getNumericValue()==0);
 
-    assert(pinState.getNumericValue()==14);
-    pinState.setPinsToDefault();
+	//assert pin update via pin number and value
 
-    assert(pinState.getPinState(3)==1);
-    //assert pin state map update
-    pinState.update(1,0);
-    pinState.update(2,0);
-    pinState.update(3,0);
-
-    assert(pinState.getNumericValue()==0);
-
-    //assert pin update via pin number and value
-
-    pinState.update(2,1);
-    assert(pinState.getNumericValue()==4);
+	pinState.update(2,1);
+	assert(pinState.getNumericValue()==4);
    
-    //assert pin update via pin state and appending multiple pins with it
-    PinState testState;
+	//assert pin update via pin state and appending multiple pins with it
+	PinState testState;
 
-    testState.setPins(std::vector<int>{4,5,6});
-    if(DISPLAY)
-	testState.displayPinState();
-    assert(testState.getNumericValue()==112);
-    pinState.update(testState);
+	testState.setPins(std::vector<int>{4,5,6});
+	if(DISPLAY)
+		testState.displayPinState();
+	assert(testState.getNumericValue()==112);
+	pinState.update(testState);
 
-    assert(pinState.getNumericValue()==116);
+	assert(pinState.getNumericValue()==116);
 
 
 }
@@ -138,330 +143,428 @@ void testPinState()
 
 StepperDriver testStepperDriver()
 {
-    if(DISPLAY)
-	cout<<"Start with testStepperDriver()"<<endl;
+	if(DISPLAY)
+		cout<<"Start with testStepperDriver()"<<endl;
 
-    StepperDriver stepperDriver(vector<int>{2,3,4});
+	StepperDriver stepperDriver(vector<int>{2,3,4});
 
-    if(DISPLAY)
-	cout<<"Created stepperdriver"<<endl;
+	if(DISPLAY)
+		cout<<"Created stepperdriver"<<endl;
 
-    PinState pinState=stepperDriver.getCurrentPinState();
+	PinState pinState=stepperDriver.getCurrentPinState();
 
-    assert(pinState.getNumericValue()==28);
-    pinState.update(2,0);
-    assert(pinState.getNumericValue()==24);
-    pinState.update(2,1);
-    pinState.update(3,0);
-    assert(pinState.getNumericValue()==20);
+	assert(pinState.getNumericValue()==28);
+	pinState.update(2,0);
+	assert(pinState.getNumericValue()==24);
+	pinState.update(2,1);
+	pinState.update(3,0);
+	assert(pinState.getNumericValue()==20);
     
-    stepperDriver.setCurrentPinState(pinState);
+	stepperDriver.setCurrentPinState(pinState);
 
 
-    PinStateSequence pinStateSequence;
-    stepperDriver.setPins({2,3,4});
-    pinStateSequence.push_back(stepperDriver.getCurrentPinState());
-    stepperDriver.setEnable(true);
+	PinStateSequence pinStateSequence;
+	stepperDriver.setPins({2,3,4});
+	pinStateSequence.push_back(stepperDriver.getCurrentPinState());
+	stepperDriver.setEnable(true);
         
-    stepperDriver.moveStep("CCW",pinStateSequence);
+	stepperDriver.moveStep("CCW",pinStateSequence);
 
-    vector<int> testSequence{28,16,0,16,20};
+	vector<int> testSequence{28,16,0,16,20};
 
     
-    if(DISPLAY)
-	{
+	if(DISPLAY)
+		{
 	    cout<<"Display low pin step sequence:"<<endl;
 	    stepperDriver.displayPinStateSequence(pinStateSequence);
 	    cout<<"Done!"<<endl;
-	}
+		}
 
-    stepperDriver.setPins({5,6,7});
-    pinStateSequence={};
-    pinStateSequence.push_back(stepperDriver.getCurrentPinState());
-    stepperDriver.moveStep("CW",pinStateSequence);
+	stepperDriver.setPins({5,6,7});
+	pinStateSequence={};
+	pinStateSequence.push_back(stepperDriver.getCurrentPinState());
+	stepperDriver.moveStep("CW",pinStateSequence);
 
-    testSequence={224, 192, 64, 192, 224};
-    assert(validateSequence(pinStateSequence,testSequence));   
+	testSequence={224, 192, 64, 192, 224};
+	assert(validateSequence(pinStateSequence,testSequence));   
 
 
-    if(DISPLAY)
-	{
+	if(DISPLAY)
+		{
 	    cout<<"Display high pin step sequence:"<<endl;
 	    stepperDriver.displayPinStateSequence(pinStateSequence);
 	    cout<<"Done!"<<endl;
-	}
+		}
 
-    testSequence={224, 192, 64, 192, 224};
-    assert(validateSequence(pinStateSequence,testSequence));
+	testSequence={224, 192, 64, 192, 224};
+	assert(validateSequence(pinStateSequence,testSequence));
     
-    vector<std::string> y(10);
-    for(int i=0;i<10;i++)
-	{
+	vector<std::string> y(10);
+	for(int i=0;i<10;i++)
+		{
 	    y[i]="CW";
-	}
-    pinStateSequence={};
-    stepperDriver.moveSteps(&y,pinStateSequence);
-    if(DISPLAY)
-	stepperDriver.displayPinStateSequence(pinStateSequence);
+		}
+	pinStateSequence={};
+	stepperDriver.moveSteps(&y,pinStateSequence);
+	if(DISPLAY)
+		stepperDriver.displayPinStateSequence(pinStateSequence);
 
-    testSequence={192, 64, 192, 64, 192, 64, 192, 64, 192, 64, 192, 64, 192, 64, 192, 64, 192, 64, 192, 64, 192, 224};
-    validateSequence(pinStateSequence,testSequence);
-    stepperDriver.setDefaultDirection("CCW");
-    stepperDriver.setPins({2,3,4});
+	testSequence={192, 64, 192, 64, 192, 64, 192, 64, 192, 64, 192, 64, 192, 64, 192, 64, 192, 64, 192, 64, 192, 224};
+	validateSequence(pinStateSequence,testSequence);
+	stepperDriver.setDefaultDirection("CCW");
+	stepperDriver.setPins({2,3,4});
 
-    if(DISPLAY)
-	{
+	if(DISPLAY)
+		{
 	    stepperDriver.displayPinState();
 	    cout<<"End with testStepperDriver()"<<endl;
-	}
+		}
     
-    return stepperDriver;
+	return stepperDriver;
 }
 
 
 std::vector<std::shared_ptr<BaseJoint>> testJoint(StepperDriver& i_driver)
 {
-    if(DISPLAY)
-	cout<<"start with Joint test"<<endl;
+	if(DISPLAY)
+		cout<<"start with Joint test"<<endl;
     
-    float position,perStep;
-    position=0;
-    perStep=0.1;
+	float position,perStep;
+	position=0;
+	perStep=0.1;
 
-    RotationalJoint<StepperDriver> joint(position, perStep, i_driver);
+	RotationalJoint<StepperDriver> joint(position, perStep, i_driver);
 
-    joint.setPosition(90);
-    std::vector<float> range={0.0,180.0};
-    joint.setRange(range);
-    Point2D point(0,50);
+	joint.setPosition(90);
+	std::vector<float> range={0.0,180.0};
+	joint.setRange(range);
+	Point2D point(0,50);
 
-    if(DISPLAY)
-	std::cout<<(joint.getRange()[0])<<", "<<
+	if(DISPLAY)
+		std::cout<<(joint.getRange()[0])<<", "<<
 	    (joint.getRange()[1])<<std::endl;
 
-    joint.predictSteps(point,"CCW",100);
+	joint.predictSteps(point,"CCW",100);
     
-    assert(verifyPoint(Point2D(-8.68241, 49.2404),point));
+	assert(verifyPoint(Point2D(-8.68241, 49.2404),point));
     
-    StepperDriver stepperDriver({5,6,7});
+	StepperDriver stepperDriver({5,6,7});
     
-    DirectionConversionMap map{{"IN","CCW"},{"OUT","CW"}};
+	DirectionConversionMap map{{"IN","CCW"},{"OUT","CW"}};
     
-    TranslationalJoint<StepperDriver> joint2(position,
-					     perStep,
-					     map,
-					     stepperDriver);
-    range[0]=50.0;
-    range[1]=200.0;
-    joint2.setRange(range);
+	TranslationalJoint<StepperDriver> joint2(position,
+																					 perStep,
+																					 map,
+																					 stepperDriver);
+	range[0]=50.0;
+	range[1]=200.0;
+	joint2.setRange(range);
 
-    if(DISPLAY)
-	std::cout<<(joint2.getRange()[0])<<", "<<
+	if(DISPLAY)
+		std::cout<<(joint2.getRange()[0])<<", "<<
 	    (joint2.getRange()[1])<<std::endl;
     
-    joint2.predictSteps(point,"IN",100);
+	joint2.predictSteps(point,"IN",100);
 
-    assert(verifyPoint(Point2D(-6.94593, 39.3923),point));
+	assert(verifyPoint(Point2D(-6.94593, 39.3923),point));
 
 
-    JointPointer jointPointer=joint.clone();
+	JointPointer jointPointer=joint.clone();
 
-    assert(jointPointer->getMovementPerStep()==joint.getMovementPerStep());
-    assert(jointPointer->getPosition()==joint.getPosition());
-    assert(jointPointer->convertDirection("CCW")==joint.convertDirection("CCW"));
+	assert(jointPointer->getMovementPerStep()==joint.getMovementPerStep());
+	assert(jointPointer->getPosition()==joint.getPosition());
+	assert(jointPointer->convertDirection("CCW")==joint.convertDirection("CCW"));
 
-    assert(joint2.clone()->getMotor()->getPins().size()!=0);
-    assert(jointPointer->getMotor()->getPins()==joint.getMotor()->getPins());
+	assert(joint2.clone()->getMotor()->getPins().size()!=0);
+	assert(jointPointer->getMotor()->getPins()==joint.getMotor()->getPins());
 
-    assert(joint2.clone()->getMotor()->getPins()==joint2.getMotor()->getPins());
-    assert(joint2.clone()->getMotor()->getPins()!=jointPointer->getMotor()->getPins());
+	assert(joint2.clone()->getMotor()->getPins()==joint2.getMotor()->getPins());
+	assert(joint2.clone()->getMotor()->getPins()!=jointPointer->getMotor()->getPins());
     
-     std::vector<std::shared_ptr<BaseJoint>> jointVector{joint.clone(),joint2.clone()};
+	std::vector<std::shared_ptr<BaseJoint>> jointVector{joint.clone(),joint2.clone()};
 
-     if(DISPLAY)
-	 cout<<"Done with Joint test"<<endl;
+	if(DISPLAY)
+		cout<<"Done with Joint test"<<endl;
 
-     return jointVector;
+	return jointVector;
 }
 
 
 JointController testJointController(std::vector<std::shared_ptr<BaseJoint>> i_jointVector)
 {
-    if(DISPLAY)
-	cout<<"Start with JointController test"<<endl;
-    JointController jointController;
+	if(DISPLAY)
+		cout<<"Start with JointController test"<<endl;
+	JointController jointController;
     
 
-    for(std::vector<std::shared_ptr<BaseJoint>>::iterator itr=i_jointVector.begin();
-	itr!=i_jointVector.end();
-	itr++)
-	{
-	    if(DISPLAY)
+	for(std::vector<std::shared_ptr<BaseJoint>>::iterator itr=i_jointVector.begin();
+			itr!=i_jointVector.end();
+			itr++)
 		{
-		    PinVector pins=(*itr)->getMotor()->getPins();
-		    for(PinVector::const_iterator pinItr=pins.begin();
-			pinItr!=pins.end();
-			pinItr++)
-			cout<<*pinItr<<", ";
-		    cout<<endl;
-		}
+	    if(DISPLAY)
+				{
+					PinVector pins=(*itr)->getMotor()->getPins();
+					for(PinVector::const_iterator pinItr=pins.begin();
+							pinItr!=pins.end();
+							pinItr++)
+						cout<<*pinItr<<", ";
+					cout<<endl;
+				}
 	    jointController.addJoint((*itr));
 
-	}
+		}
     
-    if(DISPLAY)
-	cout<<"Done with creation of the joint controller!"<<endl;
+	if(DISPLAY)
+		cout<<"Done with creation of the joint controller!"<<endl;
 
-    JointPointerVector rotationalJoints=jointController.getJoints(Rotational);
+	JointPointerVector rotationalJoints=jointController.getJoints(Rotational);
 
-    if(DISPLAY)
-	std::cout<<(jointController.getJoint(Rotational)->getRange()[0])<<", "<<
+	if(DISPLAY)
+		std::cout<<(jointController.getJoint(Rotational)->getRange()[0])<<", "<<
 	    (jointController.getJoint(Rotational)->getRange()[1])<<std::endl;
 
 
-    assert(i_jointVector[0]->getMotor()->getPins()==rotationalJoints[0]->getMotor()->getPins());
+	assert(i_jointVector[0]->getMotor()->getPins()==rotationalJoints[0]->getMotor()->getPins());
 
-    assert(jointController.getJoint(Translational)->getMovementPerStep()>0.099999);
-    assert(jointController.getJoint(Translational)->getMovementPerStep()<0.100001);
+	assert(jointController.getJoint(Translational)->getMovementPerStep()>0.099999);
+	assert(jointController.getJoint(Translational)->getMovementPerStep()<0.100001);
 
-    bool hasThrown(false);
-    try 
-	{
-	    jointController.getJoint(Translational)->convertDirection("CCW");	
+	bool hasThrown(false);
+	try{
+		jointController.getJoint(Translational)->convertDirection("CCW");	
 	} 
-    catch (std::runtime_error)
-	{
-	    hasThrown=true;	
+	catch (std::runtime_error){
+		hasThrown=true;	
 	}
     
-    //ment to throw an exception!
-    assert(hasThrown==true);
+	//ment to throw an exception!
+	assert(hasThrown==true);
 	
-    assert(jointController.getJoints(Translational)[0]->convertDirection("IN")=="CCW");
+	assert(jointController.getJoints(Translational)[0]->convertDirection("IN")=="CCW");
 
-    JointPointer rotationalJoint=jointController.getJoints(Rotational)[0];
-    JointPointer translationalJoint=jointController.getJoints(Translational)[0];
+	JointPointer rotationalJoint=jointController.getJoints(Rotational)[0];
+	JointPointer translationalJoint=jointController.getJoints(Translational)[0];
 
-    //reset the pins of the joint
-    rotationalJoint->getMotor()->setPins({2,3,4});
-    translationalJoint->getMotor()->setPins({5,6,7});
+	//reset the pins of the joint
+	rotationalJoint->getMotor()->setPins({2,3,4});
+	translationalJoint->getMotor()->setPins({5,6,7});
 
-    rotationalJoint->setPosition(90.0);
-    translationalJoint->setPosition(50);
+	rotationalJoint->setPosition(90.0);
+	translationalJoint->setPosition(50);
 
-    jointController.resetPinStateSequence();
+	jointController.resetPinStateSequence();
 
-    if(DISPLAY)
-	cout<<"start steps!"<<endl;
+	if(DISPLAY)
+		cout<<"start steps!"<<endl;
 
-    jointController.moveStep(rotationalJoints[0],"CCW",true);
+	jointController.moveStep(rotationalJoints[0],"CCW",true);
     
-    std::vector<int> testSequence{248,232,248,252};
-    assert(validateSequence(jointController.getPinStateSequence(),testSequence));
+	std::vector<int> testSequence{248,232,248,252};
+	assert(validateSequence(jointController.getPinStateSequence(),testSequence));
 
-    if(DISPLAY)
-	jointController.getJoint(Rotational)->getMotor()->displayPinStateSequence(jointController.getPinStateSequence());
+	if(DISPLAY)
+		jointController.getJoint(Rotational)->getMotor()->displayPinStateSequence(jointController.getPinStateSequence());
 
-    jointController.resetPinStateSequence();
-    testSequence={252};
-    assert(validateSequence(jointController.getPinStateSequence(),testSequence));
+	jointController.resetPinStateSequence();
+	testSequence={252};
+	assert(validateSequence(jointController.getPinStateSequence(),testSequence));
 
-    jointController.moveStep(rotationalJoints[0],"CW",false);
+	jointController.moveStep(rotationalJoints[0],"CW",false);
     
-    if(DISPLAY)
-	jointController.getJoint(Rotational)->getMotor()->displayPinStateSequence(jointController.getPinStateSequence());
+	if(DISPLAY)
+		jointController.getJoint(Rotational)->getMotor()->displayPinStateSequence(jointController.getPinStateSequence());
 	
-    testSequence={252, 240, 224, 240, 244};
-    assert(validateSequence(jointController.getPinStateSequence(),testSequence));
+	testSequence={252, 240, 224, 240, 244};
+	assert(validateSequence(jointController.getPinStateSequence(),testSequence));
 
-    if(DISPLAY)
-	{
+	if(DISPLAY)
+		{
 	    jointController.getJoint(Rotational)->getMotor()->displayPinStateSequence(jointController.getPinStateSequence());
 	    cout<<"first one is done!"<<endl<<endl<<endl;
-	}
-    jointController.resetPinStateSequence();
+		}
+	jointController.resetPinStateSequence();
 
-    jointController.moveSteps(translationalJoint,"OUT",5);
-    testSequence={252, 220, 92, 220, 92, 220, 92, 220, 92, 220, 92, 220, 252};
-    assert(validateSequence(jointController.getPinStateSequence(),testSequence));
+	jointController.moveSteps(translationalJoint,"OUT",5);
+	testSequence={252, 220, 92, 220, 92, 220, 92, 220, 92, 220, 92, 220, 252};
+	assert(validateSequence(jointController.getPinStateSequence(),testSequence));
 
-    jointController.moveStep(rotationalJoint,"CW",false);
-    testSequence={252, 220, 92, 220, 92, 220, 92, 220, 92, 220, 92, 220, 252, 240, 224, 240, 244};
+	jointController.moveStep(rotationalJoint,"CW",false);
+	testSequence={252, 220, 92, 220, 92, 220, 92, 220, 92, 220, 92, 220, 252, 240, 224, 240, 244};
     
-    jointController.getJoint(Rotational)->getMotor()->displayPinStateSequence(jointController.getPinStateSequence());
-
-    PinStateSequence pinStateSequence=jointController.getPinStateSequence();
-    assert(validateSequence(jointController.getPinStateSequence(),testSequence));
-
-    jointController.moveSteps(translationalJoint,"IN",5);
-
-    testSequence={252, 220, 92, 220, 92, 220, 92,
-		  220, 92, 220, 92, 220, 252, 240,
-		  224, 240, 244, 212, 148, 20, 148,
-		  20, 148, 20, 148, 20, 148, 20,
-		  148, 180};
-
-    assert(validateSequence(jointController.getPinStateSequence(),testSequence));
-
-
-    if(DISPLAY)
-    {
-	jointController.getJoint(Translational)->getMotor()->displayPinStateSequence(jointController.getPinStateSequence());
 	jointController.getJoint(Rotational)->getMotor()->displayPinStateSequence(jointController.getPinStateSequence());
+
+	PinStateSequence pinStateSequence=jointController.getPinStateSequence();
+	assert(validateSequence(jointController.getPinStateSequence(),testSequence));
+
+	jointController.moveSteps(translationalJoint,"IN",5);
+
+	testSequence={252, 220, 92, 220, 92, 220, 92,
+								220, 92, 220, 92, 220, 252, 240,
+								224, 240, 244, 212, 148, 20, 148,
+								20, 148, 20, 148, 20, 148, 20,
+								148, 180};
+
+	assert(validateSequence(jointController.getPinStateSequence(),testSequence));
+
+
+	if(DISPLAY)
+    {
+			jointController.getJoint(Translational)->getMotor()->displayPinStateSequence(jointController.getPinStateSequence());
+			jointController.getJoint(Rotational)->getMotor()->displayPinStateSequence(jointController.getPinStateSequence());
 	
-	cout<<"moved steps!"<<endl;
-	cout<<"Done with JointController test"<<endl;
+			cout<<"moved steps!"<<endl;
+			cout<<"Done with JointController test"<<endl;
     }
 
-    jointController.resetPinStateSequence();
-    return jointController;
+	jointController.resetPinStateSequence();
+	return jointController;
 }
 
 
-void testTraceCalculation(JointController& i_jointController)
+void testLineTraceCalculation(JointController& i_jointController)
 {
-    Trace trace;
-    Point2D startPoint(0,50);
-    trace.setStartPosition(startPoint);
-    trace.setEndPosition(Point2D(-1500,50));
+	Trace trace;
+	Point2D startPoint(0,50);
+	trace.setStartPoint(startPoint);
+	trace.setEndPoint(Point2D(-1500,50));
     
-    i_jointController.getJoint(Translational)->setMovementPerStep(0.01);
-    i_jointController.getJoint(Rotational)->setMovementPerStep(0.01);
+	i_jointController.getJoint(Translational)->setMovementPerStep(0.01);
+	i_jointController.getJoint(Rotational)->setMovementPerStep(0.01);
 
-    trace.setRotationTolerance(i_jointController.getJoint(Rotational)->getMovementPerStep()*1.5);
-    trace.setTranslationTolerance(i_jointController.getJoint(Translational)->getMovementPerStep()*1.5);
+	trace.setRotationTolerance(i_jointController.getJoint(Rotational)->getMovementPerStep()*1.5);
+	trace.setTranslationTolerance(i_jointController.getJoint(Translational)->getMovementPerStep()*1.5);
 
-    i_jointController.getJoint(Translational)->getMotor()->setHoldMotor(true);
-    i_jointController.getJoint(Rotational)->getMotor()->setHoldMotor(true);
+	i_jointController.getJoint(Translational)->getMotor()->setHoldMotor(true);
+	i_jointController.getJoint(Rotational)->getMotor()->setHoldMotor(true);
     
-    LineTraceCalculator lineTraceCalculator(&i_jointController);
-    lineTraceCalculator.setWriteLog(false);
-    lineTraceCalculator.calculateTrace(&trace,startPoint);
+	LineTraceCalculator lineTraceCalculator(&i_jointController);
+	lineTraceCalculator.setWriteLog(false);
+	lineTraceCalculator.calculateTrace(&trace,startPoint);
     
-    cout<<i_jointController.getPinStateSequence().size();
-    assert(297458==i_jointController.getPinStateSequence().size());
+	cout<<i_jointController.getPinStateSequence().size();
+	assert(296678==i_jointController.getPinStateSequence().size());
 
-    JointPointer rotationalJoint=i_jointController.getJoints(Rotational)[0];
-    JointPointer translationalJoint=i_jointController.getJoints(Translational)[0];
+	JointPointer rotationalJoint=i_jointController.getJoints(Rotational)[0];
+	JointPointer translationalJoint=i_jointController.getJoints(Translational)[0];
 
-    assert((rotationalJoint->getMotor()->getPins()==std::vector<int>{2,3,4}));
-    assert(translationalJoint->getDirectionConversionMap().find("IN")->second=="CCW");
+	assert((rotationalJoint->getMotor()->getPins()==std::vector<int>{2,3,4}));
+	assert(translationalJoint->getDirectionConversionMap().find("IN")->second=="CCW");
     
-    //    i_jointController.actuate();
+	//    i_jointController.actuate();
 }
 
+
+void testRotationTraceCalculation(JointController& i_jointController)
+{
+	RotationTrace trace(Point2D(-50,10),Point2D(50,10),Point2D(0,10));
+    
+	i_jointController.getJoint(Translational)->setMovementPerStep(0.01);
+	i_jointController.getJoint(Rotational)->setMovementPerStep(0.01);
+
+	trace.setRotationTolerance(i_jointController.getJoint(Rotational)->getMovementPerStep()*1.5);
+	trace.setTranslationTolerance(i_jointController.getJoint(Translational)->getMovementPerStep()*1.5);
+
+	i_jointController.getJoint(Translational)->getMotor()->setHoldMotor(true);
+	i_jointController.getJoint(Rotational)->getMotor()->setHoldMotor(true);
+    
+	i_jointController.getJoint(Translational)->setPosition(sqrt(50.0*50.0+10.0*10.0));
+	i_jointController.getJoint(Rotational)->setPosition(atan2(10,-50)*double(180.0)/double(PI));
+	
+	cout<<"position of translational and rotational joints: ";
+	cout<<i_jointController.getJoint(Translational)->getPosition()<<", ";
+	cout<<i_jointController.getJoint(Rotational)->getPosition()<<endl;
+
+	LineTraceCalculator lineTraceCalculator(&i_jointController);
+	lineTraceCalculator.setWriteLog(true);
+	Point2D startPoint(-50,10);
+	lineTraceCalculator.calculateTrace(&trace,startPoint);
+    
+	cout<<i_jointController.getPinStateSequence().size();
+	assert(296678==i_jointController.getPinStateSequence().size());
+
+	JointPointer rotationalJoint=i_jointController.getJoints(Rotational)[0];
+	JointPointer translationalJoint=i_jointController.getJoints(Translational)[0];
+
+	assert((rotationalJoint->getMotor()->getPins()==std::vector<int>{2,3,4}));
+	assert(translationalJoint->getDirectionConversionMap().find("IN")->second=="CCW");
+    
+	//    i_jointController.actuate();
+}
+
+
+void testTrace(){
+
+	Trace trace(Point2D(0,50),Point2D(50,50));
+	Line2D line(Point2D(0,50),Point2D(50,50));
+	
+	assert(trace.getTraceLine()==line);
+
+	assert(false==trace.isWithinBeginRange(Point2D(0,0)));
+	assert(true==trace.isWithinBeginRange(Point2D(0.001,50.001)));
+	
+	assert(false==trace.isWithinEndRange(Point2D(0,0)));
+	assert(true==trace.isWithinEndRange(Point2D(50.001,50.001)));
+
+	assert(trace.getRotationDirectionToEndPoint(Point2D(50,51))=="CW");
+	assert(trace.getRotationDirectionToEndPoint(Point2D(50,49))=="CCW");
+
+	assert(trace.getTranslationDirectionToEndPoint(Point2D(50,49))=="OUT");
+	assert(trace.getTranslationDirectionToEndPoint(Point2D(50,51))=="IN");
+
+	assert(trace.intersectingPoint(Point2D(49,49))==Point2D(50,50));
+	assert(trace.intersectingPoint(Point2D(0,49))==Point2D(0,50));
+
+	//Rotation trace testing!!!
+	RotationTrace rotationTrace(Point2D(0,1),Point2D(1,0),Point2D(0,0));
+	assert(rotationTrace.arcLength()==PI/2.0);
+	assert(rotationTrace.isConcave());
+
+	rotationTrace.setStartPoint(Point2D(0,2));
+	rotationTrace.setEndPoint(Point2D(2,0));
+	assert(rotationTrace.arcLength()==PI);
+	
+	RotationTrace rotationTrace3(Point2D(1,2),Point2D(2,1),1);
+	assert(rotationTrace3.getCentrePoint()==Point2D(1,1));
+	
+	try{
+		rotationTrace3.intersectingPoint(Point2D(-1,1));
+		assert(false);
+	}
+	catch(std::runtime_error){
+		if(DISPLAY)
+			cout<<"Caugth the no intersection error at the right moment"<<endl;
+	}
+
+	rotationTrace3.setCentrePoint(Point2D(2,2));
+	assert(rotationTrace3.isConcave()==false);
+	
+
+	try{
+		RotationTrace rotationTrace4(Point2D(0,1),Point2D(2,0),Point2D(0,0));
+		assert(false);
+	}
+	catch (std::runtime_error){
+		if(DISPLAY)
+			std::cout<<"Caught the start and stop point have a different magnitude compared to the centre point error!"<<std::endl;
+	}
+	
+		
+}
 
 int main()
 {
-    //  try{
-    for(int i=0;
-	i<1;
-	i++)
-	{
+	//  try{
+	for(int i=0;
+			i<1;
+			i++)
+		{
 	    testPinState();
-	    StepperDriver driver=testStepperDriver();
-	    std::vector<std::shared_ptr<BaseJoint>> jointVector=testJoint(driver);
-	    JointController jointController=testJointController(jointVector);
-	    testTraceCalculation(jointController);
-	}
+			testTrace();
+			StepperDriver driver=testStepperDriver();
+			std::vector<std::shared_ptr<BaseJoint>> jointVector=testJoint(driver);
+			JointController jointController=testJointController(jointVector);
+			//			testLineTraceCalculation(jointController);
+			testRotationTraceCalculation(jointController);
+			
+		}
 }

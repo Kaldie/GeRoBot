@@ -21,22 +21,23 @@ class BaseTraceCalculator
     GETSET(std::string,m_logFileName,LogFileName);
     
     //See if the joint controller pointer has been set
-    const bool hasJointController();
+    bool hasJointController();
 
     virtual void writeToStepLog(const std::string, //direction
 				 const int) const;  //number of steps
 
-    const bool shouldRotate(const Trace&,
+		bool shouldRotate(const Trace&,
 			    const Point2D&) const;
 
-    const bool shouldTranslate(const Trace&,
+    bool shouldTranslate(const Trace&,
 			       const Point2D&) const;
+
     void setTolerances();
 
  public:
     //getter and setter
-    virtual const std::vector<int> getNumberOfSteps(const Trace&,
-						    const Point2D&) const ;
+    virtual std::vector<int> getNumberOfSteps(const Trace*,
+																										const Point2D&) const ;
     
     virtual void calculateTrace(const Trace*,Point2D&);
 
