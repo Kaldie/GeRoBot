@@ -1,5 +1,7 @@
-#include <Point2D.h>
+#include <macroHeader.h>
 #include "RotationTrace.h"
+#include <Point2D.h>
+
 
 
 RotationTrace::RotationTrace(const Point2D& i_startPoint,
@@ -18,7 +20,8 @@ RotationTrace::RotationTrace(const Point2D& i_startPoint,
 	else{
 		LOG_DEBUG("Start point magnitude: "<<Magnitude(i_startPoint-i_centrePoint));
 		LOG_DEBUG("End point magnitude: "<<Magnitude(i_endPoint-i_centrePoint));
-		LOG_ERROR("radius from start point and end point are not equal, which makes it an elips?");
+		LOG_ERROR("radius from start point and end point are not equal!\n"
+							<<"StartPoint magnitude: "<<startPointMagnitude<<"!= EndPoint magnitude: "<<endPointMagnitude<<"!");
 	}
 	
 	setTraceType(Curve);

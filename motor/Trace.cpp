@@ -1,10 +1,7 @@
-#include <cmath>
-#include <iostream>
-#include <string>
+#include <macroHeader.h>
+#include "Trace.h"
 #include <Point2D.h>
 #include <Line2D.h>
-#include "Trace.h"
-
 
 Trace::Trace():
   m_traceType(Line), 

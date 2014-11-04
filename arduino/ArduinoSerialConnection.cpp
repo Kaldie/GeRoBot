@@ -1,10 +1,5 @@
 
-#include <string.h>
-#include <stdio.h>
-#include <iostream>
-#include <unistd.h>
-#include <fcntl.h>
-#include <termios.h>
+#include <macroHeader.h>
 #include "ArduinoSerialConnection.h"
 
 ArduinoSerialConnection::ArduinoSerialConnection():
@@ -125,9 +120,9 @@ void ArduinoSerialConnection::openConnection()
     cfsetispeed(&tio,m_baudRate); // 115200 baud
 
     if(m_blockThread)
-	m_fileHandle=open(getPortName().c_str(), O_RDWR|O_NOCTTY |O_NDELAY);  
+			m_fileHandle=open(getPortName().c_str(), O_RDWR|O_NOCTTY |O_NDELAY);  
     else
-	m_fileHandle=open(getPortName().c_str(), O_RDWR|O_NOCTTY);  
+			m_fileHandle=open(getPortName().c_str(), O_RDWR|O_NOCTTY);  
 
     LOG_INFO("Opening file to port: '"<< getPortName()<<"'");
 

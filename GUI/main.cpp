@@ -1,8 +1,9 @@
+#include <macroHeader.h>
 #include <QtGui>
 #include <RobotBuilder.h>
 #include "MainWindow.h"
 
- int main(int argc, char *argv[])
+int main(int argc, char *argv[])
  {
 	 Q_INIT_RESOURCE(RobotTreeResources);
 	 

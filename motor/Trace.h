@@ -1,13 +1,8 @@
 #ifndef Trace_h
 #define Trace_h
 
-#include <macroHeader.h>
-
-class Point2D;
-class Line2D;
-
-enum TRACE_TYPE{Line,
-								Curve};
+#include <Point2D.h>
+#include <Line2D.h>
 
 class Trace
 {

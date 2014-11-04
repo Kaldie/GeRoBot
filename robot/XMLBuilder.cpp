@@ -1,4 +1,4 @@
-#include <vector>
+#include <macroHeader.h>
 #include "XMLBuilder.h"
 
 XMLBuilder::XMLBuilder():

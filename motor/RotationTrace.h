@@ -1,10 +1,7 @@
 #ifndef RotationTrace_H
 #define RotationTrace_H
 
-#include <vector>
-#include <macroHeader.h>
 #include "Trace.h"
-
 
 /*
 	Rotation trace can be defined in 2 manners:

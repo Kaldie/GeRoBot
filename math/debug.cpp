@@ -1,4 +1,4 @@
-#include <iostream>
+
 #include <macroHeader.h>
 #include "Vector2D.h"
 #include "Point2D.h"

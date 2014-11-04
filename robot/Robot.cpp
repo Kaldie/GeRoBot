@@ -7,9 +7,11 @@
   These traces will be handled by the actuators of the joints    
 */
 
+#include <macroHeader.h>
 #include "Robot.h"
 #include <BaseTraceCalculator.h>
-
+#include <PinState.h>
+#include <Trace.h>
 
 Robot::Robot()
   : 

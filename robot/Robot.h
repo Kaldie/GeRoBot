@@ -1,15 +1,9 @@
 #ifndef Robot_h
 #define Robot_h
 
-#include <vector>
+#include <JointController.h> //has a joint controller
 #include <Point2D.h>
-
-//Controls the joints, interfaces the handles and the actuation of the robot
-#include <JointController.h>
-#include <Trace.h>
-
-class Robot; //forward declare so we can typedef the shared pointer!
-typedef std::shared_ptr<Robot> RobotPointer;
+class Trace;
 
 class Robot
 {
@@ -24,7 +18,6 @@ class Robot
     GETSET_NO_CONST(JointController,m_jointController,JointController);
     
  public:
-
     // actuations
     void goToPosition(const Point2D&);
     void goTrace(const Trace&);

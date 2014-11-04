@@ -1,7 +1,7 @@
-#include "BaseTraceCalculator.h"
-#include <JointController.h>
-#include <Point2D.h>
+#ifndef LinetraceCalculator_H
+#define LinetraceCalculator_H
 
+#include "BaseTraceCalculator.h"
 
 class LineTraceCalculator: public BaseTraceCalculator
 {
@@ -9,41 +9,47 @@ class LineTraceCalculator: public BaseTraceCalculator
 
     //Calculation variables
     bool m_hasRotated=true;
+
     bool m_hasTranslated=true;
 
     bool calculateStep(const Trace*,
-		       Point2D&) const;
+											 Point2D&) const;
     
     void setRotationStep();
+
     void setTranslationStep();
-  
+		
     void prepareTranslation(const Trace*,
-			    Point2D&)const;
-
+														Point2D&)const;
+		
     void prepareRotation(const Trace*,
-			    Point2D&)const;
-
+												 Point2D&)const;
+		
     const bool correctRotation(const Trace*,
-			       Point2D&) const;
+															 Point2D&) const;
+
     const bool correctTranslation(const Trace*,
-				  Point2D&)const;
-  
+																	Point2D&)const;
+		
     bool hasStepped();
+
     void prepareNextStep();
     
  public:
 
     //Calculation method
     virtual void calculateTrace(const Trace*,
-				Point2D&);
-
+																Point2D&);
     //Constructors
     LineTraceCalculator();
+
     LineTraceCalculator(JointController*);
     
     LineTraceCalculator(JointController*,
-			const float& i_tolerance);
+												const float& i_tolerance);
     
-    //assign operator
+    //Copy constructor
     LineTraceCalculator(const LineTraceCalculator& obj);
 };
+
+#endif // LinetraceCalculator

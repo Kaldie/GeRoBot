@@ -1,3 +1,4 @@
+#include <macroHeader.h>
 #include "BaseMotorItem.h"
 #include "PinStateItem.h"
 

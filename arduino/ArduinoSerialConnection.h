@@ -1,11 +1,6 @@
 #ifndef ArduinoSerialConnection_H
 #define ArduinoSerialConnection_H
 
-#include <vector>
-#include <macroHeader.h>
-#include <termios.h>
-#include <string>
-
 class ArduinoSerialConnection
 {
  private:

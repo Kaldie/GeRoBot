@@ -3,9 +3,8 @@
 
   Dep WiringPi
 */
-#include <iostream>
-#include <assert.h>
-#include <vector>
+
+#include <macroHeader.h>
 #include <StepperDriver.h>
 
 

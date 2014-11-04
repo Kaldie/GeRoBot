@@ -1,5 +1,6 @@
-#include "Vector2D.h"
 #include <macroHeader.h>
+#include "Vector2D.h"
+
 
 Vector2D& Vector2D::rotate(double angle)
 {
@@ -26,4 +27,9 @@ double Vector2D::getAlpha() const
     angle+=2*PI;
 
   return angle;
+}
+
+Vector2D& Vector2D::normalize(void)
+{
+	return (*this /= sqrt(x * x + y * y));
 }

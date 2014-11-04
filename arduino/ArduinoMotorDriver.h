@@ -1,10 +1,7 @@
 #ifndef ArduinoMotorDriver_H
 #define ArduinoMotorDriver_H
 
-#include <macroHeader.h>
 #include "ArduinoSerialConnection.h"
-#include <vector>
-
 
 class ArduinoMotorDriver
 {

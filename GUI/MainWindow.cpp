@@ -5,6 +5,7 @@
 #include "RobotItem.h"
 #include "BasePropertyItem.h"
 #include <Robot.h>
+#include <PinState.h>
 
 MainWindow::MainWindow(RobotPointer robot,QWidget* parent/*=0*/)
 	: QMainWindow(parent)

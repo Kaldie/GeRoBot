@@ -1,26 +1,8 @@
 #ifndef JointController_H
 #define JointController_H
 
-#include <memory>
-#include <macroHeader.h>
-#include <vector>
 #include <ArduinoMotorDriver.h>
-#include <BaseJoint.h>
-
-
-/*
-  The controler class represents the interface to the IO control to the different parts of the robot
-  Currently this project aims for an arduino controler
-  Which means this is no base class!
-*/
-
-
-//Joint controller type definitions
-typedef std::vector<JointPointer> JointPointerVector;
-
-// due to the fact that the base actuator is not yet implemented, it is typedefed to make this compile
-
-
+#include <PinState.h>
 class JointController
 {
  private:
@@ -40,8 +22,6 @@ class JointController
     bool validateJointVector(const JointPointerVector&) const;
 
     bool hasJoint(const JointPointer&) const;
-
-    JointPointerVector& getJoints(){return m_jointPointerVector;};
 
     void addEmptyPinStatesToSequence(const int&);
 

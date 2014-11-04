@@ -1,33 +1,22 @@
-/*Stepper driver class
-  Create the control the driver
 
-  Dep WiringPi
-*/
-#include <iostream>
+
 #include <assert.h>
-#include <vector>
-#include <string>
-#include <memory>
-
 #include <macroHeader.h>
+
 #include <PinState.h>
 #include "BaseMotor.h"
-//#include "StepperMotor.h"
 #include "StepperDriver.h"
-
 #include "BaseJoint.h"
 #include "RotationalJoint.h"
 #include "TranslationalJoint.h"
-
-//#include "JointController.h"
-
+#include "JointController.h"
 #include <Trace.h>
 #include <RotationTrace.h>
 #include <LineTraceCalculator.h>
-
 #include <Line2D.h>
 #include <Point2D.h>
 #include <Vector2D.h>
+
 using namespace std;
 
 bool DISPLAY(true);
@@ -454,7 +443,7 @@ void testLineTraceCalculation(JointController& i_jointController)
 }
 
 
-void testRotationTraceCalculation(JointController& i_jointController)
+void testRotationTraceCalculationBigCircle(JointController& i_jointController)
 {
 	RotationTrace trace(Point2D(-50,10),Point2D(50,10),Point2D(0,10));
     
@@ -491,6 +480,47 @@ void testRotationTraceCalculation(JointController& i_jointController)
 	//    i_jointController.actuate();
 }
 
+
+void testRotationTraceCalculationSmallCircle(JointController& i_jointController)
+{
+	RotationTrace trace(Point2D(-50,30),Point2D(-30,10),Point2D(-30,30));
+	
+	if(DISPLAY)
+		std::cout<<"Current trace is concave: "<<trace.isConcave();
+	
+
+	i_jointController.getJoint(Translational)->setMovementPerStep(0.01);
+	i_jointController.getJoint(Rotational)->setMovementPerStep(0.01);
+
+	trace.setRotationTolerance(i_jointController.getJoint(Rotational)->getMovementPerStep()*1.5);
+	trace.setTranslationTolerance(i_jointController.getJoint(Translational)->getMovementPerStep()*1.5);
+
+	i_jointController.getJoint(Translational)->getMotor()->setHoldMotor(true);
+	i_jointController.getJoint(Rotational)->getMotor()->setHoldMotor(true);
+    
+	i_jointController.getJoint(Translational)->setPosition(sqrt(50.0*50.0+30.0*30.0));
+	i_jointController.getJoint(Rotational)->setPosition(atan2(30,-50)*double(180.0)/double(PI));
+	
+	cout<<"position of translational and rotational joints: ";
+	cout<<i_jointController.getJoint(Translational)->getPosition()<<", ";
+	cout<<i_jointController.getJoint(Rotational)->getPosition()<<endl;
+
+	LineTraceCalculator lineTraceCalculator(&i_jointController);
+	lineTraceCalculator.setWriteLog(true);
+	Point2D startPoint(-50,30);
+	lineTraceCalculator.calculateTrace(&trace,startPoint);
+    
+	cout<<i_jointController.getPinStateSequence().size();
+	assert(296678==i_jointController.getPinStateSequence().size());
+
+	JointPointer rotationalJoint=i_jointController.getJoints(Rotational)[0];
+	JointPointer translationalJoint=i_jointController.getJoints(Translational)[0];
+
+	assert((rotationalJoint->getMotor()->getPins()==std::vector<int>{2,3,4}));
+	assert(translationalJoint->getDirectionConversionMap().find("IN")->second=="CCW");
+    
+	//    i_jointController.actuate();
+}
 
 void testTrace(){
 
@@ -563,8 +593,8 @@ int main()
 			StepperDriver driver=testStepperDriver();
 			std::vector<std::shared_ptr<BaseJoint>> jointVector=testJoint(driver);
 			JointController jointController=testJointController(jointVector);
-			//			testLineTraceCalculation(jointController);
-			testRotationTraceCalculation(jointController);
+			testLineTraceCalculation(jointController);
+			//testRotationTraceCalculationSmallCircle(jointController);
 			
 		}
 }

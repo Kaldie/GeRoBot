@@ -1,7 +1,7 @@
 #ifndef Line2D_h
 #define Line2D_h
+
 #include "Point2D.h"
-#include <macroHeader.h>
 
 class Line2D
 {

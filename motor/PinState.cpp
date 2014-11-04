@@ -1,7 +1,6 @@
-#include <iostream>
-#include <algorithm>
+#include <macroHeader.h>
 #include <PinState.h>
-#include <map>
+
 
 PinState::PinState():
     m_pinVector{},

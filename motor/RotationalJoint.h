@@ -2,14 +2,12 @@
 #ifndef RotationalJoint_H
 #define RotationalJoint_H
 
-#include <iostream>
+#include <macroHeader.h>
 #include <Point2D.h>
 #include <BaseJoint.h>
-#include <memory>
 
 template <class ActuatorType>
-class RotationalJoint:
-public BaseJoint
+class RotationalJoint: public BaseJoint
 {
  private:
     ActuatorType m_actuator;

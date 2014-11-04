@@ -1,8 +1,6 @@
-#include <algorithm>
-#include <stdlib.h>
-#include <BaseJoint.h>
+#include <macroHeader.h>
 #include <JointController.h>
-
+#include <BaseJoint.h>
 
 
 bool JointController::validateJoint(const JointPointer& i_baseJoint) const{

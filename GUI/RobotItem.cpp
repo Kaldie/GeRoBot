@@ -1,4 +1,6 @@
+
 #include "RobotItem.h"
+#include <Robot.h>
 #include <Point2D.h>
 #include "JointControllerItem.h"
 #include "BasePropertyItem.h"

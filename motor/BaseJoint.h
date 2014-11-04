@@ -1,21 +1,12 @@
 #ifndef Joint_h
 #define Joint_h
 
-#include <macroHeader.h>
-#include <memory>
-#include <vector>
-#include <Point2D.h>
+// Necessary because other joints are only implemented as h files which are not included by others
 #include <BaseMotor.h>
 
-//Type independend code!
-//Joint definitions
-enum MovementType {None,Rotational,Translational}; 
 
+class Point2D;
 class BaseJoint; //forward declare the class so we can create a type def JointPointer
-typedef std::shared_ptr<BaseJoint> JointPointer;
-
-
-typedef std::map<std::string,std::string> DirectionConversionMap;
 
 class BaseJoint
 {

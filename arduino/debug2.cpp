@@ -1,6 +1,4 @@
-#include <string>
-#include <stdio.h>
-#include <iostream>
+#include <macroHeader.h>
 #include "ArduinoSerialConnection.h"
 #include "ArduinoMotorDriver.h"
 

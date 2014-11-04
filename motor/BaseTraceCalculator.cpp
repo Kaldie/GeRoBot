@@ -1,10 +1,10 @@
-#include <iostream>
-#include <fstream>
-#include <cmath>
-#include <algorithm>
-#include <Vector2D.h>
+#include <macroHeader.h>
 #include <Point2D.h>
-#include "BaseTraceCalculator.h"
+#include <BaseTraceCalculator.h>
+#include <Trace.h>
+#include <BaseMotor.h>
+#include <BaseJoint.h>
+#include <JointController.h>
 
 
 BaseTraceCalculator::BaseTraceCalculator():
@@ -93,7 +93,7 @@ std::vector<int> BaseTraceCalculator::getNumberOfSteps(const Trace* i_trace,
 	//Magnitude difference / movement per step of Translational joint
 	int numberOfTranslationSteps=std::abs(Magnitude(i_position)-Magnitude(endPoint))/
 		(m_jointController->getJoint(Translational)->getMovementPerStep());
-		
+	
 	numberOfTranslationSteps*=m_jointController->getJoint(Translational)->getMotor()->numberOfStatesPerStep();
     
 	//Rotational difference / movement per step of Rotational joint
@@ -114,29 +114,30 @@ void BaseTraceCalculator::writeToStepLog(const std::string i_direction,
 }
 
 bool BaseTraceCalculator::shouldTranslate(const Trace& i_trace,
-					                                    	const Point2D &i_point2D) const{
-  float pointMagnitude=Magnitude(i_point2D);
-  float endPointMagnitude=Magnitude(i_trace.getEndPoint());
-  float difference=std::abs(pointMagnitude-endPointMagnitude);
-  
+																					const Point2D &i_point2D) const{
+	/*
+		Translate if the magnitude differs between the current point and the endpoint.
+	*/	
+	float pointMagnitude=Magnitude(i_point2D);
+	float endPointMagnitude=Magnitude(i_trace.getEndPoint());
+	float difference=std::abs(pointMagnitude-endPointMagnitude);
   bool shouldTranslate;
   
   if(difference>m_translationTolerance)
     shouldTranslate = true;
-  
   else if(difference>(getJointController()->getJoint(Translational)->getMovementPerStep() / 2.0))
     shouldTranslate=true;
-  
   else
     shouldTranslate = false;
 
+#ifdef DEBUG
   if(!shouldTranslate){
 		LOG_INFO("Not translating!! ");
 		LOG_INFO("Current magnitude: "<<pointMagnitude<<". ");
 		LOG_INFO("Wanted magnitude: "<<endPointMagnitude);
 		LOG_INFO("diff: "<<pointMagnitude-endPointMagnitude);
   }
-
+#endif 
   return shouldTranslate;
 }
 
@@ -145,25 +146,24 @@ bool BaseTraceCalculator::shouldRotate(const Trace& i_trace,
   float pointAngle=i_point2D.getAlpha()*180/PI;
   float endPointAngle=i_trace.getEndPoint().getAlpha()*180/PI;
   float difference=std::abs(pointAngle-endPointAngle);
-
   bool shouldRotate;
   
   if(difference>m_rotationTolerance)
 		shouldRotate=true;
-  
   else if(difference>(getJointController()->getJoint(Rotational)->getMovementPerStep()/2.0))
     shouldRotate=true;
-  
   else
     shouldRotate=false;
-    
+
+#ifdef DEBUG    
   if(!shouldRotate){
     LOG_INFO("Not rotating!!");
     LOG_INFO("current angle: "<<pointAngle<<" ");
     LOG_INFO("wanted angle: "<<endPointAngle);
     LOG_INFO("diff: "<<difference);
   }
-    
+#endif
+
 	return shouldRotate;
 }
 	    

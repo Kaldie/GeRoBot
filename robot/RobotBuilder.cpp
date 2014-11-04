@@ -1,5 +1,7 @@
+#include <macroHeader.h>
 #include "RobotBuilder.h"
 #include "JointControllerBuilder.h"
+#include "Robot.h"
 
 RobotBuilder::RobotBuilder(const std::string& i_fileName):
   XMLBuilder(i_fileName)

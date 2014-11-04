@@ -1,3 +1,4 @@
+#include <macroHeader.h>
 #include "RobotBuilder.h"
 
 void testRobot()

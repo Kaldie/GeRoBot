@@ -1,10 +1,7 @@
 #ifndef XMLBuilder_H
 #define XMLBuilder_H
 
-#include <vector>
-#include <macroHeader.h>
-#include <pugixml.hpp>
-#include <string>
+
 
 class XMLBuilder{
  private:

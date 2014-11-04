@@ -1,13 +1,6 @@
 #ifndef PinState_H
 #define PinState_H
 
-#include <map>
-#include <vector>
-#include <macroHeader.h>
-
-typedef std::vector<int> PinVector;
-typedef std::map<int,int> PinStateMap;
-
 class PinState
 {
   private:

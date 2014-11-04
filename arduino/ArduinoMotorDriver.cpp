@@ -1,8 +1,4 @@
-
-#include <unistd.h>
-#include <iostream>
-#include <stdlib.h>
-#include <glob.h>
+#include <macroHeader.h>
 #include "ArduinoMotorDriver.h"
 //#include <sys/types.h>
 //#include <dirent.h>

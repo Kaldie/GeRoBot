@@ -2,7 +2,6 @@
 #define RobotItem_H
 
 #include "BaseRobotItem.h"
-#include <Robot.h>
 
 class RobotItem:public BaseRobotItem
 {
@@ -19,6 +18,7 @@ class RobotItem:public BaseRobotItem
  public:
 	RobotItem(BaseRobotItem* i_parent,
 						RobotPointer i_robotPointer);
+
 	void setRobotPointer(RobotPointer i_robotPointer);
 	
 	virtual QVariant getPropertyData(int i_row,int i_column) const;

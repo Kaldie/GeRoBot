@@ -1,8 +1,6 @@
 #ifndef Vector2D_h
 #define Vector2D_h
 
-#include <cmath>
-
 class Vector2D
 {
  public:
@@ -117,10 +115,7 @@ class Vector2D
     return ((x != v.x) || (y != v.y));
   }
         
-  Vector2D& normalize(void)
-    {
-      return (*this /= sqrt(x * x + y * y));
-    }
+  Vector2D& normalize(void);
       
   Vector2D& rotate(double angle);
   double getAlpha() const;

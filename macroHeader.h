@@ -1,11 +1,22 @@
 #ifndef macroHeader_H
 #define macroHeader_H
 
-#include <iostream>
+//Common header decleration
+#include <algorithm>
 #include <fstream>
+#include <fcntl.h>
+#include <glob.h>
+#include <iostream>
+#include <map>
+#include <memory>
+#include <pugixml.hpp>
+#include <string>
+#include <string.h>
 #include <stdexcept>
 #include <sstream>
-#include <string.h>
+#include <termios.h>
+#include <unistd.h>
+#include <vector>
 
 #define PIN_HIGH 1
 #define PIN_LOW 0
@@ -18,13 +29,13 @@
 #define PI 3.1415926535897932384626433
 #define TOLERANCE 0.1
 
-#define DEBUG
+//#define DEBUG
 
 //make #define DEBUG_FILE
 
 //Create getter and setter for properties of a class
 #define GETSET(type, varName, property)		\
-private:																\
+	private:																\
 	type varName;														\
 public:																		\
  const type& get##property() const				\
@@ -106,4 +117,25 @@ public:																					\
 
 #define LOG_INFO(message) do {DEBUG_MSG("[INFO] ("<<__FILE__<<":"<<__LINE__<<"): "<<message);} while(false)
 
+
+//Forward declared classes
+class PinState;
+class BaseMotor;
+class BaseJoint;
+class Robot;
+
+enum MovementType {None,Rotational,Translational}; 
+enum TRACE_TYPE{Line,Curve};
+
+typedef std::vector<int> PinVector;
+typedef std::map<int,int> PinStateMap;
+typedef std::vector<PinState> PinStateSequence; //An array of set pins
+
+typedef std::shared_ptr<BaseJoint> JointPointer;
+typedef std::map<std::string,std::string> DirectionConversionMap;
+
+typedef std::vector<PinState> PinStateSequence;
+typedef std::vector<JointPointer> JointPointerVector;
+
+typedef std::shared_ptr<Robot> RobotPointer;
 #endif // macroHeader

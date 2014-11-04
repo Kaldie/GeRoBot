@@ -1,12 +1,11 @@
-#include <cmath>
-#include <algorithm>
-#include <vector>
+#include <macroHeader.h>
 #include <Vector2D.h>
 #include <Point2D.h>
+#include <PinState.h>
 #include <BaseJoint.h>
 #include <JointController.h>
 #include <LineTraceCalculator.h>
-
+#include <Trace.h>
 
 LineTraceCalculator::LineTraceCalculator():
 	BaseTraceCalculator(),

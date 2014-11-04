@@ -1,7 +1,9 @@
 #ifndef TranslationalJoint_H
 #define TranslationalJoint_H
 
+#include <macroHeader.h>
 #include <BaseJoint.h>
+#include <Point2D.h>
 
 template <typename ActuatorType>
 class TranslationalJoint: public BaseJoint

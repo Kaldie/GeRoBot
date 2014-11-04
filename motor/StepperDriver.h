@@ -1,10 +1,7 @@
 #ifndef StepperDriver_h
 #define StepperDriver_h
 
-#include <vector>
-#include <map>
-#include "BaseMotor.h"
-#include <macroHeader.h>
+#include <BaseMotor.h>
 
 class StepperDriver: public BaseMotor
 {

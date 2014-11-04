@@ -1,8 +1,6 @@
 // Code file for Joint class
 
-#include <iostream>
-#include <memory>
-#include <string>
+#include <macroHeader.h>
 #include "BaseJoint.h"
 
 

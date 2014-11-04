@@ -1,12 +1,13 @@
 #ifndef RobotBuilder_H
 #define RobotBuilder_H
 
-#include <memory>
 #include "XMLBuilder.h"
-#include <Robot.h>
+#include <JointController.h>
 
-class RobotBuilder:
-public XMLBuilder
+
+class JointController;
+
+class RobotBuilder: public XMLBuilder
 {
   //Properties
   GET(RobotPointer,m_robotPointer,RobotPointer);
