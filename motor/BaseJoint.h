@@ -1,10 +1,6 @@
 #ifndef Joint_h
 #define Joint_h
 
-// Necessary because other joints are only implemented as h files which are not included by others
-#include <BaseMotor.h>
-
-
 class Point2D;
 class BaseJoint; //forward declare the class so we can create a type def JointPointer
 

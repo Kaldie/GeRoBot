@@ -34,13 +34,20 @@ class RotationTrace:public Trace
   Point2D getCentrePoint(const Point2D& i_startPoint,
 												 const Point2D& i_endPoint,
 												 const double& i_radius,
-												 const bool& i_isConcave);
+												 const bool& i_isClockwise);
 
-	bool isConcave(const Point2D& i_startPoint,
-								 const Point2D& i_centrePoint)const;
+	bool isClockwise(const Point2D& i_startPoint,
+									 const Point2D& i_endPoint,
+									 const Point2D& i_centrePoint)const;
 
 	//initialise the partial trace vector
 	void initialise();
+
+	std::vector<RotationTrace> getNecessaryTraces();
+
+	bool shouldAddExtremePoint(double i_startAngle,
+														 double i_stopAngle,
+														 double i_extremeAngle);
 
 	//No default constructor allowed
 	RotationTrace();
@@ -50,7 +57,7 @@ class RotationTrace:public Trace
 	double radius() const;
 	double arcLength() const;
 
-	bool isConcave()const;
+	bool isClockwise()const;
 	
 	virtual Point2D intersectingPoint(const Point2D& i_currentPosition)const;
 
@@ -63,6 +70,11 @@ class RotationTrace:public Trace
 	RotationTrace(const Point2D& i_startPoint,
 								const Point2D& i_endPoint,
 								const Point2D& i_centrePoint);
+
+	void getExtremePoints(Point2D& i_firstExtreme,
+												Point2D& i_secondExtreme);
+
+
 	
 };
 

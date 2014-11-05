@@ -1,7 +1,7 @@
 #include <macroHeader.h>
 #include <JointController.h>
 #include <BaseJoint.h>
-
+#include <BaseMotor.h>
 
 bool JointController::validateJoint(const JointPointer& i_baseJoint) const{
   //pins should not be other then 2 t/m 7
