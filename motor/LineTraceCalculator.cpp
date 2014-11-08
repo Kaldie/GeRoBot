@@ -133,13 +133,21 @@ void LineTraceCalculator::prepareTranslation(const Trace* i_trace,
 }
 
 
-const bool LineTraceCalculator::correctRotation(const Trace* i_trace,
+bool LineTraceCalculator::correctRotation(const Trace* i_trace,
 																								Point2D& i_point2D) const
 {
   float jointPointDifference;
   const Point2D* destinationPoint;
 
-  Point2D intersectingPoint=i_trace->intersectingPoint(i_point2D);
+	Point2D intersectingPoint;
+	
+	try{
+		intersectingPoint=i_trace->intersectingPoint(i_point2D);
+	}
+	catch(std::runtime_error){
+		LOG_DEBUG("Found no intersection reverting the old position!");
+		return false;
+	}
     
   /* The distance to the enpoint after the correction is applied*/
   double distenceEndPointIntersectingPoint=Magnitude(intersectingPoint-i_trace->getEndPoint());
@@ -195,31 +203,68 @@ const bool LineTraceCalculator::correctRotation(const Trace* i_trace,
 }
 
 
-const bool LineTraceCalculator::correctTranslation(const Trace* i_trace,
-																									 Point2D& i_point2D) const {
-	float currentRotation=i_point2D.getAlpha();
+bool LineTraceCalculator::correctTranslation(const Trace* i_trace,
+																						 Point2D& i_point2D) const {
+	
+  /* The distance to the enpoint after the correction is applied*/
 
-	Point2D destinationPoint=i_trace->intersectingPoint(i_point2D);
+	Point2D intersectingPoint;
+	
+	try{
+		intersectingPoint=i_trace->intersectingPoint(i_point2D);
+	}
+	catch(std::runtime_error){
+		LOG_DEBUG("Found no intersection reverting the old position!");
+		return false;
+	}
     
-	if (destinationPoint!=Point2D(0,0))
+	if (intersectingPoint==Point2D(0,0))
 		return false;
     
-	LOG_INFO("Distination point: "<<destinationPoint.x<<", "<<destinationPoint.y); 
-	LOG_INFO("Current robot rotation: "<<currentRotation*(180.0/PI));
-	LOG_INFO("DistinationPoint rotation: "<<destinationPoint.getAlpha()*(180.0/PI));
-	float distinationPointRotation=destinationPoint.getAlpha();
-    
-	float jointAngleDifference=currentRotation-distinationPointRotation;
-    
-	LOG_INFO("Joint angle difference: "<<jointAngleDifference*(PI/180));
+	double currentRotation=i_point2D.getAlpha();
+	double intersectingAngle=intersectingPoint.getAlpha();
+	double endPointAngle=i_trace->getEndPoint().getAlpha();
 
-	float multiplicationFactor;
-	if(destinationPoint.getAlpha()>i_trace->getEndPoint().getAlpha())
-		multiplicationFactor=1.0;
-	else
-		multiplicationFactor=2.0;
+	LOG_INFO("Distination point: "<<intersectingPoint.x<<", "<<intersectingPoint.y); 
+	LOG_INFO("Current robot rotation: "<<currentRotation*180.0/PI);
+	LOG_INFO("DistinationPoint rotation: "<<intersectingAngle*180.0/PI);
+
+  /* The distance to the enpoint after the correction is applied*/
+  double distenceEndPointIntersectingPoint=std::abs(endPointAngle-intersectingAngle);
     
-	int numberOfSteps=std::floor((std::abs(jointAngleDifference)*multiplicationFactor)/
+  /* The distance traveled in this correction*/
+  double distanceBeginPointIntersectingPoint=std::abs(currentRotation-intersectingAngle);
+
+	//	double distinationPointRotation=intersectingPoint.getAlpha();
+	//	double jointAngleDifference=currentRotation-distinationPointRotation;
+    
+	LOG_INFO("Joint angle difference: "<<distanceBeginPointIntersectingPoint*(PI/180));
+
+	//Anglular distance for the correction
+	double jointPointDifference;
+
+	//Position the joint is aiming for
+	Point2D destinationPoint;
+
+  if(distenceEndPointIntersectingPoint<distanceBeginPointIntersectingPoint){
+    /*if the distance needed in the next step is smaller then the distance we travel in this correction step
+      Don't overshoot
+    */
+    jointPointDifference=distanceBeginPointIntersectingPoint;
+    destinationPoint=i_trace->getEndPoint();
+  }
+  else{
+    /*
+      Otherwise we assume that there is enough distance, 
+      so overshooting the correction decrease the absolute distance between the wanted and final result
+      This is done by spreading out the error over both the positive as negative side of the line
+    */
+    jointPointDifference=distanceBeginPointIntersectingPoint;
+    destinationPoint=intersectingPoint;
+    jointPointDifference*=2.0;
+  }
+
+	int numberOfSteps=std::floor(jointPointDifference/
 															 getJointController()->getJoint(Rotational)->getMovementPerStep()*(PI/180.0));
     
 	if(numberOfSteps>0)

@@ -1,7 +1,5 @@
-
-
-#include <assert.h>
 #include <macroHeader.h>
+#include <assert.h>
 
 #include <PinState.h>
 #include "BaseMotor.h"
@@ -13,13 +11,14 @@
 #include <Trace.h>
 #include <RotationTrace.h>
 #include <LineTraceCalculator.h>
+#include <RotationTraceCalculator.h>
 #include <Line2D.h>
 #include <Point2D.h>
 #include <Vector2D.h>
 
 using namespace std;
 
-bool DISPLAY(true);
+bool DISPLAY(false);
 
 
 bool verifyPoint(const Point2D& i_refPoint,
@@ -380,7 +379,8 @@ JointController testJointController(std::vector<std::shared_ptr<BaseJoint>> i_jo
 	jointController.moveStep(rotationalJoint,"CW",false);
 	testSequence={252, 220, 92, 220, 92, 220, 92, 220, 92, 220, 92, 220, 252, 240, 224, 240, 244};
     
-	jointController.getJoint(Rotational)->getMotor()->displayPinStateSequence(jointController.getPinStateSequence());
+	if(DISPLAY)
+		jointController.getJoint(Rotational)->getMotor()->displayPinStateSequence(jointController.getPinStateSequence());
 
 	PinStateSequence pinStateSequence=jointController.getPinStateSequence();
 	assert(validateSequence(jointController.getPinStateSequence(),testSequence));
@@ -430,7 +430,7 @@ void testLineTraceCalculation(JointController& i_jointController)
 	lineTraceCalculator.setWriteLog(false);
 	lineTraceCalculator.calculateTrace(&trace,startPoint);
     
-	cout<<i_jointController.getPinStateSequence().size();
+	cout<<i_jointController.getPinStateSequence().size()<<std::endl;
 	assert(296678==i_jointController.getPinStateSequence().size());
 
 	JointPointer rotationalJoint=i_jointController.getJoints(Rotational)[0];
@@ -459,16 +459,18 @@ void testRotationTraceCalculationBigCircle(JointController& i_jointController)
 	i_jointController.getJoint(Translational)->setPosition(sqrt(50.0*50.0+10.0*10.0));
 	i_jointController.getJoint(Rotational)->setPosition(atan2(10,-50)*double(180.0)/double(PI));
 	
-	cout<<"position of translational and rotational joints: ";
-	cout<<i_jointController.getJoint(Translational)->getPosition()<<", ";
-	cout<<i_jointController.getJoint(Rotational)->getPosition()<<endl;
-
+	if(DISPLAY){
+		cout<<"position of translational and rotational joints: ";
+		cout<<i_jointController.getJoint(Translational)->getPosition()<<", ";
+		cout<<i_jointController.getJoint(Rotational)->getPosition()<<endl;
+	}
+	
 	LineTraceCalculator lineTraceCalculator(&i_jointController);
-	lineTraceCalculator.setWriteLog(true);
+	lineTraceCalculator.setWriteLog(false);
 	Point2D startPoint(-50,10);
 	lineTraceCalculator.calculateTrace(&trace,startPoint);
     
-	cout<<i_jointController.getPinStateSequence().size();
+	cout<<i_jointController.getPinStateSequence().size()<<std::endl;
 	assert(296678==i_jointController.getPinStateSequence().size());
 
 	JointPointer rotationalJoint=i_jointController.getJoints(Rotational)[0];
@@ -486,32 +488,35 @@ void testRotationTraceCalculationSmallCircle(JointController& i_jointController)
 	RotationTrace trace(Point2D(-50,30),Point2D(-30,10),Point2D(-30,30));
 	
 	if(DISPLAY)
-		std::cout<<"Current trace is concave: "<<trace.isConcave();
-	
+		std::cout<<"Current trace is clockwise: "<<trace.getArc().isClockwise()<<std::endl;
 
 	i_jointController.getJoint(Translational)->setMovementPerStep(0.01);
 	i_jointController.getJoint(Rotational)->setMovementPerStep(0.01);
-
-	trace.setRotationTolerance(i_jointController.getJoint(Rotational)->getMovementPerStep()*1.5);
-	trace.setTranslationTolerance(i_jointController.getJoint(Translational)->getMovementPerStep()*1.5);
+	
+	i_jointController.resetPinStateSequence();
+	trace.setRotationTolerance(i_jointController.getJoint(Rotational)->getMovementPerStep()*0.6);
+	trace.setTranslationTolerance(i_jointController.getJoint(Translational)->getMovementPerStep()*0.6);
 
 	i_jointController.getJoint(Translational)->getMotor()->setHoldMotor(true);
 	i_jointController.getJoint(Rotational)->getMotor()->setHoldMotor(true);
     
 	i_jointController.getJoint(Translational)->setPosition(sqrt(50.0*50.0+30.0*30.0));
 	i_jointController.getJoint(Rotational)->setPosition(atan2(30,-50)*double(180.0)/double(PI));
-	
-	cout<<"position of translational and rotational joints: ";
-	cout<<i_jointController.getJoint(Translational)->getPosition()<<", ";
-	cout<<i_jointController.getJoint(Rotational)->getPosition()<<endl;
 
-	LineTraceCalculator lineTraceCalculator(&i_jointController);
-	lineTraceCalculator.setWriteLog(true);
+	if(DISPLAY){
+		cout<<"position of translational and rotational joints: ";
+		cout<<i_jointController.getJoint(Translational)->getPosition()<<", ";
+		cout<<i_jointController.getJoint(Rotational)->getPosition()<<endl;
+	}
+
+	RotationTraceCalculator rotationTraceCalculator(&i_jointController);
+	rotationTraceCalculator.setWriteLog(false);
 	Point2D startPoint(-50,30);
-	lineTraceCalculator.calculateTrace(&trace,startPoint);
+
+	rotationTraceCalculator.calculateTrace(&trace,startPoint);
     
 	cout<<i_jointController.getPinStateSequence().size();
-	assert(296678==i_jointController.getPinStateSequence().size());
+	assert(9836==i_jointController.getPinStateSequence().size());
 
 	JointPointer rotationalJoint=i_jointController.getJoints(Rotational)[0];
 	JointPointer translationalJoint=i_jointController.getJoints(Translational)[0];
@@ -529,11 +534,11 @@ void testTrace(){
 	
 	assert(trace.getTraceLine()==line);
 
-	assert(false==trace.isWithinBeginRange(Point2D(0,0)));
-	assert(true==trace.isWithinBeginRange(Point2D(0.001,50.001)));
+	assert(!trace.isWithinBeginRange(Point2D(0,0)));
+	assert(trace.isWithinBeginRange(Point2D(0.001,50.001)));
 	
-	assert(false==trace.isWithinEndRange(Point2D(0,0)));
-	assert(true==trace.isWithinEndRange(Point2D(50.001,50.001)));
+	assert(!trace.isWithinEndRange(Point2D(0,0)));
+	assert(trace.isWithinEndRange(Point2D(50.001,50.001)));
 
 	assert(trace.getRotationDirectionToEndPoint(Point2D(50,51))=="CW");
 	assert(trace.getRotationDirectionToEndPoint(Point2D(50,49))=="CCW");
@@ -545,40 +550,18 @@ void testTrace(){
 	assert(trace.intersectingPoint(Point2D(0,49))==Point2D(0,50));
 
 	//Rotation trace testing!!!
-	RotationTrace rotationTrace(Point2D(0,1),Point2D(1,0),Point2D(0,0));
-	assert(rotationTrace.arcLength()==PI/2.0);
-	assert(rotationTrace.isConcave());
+	RotationTrace rotationTrace=RotationTrace(Point2D(15,25),Point2D(25,15),Point2D(15,15));
+	Point2D firstExtreme, secondExtreme;
+	rotationTrace.getExtremePoints(firstExtreme,secondExtreme);
+	if(DISPLAY){
+		cout<<"First extreme x,y: "<<firstExtreme.x<<", "<<firstExtreme.y<<endl;
+		cout<<"Second extreme x,y: "<<secondExtreme.x<<", "<<secondExtreme.y<<endl;
+	}
+	assert(firstExtreme==Point2D(17.9028, 5.43057));
+	assert(secondExtreme==Point2D(5.43057, 17.9028));
 
-	rotationTrace.setStartPoint(Point2D(0,2));
-	rotationTrace.setEndPoint(Point2D(2,0));
-	assert(rotationTrace.arcLength()==PI);
+	//	assert(false);
 	
-	RotationTrace rotationTrace3(Point2D(1,2),Point2D(2,1),1);
-	assert(rotationTrace3.getCentrePoint()==Point2D(1,1));
-	
-	try{
-		rotationTrace3.intersectingPoint(Point2D(-1,1));
-		assert(false);
-	}
-	catch(std::runtime_error){
-		if(DISPLAY)
-			cout<<"Caugth the no intersection error at the right moment"<<endl;
-	}
-
-	rotationTrace3.setCentrePoint(Point2D(2,2));
-	assert(rotationTrace3.isConcave()==false);
-	
-
-	try{
-		RotationTrace rotationTrace4(Point2D(0,1),Point2D(2,0),Point2D(0,0));
-		assert(false);
-	}
-	catch (std::runtime_error){
-		if(DISPLAY)
-			std::cout<<"Caught the start and stop point have a different magnitude compared to the centre point error!"<<std::endl;
-	}
-	
-		
 }
 
 int main()
@@ -594,7 +577,6 @@ int main()
 			std::vector<std::shared_ptr<BaseJoint>> jointVector=testJoint(driver);
 			JointController jointController=testJointController(jointVector);
 			testLineTraceCalculation(jointController);
-			//testRotationTraceCalculationSmallCircle(jointController);
-			
+			testRotationTraceCalculationSmallCircle(jointController);
 		}
 }

@@ -3,6 +3,10 @@
 
 #include "BaseTraceCalculator.h"
 
+class Point2D;
+class Trace;
+class JointController;
+
 class LineTraceCalculator: public BaseTraceCalculator
 {
  protected:
@@ -25,10 +29,10 @@ class LineTraceCalculator: public BaseTraceCalculator
     void prepareRotation(const Trace*,
 												 Point2D&)const;
 		
-    const bool correctRotation(const Trace*,
+		bool correctRotation(const Trace*,
 															 Point2D&) const;
 
-    const bool correctTranslation(const Trace*,
+    bool correctTranslation(const Trace*,
 																	Point2D&)const;
 		
     bool hasStepped();
