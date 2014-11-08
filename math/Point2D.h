@@ -64,6 +64,8 @@ public:
     return (Point2D(x * f, y * f));
   };
 
+
+	bool operator ==(const Point2D& i_other) const ;
 	double getAngleBetweenPoints(const Point2D&) const;
   double getAngleToOrigin();
 		
