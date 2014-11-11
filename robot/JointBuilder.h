@@ -19,6 +19,8 @@ class JointBuilder: public XMLBuilder
  public:
   virtual void build();
   JointBuilder(const pugi::xml_node&);
+	
+	bool update(const JointPointer& i_jointPointer);
 };
 
 #endif // JointControllerBUilder

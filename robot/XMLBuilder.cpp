@@ -1,4 +1,5 @@
 #include <macroHeader.h>
+
 #include "XMLBuilder.h"
 
 XMLBuilder::XMLBuilder():
@@ -63,16 +64,16 @@ pugi::xml_node XMLBuilder::loadXMLFile()
 }
 
 
-pugi::xml_node XMLBuilder::getNodeFromPath(const pugi::xml_node& parrentNode,
-					   const std::string& i_path) const{
+pugi::xml_node XMLBuilder::getNodeFromPath(const pugi::xml_node& i_parrentNode,
+																					 const std::string& i_path) const{
   
-  pugi::xml_node childNode=parrentNode.first_element_by_path(i_path.c_str());
+  pugi::xml_node childNode=i_parrentNode.first_element_by_path(i_path.c_str());
   LOG_DEBUG(childNode.name());
 
   if(childNode)
     return childNode;
   else
-    LOG_ERROR("Could not find a child node from: "<<i_path<<" starting at node: "<<parrentNode.name());
+    LOG_ERROR("Could not find a child node from: "<<i_path<<" starting at node: "<<i_parrentNode.name());
 
 }
 
@@ -160,4 +161,9 @@ void XMLBuilder::displayTree()
       LOG_DEBUG(tool.child_value());
       //std::cout<<tool.path()<<std::endl;
     }
+}
+
+
+bool XMLBuilder::store(const std::string& i_fileName){
+	return m_documentPointer->save_file(i_fileName.c_str());
 }

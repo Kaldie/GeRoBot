@@ -17,6 +17,8 @@ class RobotBuilder: public XMLBuilder
 
   JointController parseJointController(const pugi::xml_node&);
 
+	bool updateJointController(const JointController& i_jointController);
+
  public:
 	RobotBuilder(const std::string&);
 	
@@ -25,6 +27,10 @@ class RobotBuilder: public XMLBuilder
   virtual void displayTree();
 	
 	void setRobotPointer(Robot* i_robotPointer);
+	
+	bool update(const RobotPointer& i_newRobotPointer);
+
+	bool store(const std::string& i_fileName);
 };
 
 #endif // RobotBuilder

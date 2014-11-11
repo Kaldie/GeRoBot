@@ -4,8 +4,7 @@
 #include "Robot.h"
 
 RobotBuilder::RobotBuilder(const std::string& i_fileName):
-  XMLBuilder(i_fileName)
-{
+  XMLBuilder(i_fileName){
 	m_robotPointer.reset(new Robot);
 }
 
@@ -19,7 +18,7 @@ void RobotBuilder::build(){
   m_robotPointer->setJointController(parseJointController(getNodeFromPath("./ROBOT/JOINTCONTROLLER")));
 }
 
-    
+
 JointController RobotBuilder::parseJointController(const pugi::xml_node& i_node){
   JointControllerBuilder jointControllerBuilder(i_node);
   jointControllerBuilder.build();  
@@ -49,4 +48,26 @@ void RobotBuilder::displayTree(){
 
 void RobotBuilder::setRobotPointer(Robot* i_robotPointer){
 	m_robotPointer.reset(i_robotPointer);
+}
+
+
+
+bool RobotBuilder::update(const RobotPointer& i_robotPointer){
+	m_robotPointer=i_robotPointer;
+	return updateJointController(m_robotPointer->getJointController());
+}    
+
+
+bool RobotBuilder::updateJointController(const JointController& i_jointController){
+	JointControllerBuilder jointControllerBuilder(getNodeFromPath("./ROBOT/JOINTCONTROLLER"));
+	return jointControllerBuilder.update(m_robotPointer->getJointController());
+}
+
+
+bool RobotBuilder::store(const std::string& i_fileName){
+	//check if this one is the owner of the document tree!
+	if(!getHasLoaded())
+		return false;
+		
+	return XMLBuilder::store(i_fileName.c_str());
 }

@@ -11,9 +11,11 @@ class StepperDriverBuilder: public XMLBuilder
  private:
   //No default construction!
   StepperDriverBuilder();
+	bool updatePins(const PinVector& i_stepperDriver);
 
  public:
   virtual void build();
+	bool update(const BaseMotor* i_stepperDriver);
   StepperDriverBuilder(const pugi::xml_node&);
 };
 

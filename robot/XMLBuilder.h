@@ -1,8 +1,6 @@
 #ifndef XMLBuilder_H
 #define XMLBuilder_H
 
-
-
 class XMLBuilder{
  private:
     GETSET(std::string,m_fileName,FileName);
@@ -13,9 +11,9 @@ class XMLBuilder{
 
     template<class T>
 		std::vector<T> getList(const pugi::xml_node&,
-			   const std::string&,
-			   const int&,
-			   T (XMLBuilder::*f)(const pugi::xml_text&)const) const;
+													 const std::string&,
+													 const int&,
+													 T (XMLBuilder::*f)(const pugi::xml_text&)const) const;
 
     //need to wrap the pugi::xml_text methods, they behave rediculus as function pointers....
     float as_float(const pugi::xml_text& i_text) const {return i_text.as_float();};
@@ -24,6 +22,7 @@ class XMLBuilder{
     bool as_bool(const pugi::xml_text& i_text) const {return i_text.as_bool();};
 
     XMLBuilder();
+
  public:
     //Build they objects
     virtual void build();
@@ -52,6 +51,8 @@ class XMLBuilder{
 																	 const std::string&) const;
 
     pugi::xml_node getNodeFromPath(const std::string&) const;
+
+		virtual bool store(const std::string& i_fileName);
 
     XMLBuilder(const std::string&);
     XMLBuilder(const pugi::xml_node&);

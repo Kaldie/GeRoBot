@@ -21,22 +21,20 @@ void JointBuilder::build()
       std::string movementType=getNodeFromPath(jointNode,"./MOVEMENT_TYPE").text().as_string();
 
       if(movementType=="ROTATIONAL"){
-	LOG_DEBUG("Building a rotational joint!");
-	RotationalJoint<StepperDriver> joint;
-	jointPointer=joint.clone();
+				LOG_DEBUG("Building a rotational joint!");
+				RotationalJoint<StepperDriver> joint;
+				jointPointer=joint.clone();
       }
       
       else if(movementType=="TRANSLATIONAL"){
-	LOG_DEBUG("Building a translational joint!");
-	TranslationalJoint<StepperDriver> joint;
-	jointPointer=joint.clone();
+				LOG_DEBUG("Building a translational joint!");
+				TranslationalJoint<StepperDriver> joint;
+				jointPointer=joint.clone();
       }
       
       else{
-	LOG_ERROR("Movement type: "<<movementType<<" is not correct!");
+				LOG_ERROR("Movement type: "<<movementType<<" is not correct!");
       }
-      
-
       
       jointPointer->setMovementPerStep(getNodeFromPath(jointNode,"./MOVEMENT_PER_STEP").text().as_float());
       jointPointer->setPosition(getNodeFromPath(jointNode,"./DEFAULT_POSITION").text().as_float());
@@ -47,30 +45,26 @@ void JointBuilder::build()
 
       *(jointPointer->getMotor())=parseStepperDriver(getNodeFromPath(jointNode,"./ACTUATOR"));
       
-      LOG_DEBUG("hoi");
-
-
       std::vector<float> range=getFloatList(jointNode,"./RANGE",2);
       jointPointer->setRange(range);
 	    
       std::vector<std::string> directionConversionStringVector=getStringList(jointNode,
-									     "./DIRECTION_CONVERSION_MAP",
-									     2);
+																																						 "./DIRECTION_CONVERSION_MAP",
+																																						 2);
       DirectionConversionMap directionMap;
       int delimPosition;
       for(std::vector<std::string>::iterator itr=directionConversionStringVector.begin();
-	  itr!=directionConversionStringVector.end();
-	  itr++){
-	delimPosition=(*itr).find_first_of(",");
-	LOG_DEBUG("Direction "<<(*itr).substr(0,delimPosition)<<
-		  " will be converted to "<<(*itr).substr(delimPosition+1));
-	directionMap[(*itr).substr(0,delimPosition)]=(*itr).substr(delimPosition+1);
+					itr!=directionConversionStringVector.end();
+					itr++){
+
+				delimPosition=(*itr).find_first_of(",");
+				LOG_DEBUG("Direction "<<(*itr).substr(0,delimPosition)<<
+									" will be converted to "<<(*itr).substr(delimPosition+1));
+				directionMap[(*itr).substr(0,delimPosition)]=(*itr).substr(delimPosition+1);
       }
 
       jointPointer->setDirectionConversionMap(directionMap);
 
-      
-      
       setJointPointer(jointPointer);
       
       LOG_DEBUG("Construction of the pointer is finished!");
@@ -92,4 +86,39 @@ StepperDriver JointBuilder::parseStepperDriver(const pugi::xml_node& i_node)
 JointBuilder::JointBuilder(const pugi::xml_node& i_node)
 {
   setNode(i_node);
+}
+
+
+bool JointBuilder::update(const JointPointer& i_jointPointer){
+	if(i_jointPointer->getMovementType()==Rotational)
+		getNodeFromPath("./MOVEMENT_TYPE").text().set("ROTATIONAL");
+	else if(i_jointPointer->getMovementType()==Translational)
+		getNodeFromPath("./MOVEMENT_TYPE").text().set("TRANSLATIONAL");
+	else
+		LOG_ERROR("Unknown movement type!");
+
+	//Set movement per set
+	getNodeFromPath("./MOVEMENT_PER_STEP").text().set(i_jointPointer->getMovementPerStep());
+	//Set current position
+	getNodeFromPath("./DEFAULT_POSITION").text().set(i_jointPointer->getPosition());
+
+	//Set range to node
+	pugi::xml_node rangeNode(getNodeFromPath("./RANGE/VALUE"));
+	rangeNode.text().set(i_jointPointer->getRange()[0]);
+	rangeNode.next_sibling().text().set(i_jointPointer->getRange()[1]);
+
+	//Direction conversion 	
+	DirectionConversionMap directionConversionMap(i_jointPointer->getDirectionConversionMap());
+	pugi::xml_node directionConversionNode=getNodeFromPath("./DIRECTION_CONVERSION_MAP/VALUE");
+	for(DirectionConversionMap::const_iterator itr=directionConversionMap.begin();
+			itr!=directionConversionMap.end();
+			itr++,directionConversionNode=directionConversionNode.next_sibling()){
+		directionConversionNode.text().set((itr->first+","+itr->second).c_str());
+	}
+
+	StepperDriverBuilder stepperDriverBuilder(getNodeFromPath("./ACTUATOR"));
+	bool hasSucceeded(true);
+	hasSucceeded&=stepperDriverBuilder.update(i_jointPointer->getMotor());
+
+	return hasSucceeded;
 }
