@@ -3,6 +3,7 @@
 
 #include <ArduinoMotorDriver.h>
 #include <PinState.h>
+
 class JointController
 {
  private:
@@ -28,7 +29,7 @@ class JointController
     void addStepToPrevious(const JointPointer&, const std::string&);
 
     void appendPinStateSequence(const PinStateSequence&,
-				const bool&);
+																const bool&);
 
  public:
     JointController();
@@ -51,9 +52,14 @@ class JointController
     //Methods to retrieve the joint(s) of a specific type
     JointPointerVector getJoints(const MovementType&);
     JointPointer& getJoint(const MovementType&);
+
+		//Method to the Arduino actuator pointer
+		ArduinoMotorDriver* getActuatorPointer(){return &m_actuator;};
     
     //no function yet
     void actuate();
+
+
 
 };
 
