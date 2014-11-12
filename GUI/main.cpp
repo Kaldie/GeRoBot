@@ -5,9 +5,9 @@
 
 int main(int argc, char *argv[])
  {
-     //Q_INIT_RESOURCE(RobotTreeResources);
+	 Q_INIT_RESOURCE(RobotTreeModel);
 	 
-     RobotBuilder robotBuilder("/home/ruud/tmp.xml");
+	 RobotBuilder robotBuilder("defaultRobot.xml");
 	 robotBuilder.build();
 	 
 	 QApplication app(argc, argv);

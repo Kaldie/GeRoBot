@@ -5,7 +5,7 @@
 const QList<QString> PinStateItem::propertyList{"NumericValue"};
 
 PinStateItem::PinStateItem(BaseRobotItem* i_parent,
-													 PinState* i_pinState):
+                           PinState* i_pinState):
 	BaseRobotItem("PinState",i_parent),
 	m_pinState(i_pinState)
 {

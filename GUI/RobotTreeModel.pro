@@ -5,17 +5,19 @@
                PinStateItem.h           \
                BaseJointItem.h          \
                JointControllerItem.h    \
+               BaseActuatorItem.h       \
                RobotItem.h              \
                RobotTreeModel.h         \
                BasePropertyItem.h       \
                MainWindow.h
 
- RESOURCES   = RobotTreeResources.qrc
+ RESOURCES   = RobotTreeModel.qrc
 
  SOURCES     = BaseRobotItem.cpp        \
                BasePropertyItem.cpp     \
                RobotItem.cpp            \
                JointControllerItem.cpp  \
+               BaseActuatorItem.cpp     \
                BaseMotorItem.cpp        \
                PinStateItem.cpp         \
                BaseJointItem.cpp        \

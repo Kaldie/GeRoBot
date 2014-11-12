@@ -10,8 +10,7 @@ class JointControllerItem:public BaseRobotItem
  private:
 	//No default constructor!
 	JointControllerItem();
-	bool addPinStateItem();
-	
+	bool addArduinoActuator();
  public:
 	JointControllerItem(BaseRobotItem* i_parrentItem,
 											JointController* motorPointer);

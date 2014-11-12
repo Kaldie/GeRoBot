@@ -51,6 +51,7 @@
     </item>
    </layout>
   </widget>
+  <widget class="QStatusBar" name="statusbar"/>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
@@ -64,24 +65,11 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
+    <addaction name="saveAction"/>
     <addaction name="exitAction"/>
    </widget>
-   <widget class="QMenu" name="actionsMenu">
-    <property name="title">
-     <string>&amp;Actions</string>
-    </property>
-    <addaction name="insertRowAction"/>
-    <addaction name="insertColumnAction"/>
-    <addaction name="separator"/>
-    <addaction name="removeRowAction"/>
-    <addaction name="removeColumnAction"/>
-    <addaction name="separator"/>
-    <addaction name="insertChildAction"/>
-   </widget>
    <addaction name="fileMenu"/>
-   <addaction name="actionsMenu"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
   <action name="exitAction">
    <property name="text">
     <string>E&amp;xit</string>
@@ -90,44 +78,21 @@
     <string>Ctrl+Q</string>
    </property>
   </action>
-  <action name="insertRowAction">
+  <action name="saveAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
-    <string>Insert Row</string>
+    <string>Save Robot</string>
+   </property>
+   <property name="iconText">
+    <string>Save Robot</string>
+   </property>
+   <property name="toolTip">
+    <string>Save Robot</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+I, R</string>
-   </property>
-  </action>
-  <action name="removeRowAction">
-   <property name="text">
-    <string>Remove Row</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+R, R</string>
-   </property>
-  </action>
-  <action name="insertColumnAction">
-   <property name="text">
-    <string>Insert Column</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+I, C</string>
-   </property>
-  </action>
-  <action name="removeColumnAction">
-   <property name="text">
-    <string>Remove Column</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+R, C</string>
-   </property>
-  </action>
-  <action name="insertChildAction">
-   <property name="text">
-    <string>Insert Child</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+N</string>
+    <string>Ctrl+S</string>
    </property>
   </action>
  </widget>

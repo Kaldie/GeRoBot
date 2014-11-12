@@ -1,15 +1,21 @@
-
-#include <QtGui>
-
+ #include <QtGui>
+#include <macroHeader.h>
 #include "BaseRobotItem.h"
+#include "BasePropertyItem.h"
+#include "RobotItem.h"
 #include "RobotTreeModel.h"
 
-RobotTreeModel ::RobotTreeModel(BaseRobotItem* robotItem,
+RobotTreeModel ::RobotTreeModel(RobotPointer i_robotPointer,
 																QObject *parent /*=0*/)
 	: QAbstractItemModel(parent)
 {
 	m_headerData << "Property name"<<"Value";
-	rootItem = robotItem;
+	rootItem = new BasePropertyItem("root",0);
+	RobotItem* robotItem = new RobotItem(rootItem,i_robotPointer);
+	robotItem->construct();
+	rootItem->insertChild(0,robotItem);
+	//		 robotItem->construct();
+	LOG_DEBUG(rootItem->parent());
 }
 
 RobotTreeModel::~RobotTreeModel()
@@ -196,65 +202,7 @@ bool RobotTreeModel::setHeaderData(int section, Qt::Orientation orientation,
 	return result;
 }
 
-/*
-void RobotTreeModel::setupModelData(const QStringList &lines, BaseRobotItem *parent)
-{
-	QList<BaseRobotItem*> parents;
-	QList<int> indentations;
-	parents << parent;
-	indentations << 0;
 
-	int number = 0;
-
-	while (number < lines.count()) {
-		int position = 0;
-		
-		// Start at the first none space charackter
-		while (position < lines[number].length()) {
-			if (lines[number].mid(position, 1) != " ")
-				break;
-			position++;
-		}
-		
-		// Get the rest of the string while removing the empty end
-		QString lineData = lines[number].mid(position).trimmed();
-
-		// Stop if the line doesnt contain anything
-		if (!lineData.isEmpty()) {
-
-			// Read the column data from the rest of the line.
-			QStringList columnStrings = lineData.split("\t", QString::SkipEmptyParts);
-
-			QVector<QVariant> columnData;
-			for (int column = 0; column < columnStrings.count(); ++column)
-				columnData << columnStrings[column];
-
-			if (position > indentations.last()) {
-				// The last child of the current parent is now the new parent
-				// unless the current parent has no children.
-
-				if (parents.last()->childCount() > 0) {
-					parents << parents.last()->child(parents.last()->childCount()-1);
-					indentations << position;
-				}
-			} 
-			else {
-				while (position < indentations.last() && parents.count() > 0) {
-					//clean parents and indentations and create a new root element child
-					parents.pop_back();
-					indentations.pop_back();
-				}
-			}
-
-			// Append a new item to the current parent's list of children.
-			// Do not forget...we only accept 2-value based childs....
-			BaseRobotItem *parent = parents.last();
-			parent->insertChildren(parent->childCount(), 1,parents.last()->getName()+"_child" );
-			for (int column = 0; column < columnData.size(); ++column)
-				parent->child(parent->childCount() - 1)->setData(column, columnData[column]);
-		}
-
-		number++;
-	}
+RobotPointer RobotTreeModel::getRobotPointer(){
+	return static_cast<RobotItem*>(rootItem->getChildItems()[0])->getRobotPointer();
 }
-*/
