@@ -6,12 +6,12 @@
 RobotBuilder::RobotBuilder(const std::string& i_fileName):
   XMLBuilder(i_fileName){
 	m_robotPointer.reset(new Robot);
+	XMLBuilder::build();
 }
 
 
 void RobotBuilder::build(){
   //need to call the xml builder build function to load the root node of the document given by the file name.
-  XMLBuilder::build();
   LOG_DEBUG("Building a robot from file name: "<<getFileName());
   LOG_DEBUG("Root node is: "<<getNode().name());
   

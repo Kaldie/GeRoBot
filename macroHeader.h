@@ -29,7 +29,7 @@
 #define PI 3.1415926535897932384626433
 #define TOLERANCE 0.1
 
-//#define DEBUG
+#define DEBUG
 
 //make #define DEBUG_FILE
 
@@ -96,18 +96,18 @@ public:																					\
 #define DEBUG_MSG(message) do {std::cout<<message<<std::endl;} while(false)
 
 #elif defined(DEBUG_FILE)
-#define DEBUG_MSG(message) do {				\
-  std::ofstream thisStream;					\
-  thisStream.open("Debug.save",std::ios_base::app);			\
-  thisStream<<message<<std::endl;						\
-  thisStream.close();				\
+#define DEBUG_MSG(message) do {													\
+		std::ofstream thisStream;														\
+		thisStream.open("Debug.save",std::ios_base::app);		\
+		thisStream<<message<<std::endl;											\
+		thisStream.close();																	\
   } while(false)
 #else
 #define DEBUG_MSG(message)
 #endif
 
-#define LOG_ERROR(message) do {						\
-    std::stringstream stream;						\
+#define LOG_ERROR(message) do {																					\
+    std::stringstream stream;																						\
     stream<<std::endl<<"("<<__FILE__<<":"<<__LINE__<<"): "<<message;		\
     throw std::runtime_error(stream.str());} while(false)
 
@@ -123,6 +123,7 @@ class PinState;
 class BaseMotor;
 class BaseJoint;
 class Robot;
+class RobotTreeModel;
 
 enum MovementType {None,Rotational,Translational}; 
 enum TRACE_TYPE{Line,Curve};
@@ -138,4 +139,8 @@ typedef std::vector<PinState> PinStateSequence;
 typedef std::vector<JointPointer> JointPointerVector;
 
 typedef std::shared_ptr<Robot> RobotPointer;
+
+typedef std::shared_ptr<RobotTreeModel> RobotTreeModelPointer;
+
+
 #endif // macroHeader

@@ -1,34 +1,30 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "RobotItem.h"
-
 #include <QMainWindow>
 #include <QModelIndex>
 #include "ui_MainWindow.h"
+
+#include <macroHeader.h>
 
 class QAction;
 class QTreeView;
 class QWidget;
 
-
-
 class MainWindow : public QMainWindow, private Ui::MainWindow
 {
 	Q_OBJECT
+
+	GETSET(RobotTreeModelPointer,m_modelPointer,ModelPointer);
 	
  public:
-	MainWindow(RobotPointer,QWidget *parent = 0);
-		 
+    MainWindow(const RobotPointer&,QWidget *parent = 0);
+
  public slots:
-	 void updateActions();
-		
+	 bool saveRobot();
+
  private slots:
-	 void insertChild();
-	 bool insertColumn(const QModelIndex &parent = QModelIndex());
-	 void insertRow();
-	 bool removeColumn(const QModelIndex &parent = QModelIndex());
-	 void removeRow();
+
 };
 
 #endif

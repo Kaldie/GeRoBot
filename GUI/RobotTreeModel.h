@@ -1,6 +1,7 @@
 #ifndef TREEMODEL_H
 #define TREEMODEL_H
 
+#include <macroHeader.h>
 #include <QAbstractItemModel>
 #include <QModelIndex>
 #include <QVariant>
@@ -12,7 +13,7 @@ class RobotTreeModel : public QAbstractItemModel
 	Q_OBJECT
 
  public:
-	RobotTreeModel(BaseRobotItem* rootItem,
+	RobotTreeModel(RobotPointer i_robotPointer,
 								 QObject *parent = 0);
 
 	~RobotTreeModel();
@@ -50,6 +51,8 @@ class RobotTreeModel : public QAbstractItemModel
 
 	bool removeRows(int position, int rows,
 									const QModelIndex &parent = QModelIndex());
+
+	RobotPointer getRobotPointer();
 
  private:
 	void setupModelData(const QStringList &lines, BaseRobotItem *parent);

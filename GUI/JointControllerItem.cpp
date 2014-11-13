@@ -2,6 +2,7 @@
 #include <JointController.h>
 #include "JointControllerItem.h"
 #include "BaseJointItem.h"
+#include "BaseActuatorItem.h"
 #include <BaseJoint.h>
 
 JointControllerItem::JointControllerItem(BaseRobotItem* parent,
@@ -13,18 +14,6 @@ JointControllerItem::JointControllerItem(BaseRobotItem* parent,
 	setNumberOfProperties(5);
 }
 
-
-/*QVariant JointControllerItem::getPropertyData(int i_row,
-																							int i_column) const {
-	return QVariant();
-}
-
-
-bool JointControllerItem::setPropertyData(int i_row,
-																					int i_column,
-																					const QVariant& i_value){
-	return false;
-	}*/
 
 bool JointControllerItem::construct(){
 	bool worked(true);
@@ -47,5 +36,17 @@ bool JointControllerItem::construct(){
 			insertChild(0,child);
 		}
 	}
-	return worked;
+	return worked && addArduinoActuator();
+}
+
+
+bool JointControllerItem::addArduinoActuator(){
+	if(!m_jointController)
+		return false;
+
+	LOG_DEBUG("Add Arduino Actuator");
+	BaseActuatorItem* child = new BaseActuatorItem(this,m_jointController->getActuatorPointer());
+	child->construct();
+	insertChild(0,child);
+	return true;
 }

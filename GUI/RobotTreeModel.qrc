@@ -1,5 +1,5 @@
- <RCC>
-     <qresource prefix="/" >
-         <file>default.txt</file>
-     </qresource>
- </RCC>
+<RCC>
+    <qresource prefix="/">
+        <file>defaultRobot.xml</file>
+    </qresource>
+</RCC>
