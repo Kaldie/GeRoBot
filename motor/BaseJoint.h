@@ -27,16 +27,19 @@ class BaseJoint
     const std::string convertDirection(const std::string)const;
 
     virtual BaseMotor* getMotor() = 0;
-    //    virtual void setMotor(const BaseMotor*) = 0;
-
+    /* This doesnt work becaus the basemotor pointer is not in the heap so will be lost.
+			 Using a normal variable doesnt work either, because it cannot be cast to other motors
+		
+			 virtual void setMotor(const BaseMotor*) = 0;
+		*/
 
     //Actual methods!
     virtual void predictStep(Point2D&,
-			     const std::string&); 
+														 const std::string&); 
 
     virtual void predictSteps(Point2D&,
-			      const std::string&,
-			      const int&)=0;
+															const std::string&,
+															const int&)=0;
   
     std::shared_ptr<BaseJoint> clone() const { return std::shared_ptr<BaseJoint>( this->cloneImpl() ); }
     
@@ -44,17 +47,16 @@ class BaseJoint
     BaseJoint();
   
     BaseJoint(float&,
-	      float&);
+							float&);
 
     BaseJoint(float&,
-	      float&,
-	      DirectionConversionMap&);
-
+							float&,
+							DirectionConversionMap&);
 
     BaseJoint(float&,
-	      float&,
-	      MovementType&,
-	      DirectionConversionMap&);
+							float&,
+							MovementType&,
+							DirectionConversionMap&);
     
     virtual ~BaseJoint(){};
 };
