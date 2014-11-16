@@ -1,32 +1,32 @@
-
+// Copyright [2014] Ruud Cools
 #include <macroHeader.h>
-#include "ArduinoSerialConnection.h"
+#include "./ArduinoSerialConnection.h"
 
-ArduinoSerialConnection::ArduinoSerialConnection():
-    m_deadTimeBetweenMessage(0),
-    m_minimumBytePerMessage(0),
-    m_closeHandleAfterMessage(true),
-    m_blockThread(false),
-    m_baudRate(B115200),
-    m_fileHandle(-1),
-    m_portName("")
+ArduinoSerialConnection::ArduinoSerialConnection()
+    : m_deadTimeBetweenMessage(0),
+      m_minimumBytePerMessage(0),
+      m_closeHandleAfterMessage(true),
+      m_blockThread(false),
+      m_baudRate(B115200),
+      m_fileHandle(-1),
+      m_portName("")
 {}
 
 
-ArduinoSerialConnection::ArduinoSerialConnection(std::string i_fileName):
-    m_deadTimeBetweenMessage(0),
-    m_minimumBytePerMessage(0),
-    m_closeHandleAfterMessage(true),
-    m_blockThread(false),
-    m_baudRate(B115200),
-    m_fileHandle(-1),
-    m_portName(i_fileName)
+ArduinoSerialConnection::ArduinoSerialConnection(std::string i_fileName)
+    : m_deadTimeBetweenMessage(0),
+      m_minimumBytePerMessage(0),
+      m_closeHandleAfterMessage(true),
+      m_blockThread(false),
+      m_baudRate(B115200),
+      m_fileHandle(-1),
+      m_portName(i_fileName)
 {}
 
 
 
 ArduinoSerialConnection::ArduinoSerialConnection(const std::string& i_portName,
-						 const int& i_minimumBytePerMessage,
+                                                 const int& i_minimumBytePerMessage,
 						 const int& i_deadTimeBetweenMessage,
 						 const int& i_baudRate,
 						 const bool& i_closeAfterMessage,
@@ -37,53 +37,44 @@ ArduinoSerialConnection::ArduinoSerialConnection(const std::string& i_portName,
     m_blockThread(i_blockThread),
     m_baudRate(B115200),
     m_fileHandle(-1),
-    m_portName(i_portName)
-{
+    m_portName(i_portName) {
     setBaudRate(i_baudRate);
 }
-					      
 
 
-void ArduinoSerialConnection::setBaudRate(const int& i_baudRate)
-{
+
+void ArduinoSerialConnection::setBaudRate(const int& i_baudRate){
     /*
       Possible baud rates:
       300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, or 115200.
     */
-	if(i_baudRate==300)
-	    m_baudRate=B300;
-	else if(i_baudRate==600)
-	    m_baudRate=B600;
-	else if(i_baudRate==1200)
-	    m_baudRate=B1200;
-	else if(i_baudRate==4800)
-	    m_baudRate=B4800;
-	else if(i_baudRate==19200)
-	    m_baudRate=B19200;
-	else if(i_baudRate==115200)
-	    m_baudRate=B115200;
-	else
-	    {
-		std::cerr<<"Baud rate: "<<i_baudRate<<" is not available!!"<<std::endl;
-		throw 100;
-	    }
+  if (i_baudRate == 300)
+    m_baudRate = B300;
+  else if (i_baudRate == 600)
+    m_baudRate = B600;
+  else if (i_baudRate == 1200)
+    m_baudRate = B1200;
+  else if (i_baudRate == 4800)
+    m_baudRate = B4800;
+  else if (i_baudRate == 19200)
+    m_baudRate = B19200;
+  else if (i_baudRate == 115200)
+    m_baudRate = B115200;
+  else
+    LOG_ERROR("Baud rate: "<< i_baudRate << " is not available!!");
 }
 
-ArduinoSerialConnection::~ArduinoSerialConnection()
-{
-    closeConnection();
+ArduinoSerialConnection::~ArduinoSerialConnection() {
+  closeConnection();
 }
 
 
-void ArduinoSerialConnection::closeConnection()
-{
-    if(m_fileHandle!=-1)
-	{
-	    LOG_INFO("Closing connection!");
-	    close(m_fileHandle);
-	    m_fileHandle=-1;
-	}
-    
+void ArduinoSerialConnection::closeConnection() {
+  if (m_fileHandle != -1) {
+    LOG_INFO("Closing connection!");
+    close(m_fileHandle);
+    m_fileHandle=-1;
+  }
 }
 
 
