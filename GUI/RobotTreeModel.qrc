@@ -1,5 +1,11 @@
 <RCC>
     <qresource prefix="/">
         <file>defaultRobot.xml</file>
+        <file>icons/CCW.png</file>
+        <file>icons/CW.png</file>
+        <file>icons/StraightDown.png</file>
+        <file>icons/StraightLeft.png</file>
+        <file>icons/StraightRight.png</file>
+        <file>icons/StraightUp.png</file>
     </qresource>
 </RCC>

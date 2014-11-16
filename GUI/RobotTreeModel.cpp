@@ -1,208 +1,193 @@
- #include <QtGui>
+// Copyright [2014] Ruud Cools
+#include <QtGui>
 #include <macroHeader.h>
-#include "BaseRobotItem.h"
-#include "BasePropertyItem.h"
-#include "RobotItem.h"
-#include "RobotTreeModel.h"
+#include "./BaseRobotItem.h"
+#include "./BasePropertyItem.h"
+#include "./RobotItem.h"
+#include "./RobotTreeModel.h"
 
-RobotTreeModel ::RobotTreeModel(RobotPointer i_robotPointer,
-																QObject *parent /*=0*/)
-	: QAbstractItemModel(parent)
-{
-	m_headerData << "Property name"<<"Value";
-	rootItem = new BasePropertyItem("root",0);
-	RobotItem* robotItem = new RobotItem(rootItem,i_robotPointer);
-	robotItem->construct();
-	rootItem->insertChild(0,robotItem);
-	//		 robotItem->construct();
-	LOG_DEBUG(rootItem->parent());
+RobotTreeModel ::RobotTreeModel(const RobotPointer& i_robotPointer,
+                                QObject *parent /*=0*/)
+    : QAbstractItemModel(parent) {
+  m_headerData << "Property name" << "Value";
+  rootItem = new BasePropertyItem("root", 0);
+  RobotItem* robotItem = new RobotItem(rootItem, i_robotPointer);
+  robotItem->construct();
+  rootItem->insertChild(0, robotItem);
+  // robotItem->construct();
+  LOG_DEBUG(rootItem->parent());
 }
 
-RobotTreeModel::~RobotTreeModel()
-{
-	delete rootItem;
+RobotTreeModel::~RobotTreeModel() {
+  delete rootItem;
 }
 
-int RobotTreeModel::columnCount(const QModelIndex & /* parent */) const
-{
-	return rootItem->columnCount();
+int RobotTreeModel::columnCount(const QModelIndex & /* parent */) const {
+  return rootItem->columnCount();
 }
 
-QVariant RobotTreeModel::data(const QModelIndex &index, int role) const
-{
-	if (!index.isValid())
-		return QVariant();
+QVariant RobotTreeModel::data(const QModelIndex &index, int role) const {
+  if (!index.isValid())
+    return QVariant();
 
-	if (role != Qt::DisplayRole && role != Qt::EditRole)
-		return QVariant();
+  if (role != Qt::DisplayRole && role != Qt::EditRole)
+    return QVariant();
 
-	BaseRobotItem *item = getItem(index);
+  BaseRobotItem *item = getItem(index);
 
-	return item->data(index.row(),index.column());
+  return item->data(index.row(), index.column());
 }
 
-Qt::ItemFlags RobotTreeModel::flags(const QModelIndex &index) const
-{
-	if (!index.isValid())
-		return 0;
+Qt::ItemFlags RobotTreeModel::flags(const QModelIndex &index) const {
+  if (!index.isValid())
+    return 0;
 
-	if(index.column()==0)
-		return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+  if(index.column() == 0)
+    return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 	
-	if(index.column()==1)
-		return Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+  if(index.column() == 1)
+    return Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 	
-	return 0;
+  return 0;
 }
 
-BaseRobotItem* RobotTreeModel::getItem(const QModelIndex &index) const
-{
-	if (index.isValid()) {
-		BaseRobotItem *item = static_cast<BaseRobotItem*>(index.internalPointer());
-		if (item) return item;
-	}
-	return rootItem;
+BaseRobotItem* RobotTreeModel::getItem(const QModelIndex &index) const {
+  if (index.isValid()) {
+    BaseRobotItem *item = static_cast<BaseRobotItem*>(index.internalPointer());
+    if (item) return item;
+  }
+  return rootItem;
 }
 
 QVariant RobotTreeModel::headerData(int section, Qt::Orientation orientation,
-																		int role) const
-{
-	if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
-		return m_headerData[section];
+                                    int role) const {
+  if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
+    return m_headerData[section];
 
-	return QVariant();
+  return QVariant();
 }
 
-QModelIndex RobotTreeModel::index(int row, int column, const QModelIndex &parent) const
-{
-	
-	if (parent.isValid() && parent.column() != 0)
-		return QModelIndex();
+QModelIndex RobotTreeModel::index(int row, int column, const QModelIndex &parent) const {
+  if (parent.isValid() && parent.column() != 0)
+    return QModelIndex();
 
-	BaseRobotItem *parentItem = getItem(parent);
+  BaseRobotItem *parentItem = getItem(parent);
 
-	BaseRobotItem *childItem = parentItem->child(row);
-	
-	if (childItem)
-		return createIndex(row, column, childItem);
-	else
-		return QModelIndex();
+  BaseRobotItem *childItem = parentItem->child(row);
+
+  if (childItem)
+    return createIndex(row, column, childItem);
+  else
+    return QModelIndex();
 }
 
-bool RobotTreeModel::insertColumns(int, int, const QModelIndex&)
-{
-	/*	bool success;
+bool RobotTreeModel::insertColumns(int, int, const QModelIndex&) {
+  /*	bool success;
 
 	beginInsertColumns(parent, position, position + columns - 1);
 	success = rootItem->insertColumns(position, columns);
 	endInsertColumns();
-	*/
-	return false;
+  */
+  return false;
 }
 
-bool RobotTreeModel::insertRows(int, int, 
-																const QModelIndex&)
-{
-	return false;
-	/*
-	BaseRobotItem *parentItem = getItem(parent);
-	QString childName=parentItem->getName() + "_child";
-	bool success;
+bool RobotTreeModel::insertRows(int, int,
+                                const QModelIndex&) {
+  return false;
+  /*
+    BaseRobotItem *parentItem = getItem(parent);
+    QString childName=parentItem->getName() + "_child";
+    bool success;
 
-	beginInsertRows(parent, position, position + rows - 1);
-	success = parentItem->insertChildren(position, rows,childName);
-	endInsertRows();
+    beginInsertRows(parent, position, position + rows - 1);
+    success = parentItem->insertChildren(position, rows,childName);
+    endInsertRows();
 
-	return success;
-	*/
+    return success;
+  */
 }
 
-QModelIndex RobotTreeModel::parent(const QModelIndex &index) const
-{
-	if (!index.isValid())
-		return QModelIndex();
+QModelIndex RobotTreeModel::parent(const QModelIndex &index) const {
+  if (!index.isValid())
+    return QModelIndex();
 
-	BaseRobotItem *childItem = getItem(index);
-	BaseRobotItem *parentItem = childItem->parent();
+  BaseRobotItem *childItem = getItem(index);
+  BaseRobotItem *parentItem = childItem->parent();
 
-	if (parentItem == rootItem)
-		return QModelIndex();
+  if (parentItem == rootItem)
+    return QModelIndex();
 
-	return createIndex(parentItem->childNumber(), 0, parentItem);
+  return createIndex(parentItem->childNumber(), 0, parentItem);
 }
 
-bool RobotTreeModel::removeColumns(int, int,const QModelIndex&)
-{
-	/*
-		bool success;
+bool RobotTreeModel::removeColumns(int, int, const QModelIndex&) {
+  /*
+    bool success;
 
-	beginRemoveColumns(parent, position, position + columns - 1);
-	success = rootItem->removeColumns(position, columns);
-	endRemoveColumns();
+    beginRemoveColumns(parent, position, position + columns - 1);
+    success = rootItem->removeColumns(position, columns);
+    endRemoveColumns();
 
-	if (rootItem->columnCount() == 0)
-		removeRows(0, rowCount());
-	*/
-	return false;
+    if (rootItem->columnCount() == 0)
+    removeRows(0, rowCount());
+  */
+  return false;
 }
 
-bool RobotTreeModel::removeRows(int, int, const QModelIndex&)
-{
-	return false;
-	/*
-	BaseRobotItem *parentItem = getItem(parent);
-	bool success = true;
+bool RobotTreeModel::removeRows(int, int, const QModelIndex&) {
+  return false;
+  /*
+    BaseRobotItem *parentItem = getItem(parent);
+    bool success = true;
 
-	beginRemoveRows(parent, position, position + rows - 1);
-	success = parentItem->removeChildren(position, rows);
-	endRemoveRows();
+    beginRemoveRows(parent, position, position + rows - 1);
+    success = parentItem->removeChildren(position, rows);
+    endRemoveRows();
 
-	return success;
-	*/
+    return success;
+  */
 }
 
-int RobotTreeModel::rowCount(const QModelIndex &parent) const
-{
-	BaseRobotItem *parentItem = getItem(parent);
+int RobotTreeModel::rowCount(const QModelIndex &parent) const {
+  BaseRobotItem *parentItem = getItem(parent);
 
-	return parentItem->rowCount();
+  return parentItem->rowCount();
 }
 
 bool RobotTreeModel::setData(const QModelIndex &index, const QVariant &value,
-														 int role)
-{
-	if (role != Qt::EditRole)
-		return false;
+                             int role) {
+  if (role != Qt::EditRole)
+    return false;
 
-	BaseRobotItem *item = getItem(index);
-	bool result = item->setData(index.row(),index.column(), value);
+  BaseRobotItem *item = getItem(index);
+  bool result = item->setData(index.row(), index.column(), value);
 
-	if (result)
-		emit dataChanged(index, index);
+  if (result)
+    emit dataChanged(index, index);
 
-	return result;
+  return result;
 }
 
 bool RobotTreeModel::setHeaderData(int section, Qt::Orientation orientation,
-																	 const QVariant &value, int role)
-{
-	if (role != Qt::EditRole || orientation != Qt::Horizontal)
-		return false;
-	
-	bool result(false);
+                                   const QVariant &value, int role) {
+  if (role != Qt::EditRole || orientation != Qt::Horizontal)
+    return false;
 
-	if(section>-1 && m_headerData.size()-1>section){
-		m_headerData[section]=value.toString();
-		result=true;
-	}
-		
-	if (result)
-		emit headerDataChanged(orientation, section, section);
+  bool result(false);
 
-	return result;
+  if (section > 1 && m_headerData.size()-1 > section) {
+    m_headerData[section]=value.toString();
+    result = true;
+  }
+
+  if (result)
+    emit headerDataChanged(orientation, section, section);
+
+  return result;
 }
 
 
-RobotPointer RobotTreeModel::getRobotPointer(){
-	return static_cast<RobotItem*>(rootItem->getChildItems()[0])->getRobotPointer();
+RobotPointer RobotTreeModel::getRobotPointer() {
+  return static_cast<RobotItem*>(
+      rootItem->getChildItems()[0])->getRobotPointer();
 }

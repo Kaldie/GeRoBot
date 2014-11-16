@@ -1,4 +1,5 @@
- FORMS       = MainWindow.ui
+ FORMS       = MainWindow.ui            \
+               RobotMovementWidget.ui
 
  HEADERS     = BaseRobotItem.h          \
                BaseMotorItem.h          \
@@ -9,6 +10,8 @@
                RobotItem.h              \
                RobotTreeModel.h         \
                BasePropertyItem.h       \
+               RobotMovementWidget.h    \
+               RobotPositionWidget.h    \
                MainWindow.h
 
  RESOURCES   = RobotTreeModel.qrc
@@ -22,6 +25,8 @@
                PinStateItem.cpp         \
                BaseJointItem.cpp        \
                RobotTreeModel.cpp       \
+               RobotMovementWidget.cpp  \
+               RobotPositionWidget.cpp  \
                MainWindow.cpp           \
                main.cpp
 
