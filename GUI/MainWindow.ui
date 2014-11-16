@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>mainWindow</class>
+ <widget class="QMainWindow" name="mainWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -31,22 +31,51 @@
      <number>0</number>
     </property>
     <item>
-     <widget class="QTreeView" name="view">
-      <property name="alternatingRowColors">
-       <bool>true</bool>
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="tabPosition">
+       <enum>QTabWidget::West</enum>
       </property>
-      <property name="selectionBehavior">
-       <enum>QAbstractItemView::SelectItems</enum>
+      <property name="tabShape">
+       <enum>QTabWidget::Rounded</enum>
       </property>
-      <property name="horizontalScrollMode">
-       <enum>QAbstractItemView::ScrollPerPixel</enum>
+      <property name="currentIndex">
+       <number>1</number>
       </property>
-      <property name="animated">
-       <bool>false</bool>
+      <property name="elideMode">
+       <enum>Qt::ElideNone</enum>
       </property>
-      <property name="allColumnsShowFocus">
-       <bool>true</bool>
-      </property>
+      <widget class="QWidget" name="configurationTab">
+       <attribute name="title">
+        <string>Configuration</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QTreeView" name="configurationView">
+          <property name="alternatingRowColors">
+           <bool>true</bool>
+          </property>
+          <property name="selectionBehavior">
+           <enum>QAbstractItemView::SelectItems</enum>
+          </property>
+          <property name="horizontalScrollMode">
+           <enum>QAbstractItemView::ScrollPerPixel</enum>
+          </property>
+          <property name="animated">
+           <bool>false</bool>
+          </property>
+          <property name="allColumnsShowFocus">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="robotMovementTab">
+       <attribute name="title">
+        <string>Tab 2</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_2"/>
+      </widget>
      </widget>
     </item>
    </layout>
