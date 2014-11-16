@@ -128,6 +128,8 @@ class RobotTreeModel;
 enum MovementType {None,Rotational,Translational}; 
 enum TRACE_TYPE{Line,Curve};
 
+enum GUIMovementMode {ToolMode,AxisMode};
+
 typedef std::vector<int> PinVector;
 typedef std::map<int,int> PinStateMap;
 typedef std::vector<PinState> PinStateSequence; //An array of set pins
