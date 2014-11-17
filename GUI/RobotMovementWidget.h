@@ -32,8 +32,7 @@ class RobotMovementWidget: public QWidget, private Ui::RobotMovementWidget {
 
  private:
     void initialise();
-    void paintWidget(Point2D& i_position);
-
+    bool hasValidConnection();
 
   public slots:
       void updateSimulateRadioButtons();

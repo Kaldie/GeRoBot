@@ -164,7 +164,7 @@ void RobotMovementWidget::updateMovementType(bool i_isChecked) {
 }
 
 
-void RobotMovementWidget::updateSimulateRadioButtons() {
+bool RobotMovementWidget::hasValidConnection() {
   LOG_DEBUG("Updating Simulation and Actuation Radio buttons!");
   /*
     This is a slot for the hasNewRobotPointer signal.
@@ -173,10 +173,9 @@ void RobotMovementWidget::updateSimulateRadioButtons() {
     if a connection can be established to an arduino motor driver    
   */
 
-  
   bool hasRobotPointer(false);
   bool hasArduinoConnection(false);
-  
+
   if (m_robotPointer.get()) {
     hasRobotPointer = true;
     LOG_DEBUG("Found robot pointer!");
@@ -197,7 +196,11 @@ void RobotMovementWidget::updateSimulateRadioButtons() {
       hasArduinoConnection = false;
     }
   }
-  if (hasRobotPointer && hasArduinoConnection) {
+  return hasRobotPointer && hasArduinoConnection;
+}
+
+void RobotMovementWidget::updateSimulateRadioButtons() {
+  if (hasValidConnection()) {
     actuateRadioButton->setEnabled(true);
   } else {
     actuateRadioButton->setEnabled(false);
@@ -208,25 +211,35 @@ void RobotMovementWidget::updateSimulateRadioButtons() {
 
 
 void RobotMovementWidget::movementUp() {
-  m_point2DPointer->y += stepSizeLineEdit->text().toDouble();
-  emit hasNewPosition();
+  if (hasValidConnection()) {
+  } else {
+    m_point2DPointer->y += stepSizeLineEdit->text().toDouble();
+  }
+    emit hasNewPosition();
 }
 
 
 void RobotMovementWidget::movementDown() {
-  m_point2DPointer->y -= stepSizeLineEdit->text().toDouble();
+  if (hasValidConnection()) {
+  } else {
+    m_point2DPointer->y -= stepSizeLineEdit->text().toDouble();
+  }
   emit hasNewPosition();
 }
 
 
 void RobotMovementWidget::movementLeft() {
-  m_point2DPointer->x -= stepSizeLineEdit->text().toDouble();
-  emit hasNewPosition();
+  if (hasValidConnection()) {
+  } else {
+    m_point2DPointer->x -= stepSizeLineEdit->text().toDouble();
+    emit hasNewPosition();
+  }
 }
-
 
 void RobotMovementWidget::movementRight() {
-  m_point2DPointer->x += stepSizeLineEdit->text().toDouble();
-  emit hasNewPosition();
+  if (hasValidConnection()) {
+  } else {
+    m_point2DPointer->x += stepSizeLineEdit->text().toDouble();
+    emit hasNewPosition();
+  }
 }
-
