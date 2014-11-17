@@ -23,7 +23,6 @@ MainWindow::MainWindow(const RobotPointer& i_robot,
 #endif
 
   m_modelPointer.reset(new RobotTreeModel(i_robot));
-
   configurationView->setModel(m_modelPointer.get());
 
   initialise();

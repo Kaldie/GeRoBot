@@ -9,41 +9,40 @@ class ArduinoSerialConnection {
   GETSET(int, m_minimumBytePerMessage, MinimumBytePerMessage);
   GETSET(bool, m_closeHandleAfterMessage, CloseHandleAfterMessage);
   GETSET(bool, m_blockThread, BlockThread);
+  GETSET(int, m_fileHandle, FileHandle);
+  GETSET(std::string, m_portName, PortName);
 
-    speed_t m_baudRate;
+  speed_t m_baudRate;
 
-    GETSET(int, m_fileHandle, FileHandle);
-    GETSET(std::string, m_portName, PortName);
-
-    void openConnection();
-    void closeConnection();
+  
+  void openConnection();
+  void closeConnection();
 
  public:
+  void setBaudRate(const int&);
+  void resetConnection();
+  
+  std::string serialRead(const int&);
 
-    void setBaudRate(const int&);
-    void resetConnection();
+  void serialWrite(std::string);
+  void serialWrite(const int&);
 
-    std::string serialRead(const int&);
+  void serialWrite(char*, const int&);
+  void serialWrite(std::vector<int>::iterator&, const int&);
 
-    void serialWrite(std::string);
-    void serialWrite(const int&);
+  // Constructors
+  ArduinoSerialConnection();
 
-    void serialWrite(char*, const int&);
-    void serialWrite(std::vector<int>::iterator&, const int&);
+  explicit ArduinoSerialConnection(std::string);
 
-    // Constructors
-    ArduinoSerialConnection();
-
-    explicit ArduinoSerialConnection(std::string);
-
-    ArduinoSerialConnection(const std::string&,
-                            const int&,
-                            const int&,
-                            const int&,
-                            const bool&,
-                            const bool&);
-    // Deconstructor
-    ~ArduinoSerialConnection();
+  ArduinoSerialConnection(const std::string&,
+                          const int&,
+                          const int&,
+                          const int&,
+                          const bool&,
+                          const bool&);
+  // Deconstructor
+  ~ArduinoSerialConnection();
 };
 
 #endif  // ARDUINO_ARDUINOSERIALCONNECTION_H_

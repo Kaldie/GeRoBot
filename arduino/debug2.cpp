@@ -1,21 +1,28 @@
+// Copyright [2014] Ruud Cools
 #include <macroHeader.h>
-#include "ArduinoSerialConnection.h"
-#include "ArduinoMotorDriver.h"
+#include "./ArduinoSerialConnection.h"
+#include "./ArduinoMotorDriver.h"
 
-int main()
-{
+int main() {
     ArduinoMotorDriver driver;
     driver.setSerialRegularExpresion("/dev/ttyUSB*");
-    driver.setReducedSpeed(false);
-    std::vector<int> bitVector={4,8,12,16,20,24,28,32,36,40,4,8,12,16,20,24,28,32,36,40,4,8,12,16,20,24,28,32,36,40,255};
+    driver.setReducedSpeed(true);
+    std::vector<int> bitVector= {4, 8, 12, 16, 20,
+                                24, 28, 32, 36, 40,
+                                4, 8, 12, 16, 20,
+                                24, 28, 32, 36,
+                                40, 4, 8, 12, 16,
+                                20, 24, 28, 32,
+                                36, 40, 255};
+
     std::vector<int> bufferVector;
 
-    for(int i=0;
-	i<100;
-	i++)
-	bufferVector.insert(bufferVector.end(),bitVector.begin(),bitVector.end());
+    for (int i = 0; i < 100; i++)
+      bufferVector.insert(bufferVector.end(),
+                          bitVector.begin(),
+                          bitVector.end());
 
-    LOG_INFO("Lenght of buffer vector:"<<bufferVector.size());
+    LOG_INFO("Lenght of buffer vector:" << bufferVector.size());
     driver.setBuffer(bufferVector);
     driver.actuate();
     /*    ArduinoSerialConnection connection=ArduinoSerialConnection("/dev/ttyUSB1");

@@ -36,6 +36,7 @@ class RobotMovementWidget: public QWidget, private Ui::RobotMovementWidget {
 
 
   public slots:
+      void updateSimulateRadioButtons();
       void updateMovementType(bool i_isSet);
       void updatePositionWidget();
       void movementUp();

@@ -7,9 +7,9 @@ ArduinoSerialConnection::ArduinoSerialConnection()
       m_minimumBytePerMessage(0),
       m_closeHandleAfterMessage(true),
       m_blockThread(false),
-      m_baudRate(B115200),
       m_fileHandle(-1),
-      m_portName("")
+      m_portName(""),
+      m_baudRate(B115200)
 {}
 
 
@@ -18,32 +18,33 @@ ArduinoSerialConnection::ArduinoSerialConnection(std::string i_fileName)
       m_minimumBytePerMessage(0),
       m_closeHandleAfterMessage(true),
       m_blockThread(false),
-      m_baudRate(B115200),
       m_fileHandle(-1),
-      m_portName(i_fileName)
+      m_portName(i_fileName),
+      m_baudRate(B115200)
+      
 {}
 
 
 
-ArduinoSerialConnection::ArduinoSerialConnection(const std::string& i_portName,
-                                                 const int& i_minimumBytePerMessage,
-						 const int& i_deadTimeBetweenMessage,
-						 const int& i_baudRate,
-						 const bool& i_closeAfterMessage,
-						 const bool& i_blockThread):
-    m_deadTimeBetweenMessage(i_deadTimeBetweenMessage),
-    m_minimumBytePerMessage(i_minimumBytePerMessage),
-    m_closeHandleAfterMessage(i_closeAfterMessage),
-    m_blockThread(i_blockThread),
-    m_baudRate(B115200),
-    m_fileHandle(-1),
-    m_portName(i_portName) {
-    setBaudRate(i_baudRate);
+ArduinoSerialConnection::ArduinoSerialConnection(
+    const std::string& i_portName,
+    const int& i_minimumBytePerMessage,
+    const int& i_deadTimeBetweenMessage,
+    const int& i_baudRate,
+    const bool& i_closeAfterMessage,
+    const bool& i_blockThread)
+    : m_deadTimeBetweenMessage(i_deadTimeBetweenMessage),
+      m_minimumBytePerMessage(i_minimumBytePerMessage),
+      m_closeHandleAfterMessage(i_closeAfterMessage),
+      m_blockThread(i_blockThread),
+      m_fileHandle(-1),
+      m_portName(i_portName),
+      m_baudRate(B115200) {
+  setBaudRate(i_baudRate);
 }
 
 
-
-void ArduinoSerialConnection::setBaudRate(const int& i_baudRate){
+void ArduinoSerialConnection::setBaudRate(const int& i_baudRate) {
     /*
       Possible baud rates:
       300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, or 115200.
@@ -78,58 +79,53 @@ void ArduinoSerialConnection::closeConnection() {
 }
 
 
-void ArduinoSerialConnection::resetConnection()
-{
+void ArduinoSerialConnection::resetConnection() {
     closeConnection();
     openConnection();
 }
 
 
-void ArduinoSerialConnection::openConnection()
-{
+void ArduinoSerialConnection::openConnection() {
 
     struct termios tio;
-    //make sure everthing is set to 0
+    // make sure everthing is set to 0
     memset(&tio,0,sizeof(tio));
 
     // 8N1
-    tio.c_cflag &= ~PARENB;// No parity detection
-    tio.c_cflag &= ~CSTOPB;// 1 stop bit
-    tio.c_cflag &= ~CSIZE;//  apply mask before setting the size of the byte
-    tio.c_cflag &= ~CRTSCTS;// no flow control
-    tio.c_cflag =  CS8|CREAD|CLOCAL; // 8n1, see termios.h for more information
-    
-    tio.c_cc[VMIN]=m_minimumBytePerMessage;
-    tio.c_cc[VTIME]=m_deadTimeBetweenMessage; 
-    
-    tio.c_iflag &= ~(IXON | IXOFF | IXANY); // turn off s/w flow ctrl
+    tio.c_cflag &= ~PARENB;  // No parity detection
+    tio.c_cflag &= ~CSTOPB;  // 1 stop bit
+    tio.c_cflag &= ~CSIZE;  //  apply mask before setting the size of the byte
+    tio.c_cflag &= ~CRTSCTS;  // no flow control
+    tio.c_cflag =  CS8|CREAD|CLOCAL;  // 8n1, see termios.h for more information
 
-    tio.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG); // make raw
-    tio.c_oflag &= ~OPOST; // make raw
+    tio.c_cc[VMIN] = m_minimumBytePerMessage;
+    tio.c_cc[VTIME] = m_deadTimeBetweenMessage;
 
-    cfsetospeed(&tio,m_baudRate); // 115200 baud
-    cfsetispeed(&tio,m_baudRate); // 115200 baud
+    tio.c_iflag &= ~(IXON | IXOFF | IXANY);  // turn off s/w flow ctrl
 
-    if(m_blockThread)
-			m_fileHandle=open(getPortName().c_str(), O_RDWR|O_NOCTTY |O_NDELAY);  
+    tio.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);  // make raw
+    tio.c_oflag &= ~OPOST;  // make raw
+
+    cfsetospeed(&tio, m_baudRate);  // 115200 baud
+    cfsetispeed(&tio, m_baudRate);  // 115200 baud
+
+    if (m_blockThread)
+      m_fileHandle = open(getPortName().c_str(), O_RDWR|O_NOCTTY |O_NDELAY);
     else
-			m_fileHandle=open(getPortName().c_str(), O_RDWR|O_NOCTTY);  
+      m_fileHandle = open(getPortName().c_str(), O_RDWR|O_NOCTTY);
 
-    LOG_INFO("Opening file to port: '"<< getPortName()<<"'");
+    LOG_INFO("Opening file to port: '" << getPortName() << "'");
 
-    if (m_fileHandle == -1)  
-	{
-
-	    LOG_ERROR("Unable to open port'"<< getPortName()<<"'");
-	    throw 100;
-	}
+    if (m_fileHandle == -1) {
+      LOG_ERROR("Unable to open port'" << getPortName() << "'");
+      throw 100;
+    }
 
 
-    if(tcsetattr(m_fileHandle,TCSAFLUSH,&tio) )
-	{
-	    LOG_ERROR("Couldn't set term attributes");
-	    throw 100;
-	}
+    if (tcsetattr(m_fileHandle, TCSAFLUSH, &tio)) {
+      LOG_ERROR("Couldn't set term attributes");
+      throw 100;
+    }
 }
 
 

@@ -64,8 +64,29 @@ void RobotMovementWidget::initialise() {
   connect(moveUpButton, SIGNAL(clicked()), this, SLOT(movementUp()));
   connect(moveDownButton, SIGNAL(clicked()), this, SLOT(movementDown()));
 
-  robotCanvas->layout()->addWidget(new RobotPositionWidget(m_point2DPointer, this));
-  emit toolModeRadioButton->toggled(true);
+  if (m_point2DPointer) {
+    // adding Robot Position widget
+    robotCanvas->layout()->
+        addWidget(new RobotPositionWidget(m_point2DPointer, this));
+    updateMovementType(true);
+  } else {
+    LOG_DEBUG("m_point2DPointer is not a valid pointer!");
+  }
+
+  if (m_robotPointer.get()) {
+    connect(simulateRadioButton,
+            SIGNAL(toggled(bool)),
+            this,
+            SLOT(updateSimulateRadioButtons()));
+
+    connect(actuateRadioButton,
+            SIGNAL(toggled(bool)),
+            this,
+            SLOT(updateSimulateRadioButtons()));
+    updateSimulateRadioButtons();
+  } else {
+    LOG_DEBUG("m_RobotPointer is not a valid pointer!");
+  }
 }
 
 
@@ -140,6 +161,49 @@ void RobotMovementWidget::updateMovementType(bool i_isChecked) {
     widget->update();
   else
     LOG_ERROR("Could not find item!");
+}
+
+
+void RobotMovementWidget::updateSimulateRadioButtons() {
+  LOG_DEBUG("Updating Simulation and Actuation Radio buttons!");
+  /*
+    This is a slot for the hasNewRobotPointer signal.
+    It will update the simulation/actuation radio buttons,
+    based on the availability of the RobotPointer and
+    if a connection can be established to an arduino motor driver    
+  */
+
+  
+  bool hasRobotPointer(false);
+  bool hasArduinoConnection(false);
+  
+  if (m_robotPointer.get()) {
+    hasRobotPointer = true;
+    LOG_DEBUG("Found robot pointer!");
+  }
+
+  if (hasRobotPointer) {
+    try {
+      ArduinoMotorDriver arduinoMotorDriver = m_robotPointer->
+          getJointController().getActuator();
+      if (arduinoMotorDriver.hasConnection()) {
+        LOG_DEBUG("Found a connection!!!");
+        hasArduinoConnection = true;
+      } else {
+        hasArduinoConnection = false;
+      }
+    } catch(std::runtime_error) {
+      LOG_DEBUG("Did not find a connection!!!");
+      hasArduinoConnection = false;
+    }
+  }
+  if (hasRobotPointer && hasArduinoConnection) {
+    actuateRadioButton->setEnabled(true);
+  } else {
+    actuateRadioButton->setEnabled(false);
+    actuateRadioButton->setChecked(false);
+    simulateRadioButton->setChecked(true);
+  }
 }
 
 

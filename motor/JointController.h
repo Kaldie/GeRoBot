@@ -1,66 +1,62 @@
-#ifndef JointController_H
-#define JointController_H
+// Copyright [2014] Ruud Cools
+#ifndef MOTOR_JOINTCONTROLLER_H_
+#define MOTOR_JOINTCONTROLLER_H_
 
 #include <ArduinoMotorDriver.h>
 #include <PinState.h>
 
-class JointController
-{
+class JointController {
  private:
-    //vector with the joints
-    GETSET(JointPointerVector,m_jointPointerVector,JointPointerVector);
+  // vector with the joints
+  GETSET(JointPointerVector, m_jointPointerVector, JointPointerVector);
 
-    //points to the actuator on the heap
-    GETSET(ArduinoMotorDriver,m_actuator,Actuator);
+  GETSET(ArduinoMotorDriver, m_actuator, Actuator);
 
-    //Vector which all the pin settins are given!
-    GETSET(PinStateSequence,m_pinStateSequence,PinStateSequence);
+  // Vector which all the pin settins are given!
+  GETSET(PinStateSequence, m_pinStateSequence, PinStateSequence);
 
-		int getNumberOfJoints(){return m_jointPointerVector.size();};
+  int getNumberOfJoints() {return m_jointPointerVector.size();}
 
-    bool validateJoint(const JointPointer&) const;
+  bool validateJoint(const JointPointer&) const;
 
-    bool validateJointVector(const JointPointerVector&) const;
+  bool validateJointVector(const JointPointerVector&) const;
 
-    bool hasJoint(const JointPointer&) const;
+  bool hasJoint(const JointPointer&) const;
 
-    void addEmptyPinStatesToSequence(const int&);
+  void addEmptyPinStatesToSequence(const int&);
 
-    void addStepToPrevious(const JointPointer&, const std::string&);
+  void addStepToPrevious(const JointPointer&, const std::string&);
 
-    void appendPinStateSequence(const PinStateSequence&,
-																const bool&);
+  void appendPinStateSequence(const PinStateSequence&,
+                              const bool&);
 
  public:
-    JointController();
-    ~JointController();
+  JointController();
+  ~JointController();
 
-    void resetPinStateSequence();
+  void resetPinStateSequence();
 
-    void addJoint(const JointPointer&);
+  void addJoint(const JointPointer&);
 
-    void moveStep(JointPointer& jointPointer,
-									const std::string& direction, 
-									const bool& appendToPrevious);
+  void moveStep(JointPointer& jointPointer,
+                const std::string& direction, 
+                const bool& appendToPrevious);
+  
 		
+  void moveSteps(JointPointer& jointPointer,  
+                 const std::string& direction,
+                 const int& numberOfSteps);
+  
 		
-    void moveSteps(JointPointer& jointPointer,  
-									 const std::string& direction,
-									 const int& numberOfSteps);   
+  // Methods to retrieve the joint(s) of a specific type
+  JointPointerVector getJoints(const MovementType&);
+  JointPointer& getJoint(const MovementType&);
+
+  // Method to the Arduino actuator pointer
+  ArduinoMotorDriver* getActuatorPointer() {return &m_actuator;}
     
-		
-    //Methods to retrieve the joint(s) of a specific type
-    JointPointerVector getJoints(const MovementType&);
-    JointPointer& getJoint(const MovementType&);
-
-		//Method to the Arduino actuator pointer
-		ArduinoMotorDriver* getActuatorPointer(){return &m_actuator;};
-    
-    //no function yet
-    void actuate();
-
-
-
+  // no function yet
+  void actuate();
 };
 
-#endif // JointController
+#endif  // MOTOR_JOINTCONTROLLER_H_

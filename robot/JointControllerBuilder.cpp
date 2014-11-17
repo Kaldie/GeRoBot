@@ -22,14 +22,14 @@ void JointControllerBuilder::addJoints(){
   for(pugi::xml_node jointNode=getNodeFromPath("./JOINT");
       jointNode;
       jointNode=jointNode.next_sibling()){
-		LOG_DEBUG(jointNode.name());
-		
-		//if the sibling is named Joint, we are in bissnuss
-		if(std::string(jointNode.name())=="JOINT"){
-			LOG_DEBUG("adding a joint!!");
-			parseJoint(jointNode);
-		}
-	}
+    LOG_DEBUG(jointNode.name());
+
+    // if the sibling is named Joint, we are in bissnuss
+    if(std::string(jointNode.name())=="JOINT"){
+      LOG_DEBUG("adding a joint!!");
+      parseJoint(jointNode);
+    }
+  }
 }
 
 
@@ -41,13 +41,15 @@ void JointControllerBuilder::parseJoint(const pugi::xml_node& i_jointNode){
 }
 
 
-ArduinoMotorDriver JointControllerBuilder::parseActuator(const pugi::xml_node& i_node){
-	if(std::string(getNodeFromPath(i_node,"./TYPE").text().as_string())!="Arduino")
-		 LOG_ERROR("None other arduino actuators are defined yet!");
+ArduinoMotorDriver JointControllerBuilder::parseActuator(const pugi::xml_node& i_node) {
+  if (std::string(getNodeFromPath(i_node, "./TYPE").text().as_string())
+      != "Arduino")
+    LOG_ERROR("None other arduino actuators are defined yet!");
 
-  std::string serialExpression=getNodeFromPath(i_node,"./REGULAR_EXPRESSION").text().as_string();
-  LOG_DEBUG("Serial port regular expression is: "<<serialExpression);
-  bool hasReducedSpeed=getNodeFromPath(i_node,"./REDUCED_SPEED").text().as_bool();
+  std::string serialExpression = getNodeFromPath(i_node,
+                                               "./REGULAR_EXPRESSION").text().as_string();
+  LOG_DEBUG("Serial port regular expression is: " << serialExpression);
+  bool hasReducedSpeed = getNodeFromPath(i_node,"./REDUCED_SPEED").text().as_bool();
   ArduinoMotorDriver arduinoMotorDriver(serialExpression);
   arduinoMotorDriver.setReducedSpeed(hasReducedSpeed);
   return arduinoMotorDriver;
