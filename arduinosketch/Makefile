@@ -74,7 +74,7 @@
 #
 ARDUINO_DIR  = /usr/share/arduino
 #
-TARGET       = ArduinoStepperControl.cpp
+TARGET       = ArduinoStepper.cpp
 ARDUINO_LIBS = 
 #
 BOARD_TAG    = uno

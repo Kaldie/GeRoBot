@@ -3,7 +3,6 @@
 #define MOTOR_JOINTCONTROLLER_H_
 
 #include <ArduinoMotorDriver.h>
-#include <PinState.h>
 
 class JointController {
  private:
@@ -12,23 +11,21 @@ class JointController {
 
   GETSET(ArduinoMotorDriver, m_actuator, Actuator);
 
-  // Vector which all the pin settins are given!
-  GETSET(PinStateSequence, m_pinStateSequence, PinStateSequence);
+  // Vector where all the sequences will be stored in!
+  GETSET(PinStateSequenceVector,
+         m_pinStateSequenceVector,
+         PinStateSequenceVector);
 
   int getNumberOfJoints() {return m_jointPointerVector.size();}
-
   bool validateJoint(const JointPointer&) const;
-
   bool validateJointVector(const JointPointerVector&) const;
 
   bool hasJoint(const JointPointer&) const;
 
-  void addEmptyPinStatesToSequence(const int&);
-
-  void addStepToPrevious(const JointPointer&, const std::string&);
-
-  void appendPinStateSequence(const PinStateSequence&,
+  void appendPinStateSequence(PinStateSequence&,
                               const bool&);
+
+  void normaliseSequenceVector();
 
  public:
   JointController();
@@ -36,26 +33,26 @@ class JointController {
 
   void resetPinStateSequence();
 
-  void addJoint(const JointPointer&);
+  bool addJoint(const JointPointer&);
 
   void moveStep(JointPointer& jointPointer,
-                const std::string& direction, 
+                const std::string& direction,
                 const bool& appendToPrevious);
-  
-		
+
   void moveSteps(JointPointer& jointPointer,  
                  const std::string& direction,
-                 const int& numberOfSteps);
-  
-		
+                 const int& numberOfSteps,
+                 const bool i_append = false);
+
   // Methods to retrieve the joint(s) of a specific type
   JointPointerVector getJoints(const MovementType&);
   JointPointer& getJoint(const MovementType&);
 
   // Method to the Arduino actuator pointer
   ArduinoMotorDriver* getActuatorPointer() {return &m_actuator;}
-    
-  // no function yet
+
+  bool isNormalisedPinStateSequenceVector() const;
+  // function which will make the robot move!
   void actuate();
 };
 
