@@ -13,23 +13,24 @@ class ArduinoSerialConnection {
   GETSET(std::string, m_portName, PortName);
 
   speed_t m_baudRate;
-
-  
   void openConnection();
   void closeConnection();
+  std::string resolvePortName() const;
 
  public:
   void setBaudRate(const int&);
   void resetConnection();
-  
-  std::string serialRead(const int&);
+  bool hasConnection();
 
+  std::string serialRead(const int&);
+  std::string serialReadString();
   void serialWrite(std::string);
   void serialWrite(const int&);
 
-  void serialWrite(char*, const int&);
+  void serialWrite(const char*, const int&);
   void serialWrite(std::vector<int>::iterator&, const int&);
 
+  bool flushConnection();
   // Constructors
   ArduinoSerialConnection();
 

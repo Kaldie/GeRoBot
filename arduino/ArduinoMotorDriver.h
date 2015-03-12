@@ -6,28 +6,25 @@
 
 
 class ArduinoMotorDriver {
-    GETSET(std::vector<int>, m_buffer, Buffer);
+    GETSET(std::vector<int>, m_bufferMessage, BufferMessage);
     GETSET(ArduinoSerialConnection, m_arduinoConnection, ArduinoConnection);
     GETSET(std::string, m_serialRegularExpresion, SerialRegularExpresion);
     GETSET(bool, m_reducedSpeed, ReducedSpeed);
 
  private:
-    void verify(const int&,
-                const std::string&);
-
     void sendMessage(const std::string&);
     std::string getSerialFileName();
     void initialiseArduinoConnection();
-    void sendSpeedMessage(const bool&);
-
+    bool handShake();
  public:
-    void actuate();
+    void actuate(const char* i_buffer,
+                 const int i_messageSize);
     bool hasConnection();
-    
+    bool resetConnection();
+    bool sendTestBit();
     // Constructors
     explicit ArduinoMotorDriver(std::string);
     ArduinoMotorDriver();
-    
 };
 
 #endif  // ARDUINO_ARDUINOMOTORDRIVER_H_
