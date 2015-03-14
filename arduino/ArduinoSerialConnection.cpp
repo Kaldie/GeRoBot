@@ -129,7 +129,6 @@ void ArduinoSerialConnection::openConnection() {
     throw 100;
   }
 
-  
   if (tcsetattr(m_fileHandle, TCSAFLUSH, &tio)) {
     LOG_ERROR("Couldn't set term attributes");
     throw 100;
@@ -164,14 +163,14 @@ void ArduinoSerialConnection::serialWrite(const char* i_pointer,
                                           const int& i_numberOfWrites) {
   if (m_fileHandle == -1)
     openConnection();
-  
-  if (i_numberOfWrites == sizeof(int)){
+  if (i_numberOfWrites == sizeof(int)) {
     int x = (int)(*i_pointer);
-    // LOG_DEBUG("Writing: "<< x << " as integer");
+    LOG_DEBUG("Writing: "<< x << " as integer");
   } else if (i_numberOfWrites == sizeof(char))
     LOG_DEBUG("Writing: "<< *i_pointer);
-  
+
   write(m_fileHandle, i_pointer, i_numberOfWrites);
+  i_pointer+=i_numberOfWrites;
 
   if (m_closeHandleAfterMessage)
     closeConnection();
@@ -179,10 +178,10 @@ void ArduinoSerialConnection::serialWrite(const char* i_pointer,
 
 
 void ArduinoSerialConnection::serialWrite(std::vector<int>::iterator& io_iterator,
-					  const int& i_numberOfWrites) {
+                                          const int& i_numberOfWrites) {
   LOG_INFO("Number of writes: " << i_numberOfWrites);
   char* buffer = new char[i_numberOfWrites];
-  
+
   for (int i = 0;
        i < i_numberOfWrites;
        i++) {
@@ -192,7 +191,7 @@ void ArduinoSerialConnection::serialWrite(std::vector<int>::iterator& io_iterato
   write(m_fileHandle,
         buffer,
         i_numberOfWrites);
-  
+
   if (m_closeHandleAfterMessage)
     closeConnection();
   delete[] buffer;
@@ -275,6 +274,7 @@ bool ArduinoSerialConnection::flushConnection() {
   else
     return false;
 }
+
 
 std::string ArduinoSerialConnection::resolvePortName() const {
     glob_t globbuf;

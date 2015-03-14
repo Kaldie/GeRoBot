@@ -26,6 +26,7 @@ byte* INTEGER_BUFFER = NULL;
 // dynamic allocated memory to store the step array
 int* STEP_ARRAY = NULL;
 // number of repetitions which need to be done
+
 int NUMBER_OF_REPETITIONS = 0;
 // number of steps which are defined in the step array
 int NUMBER_OF_STEPS = 0;
@@ -81,7 +82,7 @@ void setTimer1Interupt(int i_dekaHertz) {
 
   if (registerValue > 65536)
     registerValue = 65536;
-  
+
   OCR1A = registerValue;
 
   //  TCCR1B |= (1 << CS12) | (1 << CS10);
@@ -103,8 +104,6 @@ void setPinOutputs() {
 
 
 ISR(TIMER1_COMPA_vect) {
-  //  Serial.print("Current step: "); Serial.println(CURRENT_STEP,DEC);
-  //Serial.print("Value: "); Serial.println(STEP_ARRAY[CURRENT_STEP]);
   setPins((byte)STEP_ARRAY[CURRENT_STEP]);
   /*
     Serial.write(STEP_ARRAY[CURRENT_STEP] + '0');
@@ -119,10 +118,8 @@ ISR(TIMER1_COMPA_vect) {
     CURRENT_STEP = 0;
   }
 
-  if (NUMBER_OF_REPETITIONS == 0) {
+  if (NUMBER_OF_REPETITIONS == 0)
     disableHeartBeat();
-    Serial.println("Finished movement!");
-  }
 }
 
 
@@ -152,7 +149,7 @@ int readIntegerFromSerial() {
 void blinkKnightRider() {
   if (STEP_ARRAY != NULL)
     free(STEP_ARRAY);
-  
+
   STEP_ARRAY = reinterpret_cast<int*>(
       malloc(sizeof(*STEP_ARRAY) * 12));
   NUMBER_OF_STEPS = 12;
@@ -169,7 +166,8 @@ void blinkKnightRider() {
        i--) {
     STEP_ARRAY[6-(i-7)] = 1 << i;
   }
-  setTimer1Interupt(1);
+
+  setTimer1Interupt(5);
 }
 
 
@@ -206,7 +204,7 @@ bool handShake() {
     }
   }
 
-  if (!received){
+  if (!received) {
     sendSOSLed();
     return false;
   }
@@ -226,11 +224,9 @@ bool handShake() {
 
       INTEGER_BUFFER = reinterpret_cast<byte*>(malloc(intSize));
       SIZE_OF_INT = intSize;
-      *INTEGER_BUFFER = intSize;
       hasIntSize = true;
     }
   }
-  Serial.flush();
   return true;
 }
 
@@ -254,13 +250,15 @@ void handleMotorMessage() {
     // Speed
     // number of repetitions
     // and at least 1 step
-
+  if (Serial.available() < SIZE_OF_INT*4) {
+    delay(10);
+    handleMotorMessage();
+  }
   // number of bytes in the current message
   int numberOfBytesInMessage = readIntegerFromSerial();
   // number of steps per repetitions;
   NUMBER_OF_STEPS = (numberOfBytesInMessage / SIZE_OF_INT) - 2;
   CURRENT_STEP = 0;
-
   int speed = readIntegerFromSerial();
   NUMBER_OF_REPETITIONS = readIntegerFromSerial();
   /*
@@ -268,23 +266,19 @@ void handleMotorMessage() {
     Serial.print("Number of steps: "); Serial.println(NUMBER_OF_STEPS, DEC);
     Serial.print("Number of repetitions: "); Serial.println(NUMBER_OF_REPETITIONS,DEC);
   */
-  
   STEP_ARRAY =  reinterpret_cast<int *>(
-      malloc(sizeof(speed) * NUMBER_OF_STEPS));
+      malloc(sizeof(*STEP_ARRAY) * NUMBER_OF_STEPS));
 
-  //  Serial.print("Step array: ");
   for (int i = 0;
        i < NUMBER_OF_STEPS;
        i++) {
     STEP_ARRAY[i] = readIntegerFromSerial();
     // Serial.print(STEP_ARRAY[i]); Serial.print(" ");
   }
-  //  Serial.println(".");
-  
+
   if (Serial.available() != 0)
     sendSOSLed();
 
-  //blinkKnightRider();
   setTimer1Interupt(speed);
 }
 
@@ -307,11 +301,9 @@ void loop() {
     //    Serial.print(Serial.available(),DEC);
     handleMotorMessage();
   } else {
-
     if (NUMBER_OF_REPETITIONS == 0)
       blinkKnightRider();
     else
     {}
-      //      Serial.print("Number of reps: "); Serial.println(NUMBER_OF_REPETITIONS,DEC);
   }
 }

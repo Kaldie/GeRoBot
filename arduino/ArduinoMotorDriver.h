@@ -16,12 +16,14 @@ class ArduinoMotorDriver {
     std::string getSerialFileName();
     void initialiseArduinoConnection();
     bool handShake();
+
  public:
     void actuate(const char* i_buffer,
                  const int i_messageSize);
     bool hasConnection();
     bool resetConnection();
     bool sendTestBit();
+
     // Constructors
     explicit ArduinoMotorDriver(std::string);
     ArduinoMotorDriver();
