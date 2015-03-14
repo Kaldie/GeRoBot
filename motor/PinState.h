@@ -1,38 +1,37 @@
-#ifndef PinState_H
-#define PinState_H
+// Copyright [2014] Ruud Cools
 
-class PinState
-{
-  private:
+#ifndef MOTOR_PINSTATE_H_
+#define MOTOR_PINSTATE_H_
 
-    GETSET(PinVector,m_pinVector,PinVector);
-    GETSET(int,m_numericValue,NumericValue);       
-    
-		int getPinValue(const int&); //represents the integer value of a pin, where the pin number is the position of the bit
-    int getNumericPinValue(const int&)const;
-    
-  public:
+class PinState {
+  GETSET(PinVector, m_pinVector, PinVector);
+  GETSET(int, m_numericValue, NumericValue);
 
-    void setPins(const PinVector&);
-    void setPinsToDefault();
+ private:
+  // represents the integer value of the pins
+  int getPinValue(const int&);
+  int getNumericPinValue(const int&) const;
 
-    void update(const int&,const int&);
-    void update(const PinStateMap&);
-    void update(const PinState&);
+ public:
+  void setPins(const PinVector&);
+  void setPinsToDefault();
 
-		int getPinState(const int&)const; //get the set of a specific pin
+  void update(const int& i_pinNumber,
+              const int& i_pinValue);
+  void update(const PinState&);
 
-    //    const int getNumericValue() const;
+  // get the set of a specific pin
+  int getPinState(const int&) const;
 
-    void resetPinState();
-    
-    virtual void displayPinState()const;
+  void resetPinState();
 
-    //constructors
-    PinState();
+  void displayPinState() const;
 
-    PinState(const PinVector&); //vector of pin numbers which will be set to default value
+  // constructors
+  PinState();
 
+  // vector of pin numbers which will be set to default value
+  explicit PinState(const PinVector&);
 };
 
-#endif // PinState
+#endif  // MOTOR_PINSTATE_H_

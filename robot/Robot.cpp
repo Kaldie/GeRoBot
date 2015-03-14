@@ -14,57 +14,21 @@
 #include <Trace.h>
 
 Robot::Robot()
-  : 
-  m_speed(0), 
-  m_currentPosition{0,50}
+    : m_speed(0),
+      m_currentPosition {0, 50}
 {}
 
-void Robot::goToPosition(const Point2D &i_position)
-{
-  Trace thisTrace(m_currentPosition,i_position);
+void Robot::goToPosition(const Point2D &i_position) {
+  Trace thisTrace(m_currentPosition, i_position);
+  LOG_DEBUG("current position: " << m_currentPosition.x << m_currentPosition.y);
   BaseTraceCalculator baseTraceCalculator(&m_jointController);
   baseTraceCalculator.calculateTrace(&thisTrace,
-				     m_currentPosition);
-  getJointController().actuate();  
+                                     m_currentPosition);
+  
+  LOG_DEBUG("new position: " << m_currentPosition.x << m_currentPosition.y);
+  getJointController().actuate();
 }
 
-/*
-void Robot::actuate()
-{
-
-  std::vector<pthread_t> treadIDs;
-  int returnValue=0;
-
-  // method to run the joints...with a bit of luck
-  for(int i=0;i<m_numberOfJoints;i++)
-    {
-      pthread_t treadID;
-
-      void* jointPointer=static_cast<void*>(&m_jointVector[i]);
-      //Joint::threadedMoveSteps(jointPointer);     
-      returnValue = pthread_create(&treadID, NULL, Joint::threadedMoveSteps, jointPointer);  
-      treadIDs.push_back(treadID);      
-      //check if the thread is created!
-      if ( returnValue != 0 )  
-	{  
-	  std::cerr<<"Error in thread creation..."<<std::endl;  
-	} 
-      else
-	std::cout<<"Created thread: "<<treadID<<std::endl;
-       
-    }
-  
-  //  sleep(100);
-  
-  for(std::vector<pthread_t>::iterator itr=treadIDs.begin();itr!=treadIDs.end();itr++)
-    {
-      //      std::cout<<*itr<<std::endl;
-      returnValue = pthread_join(*itr, NULL);  
-      if ( returnValue != 0 )  
-	{  
-	  std::cerr<<"Error in thread join...."<<std::endl;  
-	} 
-    }
-
+bool Robot::hasValidConnection() {
+  return m_jointController.getActuatorPointer()->hasConnection();
 }
-*/

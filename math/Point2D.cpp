@@ -36,19 +36,19 @@ double SquaredMag(const Vector2D& v)
 }
 
 
-bool Point2D::operator==(const Point2D& i_other) const{
-	double tolerance=0.0001;
-	if(!(this->x+tolerance>i_other.x &&
-			 this->x-tolerance<i_other.x))
-		return false;
-	
-	if(!(this->y+tolerance>i_other.y &&
-			 this->y-tolerance<i_other.y))
-		return false;
-	
-	return true;
+bool Point2D::operator==(const Point2D& i_other) const {
+  double tolerance = 0.0001;
+  if (!(this->x+tolerance > i_other.x &&
+        this->x-tolerance < i_other.x))
+    return false;
+
+  if (!(this->y+tolerance > i_other.y &&
+       this->y-tolerance < i_other.y))
+    return false;
+
+  return true;
 }
-			
+
 
 double Point2D::getAngleToOrigin()
 {

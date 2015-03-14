@@ -35,6 +35,10 @@ LINKHEADERS:
 SHAREDTARGET:
 	$(foreach FOLDER,$(SHAREDFOLDERS), cd $(FOLDER); make shared; cd ..; )
 
+UNITTEST:
+	$(foreach FOLDER,$(SHAREDFOLDERS), cd $(FOLDER); cd unit_test; make unitTest; cd ../..;)
+
+
 UPLOADEDTARGET:
 	$(foreach FOLDER,$(UPLOADEDFOLDERS), cd $(FOLDER); make -i upload; cd ..; )
 

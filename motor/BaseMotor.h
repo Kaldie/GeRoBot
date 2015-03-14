@@ -1,64 +1,57 @@
-/*
-  Header file for the StepperMotor
-  Will also define the direction enum
-*/
+// Copyright [2014] Ruud Cools
 
-#ifndef BaseMotor_h
-#define BaseMotor_h
+#ifndef MOTOR_BASEMOTOR_H_
+#define MOTOR_BASEMOTOR_H_
 
 #include <PinState.h>
+#include <PinStateSequence.h>
 
-//Pin definitions
-/*
-  An integer which represents the pins.
-  Each pin represents a bit with the position as pin number
-  So we get a sort of binary expression of our pins
-  if DefaultState then its low
-  else its high
-*/
+class BaseMotor {
+  // State in which the pins currently resides
+  GETSET(PinState, m_currentPinState, CurrentPinState);
 
-class BaseMotor
-{
-	//State in which the pins currently resides
-	GETSET(PinState, m_currentPinState,CurrentPinState);
-	
-	//Direction which the motor goes when all pins are in default mode
-	GETSET(std::string,m_defaultDirection,DefaultDirection);
-	
-	//After setting the step, hold the motor or release the current
-	GETSET(bool,m_holdMotor,HoldMotor);
-  
+  // Direction which the motor goes when all pins are in default mode
+  GETSET(std::string, m_defaultDirection, DefaultDirection);
+
+  // After setting the step, hold the motor or release the current
+  GETSET(bool, m_holdMotor, HoldMotor);
+
  public:
+  PinState* getPinStatePointer() {return &m_currentPinState;}
+  virtual void setPins(const PinVector&);
+  virtual PinVector getPins() const {return m_currentPinState.getPinVector();}
 
-	PinState* getPinStatePointer(){return &m_currentPinState;};
-	virtual void setPins(const PinVector&);
-	virtual PinVector getPins() const {return m_currentPinState.getPinVector();};
-		
-	//Move steps
-	virtual void moveStep(const std::string&,
-												PinStateSequence&) =0;
+  // Move steps
+  virtual void moveStep(const std::string&,
+                        PinStateSequence&) =0;
 
-	virtual void moveSteps(const std::vector<std::string>*,
-												 PinStateSequence&) =0;
+  virtual void moveSteps(const std::string& i_motorDirection,
+                         const int& i_numberOfSteps,
+                         PinStateSequenceVector& i_vector) =0;
 
-	virtual int numberOfStatesPerStep() const =0;
+  virtual int numberOfStatesPerStep() const =0;
 
-	//Print pin states
-	virtual void displayPinState()const;
-	virtual void displayPinState(const PinState&)const;
+  // Print pin states
+  virtual void displayPinState()const;
+  virtual void displayPinState(const PinState&)const;
 
-	void displayPinStateSequence(const PinStateSequence&)const;
+  void displayPinStateSequence(const PinStateSequence&)const;
 
-	//Base Constructor
-	BaseMotor();
+  // Base Constructor
+  BaseMotor();
 
-	//Vector with pin IDs
-	BaseMotor(const PinVector&);
-    
-	//Pin IDs and default direction
-	BaseMotor(const PinVector&,
-						const std::string& );
+  // Vector with pin IDs
+  explicit BaseMotor(const PinVector&);
 
+  // Pin IDs and default direction
+  BaseMotor(const PinVector&,
+            const std::string&);
+
+    // Pin IDs and default direction
+  BaseMotor(const PinVector& i_pinVector,
+            const std::string& i_defaultDirection,
+            const bool i_holdMotor);
+
+  virtual ~BaseMotor() {}
 };
- 
-#endif 
+#endif  // MOTOR_BASEMOTOR_H_

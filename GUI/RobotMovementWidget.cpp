@@ -72,13 +72,13 @@ void RobotMovementWidget::initialise() {
   } else {
     LOG_DEBUG("m_point2DPointer is not a valid pointer!");
   }
-
+  
   if (m_robotPointer.get()) {
     connect(simulateRadioButton,
             SIGNAL(toggled(bool)),
             this,
             SLOT(updateSimulateRadioButtons()));
-
+    
     connect(actuateRadioButton,
             SIGNAL(toggled(bool)),
             this,
@@ -91,13 +91,7 @@ void RobotMovementWidget::initialise() {
 
 
 void RobotMovementWidget::updatePositionWidget() {
-  LOG_DEBUG("Update Position widget!");
-
-  // if(!m_robotPointer)
-  // return;
-
   QString textualRepresentation;
-
 
   // Update grafical widget
   QWidget* robotPositionWidget = robotCanvas->
@@ -164,7 +158,7 @@ void RobotMovementWidget::updateMovementType(bool i_isChecked) {
 }
 
 
-bool RobotMovementWidget::hasValidConnection() {
+bool RobotMovementWidget::hasValidRobot() {
   LOG_DEBUG("Updating Simulation and Actuation Radio buttons!");
   /*
     This is a slot for the hasNewRobotPointer signal.
@@ -183,9 +177,7 @@ bool RobotMovementWidget::hasValidConnection() {
 
   if (hasRobotPointer) {
     try {
-      ArduinoMotorDriver arduinoMotorDriver = m_robotPointer->
-          getJointController().getActuator();
-      if (arduinoMotorDriver.hasConnection()) {
+      if (m_robotPointer->hasValidConnection()) {
         LOG_DEBUG("Found a connection!!!");
         hasArduinoConnection = true;
       } else {
@@ -200,7 +192,7 @@ bool RobotMovementWidget::hasValidConnection() {
 }
 
 void RobotMovementWidget::updateSimulateRadioButtons() {
-  if (hasValidConnection()) {
+  if (hasValidRobot()) {
     actuateRadioButton->setEnabled(true);
   } else {
     actuateRadioButton->setEnabled(false);
@@ -211,7 +203,17 @@ void RobotMovementWidget::updateSimulateRadioButtons() {
 
 
 void RobotMovementWidget::movementUp() {
-  if (hasValidConnection()) {
+  if (hasValidRobot() && actuateRadioButton->isChecked()) {
+    LOG_DEBUG("Current position x,y "
+              << m_point2DPointer->x  <<", "<< m_point2DPointer->y);
+
+    Point2D newPosition = *m_point2DPointer;
+    newPosition.y += stepSizeLineEdit->text().toDouble();
+
+    LOG_DEBUG("New position x,y "
+              << newPosition.x  <<", "<< newPosition.y);
+
+    m_robotPointer->goToPosition(newPosition);
   } else {
     m_point2DPointer->y += stepSizeLineEdit->text().toDouble();
   }
@@ -220,7 +222,14 @@ void RobotMovementWidget::movementUp() {
 
 
 void RobotMovementWidget::movementDown() {
-  if (hasValidConnection()) {
+  if (hasValidRobot()) {
+    Point2D newPosition = *m_point2DPointer;
+    newPosition.y -= stepSizeLineEdit->text().toDouble();
+
+    LOG_DEBUG("New position x,y "
+              << newPosition.x  <<", "<< newPosition.y);
+
+    m_robotPointer->goToPosition(newPosition);
   } else {
     m_point2DPointer->y -= stepSizeLineEdit->text().toDouble();
   }
@@ -229,17 +238,31 @@ void RobotMovementWidget::movementDown() {
 
 
 void RobotMovementWidget::movementLeft() {
-  if (hasValidConnection()) {
+  if (hasValidRobot()) {
+    Point2D newPosition = *m_point2DPointer;
+    newPosition.x -= stepSizeLineEdit->text().toDouble();
+
+    LOG_DEBUG("New position x,y "
+              << newPosition.x  <<", "<< newPosition.y);
+
+    m_robotPointer->goToPosition(newPosition);
   } else {
     m_point2DPointer->x -= stepSizeLineEdit->text().toDouble();
-    emit hasNewPosition();
   }
+  emit hasNewPosition();
 }
 
 void RobotMovementWidget::movementRight() {
-  if (hasValidConnection()) {
+  if (hasValidRobot()) {
+        Point2D newPosition = *m_point2DPointer;
+    newPosition.x += stepSizeLineEdit->text().toDouble();
+
+    LOG_DEBUG("New position x,y "
+              << newPosition.x  <<", "<< newPosition.y);
+
+    m_robotPointer->goToPosition(newPosition);
   } else {
     m_point2DPointer->x += stepSizeLineEdit->text().toDouble();
-    emit hasNewPosition();
   }
+  emit hasNewPosition();
 }

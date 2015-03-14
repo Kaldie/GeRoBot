@@ -1,8 +1,8 @@
 import numpy
 import copy
 
-PRINT_MSG=False
-PRINT_TO_FILE=False
+PRINT_MSG=False#True
+PRINT_TO_FILE=False#True
 
 def DBG_MSG(i_message):
         if PRINT_MSG:
@@ -51,11 +51,13 @@ class Trace (object) :
 
        "Position settings"
        #position of the head in x,y viewed from back of robot, where robot is (0,0)
-       self.__currentPosition = numpy.array([0.00 ,self.__minArm])
+       self.__currentPosition = numpy.array([-50.00 ,30.00])
 
        #rotation in degree where 0 is perpendicular to the work piece minus angle ccw and positive cw
-       self.__currentRotation = 90.0
-       self.__currentExtension = self.__minArm
+       self.__currentRotation = numpy.arctan2(30,-50)*180/numpy.pi
+
+       self.__currentExtension = (50*50+30*30)**0.5
+
        self.__trace = []
 
 
@@ -141,15 +143,15 @@ class Trace (object) :
     def setSteps(self,i_direction,i_numberOfSteps):
 	rotationDirections=["CCW","CW"]
 	translationDirections=["IN","OUT"]
-	FILE_MSG("Current position: %0.5f, %0.5f." % (self.__currentPosition[0], self.__currentPosition[1]))
+	DBG_MSG("Current position: %0.5f, %0.5f." % (self.__currentPosition[0], self.__currentPosition[1]))
 	if i_direction.upper() in rotationDirections:
-          self.__doRotationStep(i_direction,i_numberOfSteps)
+          self.__doRotationSteps(i_direction,i_numberOfSteps)
 	elif i_direction.upper() in translationDirections:
-            self.__doTranslationStep(i_direction,i_numberOfSteps)
+            self.__doTranslationSteps(i_direction,i_numberOfSteps)
         else:
             raise ValueError("Unknown direction")
 
-    def __doTranslationStep(self,i_direction,i_numberOfSteps):
+    def __doTranslationSteps(self,i_direction,i_numberOfSteps):
             
       if i_direction=="IN":
           translationPolarity=-1.0
@@ -162,15 +164,22 @@ class Trace (object) :
       DBG_MSG (self.__currentRotation)
       unitTranslation = numpy.array([numpy.cos(self.__currentRotation * (numpy.pi / 180)), 
                                      numpy.sin(self.__currentRotation * (numpy.pi / 180))])
+      
+      DBG_MSG("Current extension: " + str(self.__currentExtension))
+      DBG_MSG("Current rotation: " + str(self.__currentRotation))
 
       self.__currentExtension += self.__transStep * translationPolarity * i_numberOfSteps
+      
+
+
+      DBG_MSG("New extension: " + str(self.__currentExtension))
       
       self.__currentPosition =unitTranslation * self.__currentExtension
 
       DBG_MSG("moved robot x: %0.2f and y: %0.2f." % (self.__currentPosition[0], self.__currentPosition[1]))
       self.__addPositionToTrace()
 
-    def __doRotationStep(self, i_direction,i_numberOfSteps):
+    def __doRotationSteps(self, i_direction,i_numberOfSteps):
       DBG_MSG ("starting rotation")
       if i_direction=="CW":
         rotationPolarity=-1.0
@@ -185,7 +194,7 @@ class Trace (object) :
       currentY=numpy.copy(self.__currentPosition[1])
 
       rotation = self.__rotStep * (numpy.pi / 180.) * rotationPolarity * i_numberOfSteps
-      print "%0.20f" % self.__rotStep
+
       
       self.__currentPosition[0] = numpy.cos(rotation) * currentX - numpy.sin(rotation) * currentY
       self.__currentPosition[1] = numpy.sin(rotation) * currentX + numpy.cos(rotation) * currentY
@@ -203,12 +212,17 @@ class Trace (object) :
       self.__trace.append(numpy.copy(self.__currentPosition))
 
     def plotTrace(self):
-        from matplotlib.pyplot import plot,show,figure
+        from matplotlib.pyplot import plot,show,figure,Circle
 	myFigure=figure()
 	myAxes=myFigure.add_subplot(111)
+        circle1=Circle((-30,30),20,color='r')
 	myAxes.plot(zip(*self.__trace)[0], zip(*self.__trace)[1],'.-')
-#	myAxes.set_ylim([45,55])
-#        myAxes.set_xlim([-5,5])
+
+	myAxes.plot([0,-44.1369],[0,15.8587])
+	myAxes.plot([0,-15.8587],[0,44.1369])
+        myAxes.set_ylim([-100,100])
+        myAxes.set_xlim([-100,100])
+        myAxes.add_artist(circle1)
         show()
 
 

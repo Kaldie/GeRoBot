@@ -18,6 +18,8 @@ class Robot {
   GETSET_NO_CONST(JointController, m_jointController, JointController);
 
  public:
+  bool hasValidConnection();
+
   Point2D* getPositionPointer() {return &m_currentPosition;}
     // actuations
   void goToPosition(const Point2D&);

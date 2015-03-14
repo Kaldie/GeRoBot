@@ -32,7 +32,7 @@ class RobotMovementWidget: public QWidget, private Ui::RobotMovementWidget {
 
  private:
     void initialise();
-    bool hasValidConnection();
+    bool hasValidRobot();
 
   public slots:
       void updateSimulateRadioButtons();

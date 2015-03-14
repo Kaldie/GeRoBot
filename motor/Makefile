@@ -8,16 +8,14 @@
 TOROOT= ..
 
 # define the C source files
-SRCS= PinState.cpp
+SRCS= PinState.cpp PinStateSequence.cpp
 SRCS:=$(SRCS) BaseMotor.cpp StepperDriver.cpp #StepperMotor.cpp
 SRCS:=$(SRCS) BaseJoint.cpp
 SRCS:=$(SRCS) JointController.cpp
-SRCS:=$(SRCS) Trace.cpp RotationTrace.cpp
-SRCS:=$(SRCS) BaseTraceCalculator.cpp LineTraceCalculator.cpp RotationTraceCalculator.cpp
 DSRCS= debug.cpp
 
-LIBS=-lMathInterface -lArduinoInterface
-
+#LIBS=-lMathInterface -lArduinoInterface
+LIBS = -lArduinoInterface
 # define the executable file 
 MAIN = MotorInterface
 DEBUG = debug
