@@ -170,7 +170,6 @@ void ArduinoSerialConnection::serialWrite(const char* i_pointer,
     LOG_DEBUG("Writing: "<< *i_pointer);
 
   write(m_fileHandle, i_pointer, i_numberOfWrites);
-  i_pointer+=i_numberOfWrites;
 
   if (m_closeHandleAfterMessage)
     closeConnection();
@@ -218,54 +217,55 @@ std::string ArduinoSerialConnection::serialReadString() {
 }
 
 
-std::string ArduinoSerialConnection::serialRead(const int& i_numberOfBytes) {
-    if (m_fileHandle == -1)
-      openConnection();
+std::vector<unsigned char> ArduinoSerialConnection::
+rawSerialRead(const int& i_numberOfBytes) {
+  unsigned char readBuffer[1];
+  std::vector<unsigned char> resultVector;
+  int numberOfFails = 0;
+  int bytes_read;
+  if (m_fileHandle == -1)
+    openConnection();
 
-    unsigned char* byte_in= new unsigned char[i_numberOfBytes+1]();
-    byte_in[i_numberOfBytes] = 0;
-    unsigned char* currentByte = byte_in;
-    //    int outputByte;
-    int bytes_read;
-    uint numberOfFails = 0;
+  for (int i = 0; i < i_numberOfBytes; i++) {
+    /* Reads ttyO port, stores data into byte_in. */
+    bytes_read = read(m_fileHandle, readBuffer, 1);
 
-    for (int i = 0; i < i_numberOfBytes; i++) {
-      /* Reads ttyO port, stores data into byte_in. */
-      bytes_read = read(m_fileHandle, currentByte, 1);
-
-      if (bytes_read == -1) {
-        i--;
-        numberOfFails++;
-        // block the processor for a bit to with for arduino sending
-        usleep(10);
-        // std::cout<<"Couldnt read...someone was not ready yet...."<<std::endl;
-      } else {
-        numberOfFails = 0;
-        LOG_INFO("read (as int): "<< static_cast<int>(*currentByte) << " ");
-        currentByte++;
-      }
-
-      if (numberOfFails > 1000) {
-        LOG_ERROR("Failed to read out the bit!");
-        numberOfFails = 0;
-        currentByte++;
-        continue;
-      }
+    if (bytes_read == -1) {
+      i--;
+      numberOfFails++;
+      // block the processor for a bit to with for arduino sending
+      usleep(10);
+    } else {
+      numberOfFails = 0;
+      LOG_INFO("read (as int): "<< static_cast<int>(*readBuffer) << " ");
+      resultVector.push_back(*readBuffer);
     }
-    std::string output("");
-    for (int i = 0;
-         i< i_numberOfBytes;
-         i++) {
-      output += std::to_string(static_cast<int>(byte_in[i]));
+
+    if (numberOfFails > 1000) {
+      LOG_ERROR("Failed to read out the bit!");
     }
-    delete[] byte_in;
+  }
 
-    if (m_closeHandleAfterMessage)
-      closeConnection();
+  if (m_closeHandleAfterMessage)
+    closeConnection();
 
-    return output;
+  return resultVector;
 }
 
+
+int ArduinoSerialConnection::serialRead(const int& i_numberOfBytes) {
+  int output;
+  if (i_numberOfBytes > static_cast<int>(sizeof(output))) {
+    LOG_ERROR("Size should smaller or equal to int size");
+  }
+  std::vector<unsigned char> result = rawSerialRead(i_numberOfBytes);
+  for (int i = 0;
+       i < static_cast<int>(result.size());
+       i++) {
+    output = result[i] << (i*4);
+  }
+  return output;
+}
 
 bool ArduinoSerialConnection::flushConnection() {
   int hasFlushed = tcflush(m_fileHandle, TCIOFLUSH);

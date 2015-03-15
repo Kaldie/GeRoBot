@@ -30,21 +30,27 @@ void ArduinoMotorDriver::initialiseArduinoConnection() {
   m_arduinoConnection.setCloseHandleAfterMessage(false);
   if (!m_arduinoConnection.hasConnection()) {
       m_arduinoConnection.openConnection();
-      handShake();
+  } else {
+    m_arduinoConnection.resetConnection();
   }
 }
 
 
 bool ArduinoMotorDriver::handShake() {
   int handShake = 200;
+  int handShakeValue = m_arduinoConnection.serialRead(1);
 
-  m_arduinoConnection.flushConnection();
-  std::string handShakeValue = m_arduinoConnection.serialRead(1);
+  if(handShake != handShakeValue) {
+    LOG_DEBUG("Bad Hand shake!!!!");
+    return ArduinoMotorDriver::handShake();
+  }
+    
   LOG_DEBUG("Hand shake value: " << handShakeValue);
   m_arduinoConnection.serialWrite(handShake);
 
   m_arduinoConnection.serialWrite(static_cast<int>(sizeof(handShake)));
-  std::string intSizeValue = m_arduinoConnection.serialRead(1);
+  int intSizeValue = m_arduinoConnection.serialRead(1);
+  
   LOG_DEBUG("Echo'd int size: " << intSizeValue);
   return true;
 }
@@ -54,31 +60,32 @@ void ArduinoMotorDriver::actuate(const char* i_buffer,
                                  const int i_messageSize) {
   if (!m_arduinoConnection.hasConnection()) {
     initialiseArduinoConnection();
-    sleep(2);
   }
 
   if (i_messageSize > 255)
     LOG_ERROR("Message is bigger then 255 chars," <<
               " which cannot be send easely of the serial");
-
+  handShake();
   m_arduinoConnection.serialWrite(i_buffer, i_messageSize);
 }
 
 
 bool ArduinoMotorDriver::sendTestBit() {
+  handShake();
+
   char* position;
-  int testInt [7] = {24,1,10,8,4,16, 4};
+  int testInt [] = {24,2,1,4,8,16,8};
 
   int i = 0;
   for (auto itr = testInt;
        i < 7;
        i++, itr++) {
-    LOG_DEBUG("reintrp");
     position = reinterpret_cast<char*>(testInt+i);
-    LOG_DEBUG("Serial write");
     m_arduinoConnection.serialWrite(position, sizeof(testInt[0]));
-    LOG_DEBUG("done write");
   }
+
+  int crcBit = m_arduinoConnection.serialRead(1);
+  LOG_INFO((int)crcBit);
   return true;
 }
 
