@@ -7,26 +7,18 @@
 // defines
 #define BAUD_RATE 115200
 #define HAND_SHAKE 200
-#define NDEBUG
-
-// debug message
-#ifdef NDEBUG
-#define DEBUG_MSG_RCS(message) {}
-#else
-#define DEBUG_MSG_RCS(message) Serial.println(message)
-#endif
-
 
 // Global variables definitions
 bool HAS_SHAKEN = false;
 int SIZE_OF_INT = 0;
-byte* INTEGER_BUFFER = NULL;
+
+// Global buffer to store integer values received from serial connection
+byte INTEGER_BUFFER[10];
 
 // Global step variables
-// dynamic allocated memory to store the step array
-int* STEP_ARRAY = NULL;
-// number of repetitions which need to be done
+int STEP_ARRAY[100];
 
+// number of repetitions which need to be done
 int NUMBER_OF_REPETITIONS = 0;
 // number of steps which are defined in the step array
 int NUMBER_OF_STEPS = 0;
@@ -36,10 +28,11 @@ int CURRENT_STEP = 0;
 extern void setPins(byte i_pinValue);
 extern bool handShake();
 extern void sendSOSLed();
-extern int readIntegerFromSerial();
+extern int readIntegerFromSerial(bool&);
 
 // example buffer filling
 extern void blinkKnightRider();
+
 
 void disableHeartBeat() {
   cli();  // stop interrupts
@@ -49,9 +42,7 @@ void disableHeartBeat() {
   TCNT1  = 0;  // initialize counter value to 0
   OCR1A  = 0;
   TIMSK1 = 0;
-  digitalWrite(13, LOW);
   sei();  // allow interrupts
-  //  Serial.flush();
 }
 
 
@@ -59,6 +50,7 @@ void setTimer1Interupt(int i_dekaHertz) {
   // i_dekaHertz is 10* input hertz
   // so we can send 100k hertz with arduino 2 byte int
   cli();  // stop interrupts
+  digitalWrite(13, HIGH);
 
   // set timer1 interrupt at 1Hz
   TCCR1A = 0;  // set entire TCCR1A  to 0
@@ -104,7 +96,7 @@ void setPinOutputs() {
 
 
 ISR(TIMER1_COMPA_vect) {
-  setPins((byte)STEP_ARRAY[CURRENT_STEP]);
+  setPins((byte)(STEP_ARRAY[CURRENT_STEP]));
   /*
     Serial.write(STEP_ARRAY[CURRENT_STEP] + '0');
     Serial.write(CURRENT_STEP + '0');
@@ -118,8 +110,10 @@ ISR(TIMER1_COMPA_vect) {
     CURRENT_STEP = 0;
   }
 
-  if (NUMBER_OF_REPETITIONS == 0)
+  if (NUMBER_OF_REPETITIONS <= 0) {
     disableHeartBeat();
+    HAS_SHAKEN = false;
+  }
 }
 
 
@@ -130,9 +124,17 @@ void setPins(byte i_byte) {
 }
 
 
-int readIntegerFromSerial() {
+int readIntegerFromSerial(bool& o_hasSucces) {
+  int attempts = 0;
+  while (Serial.available() < SIZE_OF_INT & attempts < 100) {
+    attempts++;
+  }
+
   if (Serial.available() < SIZE_OF_INT) {
-    return readIntegerFromSerial();
+    o_hasSucces &= false;
+    return 0;
+  } else {
+    o_hasSucces &= true;
   }
 
   for (int i = 0 ;
@@ -147,11 +149,6 @@ int readIntegerFromSerial() {
 
 
 void blinkKnightRider() {
-  if (STEP_ARRAY != NULL)
-    free(STEP_ARRAY);
-
-  STEP_ARRAY = reinterpret_cast<int*>(
-      malloc(sizeof(*STEP_ARRAY) * 12));
   NUMBER_OF_STEPS = 12;
   NUMBER_OF_REPETITIONS = 5;
   CURRENT_STEP = 0;
@@ -173,17 +170,6 @@ void blinkKnightRider() {
 
 bool handShake() {
   // Hand shake with the controller
-  // free possible allocated memory
-  if (INTEGER_BUFFER != NULL) {
-    free(INTEGER_BUFFER);
-    INTEGER_BUFFER = NULL;
-  }
-
-  if (STEP_ARRAY != NULL) {
-    free(STEP_ARRAY);
-    STEP_ARRAY = NULL;
-  }
-
   int intSize = 0;
   bool received = false;
   bool hasIntSize = false;
@@ -191,7 +177,7 @@ bool handShake() {
   int attempts = 0;
 
   Serial.write(HAND_SHAKE);
-  while (!received & attempts < 10) {
+  while (!received & attempts < 100) {
     if (Serial.available() > 0) {
       // receive echo
       Serial.readBytes((char*)buffer, 1);
@@ -199,17 +185,16 @@ bool handShake() {
         received = true;
       };
     } else {
-        delay(200);
-        attempts++;
+      attempts++;
     }
   }
 
   if (!received) {
-    sendSOSLed();
     return false;
   }
 
-  while (!hasIntSize) {
+  attempts = 0;
+  while( !hasIntSize & attempts < 100) {
     if (Serial.available() > 0) {
       // read the int size of the controller
       Serial.readBytes((char*)buffer, 1);
@@ -218,68 +203,75 @@ bool handShake() {
       if (intSize < 10) {
         // echo it if its ok
         Serial.write(intSize);
-      } else {
-        sendSOSLed();
       }
 
-      INTEGER_BUFFER = reinterpret_cast<byte*>(malloc(intSize));
       SIZE_OF_INT = intSize;
       hasIntSize = true;
+    } else {
+      attempts++;
     }
   }
-  return true;
+
+  if (!hasIntSize) {
+    Serial.write(3);
+  }
+
+  if (hasIntSize & received)
+    return true;
+  else
+    return false;
 }
+
 
 void sendSOSLed() {
   digitalWrite(13, HIGH);
-  delay(500);
+  delay(100);
   digitalWrite(13, LOW);
-  delay(500);
+  delay(100);
   digitalWrite(13, HIGH);
 }
 
 
-void handleMotorMessage() {
-  if (STEP_ARRAY != NULL) {
-    free(STEP_ARRAY);
-    STEP_ARRAY = NULL;
-  }
+bool handleMotorMessage() {
+  // add all values received from serial
+  // to each other and send them back as a check
+  unsigned char crcNumber = 0;
 
-  // need at least 4 integer being
-    // send number of bytes
-    // Speed
-    // number of repetitions
-    // and at least 1 step
-  if (Serial.available() < SIZE_OF_INT*4) {
-    delay(10);
-    handleMotorMessage();
-  }
+  // readIntegerFromSerial set the input
+  // variable to false once it has failed
+  bool hasSucces(true);
+  
   // number of bytes in the current message
-  int numberOfBytesInMessage = readIntegerFromSerial();
+  int numberOfBytesInMessage = readIntegerFromSerial(hasSucces);
+
   // number of steps per repetitions;
   NUMBER_OF_STEPS = (numberOfBytesInMessage / SIZE_OF_INT) - 2;
+
   CURRENT_STEP = 0;
-  int speed = readIntegerFromSerial();
-  NUMBER_OF_REPETITIONS = readIntegerFromSerial();
-  /*
-    Serial.print("Speed: "); Serial.println(speed,DEC);
-    Serial.print("Number of steps: "); Serial.println(NUMBER_OF_STEPS, DEC);
-    Serial.print("Number of repetitions: "); Serial.println(NUMBER_OF_REPETITIONS,DEC);
-  */
-  STEP_ARRAY =  reinterpret_cast<int *>(
-      malloc(sizeof(*STEP_ARRAY) * NUMBER_OF_STEPS));
+  int speed = readIntegerFromSerial(hasSucces);
+
+  NUMBER_OF_REPETITIONS = readIntegerFromSerial(hasSucces);
+
+  // calculate the crc number
+  crcNumber += numberOfBytesInMessage;
+  crcNumber += speed;
+  crcNumber += NUMBER_OF_REPETITIONS;
 
   for (int i = 0;
        i < NUMBER_OF_STEPS;
        i++) {
-    STEP_ARRAY[i] = readIntegerFromSerial();
-    // Serial.print(STEP_ARRAY[i]); Serial.print(" ");
+    STEP_ARRAY[i] = readIntegerFromSerial(hasSucces);
+    crcNumber += STEP_ARRAY[i];
   }
 
-  if (Serial.available() != 0)
-    sendSOSLed();
+  Serial.write(crcNumber);
 
-  setTimer1Interupt(speed);
+  if (hasSucces) {
+    setTimer1Interupt(speed);
+  } else {
+    NUMBER_OF_REPETITIONS = 0;
+    HAS_SHAKEN = false;
+  }
 }
 
 
@@ -288,22 +280,16 @@ void setup() {
   setPinOutputs();
   // Open the serial connections
   Serial.begin(BAUD_RATE);
-  DEBUG_MSG_RCS("done setting");
 }
 
 
 void loop() {
   // start with a hand shake if that didnt happen yet
-  while (!HAS_SHAKEN)
+  while (!HAS_SHAKEN){
     HAS_SHAKEN = handShake();
-
-  if (Serial.available() > 0) {
-    //    Serial.print(Serial.available(),DEC);
-    handleMotorMessage();
-  } else {
-    if (NUMBER_OF_REPETITIONS == 0)
-      blinkKnightRider();
-    else
-    {}
   }
+
+  if (HAS_SHAKEN & NUMBER_OF_REPETITIONS <= 0)
+    handleMotorMessage();
 }
+        
