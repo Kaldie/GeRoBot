@@ -133,6 +133,7 @@ void ArduinoSerialConnection::openConnection() {
     LOG_ERROR("Couldn't set term attributes");
     throw 100;
   }
+  tcflush(m_fileHandle, TCIOFLUSH);
 }
 
 
@@ -159,7 +160,7 @@ void ArduinoSerialConnection::serialWrite(const int& i_integer) {
 }
 
 
-void ArduinoSerialConnection::serialWrite(const char* i_pointer,
+void ArduinoSerialConnection::serialWrite(const unsigned char* i_pointer,
                                           const int& i_numberOfWrites) {
   if (m_fileHandle == -1)
     openConnection();

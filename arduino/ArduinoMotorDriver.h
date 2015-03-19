@@ -18,8 +18,7 @@ class ArduinoMotorDriver {
     bool handShake();
 
  public:
-    void actuate(const char* i_buffer,
-                 const int i_messageSize);
+    void actuate(const std::vector<int> i_messageVector);
     bool hasConnection();
     bool resetConnection();
     bool sendTestBit();
