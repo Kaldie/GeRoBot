@@ -11,7 +11,7 @@
 // Global variables definitions
 bool HAS_SHAKEN = false;
 int SIZE_OF_INT = 0;
-
+unsigned long DELAY_BEFORE_READ = 0.1;
 // Global buffer to store integer values received from serial connection
 byte INTEGER_BUFFER[10];
 
@@ -77,7 +77,6 @@ void setTimer1Interupt(int i_dekaHertz) {
 
   OCR1A = registerValue;
 
-  //  TCCR1B |= (1 << CS12) | (1 << CS10);
   if (B00000001 & i)
     TCCR1B |= 1 << CS10;
   if (B00000010 & i)
@@ -92,6 +91,13 @@ void setPinOutputs() {
   // Always hook up the 2 t/m 7 inputs!
   pinMode(13, OUTPUT);
   DDRD = DDRD | B11111100;
+}
+
+
+void setPins(byte i_byte) {
+    // no1 touches the 1st and 2nd pin;
+    i_byte &= B11111100;
+    PORTD = i_byte;
 }
 
 
@@ -117,34 +123,22 @@ ISR(TIMER1_COMPA_vect) {
 }
 
 
-void setPins(byte i_byte) {
-    // no1 touches the 1st and 2nd pin;
-    i_byte &= B11111100;
-    PORTD = i_byte;
-}
-
-
-int readIntegerFromSerial(bool& o_hasSucces) {
+bool readIntegerFromSerial(int& i_value) {
   int attempts = 0;
-  while (Serial.available() < SIZE_OF_INT & attempts < 100) {
+  while (Serial.available() < SIZE_OF_INT & attempts < 1000) {
     attempts++;
+    delay(DELAY_BEFORE_READ);
   }
 
-  if (Serial.available() < SIZE_OF_INT) {
-    o_hasSucces &= false;
-    return 0;
-  } else {
-    o_hasSucces &= true;
-  }
+  if (Serial.available() < SIZE_OF_INT)
+    return false;
 
   for (int i = 0 ;
        i < SIZE_OF_INT;
        i++)
     INTEGER_BUFFER[i] = Serial.read();
-
-  int value;
-  value = *(reinterpret_cast<int*>(INTEGER_BUFFER));
-  return value;
+  i_value = *(reinterpret_cast<int*>(INTEGER_BUFFER));
+  return true;
 }
 
 
@@ -177,7 +171,7 @@ bool handShake() {
   int attempts = 0;
 
   Serial.write(HAND_SHAKE);
-  while (!received & attempts < 100) {
+  while (!received & attempts < 1000) {
     if (Serial.available() > 0) {
       // receive echo
       Serial.readBytes((char*)buffer, 1);
@@ -186,6 +180,7 @@ bool handShake() {
       };
     } else {
       attempts++;
+      delay(DELAY_BEFORE_READ);
     }
   }
 
@@ -232,25 +227,57 @@ void sendSOSLed() {
 }
 
 
+bool verifyCRC(unsigned char i_crcNumber) {
+  unsigned char receivedCRC;
+  int attempts = 0;
+  Serial.write(i_crcNumber);
+
+  do {
+    Serial.readBytes(reinterpret_cast<char*>(&receivedCRC), 1);
+    delay(DELAY_BEFORE_READ);
+    attempts++;
+  } while (receivedCRC == -1 & attempts < 100);
+
+  if (receivedCRC != i_crcNumber) {
+    NUMBER_OF_REPETITIONS = 0;
+    HAS_SHAKEN = false;
+    return false;
+  } else {
+    return true;
+  }
+}
+
+
 bool handleMotorMessage() {
   // add all values received from serial
   // to each other and send them back as a check
   unsigned char crcNumber = 0;
+  unsigned char receivedCRC = 0;
 
-  // readIntegerFromSerial set the input
-  // variable to false once it has failed
-  bool hasSucces(true);
-  
   // number of bytes in the current message
-  int numberOfBytesInMessage = readIntegerFromSerial(hasSucces);
-
+  int numberOfBytesInMessage;
+  // speed of the state changes
+  int speed;
+  
+  if (!readIntegerFromSerial(numberOfBytesInMessage)) {
+    verifyCRC(crcNumber);
+    return false;
+  }
+  
   // number of steps per repetitions;
   NUMBER_OF_STEPS = (numberOfBytesInMessage / SIZE_OF_INT) - 2;
-
+ 
   CURRENT_STEP = 0;
-  int speed = readIntegerFromSerial(hasSucces);
+  
+  if (!readIntegerFromSerial(speed)) {
+    verifyCRC(crcNumber);
+    return false;
+  }
 
-  NUMBER_OF_REPETITIONS = readIntegerFromSerial(hasSucces);
+  if (!readIntegerFromSerial(NUMBER_OF_REPETITIONS)) {
+    verifyCRC(crcNumber);
+    return false;
+  }
 
   // calculate the crc number
   crcNumber += numberOfBytesInMessage;
@@ -260,17 +287,18 @@ bool handleMotorMessage() {
   for (int i = 0;
        i < NUMBER_OF_STEPS;
        i++) {
-    STEP_ARRAY[i] = readIntegerFromSerial(hasSucces);
-    crcNumber += STEP_ARRAY[i];
+    if (readIntegerFromSerial(STEP_ARRAY[i])) {
+      crcNumber += STEP_ARRAY[i];
+    } else {
+      verifyCRC(crcNumber);
+      return false;
+    }
   }
-
-  Serial.write(crcNumber);
-
-  if (hasSucces) {
+  if (verifyCRC(crcNumber)) {
     setTimer1Interupt(speed);
+    return true;
   } else {
-    NUMBER_OF_REPETITIONS = 0;
-    HAS_SHAKEN = false;
+    return false;
   }
 }
 
@@ -279,6 +307,7 @@ void setup() {
   // initialize the digital pin as an output.
   setPinOutputs();
   // Open the serial connections
+  Serial.setTimeout(10);
   Serial.begin(BAUD_RATE);
 }
 
@@ -291,5 +320,5 @@ void loop() {
 
   if (HAS_SHAKEN & NUMBER_OF_REPETITIONS <= 0)
     handleMotorMessage();
+  delay(5);
 }
-        
