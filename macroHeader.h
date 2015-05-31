@@ -1,7 +1,8 @@
-#ifndef macroHeader_H
-#define macroHeader_H
+// Copyright [2014] Ruud Cools
+#ifndef MACROHEADER_H_
+#define MACROHEADER_H_
 
-//Common header decleration
+// Common header decleration
 #include <algorithm>
 #include <fstream>
 #include <fcntl.h>
@@ -9,7 +10,7 @@
 #include <iostream>
 #include <map>
 #include <memory>
-#include <pugixml.hpp>
+
 #include <string>
 #include <string.h>
 #include <stdexcept>
@@ -17,6 +18,9 @@
 #include <termios.h>
 #include <unistd.h>
 #include <vector>
+#include <iomanip>
+
+#include <pugixml.hpp>
 
 #define PIN_HIGH 1
 #define PIN_LOW 0
@@ -30,119 +34,123 @@
 #define TOLERANCE 0.1
 
 #define DEBUG
-
-//make #define DEBUG_FILE
-
-//Create getter and setter for properties of a class
-#define GETSET(type, varName, property)		\
-	private:																\
-	type varName;														\
-public:																		\
- const type& get##property() const				\
- {																				\
-	 return varName;												\
- };																				\
-																					\
- void set##property(const type& val)			\
- {																				\
-	 varName = val;													\
- };
-
+//#define DEBUG_FILE
 
 //Create getter and setter for properties of a class
-#define GETSET_NO_CONST(type, varName, property)	\
-	private:																				\
-	type varName;																		\
-public:																						\
- type& get##property()														\
- {																								\
-	 return varName;																\
- };																								\
-																									\
- void set##property(const type& val)							\
- {																								\
-	 varName = val;																	\
- };
+#define GETSET(type, varName, property)                                 \
+  private:                                                              \
+  type varName;                                                         \
+public:                                                                 \
+const type& get##property() const {                                     \
+  return varName;                                                       \
+};                                                                      \
+                                                                        \
+void set##property(const type& val) {                                   \
+  varName = val;                                                        \
+};
 
 
-//Create getter and setter for Pointers in a class
-#define GETSETPOINTER(type, varName, property)	\
-	private:																			\
-	type* varName;																\
-public:																					\
- type* get##property() const										\
- {																							\
-	 return varName;															\
- };																							\
-																								\
- void set##property(type* val)									\
- {																							\
-	 varName = val;																\
- };
+// Create getter and setter for properties of a class
+#define GETSET_NO_CONST(type, varName, property)                        \
+  private:                                                              \
+  type varName;                                                         \
+public:                                                                 \
+type& get##property()                                                   \
+{                                                                       \
+  return varName;                                                       \
+};                                                                      \
+                                                                        \
+void set##property(const type& val)                                     \
+{                                                                       \
+  varName = val;                                                        \
+};
 
 
-#define GET(type, varName, property)						\
-	private:																			\
-	type varName;																	\
-public:																					\
- const type& get##property() const							\
- {																							\
-	 return varName;															\
- };
+// Create getter and setter for Pointers in a class
+#define GETSETPOINTER(type, varName, property)                          \
+  private:                                                              \
+  type* varName;                                                        \
+public:                                                                 \
+type* get##property() const {                                            \
+  return varName;                                                       \
+};                                                                      \
+                                                                        \
+void set##property(type* val) {                                         \
+  varName = val;                                                        \
+};
 
 
-//Create debug messages
+#define GET(type, varName, property)                                    \
+  private:                                                              \
+  type varName;                                                         \
+public:                                                                 \
+const type& get##property() const {                                     \
+  return varName;                                                       \
+};
+
+
+// Create debug messages
 #if defined(DEBUG)
-#define DEBUG_MSG(message) do {std::cout<<message<<std::endl;} while(false)
+#define DEBUG_MSG(message) do {std::cout << message << std::endl;} while (false)
 
 #elif defined(DEBUG_FILE)
-#define DEBUG_MSG(message) do {													\
-		std::ofstream thisStream;														\
-		thisStream.open("Debug.save",std::ios_base::app);		\
-		thisStream<<message<<std::endl;											\
-		thisStream.close();																	\
-  } while(false)
+#define DEBUG_MSG(message) do {                                         \
+    std::ofstream thisStream;                                \
+    thisStream.open("Debug.save", std::ios_base::app);                  \
+    thisStream << message << std::endl;                                 \
+    thisStream.close();                                                 \
+  } while (false)
 #else
 #define DEBUG_MSG(message)
 #endif
 
-#define LOG_ERROR(message) do {																					\
-    std::stringstream stream;																						\
-    stream<<std::endl<<"("<<__FILE__<<":"<<__LINE__<<"): "<<message;		\
-    throw std::runtime_error(stream.str());} while(false)
+#define LOG_ERROR(message) do {                                         \
+    std::stringstream stream;                                           \
+    stream << std::endl << "[ERROR_LOG]" <<                             \
+        "(" << __FILE__ << ":" << __LINE__ << "): "                     \
+           << message;                                                  \
+    std::string what = stream.str();                                    \
+    throw std::runtime_error(what);} while (false)
 
-#define LOG_WARNING(message) do {DEBUG_MSG("[WARN]("<<__FILE__<<":"<<__LINE__<<"): "<<message);} while(false)
+#define LOG_WARNING(message)                                            \
+  do {DEBUG_MSG("[WARN](" <<                                            \
+                __FILE__ << ":" << __LINE__ << "): " << message);} while (false)
 
-#define LOG_DEBUG(message) do {DEBUG_MSG("[DEBUG] ("<<__FILE__<<":"<<__LINE__<<"): "<<message);} while(false)
+#define LOG_DEBUG(message)                                              \
+  do {DEBUG_MSG("[DEBUG] (" <<                                          \
+                __FILE__<< ":" << __LINE__ << "): " << message);} while (false)
 
-#define LOG_INFO(message) do {DEBUG_MSG("[INFO] ("<<__FILE__<<":"<<__LINE__<<"): "<<message);} while(false)
+#define LOG_INFO(message)                                               \
+  do {DEBUG_MSG("[INFO] ("<<                                            \
+                __FILE__ << ":" << __LINE__ << "): " << message);} while (false)
 
 
-//Forward declared classes
+// Forward declared classes
 class PinState;
+class PinStateSequence;
 class BaseMotor;
 class BaseJoint;
 class Robot;
 class RobotTreeModel;
 
-enum MovementType {None,Rotational,Translational}; 
-enum TRACE_TYPE{Line,Curve};
+enum MovementType {None, Rotational, Translational};
+enum TRACE_TYPE {Line, Curve};
 
-enum GUIMovementMode {ToolMode,AxisMode};
+enum GUIMovementMode {ToolMode, AxisMode};
 
+// Pin state related types
 typedef std::vector<int> PinVector;
-typedef std::map<int,int> PinStateMap;
-typedef std::vector<PinState> PinStateSequence; //An array of set pins
+typedef std::vector<PinState> PinStateVector;
+typedef std::vector<PinStateSequence> PinStateSequenceVector;
 
+// Joint related types
 typedef std::shared_ptr<BaseJoint> JointPointer;
-typedef std::map<std::string,std::string> DirectionConversionMap;
-
-typedef std::vector<PinState> PinStateSequence;
+typedef std::map<std::string, std::string> DirectionConversionMap;
 typedef std::vector<JointPointer> JointPointerVector;
 
+// Robot related types
 typedef std::shared_ptr<Robot> RobotPointer;
-
 typedef std::shared_ptr<RobotTreeModel> RobotTreeModelPointer;
 
 
-#endif // macroHeader
+#endif  // MACROHEADER_H_
