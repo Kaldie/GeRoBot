@@ -75,7 +75,7 @@
 ARDUINO_DIR  = /usr/share/arduino
 #
 TARGET       = ArduinoStepper.cpp
-ARDUINO_LIBS = 
+ARDUINO_LIBS = SdFat
 #
 BOARD_TAG    = uno
 ARDUINO_PORT = /dev/ttyUSB0
