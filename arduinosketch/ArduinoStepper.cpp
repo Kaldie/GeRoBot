@@ -1,18 +1,23 @@
 // Copyright [2014] Ruud Cools
 
-#include <string.h>
-#include <stdarg.h>
 #include <Arduino.h>
 #include <ByteBuffer.h>
+#include <SdFat.h>
+
 // defines
 #define BAUD_RATE 115200
-#define HAND_SHAKE 200
+#define HAND_SHAKE_VALUE 200
+#define ACTUATE_MODE_VALUE 100
+#define ECHO_MODE_VALUE 150
+#define DELETE_FILE_MODE_VALUE 140
+#define ERROR_MODE 244
+#define CHIP_SELECT 10
 
 // States for the machine
 enum Status {
   SEND_HAND_SHAKE,
   VERIFY_HAND_SHAKE,
-  HANDLE_INT_SIZE,
+  MODE_SELECT,
   RECEIVING_MESSAGE_SIZE,
   RECEIVING_SPEED,
   RECEIVING_REPITITIONS,
@@ -20,6 +25,11 @@ enum Status {
   SEND_CRC,
   VERIFY_CRC,
   WRITE_IN_BUFFER,
+  ACTUATE_PRE_MODE,
+  ACTUATE_MODE,
+  ACTUATE_POST_MODE,
+  ECHO_MODE,
+  DELETE_FILE_MODE
 };
 
 
@@ -29,7 +39,7 @@ struct MotorMessage {
   int currentStep;
   int speed;
   int numberOfRepetitions;
-  int stepArray[30];
+  int stepArray[10];
   unsigned char currentCRC;
 };
 
@@ -43,13 +53,13 @@ enum ReturnState {
 
 // Global variables
 // Size of an received in bytes
-int SIZE_OF_INT = 0;
+int SIZE_OF_INT = 4;
 
 // Buffer needed to write the integers from the serial connection
-unsigned char INTEGER_BUFFER[10];
+unsigned char INTEGER_BUFFER[4];
 
 // buffer for motor messages
-ByteBuffer<MotorMessage> MOTOR_MESSAGE_BUFFER(20);
+ByteBuffer<MotorMessage> MOTOR_MESSAGE_BUFFER(25);
 
 // return state of the handle functions
 ReturnState RETURN_STATE;
@@ -58,13 +68,25 @@ ReturnState RETURN_STATE;
 int ATTEMPTS = 0;
 
 // status of the state machine
-Status status = SEND_HAND_SHAKE;
+Status ARDUINO_STATUS = SEND_HAND_SHAKE;
 
 // Is the motor currently running?
 bool IS_MOTOR_RUNNING = false;
 
+// SD module
+SdFat SD;
+
+// File on the SD card on which the steps are written
+SdFile stepFile;
+
+// File name on the sd card
+char STEP_FILE_NAME[] = "STEP.YZS";
+
+// Number of MotorMessages currently read
+unsigned long CURRENT_READ_MESSAGE_ON_SD = 0;
+unsigned long CURRENT_WRITE_MESSAGE_ON_SD = 0;
+
 void sendSOSLed();
-void getMessageFromBuffer();
 
 
 void disableHeartBeat() {
@@ -115,13 +137,17 @@ void setTimer1Interupt(int i_dekaHertz) {
     TCCR1B |= 1 << CS11;
   if (B00000100 & i)
     TCCR1B |= 1 << CS12;
+  IS_MOTOR_RUNNING = true;
   sei();  // allow interrupts
 }
 
 
 void setPinOutputs() {
+  // For blink
+  //  pinMode(13, OUTPUT);
+  // for SD card
+  pinMode(CHIP_SELECT, OUTPUT);
   // Always hook up the 2 t/m 7 inputs!
-  pinMode(13, OUTPUT);
   DDRD = DDRD | B11111100;
 }
 
@@ -137,12 +163,7 @@ ISR(TIMER1_COMPA_vect) {
   MotorMessage* message = MOTOR_MESSAGE_BUFFER.getReadPointer();
   setPins((byte)(
       message->stepArray[message->currentStep]));
-  /*
-    Serial.write(STEP_ARRAY[CURRENT_STEP] + '0');
-    Serial.write(CURRENT_STEP + '0');
-    Serial.write(NUMBER_OF_REPETITIONS + '0');
-    Serial.write(NUMBER_OF_STEPS + '0');
-  */
+
   message->currentStep++;
 
   if (message->currentStep >=
@@ -153,6 +174,7 @@ ISR(TIMER1_COMPA_vect) {
 
   if (message->numberOfRepetitions <= 0) {
     disableHeartBeat();
+    MOTOR_MESSAGE_BUFFER.finishReadPointer();
     IS_MOTOR_RUNNING = false;
   }
 }
@@ -194,23 +216,25 @@ void blinkKnightRider() {
       message->stepArray[6-(i-7)] = 1 << i;
     }
 
-
     MOTOR_MESSAGE_BUFFER.finishWritePointer();
-    IS_MOTOR_RUNNING = true;
-    getMessageFromBuffer();
-  } else {
+  }
+  while (MOTOR_MESSAGE_BUFFER.getReadPointer()->numberOfRepetitions <= 0 and
+         !MOTOR_MESSAGE_BUFFER.isEmpty()) {
     MOTOR_MESSAGE_BUFFER.finishReadPointer();
+  }
+  if (MOTOR_MESSAGE_BUFFER.getReadPointer()->numberOfRepetitions >= 0) {
+    setTimer1Interupt(MOTOR_MESSAGE_BUFFER.getReadPointer()->speed);
   }
 }
 
 
 bool sendHandShake(ReturnState* i_returnState) {
-  Serial.write(HAND_SHAKE);
+  Serial.write(HAND_SHAKE_VALUE);
   *i_returnState = SUCCES;
 }
 
 
-void handleIntSize(ReturnState* i_returnState) {
+void handleModeSelect(ReturnState* i_returnState) {
   if (Serial.available() < 1) {
     *i_returnState = NO_RESPONSE;
     return;
@@ -220,25 +244,56 @@ void handleIntSize(ReturnState* i_returnState) {
   byte buffer[1];
   int intSize = 0;
   Serial.readBytes((char*)buffer, 1);
-  intSize = *buffer;
 
-  if (intSize < 10) {
-    // echo it if its ok
-    Serial.write(intSize);
+  if (*buffer < 10) {
+    // It should be an int size
+    SIZE_OF_INT = *buffer;
+
+    // echo int size
+    Serial.write(*buffer);
+
+    // Set return status to succes
     *i_returnState = SUCCES;
-    SIZE_OF_INT = intSize;
+
+    // Will be receiving message over serial now!
+     ARDUINO_STATUS = RECEIVING_MESSAGE_SIZE;
   } else {
-    *i_returnState = FAIL;
-  }
+    // Something else is intended
+    switch (*buffer) {
+      case  ACTUATE_MODE_VALUE : {
+        Serial.write(*buffer);
+        *i_returnState = SUCCES;
+        ARDUINO_STATUS = ACTUATE_PRE_MODE;
+      }
+      case DELETE_FILE_MODE_VALUE : {
+        Serial.write(*buffer);
+        *i_returnState = SUCCES;
+        ARDUINO_STATUS = DELETE_FILE_MODE;
+      }
+      case ECHO_MODE_VALUE : {
+        Serial.write(*buffer);
+        *i_returnState = SUCCES;
+        ARDUINO_STATUS = ECHO_MODE;
+      }
+      case ERROR_MODE : {
+        *buffer = 0;
+        Serial.write(*buffer);
+        *i_returnState = FAIL;
+        break;
+      }
+      default : {
+        ARDUINO_STATUS = SEND_HAND_SHAKE;
+        break;
+      }
+    }  // end switch case
+  }  // end if statement
 }
 
-
 void sendSOSLed() {
-  digitalWrite(13, HIGH);
-  delay(100);
-  digitalWrite(13, LOW);
-  delay(100);
-  digitalWrite(13, HIGH);
+  digitalWrite(2, HIGH);
+  delay(500);
+  digitalWrite(2, LOW);
+  delay(500);
 }
 
 
@@ -262,39 +317,144 @@ void verifyResponse(const unsigned char& i_requiredResponse,
 }
 
 
+void writeMotorMessageBufferToSD(MotorMessage* i_messagePointer) {
+  bool isOwner;
+
+  if (stepFile.isOpen()) {
+    isOwner = false;
+  } else {
+    if (!stepFile.open(STEP_FILE_NAME, O_WRITE | O_CREAT)) {
+      SD.errorHalt("opening file for write failed");
+    }
+
+    stepFile.seekSet(CURRENT_WRITE_MESSAGE_ON_SD * sizeof(MotorMessage));
+    isOwner = true;
+  }
+
+  if (i_messagePointer->numberOfRepetitions > 0) {
+    stepFile.write(
+        reinterpret_cast<byte*>(i_messagePointer),
+        sizeof(MotorMessage));
+    CURRENT_WRITE_MESSAGE_ON_SD++;
+  }
+
+  if (isOwner) {
+    stepFile.close();
+  }
+}
+
+
+void writeMotorMessageBufferToSD() {
+  if (!stepFile.open(STEP_FILE_NAME, O_WRITE | O_CREAT)) {
+    SD.errorHalt("opening file for write failed");
+  }
+
+  stepFile.seekSet(CURRENT_WRITE_MESSAGE_ON_SD * sizeof(MotorMessage));
+
+  while (!MOTOR_MESSAGE_BUFFER.isEmpty()) {
+    writeMotorMessageBufferToSD(MOTOR_MESSAGE_BUFFER.getReadPointer());
+    MOTOR_MESSAGE_BUFFER.finishReadPointer();
+  }
+  stepFile.close();
+}
+
+
+bool readMotorMessagesFromSD() {
+  unsigned int numberOfBytesRead = 0;
+  if (!stepFile.open(STEP_FILE_NAME, O_READ)) {
+    SD.errorHalt("opening file for read failed");
+  }
+
+  stepFile.seekSet(CURRENT_READ_MESSAGE_ON_SD * sizeof(MotorMessage));
+
+  while ((!MOTOR_MESSAGE_BUFFER.isFull()) &&
+         stepFile.available()) {
+    if (CURRENT_WRITE_MESSAGE_ON_SD != 0 and
+        CURRENT_WRITE_MESSAGE_ON_SD <= CURRENT_READ_MESSAGE_ON_SD) {
+      break;
+    }
+
+    numberOfBytesRead += stepFile.read(
+        reinterpret_cast<void*>(MOTOR_MESSAGE_BUFFER.getWritePointer()),
+        sizeof(MotorMessage));
+
+    CURRENT_READ_MESSAGE_ON_SD++;
+
+    if (MOTOR_MESSAGE_BUFFER.getWritePointer()->numberOfRepetitions > 0) {
+      MOTOR_MESSAGE_BUFFER.finishWritePointer();
+    }
+  }
+  stepFile.close();
+  return numberOfBytesRead;
+}
+
+
+void printMessageToSerial(MotorMessage* i_messagePointer,
+                          bool i_verbose = true) {
+  if (!i_verbose) {
+    Serial.write(reinterpret_cast<byte*>(&i_messagePointer->numberOfSteps),
+                 sizeof(i_messagePointer->numberOfSteps));
+    Serial.write(reinterpret_cast<byte*>(&i_messagePointer->speed),
+                 sizeof(i_messagePointer->speed));
+    Serial.write(reinterpret_cast<byte*>(&i_messagePointer->numberOfRepetitions),
+                 sizeof(i_messagePointer->numberOfRepetitions));
+    for (int i = 0;
+         i < i_messagePointer->numberOfSteps;
+         i++) {
+      Serial.write(reinterpret_cast<byte*>(&i_messagePointer->stepArray[i]),
+                   sizeof(i_messagePointer->stepArray[i]));
+    }
+    return;
+  } else {
+    Serial.print("Number of steps: ");
+    Serial.println(i_messagePointer->numberOfSteps);
+    Serial.print("Speed: ");
+    Serial.println(i_messagePointer->speed);
+    Serial.print("Number of repititions: ");
+    Serial.println(i_messagePointer->numberOfRepetitions);
+
+    Serial.print("Steps: ");
+    for (int i = 0;
+         i < i_messagePointer->numberOfSteps;
+         i++) {
+      Serial.print(i_messagePointer->stepArray[i]);
+      Serial.print(", ");
+    }
+    Serial.println("------------------------");
+    return;
+  }
+}
+
 void handleStatus() {
-  switch (status) {
+  switch (ARDUINO_STATUS) {
     case SEND_HAND_SHAKE: {
       sendHandShake(&RETURN_STATE);
-      status = VERIFY_HAND_SHAKE;
+      ARDUINO_STATUS = VERIFY_HAND_SHAKE;
       break;
     }
 
     case VERIFY_HAND_SHAKE: {
-      verifyResponse(HAND_SHAKE, &RETURN_STATE);
+      verifyResponse(HAND_SHAKE_VALUE, &RETURN_STATE);
       if (RETURN_STATE == SUCCES) {
-        status = HANDLE_INT_SIZE;
+        ARDUINO_STATUS = MODE_SELECT;
         ATTEMPTS = 0;
       } else if (RETURN_STATE == FAIL) {
-        status = SEND_HAND_SHAKE;
+        ARDUINO_STATUS = SEND_HAND_SHAKE;
       }
-      
+
       if (ATTEMPTS >= 10000) {
         ATTEMPTS = 0;
-        status = SEND_HAND_SHAKE;
+        ARDUINO_STATUS = SEND_HAND_SHAKE;
       }
       ATTEMPTS++;
       break;
     }
 
-    case HANDLE_INT_SIZE: {
-      handleIntSize(&RETURN_STATE);
-      if (RETURN_STATE == SUCCES) {
-        status = RECEIVING_MESSAGE_SIZE;
-      } else if (RETURN_STATE == FAIL) {
-        status = SEND_HAND_SHAKE;
+    case MODE_SELECT: {
+      handleModeSelect(&RETURN_STATE);
+      if (RETURN_STATE == FAIL) {
+        ARDUINO_STATUS = SEND_HAND_SHAKE;
       }
-
       break;
     }
 
@@ -305,7 +465,7 @@ void handleStatus() {
         MOTOR_MESSAGE_BUFFER.getWritePointer()->numberOfSteps =
             (messageSize / SIZE_OF_INT) - 2;
         MOTOR_MESSAGE_BUFFER.getWritePointer()->currentCRC = messageSize;
-        status = RECEIVING_SPEED;
+        ARDUINO_STATUS = RECEIVING_SPEED;
       }
       break;
     }
@@ -317,7 +477,7 @@ void handleStatus() {
         MOTOR_MESSAGE_BUFFER.getWritePointer()
             ->currentCRC += MOTOR_MESSAGE_BUFFER.getWritePointer()->speed;
 
-        status = RECEIVING_REPITITIONS;
+        ARDUINO_STATUS = RECEIVING_REPITITIONS;
       }
       break;
     }
@@ -330,7 +490,7 @@ void handleStatus() {
         MOTOR_MESSAGE_BUFFER.getWritePointer()->currentCRC +=
             MOTOR_MESSAGE_BUFFER.getWritePointer()->numberOfRepetitions;
 
-        status = RECEIVING_STEPS;
+        ARDUINO_STATUS = RECEIVING_STEPS;
         MOTOR_MESSAGE_BUFFER.getWritePointer()->currentStep = 0;
       }
       break;
@@ -338,29 +498,29 @@ void handleStatus() {
 
     case RECEIVING_STEPS: {
       int step;
+      MotorMessage* currentMessage = MOTOR_MESSAGE_BUFFER.getWritePointer();
       readIntegerFromSerial(step, &RETURN_STATE);
       if (RETURN_STATE == SUCCES) {
-        MOTOR_MESSAGE_BUFFER.getWritePointer()->stepArray[
-            MOTOR_MESSAGE_BUFFER.getWritePointer()->currentStep] = step;
+        currentMessage->stepArray[
+            currentMessage->currentStep] = step;
 
-        MOTOR_MESSAGE_BUFFER.getWritePointer()->currentCRC +=
-            MOTOR_MESSAGE_BUFFER.getWritePointer()->stepArray[
-                MOTOR_MESSAGE_BUFFER.getWritePointer()->currentStep];
+        currentMessage->currentCRC +=
+            currentMessage->stepArray[
+                currentMessage->currentStep];
 
-        MOTOR_MESSAGE_BUFFER.getWritePointer()->currentStep++;
+        currentMessage->currentStep++;
       }
 
-      if (MOTOR_MESSAGE_BUFFER.getWritePointer()->currentStep >=
-          MOTOR_MESSAGE_BUFFER.getWritePointer()->numberOfSteps) {
-        status = SEND_CRC;
-        MOTOR_MESSAGE_BUFFER.getWritePointer()->currentStep = 0;
+      if (currentMessage->currentStep >= currentMessage->numberOfSteps) {
+        ARDUINO_STATUS = SEND_CRC;
+        currentMessage->currentStep = 0;
       }
       break;
     }
 
     case SEND_CRC: {
       Serial.write(MOTOR_MESSAGE_BUFFER.getWritePointer()->currentCRC);
-      status = VERIFY_CRC;
+      ARDUINO_STATUS = VERIFY_CRC;
       RETURN_STATE = SUCCES;
       break;
     }
@@ -369,41 +529,103 @@ void handleStatus() {
       verifyResponse(MOTOR_MESSAGE_BUFFER.getWritePointer()->currentCRC,
                      &RETURN_STATE);
       if (RETURN_STATE == SUCCES) {
-        status = WRITE_IN_BUFFER;
+        ARDUINO_STATUS = WRITE_IN_BUFFER;
       } else if (RETURN_STATE == FAIL) {
-        status = SEND_HAND_SHAKE;
+        ARDUINO_STATUS = SEND_HAND_SHAKE;
       }
-      //      MOTOR_MESSAGE_BUFFER.getWritePointer()->currentCRC = 0;
       break;
     }
 
     case WRITE_IN_BUFFER: {
       if (!MOTOR_MESSAGE_BUFFER.isFull()) {
         MOTOR_MESSAGE_BUFFER.finishWritePointer();
-        RETURN_STATE = SUCCES;
-        status = SEND_HAND_SHAKE;
       } else {
-        //        MOTOR_MESSAGE_BUFFER.getReadPointer();
-        //        MOTOR_MESSAGE_BUFFER.finishReadPointer();
-        RETURN_STATE = FAIL;
+        writeMotorMessageBufferToSD();
+        MOTOR_MESSAGE_BUFFER.finishWritePointer();
+      }
+      RETURN_STATE = SUCCES;
+      ARDUINO_STATUS = SEND_HAND_SHAKE;
+      break;
+    }
+
+    case DELETE_FILE_MODE : {
+      SD.remove(STEP_FILE_NAME);
+      ARDUINO_STATUS = SEND_HAND_SHAKE;
+      break;
+    }
+
+    case ECHO_MODE: {
+      MotorMessage* currentMessage;
+      Serial.println("Echoing messages on sd card!");
+      // clean the read buffer before starts
+      while (MOTOR_MESSAGE_BUFFER.finishReadPointer()) {}
+
+      // continue spamming until it breaks
+      while (true) {
+        if (readMotorMessagesFromSD()) {
+          while (!MOTOR_MESSAGE_BUFFER.isEmpty()) {
+            currentMessage = MOTOR_MESSAGE_BUFFER.getReadPointer();
+            printMessageToSerial(currentMessage,
+                                 true);
+            MOTOR_MESSAGE_BUFFER.finishReadPointer();
+          }
+        } else {
+          CURRENT_READ_MESSAGE_ON_SD = 0;
+          // reading form SD did not yield new message
+          break;
+        }
+      }
+      ARDUINO_STATUS = SEND_HAND_SHAKE;
+      break;
+    }
+
+    case ACTUATE_PRE_MODE : {
+      // cleaning the buffer and storing the last message on sd-card
+      writeMotorMessageBufferToSD();
+      writeMotorMessageBufferToSD(MOTOR_MESSAGE_BUFFER.getReadPointer());
+      ARDUINO_STATUS = ACTUATE_MODE;
+      break;
+    }
+
+    case ACTUATE_MODE : {
+      bool hasFoundMessageOnSD = false;
+      if ((MOTOR_MESSAGE_BUFFER.isEmpty() or !IS_MOTOR_RUNNING) and
+          !MOTOR_MESSAGE_BUFFER.isFull()) {
+        hasFoundMessageOnSD = readMotorMessagesFromSD();
+
+        /*
+          if there are now new message read from SD
+          and the motor is not running
+          The final and last step will activate in the next if statement
+          So we can start sending hand shakes again
+        */
+        if (!hasFoundMessageOnSD and
+            !IS_MOTOR_RUNNING) {
+          ARDUINO_STATUS = ACTUATE_POST_MODE;
+        }
+      }
+
+      if (!IS_MOTOR_RUNNING) {
+        if (MOTOR_MESSAGE_BUFFER.getReadPointer()->numberOfRepetitions > 0) {
+          setTimer1Interupt(MOTOR_MESSAGE_BUFFER.getReadPointer()->speed);
+        } else {
+          MOTOR_MESSAGE_BUFFER.finishReadPointer();
+        }
       }
       break;
     }
 
+    case ACTUATE_POST_MODE : {
+      CURRENT_WRITE_MESSAGE_ON_SD = CURRENT_READ_MESSAGE_ON_SD;
+      CURRENT_READ_MESSAGE_ON_SD = 0;
+      ARDUINO_STATUS = SEND_HAND_SHAKE;
+      break;
+    }
     default: {
       // sendSOSLed();
+      break;
     }
   }  // end switch
-}
-
-
-void getMessageFromBuffer() {
-  if (!MOTOR_MESSAGE_BUFFER.isEmpty()) {
-    // go to the next message
-    MOTOR_MESSAGE_BUFFER.finishReadPointer();
-    setTimer1Interupt(MOTOR_MESSAGE_BUFFER.getReadPointer()->speed);
-    IS_MOTOR_RUNNING = true;
-  }
 }
 
 
@@ -413,15 +635,34 @@ void setup() {
   // Open the serial connections
   Serial.setTimeout(10);
   Serial.begin(BAUD_RATE);
+
+  // see if the card is present and can be initialized:
+  if (!SD.begin(CHIP_SELECT, SPI_FULL_SPEED)) {
+    SD.initErrorHalt("Could not open the SD card!");
+  } else {
+    // define a serial output stream
+    ArduinoOutStream cout(Serial);
+    SdFile file;
+    // open next file in root.  The volume working directory, vwd, is root
+    while (file.openNext(SD.vwd(), O_READ)) {
+      file.printName(&Serial);
+      cout << ' ';
+      file.printModifyDateTime(&Serial);
+      cout << ' ';
+      cout << file.fileSize();
+      cout << endl;
+      file.close();
+    }
+    cout << "\nDone!" << endl;
+  }
 }
 
 
 void loop() {
   // Make it run!
-  if (!IS_MOTOR_RUNNING) {
-    //    blinkKnightRider();
-    getMessageFromBuffer();
-  }
+  //  if (!IS_MOTOR_RUNNING) {
+  //    blinkKnightRider();
+  //  }
 
   // start with a hand shake if that didnt happen yet
   handleStatus();
