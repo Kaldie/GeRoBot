@@ -165,7 +165,7 @@ void ArduinoSerialConnection::serialWrite(const unsigned char* i_pointer,
   if (m_fileHandle == -1)
     openConnection();
   if (i_numberOfWrites == sizeof(int)) {
-    int x = (int)(*i_pointer);
+    int x = *(int*)(i_pointer);
     LOG_DEBUG("Writing: "<< x << " as integer");
   } else if (i_numberOfWrites == sizeof(char))
     LOG_DEBUG("Writing: "<< *i_pointer);
@@ -210,7 +210,7 @@ std::string ArduinoSerialConnection::serialReadString() {
     buf = serialRead(1);
     LOG_DEBUG("found: " << buf);
     stringStream << buf;
-  } while (static_cast<int>(buf.c_str()[0]) != 10);
+  } while (static_cast<int>(buf.c_str()[0]) != 13);
 
   stringStream >> output;
   LOG_DEBUG("read string: " << output);
@@ -235,7 +235,6 @@ rawSerialRead(const int& i_numberOfBytes) {
       i--;
       numberOfFails++;
       // block the processor for a bit to with for arduino sending
-      usleep(10);
     } else {
       numberOfFails = 0;
       LOG_INFO("read (as int): "<< static_cast<int>(*readBuffer) << " ");

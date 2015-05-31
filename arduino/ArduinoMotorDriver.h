@@ -6,25 +6,34 @@
 
 
 class ArduinoMotorDriver {
-    GETSET(std::vector<int>, m_bufferMessage, BufferMessage);
     GETSET(ArduinoSerialConnection, m_arduinoConnection, ArduinoConnection);
     GETSET(std::string, m_serialRegularExpresion, SerialRegularExpresion);
-    GETSET(bool, m_reducedSpeed, ReducedSpeed);
+
+    enum DriverStatus {UPLOAD,
+                       ACTUATE,
+                       ECHO,
+                       DELETE_FILE,
+                       ERROR};
+
+    static const int HAND_SHAKE_VALUE;
+    static const int UPLOAD_MODE_VALUE;
+    static const int ACTUATE_MODE_VALUE;
+    static const int ECHO_MODE_VALUE;
+    static const int DELETE_FILE_VALUE;
 
  private:
-    void sendMessage(const std::string&);
     std::string getSerialFileName();
     void initialiseArduinoConnection();
-    bool handShake();
+    bool handShake(DriverStatus i_status);
 
  public:
-    void actuate(const std::vector<int> i_messageVector);
-    bool hasConnection();
+    void upload(const std::vector<int> i_messageVector);
+    void actuate();
     bool resetConnection();
     bool sendTestBit();
 
     // Constructors
-    explicit ArduinoMotorDriver(std::string);
+    explicit ArduinoMotorDriver(std::string i_regExpression);
     ArduinoMotorDriver();
 };
 

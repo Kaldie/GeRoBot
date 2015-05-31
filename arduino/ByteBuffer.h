@@ -68,7 +68,7 @@ ByteBuffer<T>::~ByteBuffer() {
 template <typename T>
 void ByteBuffer<T>::incrementPosition(T*& i_position) {
   i_position++;
-  if (m_endOfBuffer == i_position)
+  if (i_position >= m_endOfBuffer)
     i_position = m_buffer;
 }
 
