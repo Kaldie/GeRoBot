@@ -262,16 +262,19 @@ void handleModeSelect(ReturnState* i_returnState) {
         Serial.write(*buffer);
         *i_returnState = SUCCES;
         ARDUINO_STATUS = ACTUATE_PRE_MODE;
+        break;
       }
       case DELETE_FILE_MODE_VALUE : {
         Serial.write(*buffer);
         *i_returnState = SUCCES;
         ARDUINO_STATUS = DELETE_FILE_MODE;
+        break;
       }
       case ECHO_MODE_VALUE : {
         Serial.write(*buffer);
         *i_returnState = SUCCES;
         ARDUINO_STATUS = ECHO_MODE;
+        break;
       }
       case ERROR_MODE : {
         *buffer = 0;
@@ -412,13 +415,15 @@ void printMessageToSerial(MotorMessage* i_messagePointer,
     Serial.println(i_messagePointer->numberOfRepetitions);
 
     Serial.print("Steps: ");
-    for (int i = 0;
+    Serial.print(i_messagePointer->stepArray[0]);
+    for (int i = 1;
          i < i_messagePointer->numberOfSteps;
          i++) {
-      Serial.print(i_messagePointer->stepArray[i]);
       Serial.print(", ");
+      Serial.print(i_messagePointer->stepArray[i]);
+
     }
-    Serial.println("------------------------");
+    Serial.println("\n------------------------");
     return;
   }
 }
