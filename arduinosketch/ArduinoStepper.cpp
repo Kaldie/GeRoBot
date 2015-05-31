@@ -143,8 +143,6 @@ void setTimer1Interupt(int i_dekaHertz) {
 
 
 void setPinOutputs() {
-  // For blink
-  //  pinMode(13, OUTPUT);
   // for SD card
   pinMode(CHIP_SELECT, OUTPUT);
   // Always hook up the 2 t/m 7 inputs!
