@@ -103,9 +103,15 @@ public:
 
 static class TestDescription_suite_PinStateSequenceTestSuite_testPinStateSequenceMessage : public CxxTest::RealTestDescription {
 public:
- TestDescription_suite_PinStateSequenceTestSuite_testPinStateSequenceMessage() : CxxTest::RealTestDescription( Tests_PinStateSequenceTestSuite, suiteDescription_PinStateSequenceTestSuite, 338, "testPinStateSequenceMessage" ) {}
+ TestDescription_suite_PinStateSequenceTestSuite_testPinStateSequenceMessage() : CxxTest::RealTestDescription( Tests_PinStateSequenceTestSuite, suiteDescription_PinStateSequenceTestSuite, 339, "testPinStateSequenceMessage" ) {}
  void runTest() { suite_PinStateSequenceTestSuite.testPinStateSequenceMessage(); }
 } testDescription_suite_PinStateSequenceTestSuite_testPinStateSequenceMessage;
+
+static class TestDescription_suite_PinStateSequenceTestSuite_testCondenseSequence : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_PinStateSequenceTestSuite_testCondenseSequence() : CxxTest::RealTestDescription( Tests_PinStateSequenceTestSuite, suiteDescription_PinStateSequenceTestSuite, 355, "testCondenseSequence" ) {}
+ void runTest() { suite_PinStateSequenceTestSuite.testCondenseSequence(); }
+} testDescription_suite_PinStateSequenceTestSuite_testCondenseSequence;
 
 #include "StepperDriverUnitTest.h"
 
@@ -199,35 +205,35 @@ public:
 static JointControllerTestSuite suite_JointControllerTestSuite;
 
 static CxxTest::List Tests_JointControllerTestSuite = { 0, 0 };
-CxxTest::StaticSuiteDescription suiteDescription_JointControllerTestSuite( "JointControllerUnitTest.h", 15, "JointControllerTestSuite", suite_JointControllerTestSuite, Tests_JointControllerTestSuite );
+CxxTest::StaticSuiteDescription suiteDescription_JointControllerTestSuite( "JointControllerUnitTest.h", 17, "JointControllerTestSuite", suite_JointControllerTestSuite, Tests_JointControllerTestSuite );
 
 static class TestDescription_suite_JointControllerTestSuite_testCreation : public CxxTest::RealTestDescription {
 public:
- TestDescription_suite_JointControllerTestSuite_testCreation() : CxxTest::RealTestDescription( Tests_JointControllerTestSuite, suiteDescription_JointControllerTestSuite, 38, "testCreation" ) {}
+ TestDescription_suite_JointControllerTestSuite_testCreation() : CxxTest::RealTestDescription( Tests_JointControllerTestSuite, suiteDescription_JointControllerTestSuite, 40, "testCreation" ) {}
  void runTest() { suite_JointControllerTestSuite.testCreation(); }
 } testDescription_suite_JointControllerTestSuite_testCreation;
 
 static class TestDescription_suite_JointControllerTestSuite_testAddJoint : public CxxTest::RealTestDescription {
 public:
- TestDescription_suite_JointControllerTestSuite_testAddJoint() : CxxTest::RealTestDescription( Tests_JointControllerTestSuite, suiteDescription_JointControllerTestSuite, 47, "testAddJoint" ) {}
+ TestDescription_suite_JointControllerTestSuite_testAddJoint() : CxxTest::RealTestDescription( Tests_JointControllerTestSuite, suiteDescription_JointControllerTestSuite, 49, "testAddJoint" ) {}
  void runTest() { suite_JointControllerTestSuite.testAddJoint(); }
 } testDescription_suite_JointControllerTestSuite_testAddJoint;
 
 static class TestDescription_suite_JointControllerTestSuite_testResetPinStateSequence : public CxxTest::RealTestDescription {
 public:
- TestDescription_suite_JointControllerTestSuite_testResetPinStateSequence() : CxxTest::RealTestDescription( Tests_JointControllerTestSuite, suiteDescription_JointControllerTestSuite, 67, "testResetPinStateSequence" ) {}
+ TestDescription_suite_JointControllerTestSuite_testResetPinStateSequence() : CxxTest::RealTestDescription( Tests_JointControllerTestSuite, suiteDescription_JointControllerTestSuite, 69, "testResetPinStateSequence" ) {}
  void runTest() { suite_JointControllerTestSuite.testResetPinStateSequence(); }
 } testDescription_suite_JointControllerTestSuite_testResetPinStateSequence;
 
 static class TestDescription_suite_JointControllerTestSuite_testMoveStep : public CxxTest::RealTestDescription {
 public:
- TestDescription_suite_JointControllerTestSuite_testMoveStep() : CxxTest::RealTestDescription( Tests_JointControllerTestSuite, suiteDescription_JointControllerTestSuite, 96, "testMoveStep" ) {}
+ TestDescription_suite_JointControllerTestSuite_testMoveStep() : CxxTest::RealTestDescription( Tests_JointControllerTestSuite, suiteDescription_JointControllerTestSuite, 98, "testMoveStep" ) {}
  void runTest() { suite_JointControllerTestSuite.testMoveStep(); }
 } testDescription_suite_JointControllerTestSuite_testMoveStep;
 
 static class TestDescription_suite_JointControllerTestSuite_testMoveSteps : public CxxTest::RealTestDescription {
 public:
- TestDescription_suite_JointControllerTestSuite_testMoveSteps() : CxxTest::RealTestDescription( Tests_JointControllerTestSuite, suiteDescription_JointControllerTestSuite, 120, "testMoveSteps" ) {}
+ TestDescription_suite_JointControllerTestSuite_testMoveSteps() : CxxTest::RealTestDescription( Tests_JointControllerTestSuite, suiteDescription_JointControllerTestSuite, 122, "testMoveSteps" ) {}
  void runTest() { suite_JointControllerTestSuite.testMoveSteps(); }
 } testDescription_suite_JointControllerTestSuite_testMoveSteps;
 

@@ -246,18 +246,23 @@ void JointController::moveSteps(JointPointer& i_jointPointer,
 //  Brief: Actuate the robot from the given pin state sequence
 void JointController::actuate() {
   normaliseSequenceVector();
-  char* messageBuffer(NULL);
-  size_t messageSize(0);
+  LOG_DEBUG("Number of messages: " << m_pinStateSequenceVector.size());
+
   for (PinStateSequenceVector::const_iterator pinStateSequenceIterator
            = m_pinStateSequenceVector.begin();
        pinStateSequenceIterator != m_pinStateSequenceVector.end();
-       pinStateSequenceIterator++)
+       pinStateSequenceIterator++){
     // Get the integer sequence of this pin state
-    pinStateSequenceIterator->createArduinoBuffer(messageBuffer,
-                                                  messageSize);
-    m_actuator.actuate(messageBuffer, messageSize);
-    delete[] messageBuffer;
-    messageBuffer = NULL;
+    pinStateSequenceIterator->displaySequence();
+    if(pinStateSequenceIterator->getNumberOfRepetitions() > 0)
+      m_actuator.actuate(pinStateSequenceIterator->createArduinoBuffer());
+          
+    auto x = pinStateSequenceIterator->createArduinoBuffer();
+    for (auto i = x.begin();
+         i != x.end();
+         i++)
+      LOG_DEBUG(*i);
+  }
   resetPinStateSequence();
 }
 
@@ -282,11 +287,6 @@ bool JointController::isNormalisedPinStateSequenceVector() const  {
         try {
           pinStateIterator->getPinState(*pinIterator);
         } catch(std::runtime_error exception) {
-          /*
-            PinState pinState = *pinStateIterator;
-            pinState.update(*pinIterator,previousPinState.getPinState(*pinIterator));
-            pinStateIterator->update(pinState);
-          */
           return false;
         }  // end try catch block
       }  // end pin loop

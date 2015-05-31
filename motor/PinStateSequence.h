@@ -19,8 +19,11 @@ class PinStateSequence {
 
   std::vector<int> getIntegerSequence(
       const PinStateVector i_pinStateVector) const;
-  void writeIntegerToBuffer(const int& i_value,
-                            char*& i_bufferPosition) const;
+
+
+  static bool areEqualState(const PinState& i_firstState,
+                            const PinState& i_secondState);
+
  public:
   PinStateSequence();
 
@@ -30,6 +33,8 @@ class PinStateSequence {
 
   bool isEmpty() const;
 
+  bool appendSequence(const PinStateSequence i_sequence);
+  
   bool addToSequence(const PinState& i_pinState);
   bool addToSequence(const PinStateVector& i_pinStateVector);
   bool addToSequence(const PinStateSequence& i_otherSequence);
@@ -47,11 +52,10 @@ class PinStateSequence {
                                      PinStateSequence* io_secondSequence);
 
   bool mergePinStateSequence(PinStateSequence* io_sequence);
-
+  bool condenseSequence();
   void displaySequence() const;
 
   size_t getSizeOfMessage() const;
-  void createArduinoBuffer(char*& i_buffer,
-                            size_t& i_messageSize) const;
+  std::vector<int> createArduinoBuffer() const;
 };
 #endif  // MOTOR_PINSTATESEQUENCE_H_

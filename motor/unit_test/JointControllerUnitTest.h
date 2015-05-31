@@ -3,9 +3,11 @@
 #ifndef MOTOR_UNIT_TEST_JOINTCONTROLLERUNITTEST_H_
 #define MOTOR_UNIT_TEST_JOINTCONTROLLERUNITTEST_H_
 
+#include <macroHeader.h>
 #include <cxxtest/TestSuite.h>
 #include <StepperDriver.h>
 #include <RotationalJoint.h>
+#include <TranslationalJoint.h>
 #include <JointController.h>
 #include <macroHeader.h>
 #include <vector>
@@ -154,6 +156,17 @@ class JointControllerTestSuite : public CxxTest::TestSuite {
 
     jointController.normaliseSequenceVector();
     TS_ASSERT(jointController.isNormalisedPinStateSequenceVector());
+
+    try {
+      LOG_DEBUG("aya");
+      jointController.actuate();
+      LOG_DEBUG("paya");
+    }
+    catch (std::runtime_error)
+    {}
   }
 };
+
+
+
 #endif  // MOTOR_UNIT_TEST_JOINTCONTROLLERUNITTEST_H_

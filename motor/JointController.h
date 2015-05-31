@@ -3,6 +3,7 @@
 #define MOTOR_JOINTCONTROLLER_H_
 
 #include <ArduinoMotorDriver.h>
+#include <PinStateSequence.h>
 
 class JointController {
  private:

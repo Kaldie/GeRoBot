@@ -8,11 +8,9 @@
 TOROOT= ../..
 
 # define the C source files
-UnitTests= PinStateUnitTest.h PinStateSequenceUnitTest.h StepperDriverUnitTest.h 
+UnitTests = PinStateUnitTest.h PinStateSequenceUnitTest.h StepperDriverUnitTest.h
 UnitTests := $(UnitTests) RotationalJointUnitTest.h TranslationalJointUnitTest.h
 UnitTests := $(UnitTests) JointControllerUnitTest.h
-
-
 
 #LIBS=-lMathInterface -lArduinoInterface
 LIBS = -lArduinoInterface -lMotorInterface -lMathInterface

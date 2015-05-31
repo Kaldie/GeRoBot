@@ -1,7 +1,7 @@
 // Copyright [2015] Ruud Cools
 
-#ifndef MOTOR_PINSTATESEQUENCEUNITTEST_H_
-#define MOTOR_PINSTATESEQUENCEUNITTEST_H_
+#ifndef MOTOR_UNIT_TEST_PINSTATESEQUENCEUNITTEST_H_
+#define MOTOR_UNIT_TEST_PINSTATESEQUENCEUNITTEST_H_
 
 #include <cxxtest/TestSuite.h>
 #include <macroHeader.h>
@@ -299,6 +299,7 @@ class PinStateSequenceTestSuite : public CxxTest::TestSuite {
   }
 
   void testSequenceNormalisation() {
+    LOG_INFO("testSequenceNormalisation");
     PinState pinState1({1, 2, 3});
     pinState1.update(1, 0);
     pinState1.update(2, 1);
@@ -345,10 +346,33 @@ class PinStateSequenceTestSuite : public CxxTest::TestSuite {
          i++)
       pinStateSequence.addToSequence(pinStateVector);
 
-    LOG_DEBUG(pinStateSequence.createArduinoMessage());
+    std::vector<int> lala = pinStateSequence.createArduinoBuffer();
+    pinStateSequence.displaySequence();
+    TS_ASSERT_EQUALS(std::vector<int>({16, 3, 50, 14, 14}), lala);
+  }
+
+
+  void testCondenseSequence() {
+    PinStateVector vector;
+    PinStateSequence sequence;
+    PinState pinState({1, 2, 3});
+    for (int i = 0;
+         i <= 7;
+         i++) {
+      pinState.update(1, i%2);
+      vector.push_back(pinState);
+    }
+    sequence.addToSequence(vector);
+    TS_ASSERT(sequence.condenseSequence());
+    TS_ASSERT_EQUALS(sequence.getNumberOfRepetitions(), 4);
+    TS_ASSERT_EQUALS(sequence.getPinStateVector().size(), 2);
+
+    sequence = PinStateSequence();
+
+    pinState.update(1, 0);
+    vector.push_back(pinState);
+    sequence.addToSequence(vector);
+    TS_ASSERT_EQUALS(false, sequence.condenseSequence());
   }
 };
-
-
-
-#endif  // MOTOR_PINSTATESEQUENCEUNITTEST_H_
+#endif  // MOTOR_UNIT_TEST_PINSTATESEQUENCEUNITTEST_H_

@@ -9,8 +9,8 @@ TOROOT= ..
 
 # define the C source files
 SRCS= Vector2D.cpp Point2D.cpp Line2D.cpp Circle2D.cpp Arc2D.cpp
-#SRCS:=$(SRCS) Trace.cpp RotationTrace.cpp
-#SRCS:=$(SRCS) BaseTraceCalculator.cpp LineTraceCalculator.cpp RotationTraceCalculator.cpp 
+SRCS:=$(SRCS) Trace.cpp RotationTrace.cpp
+SRCS:=$(SRCS) BaseTraceCalculator.cpp LineTraceCalculator.cpp RotationTraceCalculator.cpp 
 DSRCS= debug.cpp
 
 # define the executable file 

@@ -5,7 +5,7 @@
 #include "./PinState.h"
 
 PinStateSequence::PinStateSequence()
-    : PinStateSequence(50,
+    : PinStateSequence(3000,
                        0,
                        {})
 {}
@@ -122,6 +122,26 @@ bool PinStateSequence::hasMutualPins(const PinState& i_pinState) const {
 }
 
 
+bool PinStateSequence::appendSequence(const PinStateSequence i_sequence) {
+  // checking parameters!
+  if (m_numberOfRepetitions != i_sequence.getNumberOfRepetitions()) {
+    LOG_DEBUG("Number of repetitions is not equal!");
+    return false;
+  }
+
+  if (m_numberOfRepetitions > 1) {
+    LOG_DEBUG("Coud not append them, number of repetitions is not 1!");
+    return false;
+  }
+
+  std::vector<PinState> pinStateVector = i_sequence.getPinStateVector();
+  m_pinStateVector.insert(m_pinStateVector.end(),
+                          pinStateVector.begin(),
+                          pinStateVector.end());
+  return true;
+}
+
+
 bool PinStateSequence::addToSequence(
     const PinState& i_pinState) {
 
@@ -207,15 +227,24 @@ bool PinStateSequence::addToSequence(const PinStateSequence& i_sequence) {
 
   if (m_numberOfRepetitions != i_sequence.getNumberOfRepetitions()) {
     LOG_DEBUG("Could not add sequence, number of repetitions is not equal: " <<
-              m_numberOfRepetitions << "!=" << i_sequence.getNumberOfRepetitions());
+              m_numberOfRepetitions << "!=" <<
+              i_sequence.getNumberOfRepetitions());
     return false;
   }
+
+  LOG_DEBUG("Size of input sequence: " <<
+            i_sequence.getPinStateVector().size());
+  LOG_DEBUG("Size of memory sequence: " << m_pinStateVector.size());
   
   auto rhsItr = i_sequence.getPinStateVector().begin();
   auto ltsItr = m_pinStateVector.begin();
+
   for (;
-       ltsItr != m_pinStateVector.end();
+       !((ltsItr == m_pinStateVector.end()) |
+         (rhsItr == i_sequence.getPinStateVector().end()));
        ltsItr++, rhsItr++) {
+    ltsItr->displayPinState();
+    rhsItr->displayPinState();
     LOG_DEBUG("Updateing the pin state vector");
     ltsItr->update(*rhsItr);
   }
@@ -225,14 +254,14 @@ bool PinStateSequence::addToSequence(const PinStateSequence& i_sequence) {
 bool PinStateSequence::mergePinStateSequence(
     PinStateSequence* io_sequence) {
   return PinStateSequence::mergePinStateSequences(this,
-                                                   io_sequence);
+                                                  io_sequence);
 }
 
 
 bool PinStateSequence::mergePinStateSequences(
     PinStateSequence* io_firstSequence,
     PinStateSequence* io_secondSequence) {
-
+  LOG_DEBUG("Merging sequences!");
   // check if we can simple add them
   if (io_firstSequence->addToSequence(*io_secondSequence)) {
     LOG_DEBUG("First sequence was empty or equal to the second " <<
@@ -328,39 +357,6 @@ bool PinStateSequence::
 }
 
 
-/*
-  Could be deleted, dont know yet....
-  bool PinStateSequence::
-  setStateForSequence(const PinStateVector& i_vector,
-                      const bool i_extend /*=false,
-                      const bool i_overrideSequence /* =false) {
-  if (i_vector.size() != m_pinStateVector.size()) {
-    LOG_DEBUG("Could not set the pin state vector, it has the wrong size!");
-    return false;
-  }
-
-  if (!i_overrideSequence) {
-    for (auto pinStateIterator = i_vector.begin();
-         pinStateIterator != i_vector.end();
-         pinStateIterator++) {
-      if (hasMutualPins(*pinStateIterator)) {
-        return false;
-      }
-    }
-  }
-  
-  auto inputPinStateIter = i_vector.begin();
-  auto currentPinStateIter = m_pinStateVector.begin();
-
-  for (;
-       (inputPinStateIter != i_vector.end() and
-        currentPinStateIter != m_pinStateVector.end());
-       inputPinStateIter++, currentPinStateIter++) {
-    currentPinStateIter->update(*inputPinStateIter);
-  }
-}
-*/
-
 void PinStateSequence::displaySequence() const {
   LOG_INFO("Speed : " << m_speed);
   LOG_INFO("Number of repititions: " << m_numberOfRepetitions);
@@ -381,47 +377,66 @@ size_t PinStateSequence::getSizeOfMessage() const {
 }
 
 
-void PinStateSequence::createArduinoBuffer(char*& o_buffer,
-                                           size_t& o_sizeOfMessage) const {
-  // o_buffer will be a byte array which needs to be send to the arduino
-  // The fact is it will contain a shit load of 0's
-  // Thus cannot use some conversion tricks
-  // So raw dynamic memory handling.
-  // The caller is responsible for deleting the memory!!
-  o_sizeOfMessage = getSizeOfMessage();
-  LOG_DEBUG("Size of message will be: " <<  o_sizeOfMessage << "bytes.");
-  o_buffer = new char[o_sizeOfMessage+1];
+std::vector<int> PinStateSequence::createArduinoBuffer() const {
+  int sizeOfMessage = getSizeOfMessage();
+  LOG_DEBUG("Size of message will be: " <<  sizeOfMessage << "bytes.");
+  std::vector<int> buffer;
+  buffer.push_back(sizeOfMessage);
+  buffer.push_back(m_speed);
+  buffer.push_back(m_numberOfRepetitions);
+  std::vector<int> integerSequence = getIntegerSequence();
+  buffer.insert(buffer.end(), integerSequence.begin(), integerSequence.end());
 
-  // someday i will print out this char array make sure stuff doesnt blow up
-  o_buffer[o_sizeOfMessage] = '\0';
-  char* currentPosition = o_buffer;
+  int realMessageSize = (buffer.size() - 1) * sizeof(*buffer.data());
+  if (realMessageSize
+      != static_cast<int>(sizeOfMessage))
+    LOG_ERROR("Buffer is not correctly created, the size is: " << realMessageSize << "!");
 
-  writeIntegerToBuffer(m_numberOfRepetitions, currentPosition);
-  LOG_DEBUG("Buffer position after writing number of repetitions " <<
-            currentPosition - o_buffer);
+  return buffer;
+}
 
-  writeIntegerToBuffer(m_speed, currentPosition);
-  LOG_DEBUG("Buffer position after writing speed" <<
-            currentPosition - o_buffer);
 
-  // set integer sequence
-  for (auto itr = m_pinStateVector.begin();
-       itr != m_pinStateVector.end();
-       itr++) {
-    writeIntegerToBuffer(itr->getNumericValue(),
-                         currentPosition);
-    LOG_DEBUG("Current string: " << o_buffer);
+bool PinStateSequence::condenseSequence() {
+  int numberOfSteps = m_pinStateVector.size();
+  auto sequencePosition = m_pinStateVector.begin();
+
+  for (int newSequenceSize = 1;
+       newSequenceSize <= numberOfSteps/2;
+       newSequenceSize++) {
+    LOG_DEBUG("Checking size: " << newSequenceSize);
+    // test if we can devide the number of steps to the new number of steps
+    if (numberOfSteps % newSequenceSize != 0) {
+      LOG_DEBUG("New size would not fit the vector!");
+      continue;
+    }
+
+    // for each part, check if it is the same as the previous
+    for (sequencePosition = m_pinStateVector.begin() + newSequenceSize;
+         sequencePosition != m_pinStateVector.end();
+         sequencePosition = sequencePosition + newSequenceSize) {
+      if (!std::equal(sequencePosition,
+                      sequencePosition + newSequenceSize,
+                      m_pinStateVector.begin(),
+                      PinStateSequence::areEqualState)) {
+        LOG_DEBUG("New partial vector would not fit!");
+        break;
+      }
+    }
+
+    if (sequencePosition == m_pinStateVector.end()) {
+      // can be condensed
+      m_numberOfRepetitions *= numberOfSteps / newSequenceSize;
+      m_pinStateVector.erase(m_pinStateVector.begin() + newSequenceSize,
+                             m_pinStateVector.end());
+      return true;
+    }
   }
-
-  if ((currentPosition + 1) - o_buffer != static_cast<int>(o_sizeOfMessage))
-    LOG_ERROR("Buffer is not correctly created!");
+  return false;
 }
 
 
-void PinStateSequence::writeIntegerToBuffer(const int& i_value,
-                                            char*& i_bufferPosition) const {
-  memcpy(i_bufferPosition,
-         &(i_value),
-         sizeof(i_value));
-  i_bufferPosition+=sizeof(i_value);
+bool PinStateSequence::areEqualState(const PinState& i_firstState,
+                                     const PinState& i_secondState) {
+  return i_firstState.getNumericValue() == i_secondState.getNumericValue();
 }
+
