@@ -5,7 +5,7 @@
 
 const int ArduinoMotorDriver::HAND_SHAKE_VALUE = 200;
 const int ArduinoMotorDriver::ACTUATE_MODE_VALUE = 100;
-const int ArduinoMotorDriver::ECHO_MODE = 150;
+const int ArduinoMotorDriver::ECHO_MODE_VALUE = 150;
 const int ArduinoMotorDriver::DELETE_FILE_MODE_VALUE = 140;
 const int ArduinoMotorDriver::UPLOAD_MODE_VALUE =
     sizeof(ArduinoMotorDriver::HAND_SHAKE_VALUE);
@@ -64,8 +64,8 @@ bool ArduinoMotorDriver::handShake(ArduinoMotorDriver::DriverStatus i_status) {
       modeValue = ArduinoMotorDriver::ACTUATE_MODE_VALUE;
       break;
     }
-    case ArduinoMotorDriver::ECHO : {
-      modeValue = ArduinoMotorDriver::ACTUATE_MODE_VALUE;
+    case ArduinoMotorDriver::SERIAL_ECHO : {
+      modeValue = ArduinoMotorDriver::ECHO_MODE_VALUE;
       break;
     }
     case ArduinoMotorDriver::DELETE_FILE : {
@@ -171,16 +171,23 @@ bool ArduinoMotorDriver::sendTestBit() {
 }
 
 
-bool ArduinoMotorDriver::deleteFile() {
+void ArduinoMotorDriver::deleteFile() {
      if (!m_arduinoConnection.hasConnection()) {
       initialiseArduinoConnection();
     }
     while (!handShake(ArduinoMotorDriver::DELETE_FILE)) {}
 }
 
-bool ArduinoMotorDriver::deleteFile() {
+void ArduinoMotorDriver::echo() {
      if (!m_arduinoConnection.hasConnection()) {
       initialiseArduinoConnection();
     }
-    while (!handShake(ArduinoMotorDriver::ECHO)) {}
+
+     while (!handShake(ArduinoMotorDriver::SERIAL_ECHO)) {}
+    
+    std::string currentString;
+    do {
+      currentString = m_arduinoConnection.serialReadString();
+      LOG_INFO(currentString);
+    } while (currentString != "");
 }

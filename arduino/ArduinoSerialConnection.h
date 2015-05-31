@@ -16,7 +16,8 @@ class ArduinoSerialConnection {
   void openConnection();
   void closeConnection();
   std::string resolvePortName() const;
-  std::vector<unsigned char> rawSerialRead(const int&);
+  const int rawSerialRead(const int& i_numberOfBytesReading,
+                         unsigned char*);
     
  public:
   void setBaudRate(const int&);

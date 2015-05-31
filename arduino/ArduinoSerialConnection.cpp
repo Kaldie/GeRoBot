@@ -5,7 +5,7 @@
 ArduinoSerialConnection::ArduinoSerialConnection()
     : m_deadTimeBetweenMessage(0),
       m_minimumBytePerMessage(0),
-      m_closeHandleAfterMessage(true),
+      m_closeHandleAfterMessage(false),
       m_blockThread(false),
       m_fileHandle(-1),
       m_portName(""),
@@ -16,7 +16,7 @@ ArduinoSerialConnection::ArduinoSerialConnection()
 ArduinoSerialConnection::ArduinoSerialConnection(std::string i_fileName)
     : m_deadTimeBetweenMessage(0),
       m_minimumBytePerMessage(0),
-      m_closeHandleAfterMessage(true),
+      m_closeHandleAfterMessage(false),
       m_blockThread(false),
       m_fileHandle(-1),
       m_portName(i_fileName),
@@ -199,57 +199,77 @@ void ArduinoSerialConnection::serialWrite(std::vector<int>::iterator& io_iterato
 
 
 std::string ArduinoSerialConnection::serialReadString() {
+  // Read string will use a none-blocking thread
+  // to read the data from the serial connection
   if (m_fileHandle == -1)
     openConnection();
 
+  //  m_blockThread = false;
+  //  m_closeHandleAfterMessage = false;
+  
+  //  openConnection();
+  int arrayLength(2);
+  char* result = new char[arrayLength];
   std::stringstream stringStream;
-  std::string output;
-  std::string buf;
-  LOG_DEBUG("Start reading string from serial connection");
+  int numberOfBytes;
+  //  LOG_DEBUG("Start reading string from serial connection");
   do {
-    buf = serialRead(1);
-    LOG_DEBUG("found: " << buf);
-    stringStream << buf;
-  } while (static_cast<int>(buf.c_str()[0]) != 13);
+    memset(result, '\0', sizeof(*result) * arrayLength);
+    try {
+      numberOfBytes  = rawSerialRead(arrayLength-1,
+                                     reinterpret_cast<unsigned char*>(result));
+    } catch(const std::runtime_error& e) {
+      LOG_DEBUG("No string read from serial connection!");
+      break;
+    }
 
-  stringStream >> output;
-  LOG_DEBUG("read string: " << output);
-  return output;
+    for (int i = 0;
+         i < numberOfBytes;
+         i++) {
+      if (result[i] != 13 and result[i] != 10) {
+        stringStream.put(result[i]);
+      }
+    }
+  } while (result[numberOfBytes-1] != 10);
+  
+  delete[] result;
+  return stringStream.str();
 }
 
 
-std::vector<unsigned char> ArduinoSerialConnection::
-rawSerialRead(const int& i_numberOfBytes) {
-  unsigned char readBuffer[1];
-  std::vector<unsigned char> resultVector;
+const int ArduinoSerialConnection::
+rawSerialRead(const int& i_numberOfBytes,
+              unsigned char* buffer) {
   int numberOfFails = 0;
-  int bytes_read;
+  int bytes_read = 0;
+  int currentRead = 0;
   if (m_fileHandle == -1)
     openConnection();
 
   for (int i = 0; i < i_numberOfBytes; i++) {
     /* Reads ttyO port, stores data into byte_in. */
-    bytes_read = read(m_fileHandle, readBuffer, 1);
-
-    if (bytes_read == -1) {
+    currentRead = read(m_fileHandle, reinterpret_cast<void*>(buffer + i),
+                       1);
+    if (currentRead == -1) {
       i--;
       numberOfFails++;
+      //      LOG_DEBUG("FAILED to read the bit, will try again!");
       // block the processor for a bit to with for arduino sending
     } else {
+      bytes_read += currentRead;
       numberOfFails = 0;
-      LOG_INFO("read (as int): "<< static_cast<int>(*readBuffer) << " ");
-      resultVector.push_back(*readBuffer);
+      //   LOG_INFO("read (as int): "<< static_cast<int>(buffer[i]) << " ");
     }
 
-    if (numberOfFails > 1000) {
+    if (numberOfFails > 100000) {
       LOG_ERROR("Failed to read out the bit!");
     }
   }
 
-  if (m_closeHandleAfterMessage)
+  if (m_closeHandleAfterMessage) {
     closeConnection();
-
-  return resultVector;
+  }
+  return bytes_read;
 }
 
 
@@ -258,12 +278,14 @@ int ArduinoSerialConnection::serialRead(const int& i_numberOfBytes) {
   if (i_numberOfBytes > static_cast<int>(sizeof(output))) {
     LOG_ERROR("Size should smaller or equal to int size");
   }
-  std::vector<unsigned char> result = rawSerialRead(i_numberOfBytes);
+  unsigned char* result = new unsigned char[i_numberOfBytes];
+  int numberOfBytes = rawSerialRead(i_numberOfBytes, result);
   for (int i = 0;
-       i < static_cast<int>(result.size());
+       i < numberOfBytes;
        i++) {
     output = result[i] << (i*4);
   }
+  delete[] result;
   return output;
 }
 

@@ -9,9 +9,9 @@ class ArduinoMotorDriver {
     GETSET(ArduinoSerialConnection, m_arduinoConnection, ArduinoConnection);
     GETSET(std::string, m_serialRegularExpresion, SerialRegularExpresion);
 
-    enum DriverStatus {UPLOAD,
+    enum DriverStatus {UPLOAD=0,
                        ACTUATE,
-                       ECHO,
+                       SERIAL_ECHO,
                        DELETE_FILE,
                        ERROR};
 
@@ -19,7 +19,7 @@ class ArduinoMotorDriver {
     static const int UPLOAD_MODE_VALUE;
     static const int ACTUATE_MODE_VALUE;
     static const int ECHO_MODE_VALUE;
-    static const int DELETE_FILE_VALUE;
+    static const int DELETE_FILE_MODE_VALUE;
 
  private:
     std::string getSerialFileName();
@@ -31,7 +31,9 @@ class ArduinoMotorDriver {
     void actuate();
     bool resetConnection();
     bool sendTestBit();
-
+    void deleteFile();
+    void echo();
+    
     // Constructors
     explicit ArduinoMotorDriver(std::string i_regExpression);
     ArduinoMotorDriver();
