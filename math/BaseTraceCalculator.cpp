@@ -93,18 +93,12 @@ std::vector<int> BaseTraceCalculator::getNumberOfSteps(
       std::abs(Magnitude(i_position)-Magnitude(endPoint))/
       (m_jointController->getJoint(Translational)->getMovementPerStep());
 
-  numberOfTranslationSteps *= m_jointController->
-      getJoint(Translational)->getMotor()->numberOfStatesPerStep();
-
   // Rotational difference / movement per step of Rotational joint
   int numberOfRotationSteps =
       (std::abs(i_position.getAlpha()-endPoint.getAlpha())*(180/PI))/
       (m_jointController->getJoint(Rotational)->getMovementPerStep());
 
-  numberOfRotationSteps *= m_jointController->
-      getJoint(Translational)->getMotor()->numberOfStatesPerStep();
-
-  return std::vector<int> {numberOfRotationSteps, numberOfTranslationSteps} ;
+   return std::vector<int> {numberOfRotationSteps, numberOfTranslationSteps} ;
 }
 
 
@@ -194,44 +188,29 @@ void BaseTraceCalculator::calculateTrace(const Trace* i_trace,
   std::vector<int> numberOfSteps = getNumberOfSteps(i_trace, i_startPoint);
   LOG_INFO("\nNumber of rotation steps: " << numberOfSteps[0] << "\n"
            "Number of translation steps: " << numberOfSteps[1]);
-		
-  std::vector<int>::iterator maximumNumberOfSteps =
-      std::max_element(numberOfSteps.begin(),
-                       numberOfSteps.end());
 
-  PinStateSequence pinStateSequence =
-      getJointController()->getPinStateSequence();
-
-  pinStateSequence.reserve(pinStateSequence.size()+(*maximumNumberOfSteps)+5);
-
-  int numberOfTranslationSteps = numberOfSteps[1] / m_jointController->
-      getJoint(Translational)->getMotor()->numberOfStatesPerStep();
-
-  int numberOfRotationSteps = numberOfSteps[0] / m_jointController->
-      getJoint(Rotational)->getMotor()->numberOfStatesPerStep();
-
-  if (numberOfRotationSteps > 0) {
+  if (numberOfSteps[0] > 0) {
     getJointController()->getJoint(Rotational)->
         predictSteps(i_startPoint,
                      rotationDirection,
-                     numberOfRotationSteps);
+                     numberOfSteps[0]);
 
     getJointController()->moveSteps(getJointController()->getJoint(Rotational),
                                     rotationDirection,
-                                    numberOfRotationSteps,
+                                    numberOfSteps[0],
                                     true);
   }
 
-  if (numberOfTranslationSteps > 0) {
+  if (numberOfSteps[1] > 0) {
     getJointController()->getJoint(Translational)->
         predictSteps(i_startPoint,
                      translationDirection,
-                     numberOfTranslationSteps);
+                     numberOfSteps[1]);
 
     getJointController()->moveSteps(
         getJointController()->getJoint(Translational),
         translationDirection,
-        numberOfTranslationSteps,
+        numberOfSteps[1],
         true);
   }
 }

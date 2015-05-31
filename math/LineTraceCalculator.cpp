@@ -1,13 +1,13 @@
 // Copyright [2014] Ruud Cools
 
 #include <macroHeader.h>
-#include <Vector2D.h>
 #include <Point2D.h>
 #include <PinState.h>
 #include <BaseJoint.h>
 #include <JointController.h>
 #include <LineTraceCalculator.h>
 #include <Trace.h>
+
 
 LineTraceCalculator::LineTraceCalculator()
     : BaseTraceCalculator(),
@@ -34,7 +34,6 @@ LineTraceCalculator::LineTraceCalculator(JointController* i_jointController,
 // assign operator
 LineTraceCalculator::LineTraceCalculator(const LineTraceCalculator& rhs) {
   LOG_INFO("Copy constructor");
-
   this->setJointController(rhs.getJointController());
   this->setTolerance(rhs.getTolerance());
 }
@@ -47,16 +46,6 @@ void LineTraceCalculator::calculateTrace(const Trace* i_trace,
   std::vector<int>::iterator maximumNumberOfSteps =
       std::max_element(numberOfSteps.begin(),
                        numberOfSteps.end());
-
-  PinStateSequence pinStateSequencePointer =
-      getJointController()->getPinStateSequence();
-
-  LOG_INFO("Reserving: " <<
-           pinStateSequencePointer.size()+*maximumNumberOfSteps);
-
-  pinStateSequencePointer.reserve(pinStateSequencePointer.size()+
-                                  (*maximumNumberOfSteps)+5);
-
   int i = 0;
   bool hasStepped(true);
   do {
