@@ -274,7 +274,7 @@ rawSerialRead(const int& i_numberOfBytes,
 
 
 int ArduinoSerialConnection::serialRead(const int& i_numberOfBytes) {
-  int output;
+  int output=0;
   if (i_numberOfBytes > static_cast<int>(sizeof(output))) {
     LOG_ERROR("Size should smaller or equal to int size");
   }
@@ -283,7 +283,7 @@ int ArduinoSerialConnection::serialRead(const int& i_numberOfBytes) {
   for (int i = 0;
        i < numberOfBytes;
        i++) {
-    output = result[i] << (i*4);
+    output += result[i] << (i*8);
   }
   delete[] result;
   return output;
