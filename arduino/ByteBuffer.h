@@ -16,18 +16,17 @@
 template <typename T>
 class ByteBuffer {
  private:
-  static const int DEFAULT_SIZE = 10;
   T* m_readPosition;
   T* m_writePosition;
   T* m_buffer;
   T* m_endOfBuffer;
-
+  int m_itemCount;
   void incrementPosition(T*& i_position);
+  ByteBuffer();
 
 
  public:
   // Constructors
-  ByteBuffer();
   explicit ByteBuffer(const int& i_size);
 
   // Deconstructor
@@ -45,18 +44,13 @@ class ByteBuffer {
 
 // Constructors
 template <typename T>
-ByteBuffer<T>::ByteBuffer()
-: ByteBuffer(DEFAULT_SIZE)
-{}
-
-
-template <typename T>
 ByteBuffer<T>::ByteBuffer(const int& i_size) {
   m_buffer = (T*)malloc(sizeof(T) * i_size);
   memset(m_buffer, 0, sizeof(T) * i_size);
   m_endOfBuffer = m_buffer + i_size;
   m_readPosition = m_buffer;
-  m_writePosition = m_buffer + 1;
+  m_writePosition = m_buffer;
+  m_itemCount = 0;
 }
 
 // Deconstructor
@@ -76,17 +70,13 @@ void ByteBuffer<T>::incrementPosition(T*& i_position) {
 // Actual methods
 template <typename T>
 const bool ByteBuffer<T>::isFull() {
-  T* testPointer =  m_writePosition;
-  incrementPosition(testPointer);
-  return testPointer == m_readPosition;
+  return (m_endOfBuffer - m_buffer) <= m_itemCount;
 }
 
 
 template <typename T>
 const bool ByteBuffer<T>::isEmpty() {
-  T* testPointer =  m_readPosition;
-  incrementPosition(testPointer);
-  return testPointer == m_writePosition;
+  return m_itemCount == 0;
 }
 
 
@@ -102,6 +92,7 @@ bool ByteBuffer<T>::finishReadPointer() {
     return false;
   } else {
     incrementPosition(m_readPosition);
+    --m_itemCount;
     return true;
   }
 }
@@ -118,6 +109,7 @@ bool ByteBuffer<T>::finishWritePointer() {
   if (isFull()) {
     return false;
   } else {
+    m_itemCount++;
     incrementPosition(m_writePosition);
     return true;
   }
