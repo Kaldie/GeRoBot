@@ -338,17 +338,18 @@ class PinStateSequenceTestSuite : public CxxTest::TestSuite {
   
   void testPinStateSequenceMessage() {
     PinStateSequence pinStateSequence;
+    pinStateSequence.setSpeed(3);
     PinStateVector pinStateVector{
       PinState(PinVector{1, 2, 3}),
       PinState(PinVector{1, 2, 3})};
     for (auto i = 0;
-         i < 3;
+         i < 5;
          i++)
       pinStateSequence.addToSequence(pinStateVector);
 
     std::vector<int> lala = pinStateSequence.createArduinoBuffer();
     pinStateSequence.displaySequence();
-    TS_ASSERT_EQUALS(std::vector<int>({16, 3, 50, 14, 14}), lala);
+    TS_ASSERT_EQUALS(std::vector<int>({16, 3, 5, 14, 14}), lala);
   }
 
 
