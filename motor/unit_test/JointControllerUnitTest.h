@@ -86,7 +86,7 @@ class JointControllerTestSuite : public CxxTest::TestSuite {
     TS_ASSERT_EQUALS(pinStateVector.size(), 1);
     TS_ASSERT_EQUALS(pinStateVector[0].getPinStateVector().size(), 1);
     TS_ASSERT_EQUALS(pinStateVector[0].getNumberOfRepetitions(), 0);
-    int pinStateValue;
+    int pinStateValue=0;
     for (int i = 2;
          i < 8;
          i++)
