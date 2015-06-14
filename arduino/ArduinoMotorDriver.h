@@ -11,6 +11,7 @@ class ArduinoMotorDriver {
 
     enum DriverStatus {UPLOAD=0,
                        ACTUATE,
+                       SERIAL_ECHO_VERBOSE,
                        SERIAL_ECHO,
                        DELETE_FILE,
                        ERROR};
@@ -19,13 +20,15 @@ class ArduinoMotorDriver {
     static const int UPLOAD_MODE_VALUE;
     static const int ACTUATE_MODE_VALUE;
     static const int ECHO_MODE_VALUE;
+    static const int ECHO_MODE_VERBOSE_VALUE;
     static const int DELETE_FILE_MODE_VALUE;
 
  private:
     std::string getSerialFileName();
     void initialiseArduinoConnection();
     bool handShake(DriverStatus i_status);
-
+    void createRandomMessages(const int& i_numberOfMessages,
+                              std::vector< std::vector<int> > *i_totalVector);
  public:
     void upload(const std::vector<int> i_messageVector);
     void actuate();
@@ -33,7 +36,7 @@ class ArduinoMotorDriver {
     bool sendTestBit();
     void deleteFile();
     void echo();
-    
+    bool benchmarkSD(const int& i_numberOfMessages);
     // Constructors
     explicit ArduinoMotorDriver(std::string i_regExpression);
     ArduinoMotorDriver();
