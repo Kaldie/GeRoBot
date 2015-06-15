@@ -10,9 +10,6 @@
 bool JointController::validateJoint(const JointPointer& i_baseJoint) const {
   // pins should not be other then 2 t/m 7
   PinVector pins = i_baseJoint->getMotor()->getPins();
-  std::sort(pins.begin(), pins.end());
-
-  int prevsPin = pins[0];
   for (PinVector::const_iterator itr = pins.begin();
       itr != pins.end();
       itr++) {
@@ -21,14 +18,6 @@ bool JointController::validateJoint(const JointPointer& i_baseJoint) const {
       LOG_INFO("Pin: " << (*itr) << " is not within range!!");
       return false;
     }
-
-    if (prevsPin-(*itr) > 1) {
-      LOG_INFO("distance between pins is more then 1: " << prevsPin);
-      LOG_INFO(*itr);
-      return false;
-    }
-
-    prevsPin = (*itr);
   }
   return true;
 }
@@ -255,7 +244,7 @@ void JointController::actuate() {
     // Get the integer sequence of this pin state
     pinStateSequenceIterator->displaySequence();
     if(pinStateSequenceIterator->getNumberOfRepetitions() > 0)
-      m_actuator.actuate(pinStateSequenceIterator->createArduinoBuffer());
+      m_actuator.upload(pinStateSequenceIterator->createArduinoBuffer());
           
     auto x = pinStateSequenceIterator->createArduinoBuffer();
     for (auto i = x.begin();
