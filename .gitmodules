@@ -1,0 +1,6 @@
+[submodule "workspace/pugixml"]
+	path = workspace/pugixml
+	url = git://github.com/zeux/pugixml
+[submodule "pugixml"]
+	path = pugixml
+	url = git://github.com/zeux/pugixml
