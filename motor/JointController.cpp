@@ -255,7 +255,7 @@ void JointController::actuate() {
     // Get the integer sequence of this pin state
     pinStateSequenceIterator->displaySequence();
     if(pinStateSequenceIterator->getNumberOfRepetitions() > 0)
-      m_actuator.actuate(pinStateSequenceIterator->createArduinoBuffer());
+      m_actuator.upload(pinStateSequenceIterator->createArduinoBuffer());
           
     auto x = pinStateSequenceIterator->createArduinoBuffer();
     for (auto i = x.begin();
@@ -263,6 +263,7 @@ void JointController::actuate() {
          i++)
       LOG_DEBUG(*i);
   }
+  m_actuator.actuate();
   resetPinStateSequence();
 }
 
