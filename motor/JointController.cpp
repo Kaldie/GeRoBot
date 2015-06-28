@@ -253,6 +253,7 @@ void JointController::actuate() {
          i++)
       LOG_DEBUG(*i);
   }
+  m_actuator.actuate();
   resetPinStateSequence();
 }
 
