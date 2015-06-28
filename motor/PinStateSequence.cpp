@@ -308,34 +308,43 @@ bool PinStateSequence::
   setStateForSequence(const PinState& i_pinState,
                       const bool& i_extend /*= false*/,
                       const bool& i_overrideSequence /*=false*/) {
-  bool overrideSequence = i_overrideSequence;
-  bool extendSequence = i_extend;
-  PinState latestPinState = i_pinState;
-  
+  // Set a state for the whole sequence
+  // If i_extend,
+  //    the state will be set untill pins from i_pinState are defined once
+  // When these pins are undefined in following states
+  //    The latest state, defined, state will be used to define these pins
+  // If i_override, the state will be forced independend on earlier definitions
+
+  // check if not both are set
   if (i_extend and i_overrideSequence)
     LOG_ERROR("Cannot extend and override at the same time!");
 
-  if (!i_extend and !i_overrideSequence) {
+  PinState latestPinState = i_pinState;
+  bool overrideSequence = i_overrideSequence;
+  bool extendSequence = i_extend;
+  // if none are set, ensure that there are no mutal pins
+  if (!(extendSequence or overrideSequence)) {
     if (hasMutualPins(i_pinState)) {
       LOG_DEBUG("Extend or overide was not selected " <<
                 "and has mutual pins," <<
                 "could not set the state for the sequence!");
       return false;
     } else {
-      overrideSequence = true;
       extendSequence = false;
+      overrideSequence = true;
     }
   }
 
-  LOG_DEBUG("Extend: "<< extendSequence << " Override: "<< overrideSequence);
   for (auto pinStateIterator = m_pinStateVector.begin();
        pinStateIterator != m_pinStateVector.end();
        pinStateIterator++) {
+    // if override, override....
     if (overrideSequence) {
       pinStateIterator->update(i_pinState);
     }
 
-    if (i_extend) {
+    // extending states
+    if (extendSequence) {
       for (auto pinIterator = latestPinState.getPinVector().begin();
            pinIterator != latestPinState.getPinVector().end();
            pinIterator++) {
@@ -373,7 +382,7 @@ void PinStateSequence::displaySequence() const {
 size_t PinStateSequence::getSizeOfMessage() const {
   return (sizeof(m_numberOfRepetitions) +
           sizeof(m_speed) +
-          m_pinStateVector.size() * sizeof(std::vector<int>::value_type));
+          m_pinStateVector.size() * sizeof(int));
 }
 
 
@@ -413,7 +422,7 @@ bool PinStateSequence::condenseSequence() {
     // for each part, check if it is the same as the previous
     for (sequencePosition = m_pinStateVector.begin() + newSequenceSize;
          sequencePosition != m_pinStateVector.end();
-         sequencePosition = sequencePosition + newSequenceSize) {
+         sequencePosition += newSequenceSize) {
       if (!std::equal(sequencePosition,
                       sequencePosition + newSequenceSize,
                       m_pinStateVector.begin(),
