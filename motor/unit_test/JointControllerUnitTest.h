@@ -9,7 +9,6 @@
 #include <RotationalJoint.h>
 #include <TranslationalJoint.h>
 #include <JointController.h>
-#include <macroHeader.h>
 #include <vector>
 #include <string>
 
@@ -53,7 +52,7 @@ class JointControllerTestSuite : public CxxTest::TestSuite {
     RotationalJoint<StepperDriver> rotationalJoint2(50, 1, stepperDriver3);
     TranslationalJoint<StepperDriver>
         translationalJoint2(50, 1, stepperDriver4);
-    
+
     JointController jointController2;
 
     TS_ASSERT(jointController.addJoint(rotationalJoint2.clone()));
@@ -86,7 +85,7 @@ class JointControllerTestSuite : public CxxTest::TestSuite {
     TS_ASSERT_EQUALS(pinStateVector.size(), 1);
     TS_ASSERT_EQUALS(pinStateVector[0].getPinStateVector().size(), 1);
     TS_ASSERT_EQUALS(pinStateVector[0].getNumberOfRepetitions(), 0);
-    int pinStateValue=0;
+    int pinStateValue = 0;
     for (int i = 2;
          i < 8;
          i++)
@@ -162,7 +161,7 @@ class JointControllerTestSuite : public CxxTest::TestSuite {
       jointController.actuate();
       LOG_DEBUG("paya");
     }
-    catch (std::runtime_error)
+    catch(std::runtime_error)
     {}
   }
 };

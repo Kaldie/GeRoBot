@@ -373,7 +373,7 @@ class PinStateSequenceTestSuite : public CxxTest::TestSuite {
     pinState.update(1, 0);
     vector.push_back(pinState);
     sequence.addToSequence(vector);
-    TS_ASSERT_EQUALS(false, sequence.condenseSequence());
+    TS_ASSERT(!sequence.condenseSequence());
   }
 };
 #endif  // MOTOR_UNIT_TEST_PINSTATESEQUENCEUNITTEST_H_
