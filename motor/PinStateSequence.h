@@ -43,10 +43,12 @@ class PinStateSequence {
                            const bool& i_extent = false,
                            const bool& overrideSequence = false);
 
-  bool setStateForSequence(const PinStateVector& i_pinStateVector,
+  /*
+    bool setStateForSequence(const PinStateVector& i_pinStateVector,
                            const bool& i_extent = false,
                            const bool& i_overRide = false);
-
+  */
+  
   std::vector<int> getIntegerSequence() const;
   static bool mergePinStateSequences(PinStateSequence* io_firstSequence,
                                      PinStateSequence* io_secondSequence);

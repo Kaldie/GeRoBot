@@ -3,6 +3,7 @@
 #include <JointController.h>
 #include <ArduinoMotorDriver.h>
 #include <PinStateSequence.h>
+#include <SequenceVector.h>
 #include <BaseJoint.h>
 #include <BaseMotor.h>
 
