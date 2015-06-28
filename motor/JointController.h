@@ -4,6 +4,7 @@
 
 #include <ArduinoMotorDriver.h>
 #include <PinStateSequence.h>
+#include <SequenceVector.h>
 
 class JointController {
  private:
@@ -13,9 +14,9 @@ class JointController {
   GETSET(ArduinoMotorDriver, m_actuator, Actuator);
 
   // Vector where all the sequences will be stored in!
-  GETSET(PinStateSequenceVector,
-         m_pinStateSequenceVector,
-         PinStateSequenceVector);
+  GETSET(SequenceVector,
+         m_sequenceVector,
+         SequenceVector);
 
   int getNumberOfJoints() {return m_jointPointerVector.size();}
   bool validateJoint(const JointPointer&) const;

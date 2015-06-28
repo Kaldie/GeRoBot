@@ -47,6 +47,7 @@ bool JointController::validateJointVector(
       i_jointVector[1]->getMovementType())
     return false;
 
+  // get all pins
   PinVector pinVector;
   for (auto jointIterator = i_jointVector.begin();
        jointIterator != i_jointVector.end();
