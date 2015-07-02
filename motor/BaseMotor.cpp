@@ -48,6 +48,6 @@ void BaseMotor::displayPinState(const PinState& i_pinState) const {
 
 
 void BaseMotor::displayPinStateSequence(
-    const PinStateSequence& i_pinStateSequence) const {
-  i_pinStateSequence.displaySequence();
+    const StateSequence& i_stateSequence) const {
+  i_stateSequence.displaySequence();
 }

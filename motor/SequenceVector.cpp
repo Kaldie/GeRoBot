@@ -1,6 +1,6 @@
 // Copyright [2015] Ruud Cools
 #include <macroHeader.h>
-#include <PinStateSequence.h>
+#include <StateSequence.h>
 #include <PinState.h>
 #include "./SequenceVector.h"
 

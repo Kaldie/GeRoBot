@@ -3,10 +3,12 @@
 #ifndef MOTOR_SEQUENCEVECTOR_H_
 #define MOTOR_SEQUENCEVECTOR_H_
 
-#include <PinStateSequence.h>
+#include <StateSequence.h>
 
 class SequenceVector {
-  GETSET(std::vector<PinStateSequence>, m_sequenceVector, SequenceVector);
+  GETSET(PinStateSequenceVector,
+         m_sequenceVector,
+         SequenceVector);
 
  private:
   // all consequtive sequences with 1 repetitions will be grouped in 1 sequence

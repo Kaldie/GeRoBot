@@ -72,7 +72,7 @@ const bool StepperDriver::setDirection(const std::string& i_directionString) {
 
 void StepperDriver::moveStep(
     const std::string& i_direction,
-    PinStateSequence& i_pinStateSequence) {
+    StateSequence& i_stateSequence) {
 
   PinStateVector pinStateVector;
   // Enable the driver!
@@ -98,7 +98,7 @@ void StepperDriver::moveStep(
       pinStateVector.push_back(getCurrentPinState());
   }
 
-  if (!i_pinStateSequence.addToSequence(pinStateVector))
+  if (!i_stateSequence.addToSequence(pinStateVector))
     LOG_ERROR("Could not add the pin state vector to the sequence!");
 }
 
@@ -112,7 +112,7 @@ void StepperDriver::moveSteps(
   setHoldMotor(true);
 
   if (o_pinStateSequenceVector.size() == 0) {
-    PinStateSequence pinStateSequence;
+    StateSequence pinStateSequence;
     o_pinStateSequenceVector.push_back(pinStateSequence);
   }
   
@@ -120,7 +120,7 @@ void StepperDriver::moveSteps(
        i< i_numberOfSteps;
        i++) {
     LOG_DEBUG("Setting step: " << i);
-    PinStateSequence pinStateSequence;
+    StateSequence pinStateSequence;
     moveStep(i_direction, pinStateSequence);
     LOG_DEBUG("done setting step: " << i);
 
@@ -133,7 +133,7 @@ void StepperDriver::moveSteps(
     LOG_DEBUG("No power on coils!");
     if (setEnable(false)) {
       LOG_DEBUG("Setting enable off!");
-      PinStateSequence pinStateSequence;
+      StateSequence pinStateSequence;
       if (!pinStateSequence.addToSequence(getCurrentPinState()))
         LOG_ERROR("Could not add a pinstate to the empty sequence");
       o_pinStateSequenceVector.push_back(pinStateSequence);

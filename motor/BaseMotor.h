@@ -4,7 +4,7 @@
 #define MOTOR_BASEMOTOR_H_
 
 #include <PinState.h>
-#include <PinStateSequence.h>
+#include <StateSequence.h>
 
 class BaseMotor {
   // State in which the pins currently resides
@@ -23,7 +23,7 @@ class BaseMotor {
 
   // Move steps
   virtual void moveStep(const std::string&,
-                        PinStateSequence&) =0;
+                        StateSequence&) =0;
 
   virtual void moveSteps(const std::string& i_motorDirection,
                          const int& i_numberOfSteps,
@@ -35,7 +35,7 @@ class BaseMotor {
   virtual void displayPinState()const;
   virtual void displayPinState(const PinState&)const;
 
-  void displayPinStateSequence(const PinStateSequence&)const;
+  void displayPinStateSequence(const StateSequence&)const;
 
   // Base Constructor
   BaseMotor();

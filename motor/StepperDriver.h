@@ -33,7 +33,7 @@ class StepperDriver: public BaseMotor {
 
   // Move Steps
   virtual void moveStep(const std::string&,
-                        PinStateSequence&);
+                        StateSequence&);
 
   virtual void moveSteps(const std::string&,
                          const int& i_numberOfSteps,
