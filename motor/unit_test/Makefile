@@ -16,3 +16,4 @@ UnitTests := $(UnitTests) JointControllerUnitTest.h
 LIBS = -lArduinoInterface -lMotorInterface -lMathInterface
 include $(TOROOT)/Makefile.config
 
+.DEFAULT_GOAL := unitTest
