@@ -24,6 +24,8 @@ class PinStateSequence {
   static const bool areEqualState(const PinState& i_firstState,
                             const PinState& i_secondState);
 
+  const size_t getSizeOfMessage() const;
+
  public:
   PinStateSequence();
 
@@ -34,7 +36,7 @@ class PinStateSequence {
   const bool isEmpty() const;
 
   const bool appendSequence(const PinStateSequence i_sequence);
-  
+
   const bool addToSequence(const PinState& i_pinState);
   const bool addToSequence(const PinStateVector& i_pinStateVector);
   const bool addToSequence(const PinStateSequence& i_otherSequence);
@@ -43,12 +45,6 @@ class PinStateSequence {
                            const bool& i_extent = false,
                            const bool& overrideSequence = false);
 
-  /*
-    bool setStateForSequence(const PinStateVector& i_pinStateVector,
-                           const bool& i_extent = false,
-                           const bool& i_overRide = false);
-  */
-  
   std::vector<int> getIntegerSequence() const;
   static const bool mergePinStateSequences(PinStateSequence* io_firstSequence,
                                      PinStateSequence* io_secondSequence);
@@ -57,7 +53,6 @@ class PinStateSequence {
   const bool condenseSequence();
   void displaySequence() const;
 
-  const size_t getSizeOfMessage() const;
   std::vector<int> createArduinoBuffer() const;
 };
 #endif  // MOTOR_PINSTATESEQUENCE_H_
