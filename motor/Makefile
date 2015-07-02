@@ -8,11 +8,9 @@
 TOROOT= ..
 
 # define the C source files
-SRCS= PinState.cpp PinStateSequence.cpp SequenceVector.cpp
-SRCS:=$(SRCS) BaseMotor.cpp StepperDriver.cpp #StepperMotor.cpp
-SRCS:=$(SRCS) BaseJoint.cpp
-SRCS:=$(SRCS) JointController.cpp
 DSRCS= debug.cpp
+SRCS := $(filter-out $(DSRCS), $(wildcard *.cpp))
+
 
 #LIBS=-lMathInterface -lArduinoInterface
 LIBS = -lArduinoInterface
