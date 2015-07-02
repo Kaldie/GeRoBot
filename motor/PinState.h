@@ -9,8 +9,7 @@ class PinState {
 
  private:
   // represents the integer value of the pins
-  int getPinValue(const int&);
-  int getNumericPinValue(const int&) const;
+  const int getNumericPinValue(const int&) const;
 
  public:
   void setPins(const PinVector&);
@@ -21,7 +20,7 @@ class PinState {
   void update(const PinState&);
 
   // get the set of a specific pin
-  int getPinState(const int&) const;
+  const int getPinState(const int&) const;
 
   void resetPinState();
 
