@@ -3,6 +3,8 @@
 #ifndef MOTOR_PINSTATE_H_
 #define MOTOR_PINSTATE_H_
 
+typedef std::vector<int> PinVector;
+
 class PinState {
   GETSET(PinVector, m_pinVector, PinVector);
   GETSET(int, m_numericValue, NumericValue);
