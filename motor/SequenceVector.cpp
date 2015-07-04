@@ -2,7 +2,7 @@
 #include <macroHeader.h>
 #include <StateSequence.h>
 #include <PinState.h>
-#include "./SequenceVector.h"
+#include <SequenceVector.h>
 
 
 int SequenceVector::numberOfSteps() const {
@@ -19,7 +19,7 @@ int SequenceVector::numberOfSteps() const {
 
 
 int SequenceVector::numberOfSequences() const {
-  LOG_DEBUG("Printing number of sequences!");
+  LOG_DEBUG("Printing number of sequences!" << m_sequenceVector.size());
   return m_sequenceVector.size();
 }
 
@@ -50,14 +50,14 @@ bool SequenceVector::isNormilized() const {
   PinState previousPinState =
       m_sequenceVector.front().getPinStateVector()[0];
   // Sequence loop
-  for (auto pinStateSequenceIterator = m_sequenceVector.begin();
-       pinStateSequenceIterator != m_sequenceVector.end();
-       pinStateSequenceIterator++) {
+  for (auto stateSequenceIterator = m_sequenceVector.begin();
+       stateSequenceIterator != m_sequenceVector.end();
+       stateSequenceIterator++) {
     // PinState loop
     for (auto pinStateIterator =
-             pinStateSequenceIterator->getPinStateVector().begin();
+             stateSequenceIterator->getPinStateVector().begin();
          pinStateIterator !=
-             pinStateSequenceIterator->getPinStateVector().end();
+             stateSequenceIterator->getPinStateVector().end();
          pinStateIterator++) {
       // Pin loop
       for (auto pinIterator  = previousPinState.getPinVector().begin();
@@ -78,7 +78,7 @@ bool SequenceVector::isNormilized() const {
 
 bool SequenceVector::condenseVector(
     const bool i_removeFromVector /* = false*/) {
-
+  bool hasCondensed = false;
   LOG_DEBUG("Condensing vector!");
   // merge all sequential sequence with 1 repetition.
   for (auto sequence = m_sequenceVector.end(),
@@ -86,13 +86,73 @@ bool SequenceVector::condenseVector(
        sequence != begin;
        sequence--) {
     if (sequence->getNumberOfRepetitions() == 1) {
-      if ((sequence+1)->addToSequence(*sequence)) {
-        if (i_removeFromVector)
+      if ((sequence-1)->addToSequence(*sequence)) {
+        if (i_removeFromVector) {
           sequence = m_sequenceVector.erase(sequence);
-        else
+        } else {
           sequence->setNumberOfRepetitions(0);
+        }
+        hasCondensed = true;
       }
     }
   }
-  return false;
+  return hasCondensed;
+}
+
+
+void SequenceVector::clean() {
+  // check if it is not empty
+  if (numberOfSequences() == 0) {
+    return;
+  }
+  // Make sure that the last state represents all pins
+  normalise();
+
+  PinStateSequenceVector emptyPinStateSequenceVector;
+  StateSequence lastSequence;
+  PinState lastPinState =
+      m_sequenceVector.back().getPinStateVector().back();
+
+  lastSequence.addToSequence(lastPinState);
+  lastSequence.setNumberOfRepetitions(0);
+  emptyPinStateSequenceVector.push_back(lastSequence);
+#ifndef NDEBUG
+    lastSequence.displaySequence();
+#endif
+    m_sequenceVector.swap(emptyPinStateSequenceVector);
+}
+
+
+void SequenceVector::appendStateSequence(
+    const StateSequence& i_newStateSequence,
+    const bool& i_merge) {
+  if (i_newStateSequence.isEmpty())
+    return;
+
+  if (m_sequenceVector.size() == 0) {
+    m_sequenceVector.push_back(i_newStateSequence);
+    return;
+  }
+
+  if (m_sequenceVector.back().addToSequence(i_newStateSequence))
+    return;
+
+  if (i_merge) {
+    StateSequence stateSequence = i_newStateSequence;
+    StateSequence::
+        mergePinStateSequences(&m_sequenceVector.back(),
+                               &stateSequence);
+    m_sequenceVector.push_back(stateSequence);
+    return;
+  }
+  m_sequenceVector.push_back(i_newStateSequence);
+}
+
+
+StateSequence& SequenceVector::getLastSequence() {
+  if (m_sequenceVector.size() == 0) {
+    m_sequenceVector.push_back(StateSequence());
+  }
+
+  return *(m_sequenceVector.end()-1);
 }

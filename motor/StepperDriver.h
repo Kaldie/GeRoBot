@@ -3,6 +3,10 @@
 
 #include <BaseMotor.h>
 
+// Forward declared classes
+class StateSequence;
+class SequenceVector;
+
 class StepperDriver: public BaseMotor {
  private:
   // Private methods to have easy acces to certain pins, such as enable pin
@@ -35,12 +39,13 @@ class StepperDriver: public BaseMotor {
   virtual void moveStep(const std::string&,
                         StateSequence&);
 
-  virtual void moveSteps(const std::string&,
+  virtual void moveSteps(const std::string& i_motorDirection,
                          const int& i_numberOfSteps,
-                         PinStateSequenceVector&);
+                         SequenceVector& i_vector);
 
-  virtual int numberOfStatesPerStep() const {return 2;}
-	
+  
+  virtual const int numberOfStatesPerStep() const {return 2;}
+
   // Display pin state vector
   virtual void displayPinState(const PinState&) const;
   virtual void displayPinState()const;

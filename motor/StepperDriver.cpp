@@ -1,7 +1,8 @@
 // Copyright [2014] Ruud Cools
 #include <macroHeader.h>
 #include <StepperDriver.h>
-
+#include <StateSequence.h>
+#include <SequenceVector.h>
 
 // Constructor
 StepperDriver::StepperDriver()
@@ -106,26 +107,27 @@ void StepperDriver::moveStep(
 void StepperDriver::moveSteps(
     const std::string& i_direction,
     const int& i_numberOfSteps,
-    PinStateSequenceVector& o_pinStateSequenceVector) {
+    SequenceVector& o_sequenceVector) {
 
   bool holdMotorAfterSteps = getHoldMotor();
   setHoldMotor(true);
-
-  if (o_pinStateSequenceVector.size() == 0) {
-    StateSequence pinStateSequence;
-    o_pinStateSequenceVector.push_back(pinStateSequence);
+  if (o_sequenceVector.numberOfSequences() == 0) {
+    StateSequence stateSequence;
+    o_sequenceVector.appendStateSequence(stateSequence,
+                                         true);
   }
-  
+
   for (int i = 0;
        i< i_numberOfSteps;
        i++) {
     LOG_DEBUG("Setting step: " << i);
-    StateSequence pinStateSequence;
-    moveStep(i_direction, pinStateSequence);
+    StateSequence stateSequence;
+    moveStep(i_direction, stateSequence);
     LOG_DEBUG("done setting step: " << i);
 
-    if (!o_pinStateSequenceVector.back().addToSequence(pinStateSequence))
-      o_pinStateSequenceVector.push_back(pinStateSequence);
+    if (!o_sequenceVector.addToSequence(stateSequence))
+      o_sequenceVector.appendStateSequence(stateSequence,
+                                           true);
   }
 
   setHoldMotor(holdMotorAfterSteps);
@@ -133,11 +135,11 @@ void StepperDriver::moveSteps(
     LOG_DEBUG("No power on coils!");
     if (setEnable(false)) {
       LOG_DEBUG("Setting enable off!");
-      StateSequence pinStateSequence;
-      if (!pinStateSequence.addToSequence(getCurrentPinState()))
+      StateSequence stateSequence;
+      if (!stateSequence.addToSequence(getCurrentPinState()))
         LOG_ERROR("Could not add a pinstate to the empty sequence");
-      o_pinStateSequenceVector.push_back(pinStateSequence);
-      
+      o_sequenceVector.appendStateSequence(stateSequence,
+                                           true);
     }
   }
 }
