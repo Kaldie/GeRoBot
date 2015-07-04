@@ -4,7 +4,10 @@
 #define MOTOR_BASEMOTOR_H_
 
 #include <PinState.h>
-#include <StateSequence.h>
+
+// Forward declared, only used as reference
+class SequenceVector;
+class StateSequence;
 
 class BaseMotor {
   // State in which the pins currently resides
@@ -27,15 +30,15 @@ class BaseMotor {
 
   virtual void moveSteps(const std::string& i_motorDirection,
                          const int& i_numberOfSteps,
-                         PinStateSequenceVector& i_vector) =0;
+                         SequenceVector& i_vector) =0;
 
-  virtual int numberOfStatesPerStep() const =0;
+  virtual const int numberOfStatesPerStep() const =0;
 
   // Print pin states
-  virtual void displayPinState()const;
-  virtual void displayPinState(const PinState&)const;
+  virtual void displayPinState() const;
+  virtual void displayPinState(const PinState&) const;
 
-  void displayPinStateSequence(const StateSequence&)const;
+  void displayPinStateSequence(const StateSequence&) const;
 
   // Base Constructor
   BaseMotor();

@@ -1,7 +1,10 @@
 // Copyright [2014] Ruud Cools
 
 #include <macroHeader.h>
+#include <StateSequence.h>
+#include <SequenceVector.h>
 #include "./BaseMotor.h"
+
 
 // Constructors
 BaseMotor::BaseMotor()
