@@ -1,6 +1,5 @@
 // Copyright [2014] Ruud Cools
 #include <macroHeader.h>
-#include <PinStateSequence.h>
 #include "./ArduinoMotorDriver.h"
 
 const int ArduinoMotorDriver::HAND_SHAKE_VALUE = 200;
