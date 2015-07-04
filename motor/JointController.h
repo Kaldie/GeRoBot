@@ -3,31 +3,24 @@
 #define MOTOR_JOINTCONTROLLER_H_
 
 #include <ArduinoMotorDriver.h>
-#include <PinStateSequence.h>
+#include <StateSequence.h>
 #include <SequenceVector.h>
 
 class JointController {
  private:
   // vector with the joints
   GETSET(JointPointerVector, m_jointPointerVector, JointPointerVector);
-
   GETSET(ArduinoMotorDriver, m_actuator, Actuator);
 
   // Vector where all the sequences will be stored in!
-  GETSET(SequenceVector,
+  GET(SequenceVector,
          m_sequenceVector,
          SequenceVector);
 
   int getNumberOfJoints() {return m_jointPointerVector.size();}
   bool validateJoint(const JointPointer&) const;
   bool validateJointVector(const JointPointerVector&) const;
-
   bool hasJoint(const JointPointer&) const;
-
-  void appendPinStateSequence(PinStateSequence&,
-                              const bool&);
-
-  void normaliseSequenceVector();
 
  public:
   JointController();
@@ -53,7 +46,6 @@ class JointController {
   // Method to the Arduino actuator pointer
   ArduinoMotorDriver* getActuatorPointer() {return &m_actuator;}
 
-  bool isNormalisedPinStateSequenceVector() const;
   // function which will make the robot move!
   void actuate();
 };

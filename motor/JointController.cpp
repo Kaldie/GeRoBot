@@ -2,11 +2,17 @@
 #include <macroHeader.h>
 #include <JointController.h>
 #include <ArduinoMotorDriver.h>
-#include <PinStateSequence.h>
+#include <StateSequence.h>
 #include <SequenceVector.h>
 #include <BaseJoint.h>
 #include <BaseMotor.h>
 
+JointController::JointController()
+    :m_actuator(ArduinoMotorDriver("/dev/ttyUSB*"))
+{}
+
+JointController::~JointController()
+{}
 
 bool JointController::validateJoint(const JointPointer& i_baseJoint) const {
   // pins should not be other then 2 t/m 7
@@ -130,24 +136,7 @@ JointPointer& JointController::getJoint(const MovementType &i_movementType) {
 
 
 void JointController::resetPinStateSequence() {
-  PinStateSequenceVector emptyPinStateSequenceVector;
-  PinStateSequence cleanPinStateSequence;
-
-  for (JointPointerVector::iterator itr = m_jointPointerVector.begin();
-      itr != m_jointPointerVector.end();
-      itr++) {
-    if ( !cleanPinStateSequence.
-         addToSequence((*itr)->getMotor()->getCurrentPinState())) {
-      LOG_ERROR("Could not create empty PinState Sequence");
-    }
-    cleanPinStateSequence.setNumberOfRepetitions(0);
-#ifndef NDEBUG
-    cleanPinStateSequence.displaySequence();
-#endif
-  }
-
-  emptyPinStateSequenceVector.push_back(cleanPinStateSequence);
-  m_pinStateSequenceVector.swap(emptyPinStateSequenceVector);
+  m_sequenceVector.clean();
 }
 
 
@@ -162,44 +151,6 @@ bool JointController::hasJoint(const JointPointer& i_jointPointer) const {
 }
 
 
-void JointController::appendPinStateSequence(
-    PinStateSequence& i_newPinStateSequence,
-    const bool& i_merge) {
-
-  if (i_newPinStateSequence.isEmpty())
-    return;
-
-  if (m_pinStateSequenceVector.size() == 0) {
-    m_pinStateSequenceVector.push_back(i_newPinStateSequence);
-    return;
-  }
-
-  if (m_pinStateSequenceVector.back().addToSequence(i_newPinStateSequence))
-    return;
-
-  if (i_merge) {
-    PinStateSequence::
-        mergePinStateSequences(&(m_pinStateSequenceVector.back()),
-                               &i_newPinStateSequence);
-  }
-  m_pinStateSequenceVector.push_back(i_newPinStateSequence);
-}
-
-
-void JointController::normaliseSequenceVector() {
-  if (m_pinStateSequenceVector.size() < 2)
-    return;
-
-  for (auto currentSequence = m_pinStateSequenceVector.begin() + 1;
-       currentSequence !=  m_pinStateSequenceVector.end();
-       currentSequence++) {
-    currentSequence->setStateForSequence(
-        (currentSequence-1)->getPinStateVector().back(),
-        true, false);
-  }
-}
-
-
 void JointController::moveStep(JointPointer& i_jointPointer,
                                const std::string& i_directionString,
                                const bool& i_appendToPreviousStep) {
@@ -210,13 +161,13 @@ void JointController::moveStep(JointPointer& i_jointPointer,
   std::string motorDirection =
       i_jointPointer->convertDirection(i_directionString);
 
-  PinStateSequence pinStateSequence;
-  i_jointPointer->getMotor()->moveStep(motorDirection, pinStateSequence);
+  StateSequence stateSequence;
+  i_jointPointer->getMotor()->moveStep(motorDirection, stateSequence);
 
   if (i_appendToPreviousStep) {
-    appendPinStateSequence(pinStateSequence, true);
+    m_sequenceVector.appendStateSequence(stateSequence, true);
   } else {
-    appendPinStateSequence(pinStateSequence, false);
+    m_sequenceVector.appendStateSequence(stateSequence, false);
   }
 }
 
@@ -228,70 +179,35 @@ void JointController::moveSteps(JointPointer& i_jointPointer,
   // Check if the joint controller has this joint
   if (!hasJoint(i_jointPointer))
     LOG_ERROR("Joint not avalaible in this controller!");
+  // TODO(Ruud): change this so it works with sequence vector
   i_jointPointer->getMotor()->moveSteps(i_directionString,
                                         i_numberOfSteps,
-                                        m_pinStateSequenceVector);
+                                        m_sequenceVector);
 }
 
 
 //  Brief: Actuate the robot from the given pin state sequence
 void JointController::actuate() {
-  normaliseSequenceVector();
-  LOG_DEBUG("Number of messages: " << m_pinStateSequenceVector.size());
-
+  m_sequenceVector.normalise();
   for (PinStateSequenceVector::const_iterator pinStateSequenceIterator
-           = m_pinStateSequenceVector.begin();
-       pinStateSequenceIterator != m_pinStateSequenceVector.end();
-       pinStateSequenceIterator++){
-    // Get the integer sequence of this pin state
+           = m_sequenceVector.begin();
+       pinStateSequenceIterator != m_sequenceVector.end();
+       pinStateSequenceIterator++) {
+#ifdef NDEBUG
     pinStateSequenceIterator->displaySequence();
-    if(pinStateSequenceIterator->getNumberOfRepetitions() > 0)
+#endif /*NDEBUG statement that shows the sequences */
+    // Get the integer sequence of this pin state
+    if (pinStateSequenceIterator->getNumberOfRepetitions() > 0) {
       m_actuator.upload(pinStateSequenceIterator->createArduinoBuffer());
-          
+    }
+#ifdef DEBUG
     auto x = pinStateSequenceIterator->createArduinoBuffer();
     for (auto i = x.begin();
          i != x.end();
          i++)
       LOG_DEBUG(*i);
+#endif /*Shows the actual message passed though the arduino driver */
   }
   m_actuator.actuate();
   resetPinStateSequence();
 }
-
-
-bool JointController::isNormalisedPinStateSequenceVector() const  {
-  PinState previousPinState =
-      m_pinStateSequenceVector.front().getPinStateVector()[0];
-  // Sequence loop
-  for (auto pinStateSequenceIterator = m_pinStateSequenceVector.begin();
-       pinStateSequenceIterator != m_pinStateSequenceVector.end();
-       pinStateSequenceIterator++) {
-    // PinState loop
-    for (auto pinStateIterator =
-             pinStateSequenceIterator->getPinStateVector().begin();
-         pinStateIterator !=
-             pinStateSequenceIterator->getPinStateVector().end();
-         pinStateIterator++) {
-      // Pin loop
-      for (auto pinIterator  = previousPinState.getPinVector().begin();
-           pinIterator != previousPinState.getPinVector().end();
-           pinIterator++) {
-        try {
-          pinStateIterator->getPinState(*pinIterator);
-        } catch(std::runtime_error exception) {
-          return false;
-        }  // end try catch block
-      }  // end pin loop
-      previousPinState = *pinStateIterator;
-    }  // end pin state loop
-  }  // end pin state sequence loop
-  return true;
-}
-
-
-JointController::JointController()
-    :m_actuator(ArduinoMotorDriver("/dev/ttyUSB*"))
-{}
-
-JointController::~JointController()
-{}
