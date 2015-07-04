@@ -33,10 +33,10 @@
 #define PI 3.1415926535897932384626433
 #define TOLERANCE 0.1
 
-#define DEBUG
-//#define DEBUG_FILE
+//#define DEBUG
+// #define DEBUG_FILE
 
-//Create getter and setter for properties of a class
+// Create getter and setter for properties of a class
 #define GETSET(type, varName, property)                                 \
   private:                                                              \
   type varName;                                                         \
@@ -127,7 +127,7 @@ const type& get##property() const {                                     \
 
 // Forward declared classes
 class PinState;
-class PinStateSequence;
+class StateSequence;
 class BaseMotor;
 class BaseJoint;
 class Robot;
@@ -137,11 +137,6 @@ enum MovementType {None, Rotational, Translational};
 enum TRACE_TYPE {Line, Curve};
 
 enum GUIMovementMode {ToolMode, AxisMode};
-
-// Pin state related types
-typedef std::vector<int> PinVector;
-typedef std::vector<PinState> PinStateVector;
-typedef std::vector<PinStateSequence> PinStateSequenceVector;
 
 // Joint related types
 typedef std::shared_ptr<BaseJoint> JointPointer;
