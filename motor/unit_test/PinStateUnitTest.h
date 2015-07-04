@@ -1,11 +1,11 @@
 // MyTestSuite1.h
 
-#ifndef MOTOR_PINSTATEUNITTEST_H_
-#define MOTOR_PINSTATEUNITTEST_H_
+#ifndef MOTOR_UNIT_TEST_PINSTATEUNITTEST_H_
+#define MOTOR_UNIT_TEST_PINSTATEUNITTEST_H_
 
-#include <vector>
-#include <cxxtest/TestSuite.h>
 #include <macroHeader.h>
+#include <cxxtest/TestSuite.h>
+#include <vector>
 #include "./PinState.h"
 
 class PinStateTestSuite : public CxxTest::TestSuite {
@@ -63,4 +63,4 @@ class PinStateTestSuite : public CxxTest::TestSuite {
     }
 };
 
-#endif  // MOTOR_PINSTATEUNITTEST_H_
+#endif  // MOTOR_UNIT_TEST_PINSTATEUNITTEST_H_

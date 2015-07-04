@@ -7,6 +7,8 @@
 #include <macroHeader.h>
 #include <vector>
 #include <string>
+#include <SequenceVector.h>
+#include <StateSequence.h>
 #include "../StepperDriver.h"
 
 class StepperDriverUnitTest : public CxxTest::TestSuite {
@@ -32,15 +34,15 @@ class StepperDriverUnitTest : public CxxTest::TestSuite {
 
   void testMoveStep() {
     LOG_DEBUG("Starting StepperDriverUnitTest:: testMoveStep");
-    PinStateSequence pinStateSequence1;
+    StateSequence stateSequence1;
     StepperDriver stepperDriver;
     stepperDriver.setHoldMotor(false);
 
     stepperDriver.moveStep("CCW",
-                           pinStateSequence1);
-    TS_ASSERT_EQUALS(pinStateSequence1.getIntegerSequence().size(),
+                           stateSequence1);
+    TS_ASSERT_EQUALS(stateSequence1.getIntegerSequence().size(),
                      4);
-    std::vector<int> integerSequence1 = pinStateSequence1.getIntegerSequence();
+    std::vector<int> integerSequence1 = stateSequence1.getIntegerSequence();
 
     std::vector<int> benchMarkVector1 {
           DEFAULT_STATE * 16 + !DEFAULT_STATE * (4 + 8),
@@ -50,7 +52,7 @@ class StepperDriverUnitTest : public CxxTest::TestSuite {
 
     TS_ASSERT_EQUALS(integerSequence1, benchMarkVector1);
 
-    PinStateSequence pinStateSequence2;
+    StateSequence pinStateSequence2;
     stepperDriver.setHoldMotor(true);
     stepperDriver.moveStep("CW",
                            pinStateSequence2);
@@ -71,34 +73,38 @@ class StepperDriverUnitTest : public CxxTest::TestSuite {
   void testMoveSteps() {
     LOG_DEBUG("Starting StepperDriverUnitTest:: testMoveSteps");
     StepperDriver stepperDriver(std::vector<int>{3, 4, 5});
-    PinStateSequenceVector pinStateSequenceVector;
+    SequenceVector sequenceVector;
+        
     stepperDriver.moveSteps("CW",
                             10,
-                            pinStateSequenceVector);
+                            sequenceVector);
 
-    TS_ASSERT_EQUALS(pinStateSequenceVector.size(),
+    TS_ASSERT_EQUALS(sequenceVector.numberOfSequences(),
                      3);
 
-    TS_ASSERT_EQUALS(pinStateSequenceVector[0].getNumberOfRepetitions(),
+    StateSequence thisSequence = *sequenceVector.begin();
+
+    TS_ASSERT_EQUALS(thisSequence.getNumberOfRepetitions(),
                      1);
-    TS_ASSERT_EQUALS(pinStateSequenceVector[0].getIntegerSequence().size(),
+    TS_ASSERT_EQUALS(thisSequence.getIntegerSequence().size(),
                      3);
-    
-    TS_ASSERT_EQUALS(pinStateSequenceVector[1].getNumberOfRepetitions(),
+
+    thisSequence = *(++sequenceVector.begin());
+    TS_ASSERT_EQUALS(thisSequence.getNumberOfRepetitions(),
                      9);
-    TS_ASSERT_EQUALS(pinStateSequenceVector[1].getIntegerSequence().size(),
+    TS_ASSERT_EQUALS(thisSequence.getIntegerSequence().size(),
                      2);
     std::vector<int> benchmarkVector1 { DEFAULT_STATE * (16) + !DEFAULT_STATE * (32 + 64),
                                         DEFAULT_STATE * (16+32) + !DEFAULT_STATE * (64)};
-    TS_ASSERT_EQUALS(pinStateSequenceVector[1].getIntegerSequence(),
+    TS_ASSERT_EQUALS(thisSequence.getIntegerSequence(),
                      benchmarkVector1);
 
-    TS_ASSERT_EQUALS(pinStateSequenceVector[2].getNumberOfRepetitions(),
+    thisSequence = *(sequenceVector.begin()+2);
+    TS_ASSERT_EQUALS(thisSequence.getNumberOfRepetitions(),
                      1);
-    TS_ASSERT_EQUALS(pinStateSequenceVector[2].getIntegerSequence().size(),
+    TS_ASSERT_EQUALS(thisSequence.getIntegerSequence().size(),
                      1);
   }
-
 };
 
 #endif  // MOTOR_STEPPERDRIVERUNITTEST_H_

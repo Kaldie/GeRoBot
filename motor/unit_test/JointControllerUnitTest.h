@@ -38,8 +38,9 @@ class JointControllerTestSuite : public CxxTest::TestSuite {
 
   void testCreation(void) {
     JointController jointController2;
-    TS_ASSERT_EQUALS(jointController2.getPinStateSequenceVector().size(),
-                    0);
+    TS_ASSERT_EQUALS(
+        jointController2.getSequenceVector().numberOfSequences(),
+        0);
     TS_ASSERT_EQUALS(jointController2.getJointPointerVector().size(),
                     0);
   }
@@ -66,32 +67,28 @@ class JointControllerTestSuite : public CxxTest::TestSuite {
 
 
   void testResetPinStateSequence() {
-    PinStateSequenceVector pinStateVector =
-        jointController.getPinStateSequenceVector();
-    TS_ASSERT_EQUALS(pinStateVector.size(), 1);
+    SequenceVector pinStateVector =
+        jointController.getSequenceVector();
+    TS_ASSERT_EQUALS(pinStateVector.numberOfSequences(), 0);
     LOG_INFO("JointControlerUnitTest::test resetPinState");
     JointPointer rotationalJointPointer = jointController.getJoint(Rotational);
     jointController.moveStep(rotationalJointPointer, "CW", false);
     pinStateVector =
-        jointController.getPinStateSequenceVector();
+        jointController.getSequenceVector();
 
-    TS_ASSERT_DIFFERS(pinStateVector.size(), 0);
-    TS_ASSERT_EQUALS(pinStateVector.size(), 2);
+    TS_ASSERT_DIFFERS(pinStateVector.numberOfSequences(), 0);
+    TS_ASSERT_EQUALS(pinStateVector.numberOfSequences(), 1);
 
     jointController.resetPinStateSequence();
     pinStateVector =
-        jointController.getPinStateSequenceVector();
+        jointController.getSequenceVector();
 
-    TS_ASSERT_EQUALS(pinStateVector.size(), 1);
-    TS_ASSERT_EQUALS(pinStateVector[0].getPinStateVector().size(), 1);
-    TS_ASSERT_EQUALS(pinStateVector[0].getNumberOfRepetitions(), 0);
-    int pinStateValue = 0;
-    for (int i = 2;
-         i < 8;
-         i++)
-      pinStateValue += 1<<(i) * DEFAULT_STATE;
-    TS_ASSERT_EQUALS(pinStateVector[0].getIntegerSequence(),
-                     std::vector<int> {pinStateValue});
+    TS_ASSERT_EQUALS(pinStateVector.numberOfSequences(), 1);
+    StateSequence stateSequence = *pinStateVector.begin();
+    TS_ASSERT_EQUALS(stateSequence.getPinStateVector().size(), 1);
+    TS_ASSERT_EQUALS(stateSequence.getNumberOfRepetitions(), 0);
+    TS_ASSERT_EQUALS((*pinStateVector.begin()).getIntegerSequence(),
+                     std::vector<int> {224});
   }
 
   void testMoveStep() {
@@ -102,19 +99,27 @@ class JointControllerTestSuite : public CxxTest::TestSuite {
 
     jointController.moveStep(rotationalJointPointer, "CCW", true);
 
-    TS_ASSERT_EQUALS(jointController.getPinStateSequenceVector().size(), 2);
     TS_ASSERT_EQUALS(
-        jointController.getPinStateSequenceVector()[1].getIntegerSequence(),
+        jointController.getSequenceVector().numberOfSequences(), 2);
+    std::vector<int> integerSequence =
+        (*(--jointController.getSequenceVector().end())).getIntegerSequence();
+
+    TS_ASSERT_EQUALS(
+        integerSequence,
         (std::vector<int> {128, 0, 128, 160}));
 
     // step also with the other joint
     jointController.moveStep(translationJointPointer, "OUT", true);
 
     LOG_DEBUG("Test if the pin state has the same number of steps");
-    TS_ASSERT_EQUALS(jointController.getPinStateSequenceVector().size(), 2);
+    TS_ASSERT_EQUALS(jointController.getSequenceVector().numberOfSequences(),
+                     2);
+
+    integerSequence = (*(jointController.getSequenceVector().
+                          end()-1)).getIntegerSequence();
 
     TS_ASSERT_EQUALS(
-        jointController.getPinStateSequenceVector()[1].getIntegerSequence(),
+        integerSequence,
         (std::vector<int> {152, 8, 152, 188}));
   }
 
@@ -125,9 +130,10 @@ class JointControllerTestSuite : public CxxTest::TestSuite {
         jointController.getJoint(Translational);
 
     jointController.moveSteps(rotationalJointPointer, "CW", 5);
-    TS_ASSERT_EQUALS(jointController.getPinStateSequenceVector().size(), 4);
+    TS_ASSERT_EQUALS(
+        jointController.getSequenceVector().numberOfSequences(), 4);
 
-    if (jointController.getPinStateSequenceVector().size() != 4) {
+    if (jointController.getSequenceVector().numberOfSequences() != 4) {
       LOG_ERROR("Should be 4!");
     }
 
@@ -139,10 +145,10 @@ class JointControllerTestSuite : public CxxTest::TestSuite {
 
     auto repetitionIter = numberOfRepetitionsOfVector.begin();
     auto integerSequenceIter = integerSequence.begin();
-    auto sequenceIterator = jointController.getPinStateSequenceVector().begin();
+    auto sequenceIterator = jointController.getSequenceVector().begin();
 
     for (;
-         sequenceIterator != jointController.getPinStateSequenceVector().end();
+         sequenceIterator != jointController.getSequenceVector().end();
          sequenceIterator++, repetitionIter++, integerSequenceIter++) {
       TS_ASSERT_EQUALS(sequenceIterator->getNumberOfRepetitions(),
                        *repetitionIter);
@@ -151,10 +157,11 @@ class JointControllerTestSuite : public CxxTest::TestSuite {
                        *integerSequenceIter);
     }
 
-    TS_ASSERT(!jointController.isNormalisedPinStateSequenceVector());
+    TS_ASSERT(!jointController.getSequenceVector().isNormilized());
 
-    jointController.normaliseSequenceVector();
-    TS_ASSERT(jointController.isNormalisedPinStateSequenceVector());
+    SequenceVector sequenceVector = jointController.getSequenceVector();
+    sequenceVector.normalise();
+    TS_ASSERT(sequenceVector.isNormilized());
 
     try {
       LOG_DEBUG("aya");
