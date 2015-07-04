@@ -8,12 +8,13 @@
 TOROOT= ../..
 
 # define the C source files
-UnitTests = PinStateUnitTest.h PinStateSequenceUnitTest.h StepperDriverUnitTest.h
-UnitTests := $(UnitTests) RotationalJointUnitTest.h TranslationalJointUnitTest.h
-UnitTests := $(UnitTests) JointControllerUnitTest.h
+DSRCS= ../debug.cpp
+SRCS := $(filter-out $(DSRCS), $(wildcard ../*.cpp))
+
+UnitTests = $(wildcard *.h)
 
 #LIBS=-lMathInterface -lArduinoInterface
-LIBS = -lArduinoInterface -lMotorInterface -lMathInterface
+LIBS = -lArduinoInterface -lMathInterface
 include $(TOROOT)/Makefile.config
 
 .DEFAULT_GOAL := unitTest
