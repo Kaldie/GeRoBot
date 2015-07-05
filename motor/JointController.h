@@ -14,8 +14,8 @@ class JointController {
 
   // Vector where all the sequences will be stored in!
   GET(SequenceVector,
-         m_sequenceVector,
-         SequenceVector);
+      m_sequenceVector,
+      SequenceVector);
 
   int getNumberOfJoints() {return m_jointPointerVector.size();}
   bool validateJoint(const JointPointer&) const;

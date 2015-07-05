@@ -15,7 +15,7 @@ class SequenceVector {
   // all consequtive sequences with 1 repetitions will be grouped in 1 sequence
   // after this is done try to find repitions
   bool condenseVector(bool i_removeElements = false);
-  StateSequence& getLastSequence();
+  StateSequence* getLastSequence();
   //  StateSequence& getFirstSequence();
 
  public:
@@ -30,14 +30,14 @@ class SequenceVector {
   std::vector<StateSequence>::const_iterator begin() const { return m_sequenceVector.begin();};
   std::vector<StateSequence>::const_iterator end() const { return m_sequenceVector.end();};
   
-  const bool addToSequence(const PinState& i_pinState)
-    {return getLastSequence().addToSequence(i_pinState);};
+  bool addToSequence(const PinState& i_pinState) {
+    return getLastSequence()->addToSequence(i_pinState);};
 
-  const bool addToSequence(const PinStateVector& i_pinStateVector)
-    {return getLastSequence().addToSequence(i_pinStateVector);};
+  bool addToSequence(const PinStateVector& i_pinStateVector) {
+    return getLastSequence()->addToSequence(i_pinStateVector);};
 
-  const bool addToSequence(const StateSequence& i_otherSequence)
-    {return getLastSequence().addToSequence(i_otherSequence);};
+  bool addToSequence(const StateSequence& i_otherSequence) {
+    return getLastSequence()->addToSequence(i_otherSequence);};
 
   void clean();
 };

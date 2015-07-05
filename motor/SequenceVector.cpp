@@ -149,10 +149,9 @@ void SequenceVector::appendStateSequence(
 }
 
 
-StateSequence& SequenceVector::getLastSequence() {
+StateSequence* SequenceVector::getLastSequence() {
   if (m_sequenceVector.size() == 0) {
     m_sequenceVector.push_back(StateSequence());
   }
-
-  return *(m_sequenceVector.end()-1);
+  return &(*(m_sequenceVector.end()-1));
 }
