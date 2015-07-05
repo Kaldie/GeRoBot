@@ -13,12 +13,12 @@ class StepperDriver: public BaseMotor {
   const int getPin(const int i_number) const
   {return getCurrentPinState().getPinVector()[i_number];}
 
-  const int enablePin() const {return getPin(0);}
-  const int directionPin() const {return getPin(1);}
-  const int stepPin() const {return getPin(2);}
+  int enablePin() const {return getPin(0);}
+  int directionPin() const {return getPin(1);}
+  int stepPin() const {return getPin(2);}
 
-  const bool setDirection(const std::string&);
-  const int getPinValueForDirection(const std::string&);
+  bool setDirection(const std::string&);
+  int getPinValueForDirection(const std::string&);
 
  public:
   // Constructors
@@ -44,7 +44,7 @@ class StepperDriver: public BaseMotor {
                          SequenceVector& i_vector);
 
   
-  virtual const int numberOfStatesPerStep() const {return 2;}
+  virtual  int numberOfStatesPerStep() const {return 2;}
 
   // Display pin state vector
   virtual void displayPinState(const PinState&) const;

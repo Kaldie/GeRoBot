@@ -39,7 +39,7 @@ bool StepperDriver::setEnable(const bool& i_setEnable) {
 }
 
 
-const int StepperDriver::getPinValueForDirection(
+int StepperDriver::getPinValueForDirection(
     const std::string &i_directionString) {
     /*
       Function will give the direction pin value given a directionEnum
@@ -54,7 +54,7 @@ const int StepperDriver::getPinValueForDirection(
 }
 
 
-const bool StepperDriver::setDirection(const std::string& i_directionString) {
+bool StepperDriver::setDirection(const std::string& i_directionString) {
   PinState pinState = getCurrentPinState();
   int newPinValue = getPinValueForDirection(i_directionString);
 
