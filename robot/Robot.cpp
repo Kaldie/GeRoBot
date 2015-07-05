@@ -30,5 +30,6 @@ void Robot::goToPosition(const Point2D &i_position) {
 }
 
 bool Robot::hasValidConnection() {
-  return m_jointController.getActuatorPointer()->hasConnection();
+  return m_jointController.getActuatorPointer()->
+      getArduinoConnection().hasConnection();
 }
