@@ -1,7 +1,8 @@
+// Copyright [2015] Ruud Cools
 #include <macroHeader.h>
-#include "RobotBuilder.h"
-#include "JointControllerBuilder.h"
-#include "Robot.h"
+#include "./RobotBuilder.h"
+#include "./JointControllerBuilder.h"
+#include "./Robot.h"
 
 RobotBuilder::RobotBuilder(const std::string& i_fileName)
     : XMLBuilder(i_fileName) {
@@ -32,7 +33,7 @@ void RobotBuilder::displayTree() {
   LOG_DEBUG("Finding root node!");
   pugi::xml_node node = getNode();
   LOG_DEBUG("Root node found!");
-  
+
   if (node.first_child())
     LOG_DEBUG("First child found: " << node.first_child().name());
   else

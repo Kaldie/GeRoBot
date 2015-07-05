@@ -17,7 +17,7 @@ void JointControllerBuilder::build()
 
 
 void JointControllerBuilder::addJoints(){
-  // Adding all the joints that 
+  // Adding all the joints that
   LOG_DEBUG("Adding Joints");
 
   JointPointer pointer;
@@ -27,7 +27,7 @@ void JointControllerBuilder::addJoints(){
     LOG_DEBUG(jointNode.name());
 
     // if the sibling is named Joint, we are in bissnuss
-    if(std::string(jointNode.name())=="JOINT") {
+    if(std::string(jointNode.name()) == "JOINT") {
       LOG_DEBUG("adding a joint!!");
       parseJoint(jointNode);
     }
@@ -35,53 +35,55 @@ void JointControllerBuilder::addJoints(){
 }
 
 
-void JointControllerBuilder::parseJoint(const pugi::xml_node& i_jointNode){
-  
+void JointControllerBuilder::parseJoint(const pugi::xml_node& i_jointNode) {
   JointBuilder jointBuilder(i_jointNode);
   jointBuilder.build();
   getJointController().addJoint(jointBuilder.getJointPointer());
 }
 
 
-ArduinoMotorDriver JointControllerBuilder::parseActuator(const pugi::xml_node& i_node) {
+ArduinoMotorDriver JointControllerBuilder::parseActuator(
+    const pugi::xml_node& i_node) {
   if (std::string(getNodeFromPath(i_node, "./TYPE").text().as_string())
       != "Arduino")
     LOG_ERROR("None other arduino actuators are defined yet!");
 
-  std::string serialExpression = getNodeFromPath(i_node,
-                                               "./REGULAR_EXPRESSION").text().as_string();
+  std::string serialExpression =
+      getNodeFromPath(i_node,
+                      "./REGULAR_EXPRESSION").text().as_string();
   LOG_DEBUG("Serial port regular expression is: " << serialExpression);
-  bool hasReducedSpeed = getNodeFromPath(i_node,"./REDUCED_SPEED").text().as_bool();
+  bool hasReducedSpeed =
+      getNodeFromPath(i_node, "./REDUCED_SPEED").text().as_bool();
   ArduinoMotorDriver arduinoMotorDriver(serialExpression);
-  arduinoMotorDriver.setReducedSpeed(hasReducedSpeed);
+  //  arduinoMotorDriver.setReducedSpeed(hasReducedSpeed);
   return arduinoMotorDriver;
 }
 
 
-bool JointControllerBuilder::update(const JointController& i_jointController){
+bool JointControllerBuilder::update(
+    const JointController& i_jointController) {
   bool hasSucceeded(true);
   setJointController(i_jointController);
-  hasSucceeded& = updateActuatorNode();
-  hasSucceeded& = updateJointNodes();
+  hasSucceeded &= updateActuatorNode();
+  hasSucceeded &= updateJointNodes();
   return hasSucceeded;
 }
 
 
-bool JointControllerBuilder::updateActuatorNode(){
+bool JointControllerBuilder::updateActuatorNode() {
   pugi::xml_node actuatorNode = getNodeFromPath("./ACTUATOR");
 
   getNodeFromPath(actuatorNode, "./REGULAR_EXPRESSION").text().
       set(getJointController().
           getActuator().getSerialRegularExpresion().c_str());
 
-  getNodeFromPath(actuatorNode, "./REDUCED_SPEED").text().
-      set(getJointController().getActuator().getReducedSpeed());
+  //  getNodeFromPath(actuatorNode, "./REDUCED_SPEED").text().
+  //   set(getJointController().getActuator().getReducedSpeed());
   return true;
 }
 
 
-bool JointControllerBuilder::updateJointNodes(){
-	
+bool JointControllerBuilder::updateJointNodes() {
   bool hasSucceeded(true);
   JointPointerVector rotationalJointVector =
       m_jointController.getJoints(Rotational);
@@ -89,14 +91,14 @@ bool JointControllerBuilder::updateJointNodes(){
   JointPointerVector translationalJointVector =
       m_jointController.getJoints(Translational);
   JointPointer jointPointer;
-	
+
   // remove all joints first
   for (pugi::xml_node jointNode = getNodeFromPath("./JOINT");
       jointNode;
       jointNode = jointNode.next_sibling()) {
     std::string movementType =
         getNodeFromPath(jointNode, "./MOVEMENT_TYPE").text().as_string();
-		
+
     if (movementType == "ROTATIONAL") {
       if (rotationalJointVector.size() < 1)
         LOG_ERROR("Number of rotational joint in the previous" <<
@@ -113,7 +115,7 @@ bool JointControllerBuilder::updateJointNodes(){
 
 
     JointBuilder jointBuilder(jointNode);
-    hasSucceeded& = jointBuilder.update(jointPointer);
+    hasSucceeded &= jointBuilder.update(jointPointer);
   }
   return hasSucceeded;
 }
