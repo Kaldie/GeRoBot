@@ -22,7 +22,6 @@ StateSequence::StateSequence(const int& i_speed,
 
 
 void StateSequence::validate() const {
-  std::cout<<"yay";
   return validate(m_pinStateVector);
 }
 
@@ -77,7 +76,7 @@ std::vector<int> StateSequence::getIntegerSequence(
 }
 
 
-const bool StateSequence::hasEqualSequence(
+bool StateSequence::hasEqualSequence(
     const StateSequence& i_sequence) const {
 
   if (this->getIntegerSequence() == i_sequence.getIntegerSequence())
@@ -97,13 +96,13 @@ bool StateSequence::isEmpty() const {
 }
 
 
-const bool StateSequence::hasMutualPins(
+bool StateSequence::hasMutualPins(
     const StateSequence& i_pinStateSequence) const {
   return hasMutualPins(i_pinStateSequence.getPinStateVector()[0]);
 }
 
 
-const bool StateSequence::hasMutualPins(const PinState& i_pinState) const {
+bool StateSequence::hasMutualPins(const PinState& i_pinState) const {
   // If the pin state vector is not yet set, then always no mutual pins!
   if (m_pinStateVector.size() == 0)
       return false;
@@ -123,7 +122,7 @@ const bool StateSequence::hasMutualPins(const PinState& i_pinState) const {
 }
 
 
-const bool StateSequence::appendSequence(const StateSequence i_sequence) {
+bool StateSequence::appendSequence(const StateSequence i_sequence) {
   // checking parameters!
   if (m_numberOfRepetitions != i_sequence.getNumberOfRepetitions()) {
     LOG_DEBUG("Number of repetitions is not equal!");
@@ -143,7 +142,7 @@ const bool StateSequence::appendSequence(const StateSequence i_sequence) {
 }
 
 
-const bool StateSequence::addToSequence(
+bool StateSequence::addToSequence(
     const PinState& i_pinState) {
 
   if (m_numberOfRepetitions > 1) {
@@ -162,17 +161,19 @@ const bool StateSequence::addToSequence(
     return false;
   }
 
-  if (m_pinStateVector.size() == 1)
+  if (m_pinStateVector.size() == 1) {
+    LOG_DEBUG("Updateing the first pin state!");
     m_pinStateVector[0].update(i_pinState);
-  else
+  } else {
+    LOG_DEBUG("Pushing back the first state!");
     m_pinStateVector.push_back(i_pinState);
-
+  }
   m_numberOfRepetitions = 1;
   return true;
 }
 
 
-const bool StateSequence::addToSequence(
+bool StateSequence::addToSequence(
     const PinStateVector& i_pinStateVector) {
 
   if (isEmpty()) {
@@ -203,7 +204,7 @@ const bool StateSequence::addToSequence(
 }
 
 
-const bool StateSequence::addToSequence(const StateSequence& i_sequence) {
+bool StateSequence::addToSequence(const StateSequence& i_sequence) {
   if (i_sequence.isEmpty()) {
     LOG_DEBUG("Nothing to add, sequence is empty");
     return false;
@@ -252,14 +253,14 @@ const bool StateSequence::addToSequence(const StateSequence& i_sequence) {
   return true;
 }
 
-const bool StateSequence::mergePinStateSequence(
+bool StateSequence::mergePinStateSequence(
     StateSequence* io_sequence) {
   return StateSequence::mergePinStateSequences(this,
                                                   io_sequence);
 }
 
 
-const bool StateSequence::mergePinStateSequences(
+bool StateSequence::mergePinStateSequences(
     StateSequence* io_firstSequence,
     StateSequence* io_secondSequence) {
   LOG_DEBUG("Merging sequences!");
@@ -305,7 +306,7 @@ const bool StateSequence::mergePinStateSequences(
 }
 
 
-const bool StateSequence::
+bool StateSequence::
   setStateForSequence(const PinState& i_pinState,
                       const bool& i_extend /*= false*/,
                       const bool& i_overrideSequence /*=false*/) {
@@ -380,7 +381,7 @@ void StateSequence::displaySequence() const {
 }
 
 
-const size_t StateSequence::getSizeOfMessage() const {
+size_t StateSequence::getSizeOfMessage() const {
   return (sizeof(m_numberOfRepetitions) +
           sizeof(m_speed) +
           m_pinStateVector.size() * sizeof(int));
@@ -406,7 +407,7 @@ std::vector<int> StateSequence::createArduinoBuffer() const {
 }
 
 
-const bool StateSequence::condenseSequence() {
+bool StateSequence::condenseSequence() {
   int numberOfSteps = m_pinStateVector.size();
   auto sequencePosition = m_pinStateVector.begin();
 
@@ -445,7 +446,7 @@ const bool StateSequence::condenseSequence() {
 }
 
 
-const bool StateSequence::areEqualState(const PinState& i_firstState,
+bool StateSequence::areEqualState(const PinState& i_firstState,
                                      const PinState& i_secondState) {
   return i_firstState.getNumericValue() == i_secondState.getNumericValue();
 }

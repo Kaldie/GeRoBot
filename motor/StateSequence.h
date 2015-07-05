@@ -3,6 +3,7 @@
 #ifndef MOTOR_PINSTATESEQUENCE_H_
 #define MOTOR_PINSTATESEQUENCE_H_
 
+#include <PinState.h>
 typedef std::vector<PinState> PinStateVector;
 
 class StateSequence {
@@ -12,20 +13,20 @@ class StateSequence {
   GET(PinStateVector, m_pinStateVector, PinStateVector);
 
  private:
-  const bool hasEqualSequence(const StateSequence& i_sequence) const;
+  bool hasEqualSequence(const StateSequence& i_sequence) const;
   void validate() const;
   void validate(const PinStateVector& i_pinStateVector) const;
 
-  const bool hasMutualPins(const PinState& i_pinState) const;
-  const bool hasMutualPins(const StateSequence& i_otherSequence) const;
+  bool hasMutualPins(const PinState& i_pinState) const;
+  bool hasMutualPins(const StateSequence& i_otherSequence) const;
 
   std::vector<int> getIntegerSequence(
       const PinStateVector& i_pinStateVector) const;
 
-  static const bool areEqualState(const PinState& i_firstState,
+  static bool areEqualState(const PinState& i_firstState,
                             const PinState& i_secondState);
 
-  const size_t getSizeOfMessage() const;
+  size_t getSizeOfMessage() const;
 
  public:
   StateSequence();
@@ -36,22 +37,22 @@ class StateSequence {
 
   bool isEmpty()const;
 
-  const bool appendSequence(const StateSequence i_sequence);
+  bool appendSequence(const StateSequence i_sequence);
 
-  const bool addToSequence(const PinState& i_pinState);
-  const bool addToSequence(const PinStateVector& i_pinStateVector);
-  const bool addToSequence(const StateSequence& i_otherSequence);
+  bool addToSequence(const PinState& i_pinState);
+  bool addToSequence(const PinStateVector& i_pinStateVector);
+  bool addToSequence(const StateSequence& i_otherSequence);
 
-  const bool setStateForSequence(const PinState& i_pinState,
+  bool setStateForSequence(const PinState& i_pinState,
                            const bool& i_extent = false,
                            const bool& overrideSequence = false);
 
   std::vector<int> getIntegerSequence() const;
-  static const bool mergePinStateSequences(StateSequence* io_firstSequence,
+  static bool mergePinStateSequences(StateSequence* io_firstSequence,
                                      StateSequence* io_secondSequence);
 
-  const bool mergePinStateSequence(StateSequence* io_sequence);
-  const bool condenseSequence();
+  bool mergePinStateSequence(StateSequence* io_sequence);
+  bool condenseSequence();
   void displaySequence() const;
 
   std::vector<int> createArduinoBuffer() const;
