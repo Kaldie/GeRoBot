@@ -79,11 +79,10 @@ class PinStateSequenceTestSuite : public CxxTest::TestSuite {
     LOG_INFO("PinStateSequenceTestSuite::testAddSequence");
     StateSequence stateSequence;
     PinState pinState1(PinVector{1,2,3});
-    TS_ASSERT(stateSequence.addToSequence(pinState1));
     PinState pinState2(PinVector{4,5,6});
+    TS_ASSERT(stateSequence.addToSequence(pinState1));
     TS_ASSERT(stateSequence.addToSequence(pinState2));
-    PinState pinState3(PinVector{1,2,3});
-    TS_ASSERT(!stateSequence.addToSequence(pinState3));
+    TS_ASSERT(!stateSequence.addToSequence(pinState1));
     TS_ASSERT_EQUALS(stateSequence.getNumberOfRepetitions(), 1);
     TS_ASSERT_EQUALS(stateSequence.getPinStateVector().size(), 1);
     TS_ASSERT_EQUALS(stateSequence.getIntegerSequence(),
