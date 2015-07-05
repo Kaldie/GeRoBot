@@ -51,11 +51,22 @@ class SequenceVectorUnitTest : public CxxTest::TestSuite {
   void testCount() {
     sequenceVector.addToSequence(pinState1);
     sequenceVector.addToSequence(pinState2);
+    TS_ASSERT_EQUALS(sequenceVector.numberOfSteps(),
+                     1);
     pinState1.update(pinState2);
-    for (auto pin = pinState1.getPinVector().begin();
-         pin != pinState1.getPinVector().end();
-         pin++) {
-      pinState1.update(*pin, !pinState1.getPinState(*pin));
+    for (int i = 1;
+         i < 5;
+         i++) {
+      for (auto pin = pinState1.getPinVector().begin();
+           pin != pinState1.getPinVector().end();
+           pin++) {
+        pinState1.update(*pin,
+                         !pinState1.getPinState(*pin));
+      }
+      sequenceVector.addToSequence(pinState1,
+                                   true);
+      TS_ASSERT_EQUALS(sequenceVector.numberOfSteps(),
+                       1+i);
     }
     //    sequenceVector.begin()->setNumberOfRepetitions(10);
     
