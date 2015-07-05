@@ -1,3 +1,4 @@
+// Copyright [2015] Ruud Cools
 #include <macroHeader.h>
 #include <Point2D.h>
 #include <BaseTraceCalculator.h>
@@ -49,7 +50,7 @@ BaseTraceCalculator::BaseTraceCalculator(const BaseTraceCalculator& obj) {
 }
 
 
-bool BaseTraceCalculator::hasJointController() {
+bool BaseTraceCalculator::hasJointController() const {
   if (m_jointController == nullptr)
     return false;
   else
@@ -78,8 +79,10 @@ void BaseTraceCalculator::setTolerances() {
 std::vector<int> BaseTraceCalculator::getNumberOfSteps(
     const Trace* i_trace,
     const Point2D& i_position) const {
+  if (!hasJointController())
+    LOG_ERROR("Does not have a joint controller!");
+  
   Point2D endPoint = i_trace->getEndPoint();
-
   LOG_INFO("Translational movement per step: "<<
            static_cast<float>(
                m_jointController->getJoint(Translational)->
@@ -148,7 +151,7 @@ bool BaseTraceCalculator::shouldRotate(const Trace& i_trace,
   float endPointAngle = i_trace.getEndPoint().getAlpha()*180/PI;
   float difference = std::abs(pointAngle-endPointAngle);
   bool shouldRotate;
-  
+
   if (difference>m_rotationTolerance)
     shouldRotate = true;
   else if (difference>
@@ -167,12 +170,14 @@ bool BaseTraceCalculator::shouldRotate(const Trace& i_trace,
     LOG_INFO("diff: " << difference);
   }
 #endif
-
   return shouldRotate;
 }
 
 void BaseTraceCalculator::calculateTrace(const Trace* i_trace,
                                          Point2D& i_startPoint) {
+  if (!hasJointController()) {
+    LOG_ERROR("Does not have a joint controller!");
+  }
   LOG_INFO("Current robot position: " <<
            i_startPoint.x << ", " << i_startPoint.y);
 
@@ -190,15 +195,16 @@ void BaseTraceCalculator::calculateTrace(const Trace* i_trace,
            "Number of translation steps: " << numberOfSteps[1]);
 
   if (numberOfSteps[0] > 0) {
-    getJointController()->getJoint(Rotational)->
-        predictSteps(i_startPoint,
-                     rotationDirection,
-                     numberOfSteps[0]);
+    getJointController()->getJoint(Rotational)->predictSteps(
+        i_startPoint,
+        rotationDirection,
+        numberOfSteps[0]);
 
-    getJointController()->moveSteps(getJointController()->getJoint(Rotational),
-                                    rotationDirection,
-                                    numberOfSteps[0],
-                                    true);
+    getJointController()->moveSteps(
+        getJointController()->getJoint(Rotational),
+        rotationDirection,
+        numberOfSteps[0],
+        true);
   }
 
   if (numberOfSteps[1] > 0) {
@@ -213,4 +219,4 @@ void BaseTraceCalculator::calculateTrace(const Trace* i_trace,
         numberOfSteps[1],
         true);
   }
-}
+  }

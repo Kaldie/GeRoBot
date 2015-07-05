@@ -14,9 +14,14 @@ class BaseTraceCalculator {
   GETSET(bool, m_writeLog, WriteLog);
   GETSET(std::string, m_logFileName, LogFileName);
 
+ private:
+  // assign operator
+  //  BaseTraceCalculator& operator=(const BaseTraceCalculator& obj);
+  // copy constructor
+  BaseTraceCalculator(const BaseTraceCalculator& obj);
  protected:
   // See if the joint controller pointer has been set
-  bool hasJointController();
+  bool hasJointController() const;
   bool shouldRotate(const Trace&,
                     const Point2D&) const;
   bool shouldTranslate(const Trace&,
@@ -59,8 +64,6 @@ class BaseTraceCalculator {
   BaseTraceCalculator(JointController*,
                       const float& i_tolerance);
   virtual ~BaseTraceCalculator() {};
-  //assign operator
-  BaseTraceCalculator(const BaseTraceCalculator& obj);
 };
 
 #endif  // MATH_BASETRACECALCULATOR_H_
