@@ -16,32 +16,35 @@ BaseActuatorItem::BaseActuatorItem(BaseRobotItem* i_parent,
 
 QVariant BaseActuatorItem::getPropertyData(int i_row,
                                            int i_column) const {
-  if (i_column>1)
+  if (i_column>1) {
     return false;
-
-  else if (i_row ==
-           BaseActuatorItem::propertyList.indexOf("SerialRegularExpression"))
+  } else if (
+      i_row ==
+      BaseActuatorItem::propertyList.indexOf("SerialRegularExpression")) {
     if (i_column == 0)
       return QVariant(QString("Serial regular expression"));
     else
       return QVariant(QString(
           m_arduinoMotorDriver->getSerialRegularExpresion().c_str()));
-
-  else if (i_row == BaseActuatorItem::propertyList.indexOf("ReducedSpeed"))
-    if (i_column == 0)
+  } else if (i_row == BaseActuatorItem::propertyList.indexOf("ReducedSpeed")) {
+    if (i_column == 0) {
       return QVariant(QString("Reduced speed"));
-    else
-      return QVariant(m_arduinoMotorDriver->getReducedSpeed());
-
-  else if (i_row == BaseActuatorItem::propertyList.indexOf("BufferSize"))
-    if (i_column == 0)
+    } else {
+      // reduced speed is no longer in effect!
+      //      return QVariant(m_arduinoMotorDriver->getReducedSpeed());
+      return false;
+    }
+  } else if (i_row == BaseActuatorItem::propertyList.indexOf("BufferSize")) {
+    if (i_column == 0) {
       return QVariant(QString("Buffer size"));
-    else
-      return QVariant(m_arduinoMotorDriver->getBuffer().size());
-	
-  else
+    } else {
+      // No longer in use!
+      return 0;
+      // return QVariant(m_arduinoMotorDriver->getBuffer().size());
+    }
+  } else {
     return QVariant();
-	
+  }
 }
 
 bool BaseActuatorItem::setPropertyData(int i_row,
@@ -61,7 +64,7 @@ bool BaseActuatorItem::setPropertyData(int i_row,
     return true;
   }  else if (i_row == BaseActuatorItem::propertyList.indexOf("ReducedSpeed")) {
     LOG_DEBUG(i_value.toString().toStdString());
-    m_arduinoMotorDriver->setReducedSpeed(i_value.toBool());
+    //    m_arduinoMotorDriver->setReducedSpeed(i_value.toBool());
     return true;
   }  else if (i_row == BaseActuatorItem::propertyList.indexOf("BufferSize")) {
     return false;

@@ -98,7 +98,13 @@ bool StateSequence::isEmpty() const {
 
 bool StateSequence::hasMutualPins(
     const StateSequence& i_pinStateSequence) const {
-  return hasMutualPins(i_pinStateSequence.getPinStateVector()[0]);
+  bool hasMutualPin = false;
+  for (auto itr = i_pinStateSequence.getPinStateVector().begin();
+       itr!= i_pinStateSequence.getPinStateVector().end();
+       itr++) {
+    hasMutualPin |= hasMutualPins(*itr);
+  }
+  return hasMutualPin;
 }
 
 
@@ -143,30 +149,36 @@ bool StateSequence::appendSequence(const StateSequence i_sequence) {
 
 
 bool StateSequence::addToSequence(
-    const PinState& i_pinState) {
-
+    const PinState& i_pinState,
+    const bool& i_forceAdd /*=false*/) {
+  /* gentleAdd is used to make sure you don't make a mistake
+     It will make sure if mutual pins are in it does not add
+     However, it might be benificial to still add it.
+   */
   if (m_numberOfRepetitions > 1) {
     LOG_DEBUG("Number of repetitions is more then 1 thus this will not fly");
     return false;
   }
 
-  if (m_pinStateVector.size() >1) {
-    LOG_DEBUG("Number of states in the vector is more then 1. Will not fly!");
-    return false;
-  }
-
-  if (hasMutualPins(i_pinState)) {
+  bool hasMutualPin = hasMutualPins(i_pinState);
+  LOG_DEBUG("Has mutual pins: " << hasMutualPin);
+  if (hasMutualPin || i_forceAdd) {
     LOG_DEBUG("The added pin states has mutual " <<
               "pins to the allready defined ones!");
     return false;
   }
 
-  if (m_pinStateVector.size() == 1) {
-    LOG_DEBUG("Updateing the first pin state!");
-    m_pinStateVector[0].update(i_pinState);
-  } else {
+  if (m_pinStateVector.size() == 0) {
     LOG_DEBUG("Pushing back the first state!");
     m_pinStateVector.push_back(i_pinState);
+  } else {
+    if (hasMutualPin) {
+      LOG_DEBUG("Adding another pin state!");
+      m_pinStateVector.push_back(i_pinState);
+    } else {
+      LOG_DEBUG("Updateing the first pin state!");
+      m_pinStateVector[0].update(i_pinState);
+    }
   }
   m_numberOfRepetitions = 1;
   return true;

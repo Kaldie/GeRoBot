@@ -39,7 +39,8 @@ class StateSequence {
 
   bool appendSequence(const StateSequence i_sequence);
 
-  bool addToSequence(const PinState& i_pinState);
+  bool addToSequence(const PinState& i_pinState,
+                     const bool& i_gentleAdd = false);
   bool addToSequence(const PinStateVector& i_pinStateVector);
   bool addToSequence(const StateSequence& i_otherSequence);
 
