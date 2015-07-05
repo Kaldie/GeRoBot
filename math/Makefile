@@ -4,20 +4,19 @@
 # 'make clean'  removes all .o and executable files
 #
 
-#Folder dependend configuration
+
 TOROOT= ..
 
 # define the C source files
-SRCS= Vector2D.cpp Point2D.cpp Line2D.cpp Circle2D.cpp Arc2D.cpp
-SRCS:=$(SRCS) Trace.cpp RotationTrace.cpp
-SRCS:=$(SRCS) BaseTraceCalculator.cpp LineTraceCalculator.cpp RotationTraceCalculator.cpp 
 DSRCS= debug.cpp
+SRCS := $(filter-out $(DSRCS), $(wildcard *.cpp))
 
+
+#LIBS=-lMathInterface -lArduinoInterface
+LIBS = -lMotorInterface
 # define the executable file 
 MAIN = MathInterface
-DEBUG= debug
-
-LIBS=-lMotorInterface
-
+DEBUG = debug
 
 include ../Makefile.config
+
