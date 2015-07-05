@@ -8,11 +8,12 @@
 
 # Main math makefile
 TOROOT=.
-SHAREDFOLDERS = ./math ./arduino ./motor ./robot ./pugixml/src
+PUGISRC = ./pugixml/src
+SHAREDFOLDERS = ./math ./arduino ./motor ./robot $(PUGISRC)
 UPLOADEDFOLDERS = ./arduinosketch
+include Makefile.config
 
 .PHONY: CLEAN ALL INSTALL CREATENECESSARYFOLDERS LINKHEADERS clean MACROHEADER
-
 
 ALL: INSTALL MACROHEADER SHAREDTARGET UPLOADEDTARGET
 
@@ -24,7 +25,7 @@ CREATENECESSARYFOLDERS:
 	$(MKDIR_P) $(OBJECTFOLDER)
 	$(MKDIR_P) $(LIBFOLDER)
 
-MACROHEADER:macroHeader.h.gch
+MACROHEADER: $(TOROOT)/$(INCLUDEFOLDER)/macroHeader.h.gch
 	@echo "yay"
 
 LINKHEADERS:
@@ -38,6 +39,9 @@ SHAREDTARGET:
 UNITTEST:
 	$(foreach FOLDER,$(SHAREDFOLDERS), cd $(FOLDER); cd unit_test; make unitTest; cd ../..;)
 
+PUGI:
+	SRCS := $(filter-out $(DSRCS), $(wildcard $(PUGISRC)/*.cpp))
+	shared
 
 UPLOADEDTARGET:
 	$(foreach FOLDER,$(UPLOADEDFOLDERS), cd $(FOLDER); make -i upload; cd ..; )
@@ -46,7 +50,6 @@ CLEAN:
 	$(foreach FOLDER,$(UPLOADEDFOLDERS), cd $(FOLDER); make clean; cd ..;)
 	$(foreach FOLDER,$(SHAREDFOLDERS), cd $(FOLDER); make clean; cd ..;)
 	$(RM) macroHeader.h.gch
-include Makefile.config
 
 clean:
 	@echo "Dumb fuck...no clean in the root or it will be like realy clean!"
