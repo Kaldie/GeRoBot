@@ -33,8 +33,7 @@ void PinState::setPins(const PinVector& i_pins) {
     m_pinVector.push_back(*itr);
     LOG_INFO("Setting: " << (*itr) << " to: " << DEFAULT_STATE);
     if (DEFAULT_STATE)
-      m_numericValue += getNumericPinValue(*itr);
-    
+      m_numericValue += getNumericPinValue(*itr);    
   }
 }
 
@@ -75,12 +74,12 @@ void PinState::update(const PinState& i_pinState) {
 }
 
 
-const int PinState::getNumericPinValue(const int& i_pinNumber) const {
+int PinState::getNumericPinValue(const int& i_pinNumber) const {
   return 1 << i_pinNumber;
 }
 
 
-const int PinState::getPinState(const int& i_pinNumber) const {
+int PinState::getPinState(const int& i_pinNumber) const {
   PinVector::const_iterator itr = std::find(m_pinVector.begin(),
                                             m_pinVector.end(),
                                             i_pinNumber);
@@ -98,4 +97,20 @@ void PinState::displayPinState() const {
        itr++) {
     LOG_DEBUG("Pin: " << (*itr) << " is in state: " << getPinState(*itr));
   }
+}
+
+
+bool PinState::operator==(const PinState& rhs) const {
+  if(rhs.getNumericValue() != getNumericValue())
+    return false;
+  std::vector<int> lhsPinVector = getPinVector();
+  std::vector<int> rhsPinVector = rhs.getPinVector();
+  std::sort(lhsPinVector.begin(),
+            lhsPinVector.end());
+  std::sort(rhsPinVector.begin(),
+            rhsPinVector.end());
+  if (lhsPinVector!= rhsPinVector)
+    return false;
+
+  return true;
 }
