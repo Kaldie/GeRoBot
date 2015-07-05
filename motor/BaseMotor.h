@@ -32,7 +32,7 @@ class BaseMotor {
                          const int& i_numberOfSteps,
                          SequenceVector& i_vector) =0;
 
-  virtual const int numberOfStatesPerStep() const =0;
+  virtual int numberOfStatesPerStep() const =0;
 
   // Print pin states
   virtual void displayPinState() const;
