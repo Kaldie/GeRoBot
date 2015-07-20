@@ -3,7 +3,7 @@
 #include <StateSequence.h>
 #include <PinState.h>
 #include <SequenceVector.h>
-
+#include <Condensor.h>
 
 int SequenceVector::numberOfSteps() const {
   LOG_DEBUG("Counting number of steps!");
@@ -26,18 +26,24 @@ int SequenceVector::numberOfSequences() const {
 
 void SequenceVector::normalise(const bool i_condenseVector /* = false*/) {
   LOG_DEBUG("Normalising vector!");
-  if (numberOfSequences() < 2) {
-    LOG_DEBUG("Could not normalize vector, not enough sequences.");
+  if (numberOfSequences() == 0) {
+    LOG_DEBUG("Could not normalize vector, No sequences defined.");
     return;
   }
 
-  for (auto currentSequence = m_sequenceVector.begin() + 1;
-       currentSequence !=  m_sequenceVector.end();
+  PinState thisPinState = m_sequenceVector.begin()->getPinStateVector().front();
+  for (auto currentSequence  = m_sequenceVector.begin();
+       currentSequence != m_sequenceVector.end();
        currentSequence++) {
-    currentSequence->setStateForSequence(
-        (currentSequence-1)->getPinStateVector().back(),
-        true,    // extent
-        false);  // override
+    currentSequence->setStateForSequence(thisPinState,
+                                         true,    // extent
+                                         false);  // override
+    thisPinState = currentSequence->getPinStateVector().back();
+    if (currentSequence != m_sequenceVector.end()) {
+      thisPinState = *currentSequence->getPinStateVector().begin();
+    } else {
+      break;
+    }
   }
 
   if (i_condenseVector)
@@ -78,25 +84,67 @@ bool SequenceVector::isNormilized() const {
 
 bool SequenceVector::condenseVector(
     const bool i_removeFromVector /* = false*/) {
-  bool hasCondensed = false;
-  LOG_DEBUG("Condensing vector!");
-  // merge all sequential sequence with 1 repetition.
-  for (auto sequence = m_sequenceVector.end(),
-           begin = m_sequenceVector.begin();
-       sequence != begin;
-       sequence--) {
-    if (sequence->getNumberOfRepetitions() == 1) {
-      if ((sequence-1)->addToSequence(*sequence)) {
-        if (i_removeFromVector) {
-          sequence = m_sequenceVector.erase(sequence);
-        } else {
-          sequence->setNumberOfRepetitions(0);
-        }
-        hasCondensed = true;
-      }
-    }
+  bool internalyCondesed = Condensor::internalCondense(&m_sequenceVector);
+  bool mergedCondensed = Condensor::mergeCondense(&m_sequenceVector,
+                                                  i_removeFromVector);
+  bool recompileCondensed = Condensor::recompileSequenceVector(&m_sequenceVector);
+
+  // let it be known that at least it is a bit shorter!
+  return internalyCondesed | mergedCondensed | recompileCondensed;
+}
+
+
+bool SequenceVector::internalCondense() {
+  bool internalyCondesed = false;
+  for (auto sequenceIterator = m_sequenceVector.begin();
+       sequenceIterator != m_sequenceVector.end();
+       sequenceIterator++) {
+    internalyCondesed |= sequenceIterator->condenseSequence();
   }
-  return hasCondensed;
+  return internalyCondesed;
+}
+
+
+bool SequenceVector::mergeCondense(const bool& i_removeFromVector) {
+  bool mergedCondensed = false;
+  LOG_DEBUG("Condensing vector by merging state sequences!");
+  // merge all sequential sequence with 1 repetition.
+  auto sequence = m_sequenceVector.begin();
+  auto nextSequence = sequence+1;
+
+  while ((nextSequence != m_sequenceVector.end() &&
+          sequence != m_sequenceVector.end())) {
+    LOG_DEBUG("attempting merge condense!");
+    // add the previous sequence to the next
+    if (nextSequence->addToSequence(*sequence)) {
+      // it has worked at least once
+      mergedCondensed |= true;
+      // if it worked determine how to handle the old one
+      if (i_removeFromVector) {
+        // remove it from the vector, slow but lowers memory
+        // the returned sequence is next sequence
+        sequence = m_sequenceVector.erase(sequence);
+      } else {
+        // make it emtpy, slightly faster
+        // bit tho
+        // due to the fact that we need to clear the pinStateSequenceVector
+        sequence->setNumberOfRepetitions(0);
+        sequence->setPinStateVector(PinStateVector());
+        // update sequence
+        ++sequence;
+      }
+    } else {
+      ++sequence;
+    }
+    // get the next sequence of the vector
+    nextSequence = sequence+1;
+  }
+  return mergedCondensed;
+}
+
+
+bool SequenceVector::recompileCondense() {
+  return true;
 }
 
 
@@ -130,13 +178,17 @@ void SequenceVector::appendStateSequence(
     return;
 
   if (m_sequenceVector.size() == 0) {
+    LOG_DEBUG("First pin sequence");
     m_sequenceVector.push_back(i_newStateSequence);
     return;
   }
 
-  if (m_sequenceVector.back().addToSequence(i_newStateSequence))
+  if (m_sequenceVector.back().addToSequence(i_newStateSequence)) {
+    LOG_DEBUG("Adding the new state sequence to the previous one!");
     return;
+  }
 
+  LOG_DEBUG("Added new state sequence to vector");
   if (i_merge) {
     StateSequence stateSequence = i_newStateSequence;
     StateSequence::
