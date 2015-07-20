@@ -228,7 +228,10 @@ class PinStateSequenceTestSuite : public CxxTest::TestSuite {
 
     TS_ASSERT_EQUALS(pinVector1.size(), pinVector2.size())
     PinVector::iterator pin2 = pinVector2.begin();
-    for (auto pin1 = pinVector1.begin();
+    PinVector::iterator pin1 = pinVector1.begin();
+    TS_ASSERT_EQUALS(pinVector1.size(),
+                     pinVector2.size());
+    for (;
          pin1 != pinVector1.end();
          pin1++, pin2++) {
       noneDefaultPinState1.update(*pin1, !DEFAULT_STATE);
@@ -326,7 +329,7 @@ class PinStateSequenceTestSuite : public CxxTest::TestSuite {
     sequence.addToSequence(stateVector);
     TS_ASSERT_EQUALS(sequence.getIntegerSequence(),
                      std::vector<int>({80, 10, 80}));
-    
+
     sequence.setStateForSequence(pinState1, true);
     TS_ASSERT_EQUALS(sequence.getIntegerSequence(),
                      std::vector<int>({84, 10, 90}));
@@ -335,7 +338,7 @@ class PinStateSequenceTestSuite : public CxxTest::TestSuite {
                      std::vector<int>({84, 90, 90}));
   }
 
-  
+
   void testPinStateSequenceMessage() {
     StateSequence stateSequence;
     stateSequence.setSpeed(3);
@@ -360,7 +363,8 @@ class PinStateSequenceTestSuite : public CxxTest::TestSuite {
     for (int i = 0;
          i <= 7;
          i++) {
-      pinState.update(1, i%2);
+      pinState.update(1, i % 2);
+      pinState.update(2, (i+1) % 2);
       vector.push_back(pinState);
     }
     sequence.addToSequence(vector);

@@ -7,7 +7,7 @@
 #include <SequenceVector.h>
 #include <StateSequence.h>
 #include <PinState.h>
-
+#include <Condensor.h>
 
 class SequenceVectorUnitTest : public CxxTest::TestSuite {
  public:
@@ -15,14 +15,15 @@ class SequenceVectorUnitTest : public CxxTest::TestSuite {
   StateSequence stateSequence;
   PinState pinState1;
   PinState pinState2;
-  
+
   void setUp() {
-    SequenceVector sequenceVector;
-    StateSequence stateSequence;
-    pinState1 = PinState(std::vector<int>({4,5,6}));
-    pinState2 = PinState(std::vector<int>({1,2,3}));
+    sequenceVector = SequenceVector();
+    stateSequence = StateSequence();
+    pinState1 = PinState(std::vector<int>({4, 5, 6}));
+    pinState2 = PinState(std::vector<int>({1, 2, 3}));
   }
-    
+
+
   void testCreation() {
     // Default creations no settings have to be set!
     TS_ASSERT_EQUALS(sequenceVector.numberOfSequences(), 0);
@@ -68,24 +69,213 @@ class SequenceVectorUnitTest : public CxxTest::TestSuite {
       TS_ASSERT_EQUALS(sequenceVector.numberOfSteps(),
                        1+i);
     }
-    //    sequenceVector.begin()->setNumberOfRepetitions(10);
-    
+    StateSequence stateSequence2 = *sequenceVector.begin();
+    LOG_DEBUG("adding to sequence");
+    if (!stateSequence2.addToSequence(PinState({10, 6, 7}), true))
+      LOG_ERROR("failed to add!");
+    stateSequence2.setNumberOfRepetitions(10);
+    sequenceVector.appendStateSequence(stateSequence2, false);
+    TS_ASSERT_EQUALS(sequenceVector.numberOfSteps(),
+                     5+6*10);
   }
 
   void testIsNormalised() {
+    sequenceVector.addToSequence(PinState({1, 2, 3, 4, 5, 6}), true);
+    sequenceVector.addToSequence(PinState({/*1,*/ 2, 3, 4, 5, 6}), true);
+    TS_ASSERT(!sequenceVector.isNormilized());
+
+    sequenceVector = SequenceVector();
+    PinState pinState = PinState({1, 2, 3, 4, 5, 6});
+    sequenceVector.addToSequence(pinState);
+    for (auto pin = pinState.getPinVector().begin();
+         pin != pinState.getPinVector().end();
+         pin++) {
+      pinState.update(*pin, !pinState.getPinState(*pin));
+    }
+    sequenceVector.addToSequence(pinState, true);
+    TS_ASSERT(sequenceVector.isNormilized());
   }
 
   void testNormalise() {
+    sequenceVector.addToSequence(PinState({1, 2, 3, 4, 5, 6}), true);
+    sequenceVector.addToSequence(PinState({/*1,*/ 2, 3, 4, 5, 6}), true);
+    TS_ASSERT(!sequenceVector.isNormilized());
+    sequenceVector.normalise();
+    TS_ASSERT(sequenceVector.isNormilized());
+    TS_ASSERT_EQUALS((*sequenceVector.begin()).getIntegerSequence(),
+                     std::vector<int>({126, 126}));    
   }
 
-  void testCondense() {
+
+  void testInternalCondense() {
+    sequenceVector.addToSequence(PinState({1, 2, 3, 4, 5, 6}), true);
+    sequenceVector.addToSequence(PinState({1, 2, 3, 4, 5, 6}), true);
+    TS_ASSERT_EQUALS(1, sequenceVector.begin()->getNumberOfRepetitions());
+    TS_ASSERT_EQUALS(2, sequenceVector.begin()->getIntegerSequence().size());
+    // test if  condensing is possible if there is only 1 sequence
+    // internally condensing
+    LOG_DEBUG("Test internal condensing");
+    TS_ASSERT(sequenceVector.condenseVector());
+    TS_ASSERT_EQUALS(2, sequenceVector.begin()->getNumberOfRepetitions());
+    TS_ASSERT_EQUALS(1, sequenceVector.begin()->getIntegerSequence().size());
+  }
+
+
+  void testMergeCondenseCondense() {
+    StateSequence newStateSequence1(
+        3000, 1,
+        PinStateVector({PinState({1, 2, 3, 4, 5, 6})}));
+
+    auto pin1 = pinState1.getPinVector().begin();
+    auto pin2 = pinState2.getPinVector().begin();
+    for (;
+         pin1 != pinState1.getPinVector().end() &&
+         pin2 != pinState2.getPinVector().end();
+         pin1++, pin2++) {
+      pinState1.update(*pin1, !pinState1.getPinState(*pin1));
+      pinState2.update(*pin2, !pinState2.getPinState(*pin2));
+    }
+
+    newStateSequence1.addToSequence(pinState2, true);
+    newStateSequence1.addToSequence(pinState1, true);
+
+    sequenceVector = SequenceVector();
+    newStateSequence1.setNumberOfRepetitions(23);
+    PinStateSequenceVector  pinStatevector(
+        {newStateSequence1, newStateSequence1,
+         newStateSequence1, newStateSequence1,
+         newStateSequence1, newStateSequence1,
+         newStateSequence1, newStateSequence1,
+         newStateSequence1});
+    sequenceVector.setSequenceVector(pinStatevector);
+    int oldNumberOfSteps = sequenceVector.numberOfSteps();
+    int oldNumberOfSequences = sequenceVector.numberOfSequences();
+    TS_ASSERT(sequenceVector.condenseVector());
+    TS_ASSERT_EQUALS(sequenceVector.numberOfSteps(), oldNumberOfSteps);
+    TS_ASSERT_EQUALS(sequenceVector.numberOfSequences(), oldNumberOfSequences);
+
+    sequenceVector.setSequenceVector(pinStatevector);
+    TS_ASSERT(sequenceVector.condenseVector(true));
+    TS_ASSERT_EQUALS(sequenceVector.numberOfSteps(), oldNumberOfSteps);
+    TS_ASSERT_EQUALS(sequenceVector.numberOfSequences(), 1);
+
+    for (auto stateSequenceItr = sequenceVector.begin();
+         stateSequenceItr != sequenceVector.end();
+         stateSequenceItr++) {
+      stateSequenceItr->displaySequence();
+    }
+  }
+
+
+  void testRecompileCondense_backwardCorrispondense() {
+    LOG_INFO("testRecompileCondense_backwardCorrispondense");
+    // Simulating 10 cw step
+    PinStateVector pinStatevector;
+    pinState2.update(1, 0);
+    pinState2.update(2, 0);
+    pinState2.update(3, 0);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(3, 1);
+    pinStatevector.push_back(pinState2);
+    stateSequence.setPinStateVector(pinStatevector);
+    stateSequence.setNumberOfRepetitions(10);
+    
+    // simulating a cw step
+    StateSequence stateSequence1;
+    pinStatevector = PinStateVector();
+    pinState2.update(3, 0);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(3, 1);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(3, 0);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(3, 1);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(1, 1);
+    pinState2.update(2, 1);
+    pinState2.update(3, 1);
+    pinStatevector.push_back(pinState2);
+    stateSequence1.setPinStateVector(pinStatevector);
+    stateSequence1.setNumberOfRepetitions(1);
+
+    // Simulating 10 cw steps
+    pinStatevector = PinStateVector();
+    pinState2.update(3, 0);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(3, 1);
+    pinStatevector.push_back(pinState2);
+
+    StateSequence stateSequence2;
+    stateSequence2.setPinStateVector(pinStatevector);
+    stateSequence2.setNumberOfRepetitions(10);
+
+    sequenceVector.setSequenceVector(
+        PinStateSequenceVector({stateSequence,stateSequence1, stateSequence2}));
+    LOG_DEBUG("Displaying sequences that need to be recompile condensed");
+    stateSequence.displaySequence();
+    stateSequence1.displaySequence();
+    stateSequence2.displaySequence();
+    TS_ASSERT(sequenceVector.condenseVector());
+    PinStateSequenceVector x = sequenceVector.getSequenceVector();
+    //    for (auto i : x) {
+    //      i.displaySequence();
+    //    }
+  }
+
+
+  void testRecompileCondense_forwardCorrispondense() {
+    LOG_INFO("testRecompileCondense_forwardCorrispondense");
+    // Simulating a ccw step
+    PinStateVector pinStatevector;
+    pinStatevector.push_back(pinState2);
+    pinState2.update(1, 0);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(3, 0);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(3, 1);
+    pinStatevector.push_back(pinState2);
+    stateSequence.setPinStateVector(pinStatevector);
+    stateSequence.setNumberOfRepetitions(1);
+    
+    // simulating a cw step
+    StateSequence stateSequence1;
+    pinStatevector = PinStateVector();
+    pinState2.update(2, 0);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(3, 0);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(3, 1);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(3, 0);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(3, 1);
+    pinStatevector.push_back(pinState2);
+    stateSequence1.setPinStateVector(pinStatevector);
+    stateSequence1.setNumberOfRepetitions(1);
+
+    // Simulating 10 cw steps
+    pinStatevector = PinStateVector();
+    pinState2.update(3, 0);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(3, 1);
+    pinStatevector.push_back(pinState2);
+
+    StateSequence stateSequence2;
+    stateSequence2.setPinStateVector(pinStatevector);
+    stateSequence2.setNumberOfRepetitions(10);
+
+    sequenceVector.setSequenceVector(
+        PinStateSequenceVector({stateSequence,stateSequence1, stateSequence2}));
+    LOG_DEBUG("Displaying sequences that need to be recompile condensed");
+    stateSequence.displaySequence();
+    stateSequence1.displaySequence();
+    stateSequence2.displaySequence();
+    TS_ASSERT(sequenceVector.condenseVector());
   }
 
 
   void testReduce() {
   }
-
-  
 };
 
 #endif  // MOTOR_UNIT_TEST_SEQUENCEVECTORUNITTEST_H_

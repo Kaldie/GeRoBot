@@ -4,12 +4,11 @@
 
 #include "./ArduinoSerialConnection.h"
 
-
 class ArduinoMotorDriver {
     GETSET(ArduinoSerialConnection, m_arduinoConnection, ArduinoConnection);
     GETSET(std::string, m_serialRegularExpresion, SerialRegularExpresion);
 
-    enum DriverStatus {UPLOAD=0,
+    enum DriverStatus {UPLOAD = 0,
                        ACTUATE,
                        SERIAL_ECHO_VERBOSE,
                        SERIAL_ECHO,
@@ -29,7 +28,8 @@ class ArduinoMotorDriver {
     bool handShake(DriverStatus i_status);
     void createRandomMessages(const int& i_numberOfMessages,
                               std::vector< std::vector<int> > *i_totalVector);
- public:
+
+public:
     void upload(const std::vector<int> i_messageVector);
     void actuate();
     bool resetConnection();
