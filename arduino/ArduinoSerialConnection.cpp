@@ -78,7 +78,7 @@ void ArduinoSerialConnection::closeConnection() {
   }
 }
 
-bool ArduinoSerialConnection::hasConnection() {
+bool ArduinoSerialConnection::hasConnection()const {
   if (m_fileHandle != -1)
     return true;
   else
@@ -165,8 +165,7 @@ void ArduinoSerialConnection::serialWrite(const unsigned char* i_pointer,
   if (m_fileHandle == -1)
     openConnection();
   if (i_numberOfWrites == sizeof(int)) {
-    int x = *(int*)(i_pointer);
-    LOG_DEBUG("Writing: "<< x << " as integer");
+    LOG_DEBUG("Writing: "<< *(int*)(i_pointer); << " as integer");
   } else if (i_numberOfWrites == sizeof(char))
     LOG_DEBUG("Writing: "<< *i_pointer);
 
@@ -237,9 +236,8 @@ std::string ArduinoSerialConnection::serialReadString() {
 }
 
 
-const int ArduinoSerialConnection::
-rawSerialRead(const int& i_numberOfBytes,
-              unsigned char* buffer) {
+int ArduinoSerialConnection::rawSerialRead(const int& i_numberOfBytes,
+                                           unsigned char* buffer) {
   int numberOfFails = 0;
   int bytes_read = 0;
   int currentRead = 0;

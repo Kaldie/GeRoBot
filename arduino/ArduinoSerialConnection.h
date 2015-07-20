@@ -16,13 +16,13 @@ class ArduinoSerialConnection {
   void openConnection();
   void closeConnection();
   std::string resolvePortName() const;
-  const int rawSerialRead(const int& i_numberOfBytesReading,
+  int rawSerialRead(const int& i_numberOfBytesReading,
                          unsigned char*);
     
  public:
   void setBaudRate(const int&);
   void resetConnection();
-  bool hasConnection();
+  bool hasConnection() const;
 
   int serialRead(const int& i_numberOfBytes);
   //  std::string serialRead(const int& i_numberOfBytes);
