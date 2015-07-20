@@ -10,7 +10,7 @@ class StateSequence {
   // speed is defined in hecto Hertz (so 50 is 5k hertz)
   GETSET(int, m_speed, Speed);
   GETSET(int, m_numberOfRepetitions, NumberOfRepetitions);
-  GET(PinStateVector, m_pinStateVector, PinStateVector);
+  GETSET(PinStateVector, m_pinStateVector, PinStateVector);
 
  private:
   bool hasEqualSequence(const StateSequence& i_sequence) const;
@@ -32,15 +32,15 @@ class StateSequence {
   StateSequence();
 
   StateSequence(const int& i_speed,
-                   const int& i_numberOfRepetitions,
-                   const PinStateVector& i_pinStateVector);
+                const int& i_numberOfRepetitions,
+                const PinStateVector& i_pinStateVector);
 
   bool isEmpty()const;
 
   bool appendSequence(const StateSequence i_sequence);
 
   bool addToSequence(const PinState& i_pinState,
-                     const bool& i_gentleAdd = false);
+                     const bool& i_forceAdd = false);
   bool addToSequence(const PinStateVector& i_pinStateVector);
   bool addToSequence(const StateSequence& i_otherSequence);
 

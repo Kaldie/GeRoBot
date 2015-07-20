@@ -78,8 +78,7 @@ std::vector<int> StateSequence::getIntegerSequence(
 
 bool StateSequence::hasEqualSequence(
     const StateSequence& i_sequence) const {
-
-  if (this->getIntegerSequence() == i_sequence.getIntegerSequence())
+    if (this->getIntegerSequence() == i_sequence.getIntegerSequence())
     return true;
   else
     return false;
@@ -113,8 +112,8 @@ bool StateSequence::hasMutualPins(const PinState& i_pinState) const {
   if (m_pinStateVector.size() == 0)
       return false;
   
-  auto start = m_pinStateVector[0].getPinVector().begin();
-  auto end = m_pinStateVector[0].getPinVector().end();
+  auto start = m_pinStateVector.back().getPinVector().begin();
+  auto end = m_pinStateVector.back().getPinVector().end();
 
   PinVector firstPinVector = i_pinState.getPinVector();
 
@@ -159,10 +158,9 @@ bool StateSequence::addToSequence(
     LOG_DEBUG("Number of repetitions is more then 1 thus this will not fly");
     return false;
   }
-
   bool hasMutualPin = hasMutualPins(i_pinState);
   LOG_DEBUG("Has mutual pins: " << hasMutualPin);
-  if (hasMutualPin || i_forceAdd) {
+  if (hasMutualPin && !i_forceAdd) {
     LOG_DEBUG("The added pin states has mutual " <<
               "pins to the allready defined ones!");
     return false;
@@ -176,8 +174,8 @@ bool StateSequence::addToSequence(
       LOG_DEBUG("Adding another pin state!");
       m_pinStateVector.push_back(i_pinState);
     } else {
-      LOG_DEBUG("Updateing the first pin state!");
-      m_pinStateVector[0].update(i_pinState);
+      LOG_DEBUG("Updateing the last pin state!");
+      m_pinStateVector.back().update(i_pinState);
     }
   }
   m_numberOfRepetitions = 1;
@@ -248,14 +246,21 @@ bool StateSequence::addToSequence(const StateSequence& i_sequence) {
 
   LOG_DEBUG("Size of input sequence: " <<
             i_sequence.getPinStateVector().size());
-  LOG_DEBUG("Size of memory sequence: " << m_pinStateVector.size());
-  
+  LOG_DEBUG("Size of current sequence: " << m_pinStateVector.size());
+
+  if (i_sequence.getPinStateVector().size() >
+      m_pinStateVector.size()) {
+    LOG_DEBUG("Cannot merge the two, " <<
+              "the right hand side has more pin states then the left");
+    return false;
+  }
+
   auto rhsItr = i_sequence.getPinStateVector().begin();
   auto ltsItr = m_pinStateVector.begin();
 
   for (;
-       !((ltsItr == m_pinStateVector.end()) |
-         (rhsItr == i_sequence.getPinStateVector().end()));
+       ltsItr != m_pinStateVector.end() &&
+       rhsItr != i_sequence.getPinStateVector().end();
        ltsItr++, rhsItr++) {
     ltsItr->displayPinState();
     rhsItr->displayPinState();
