@@ -103,7 +103,7 @@ class SequenceVectorUnitTest : public CxxTest::TestSuite {
     sequenceVector.normalise();
     TS_ASSERT(sequenceVector.isNormilized());
     TS_ASSERT_EQUALS((*sequenceVector.begin()).getIntegerSequence(),
-                     std::vector<int>({126, 126}));    
+                     std::vector<int>({126, 126}));
   }
 
 
@@ -179,7 +179,7 @@ class SequenceVectorUnitTest : public CxxTest::TestSuite {
     pinStatevector.push_back(pinState2);
     stateSequence.setPinStateVector(pinStatevector);
     stateSequence.setNumberOfRepetitions(10);
-    
+
     // simulating a cw step
     StateSequence stateSequence1;
     pinStatevector = PinStateVector();
@@ -210,16 +210,28 @@ class SequenceVectorUnitTest : public CxxTest::TestSuite {
     stateSequence2.setNumberOfRepetitions(10);
 
     sequenceVector.setSequenceVector(
-        PinStateSequenceVector({stateSequence,stateSequence1, stateSequence2}));
+        PinStateSequenceVector(
+            {stateSequence, stateSequence1, stateSequence2}));
     LOG_DEBUG("Displaying sequences that need to be recompile condensed");
     stateSequence.displaySequence();
     stateSequence1.displaySequence();
     stateSequence2.displaySequence();
+
+    int numberOfOriginalSteps = sequenceVector.numberOfSteps();
+
     TS_ASSERT(sequenceVector.condenseVector());
-    PinStateSequenceVector x = sequenceVector.getSequenceVector();
-    //    for (auto i : x) {
-    //      i.displaySequence();
-    //    }
+    TS_ASSERT_EQUALS(sequenceVector.numberOfSteps(),
+                     numberOfOriginalSteps);
+
+    TS_ASSERT_EQUALS(sequenceVector.numberOfSequences(), 4);
+    TS_ASSERT_EQUALS(sequenceVector.getSequenceVector()[0].getIntegerSequence(),
+                     std::vector<int>({0, 8}));
+    TS_ASSERT_EQUALS(sequenceVector.getSequenceVector()[1].getIntegerSequence(),
+                     std::vector<int>({}));
+    TS_ASSERT_EQUALS(sequenceVector.getSequenceVector()[2].getIntegerSequence(),
+                     std::vector<int>({14}));
+    TS_ASSERT_EQUALS(sequenceVector.getSequenceVector()[3].getIntegerSequence(),
+                     std::vector<int>({6, 14}));
   }
 
 
@@ -236,7 +248,7 @@ class SequenceVectorUnitTest : public CxxTest::TestSuite {
     pinStatevector.push_back(pinState2);
     stateSequence.setPinStateVector(pinStatevector);
     stateSequence.setNumberOfRepetitions(1);
-    
+
     // simulating a cw step
     StateSequence stateSequence1;
     pinStatevector = PinStateVector();
@@ -265,12 +277,32 @@ class SequenceVectorUnitTest : public CxxTest::TestSuite {
     stateSequence2.setNumberOfRepetitions(10);
 
     sequenceVector.setSequenceVector(
-        PinStateSequenceVector({stateSequence,stateSequence1, stateSequence2}));
-    LOG_DEBUG("Displaying sequences that need to be recompile condensed");
-    stateSequence.displaySequence();
-    stateSequence1.displaySequence();
-    stateSequence2.displaySequence();
+        PinStateSequenceVector(
+            {stateSequence, stateSequence1, stateSequence2}));
+
+    /*
+      LOG_DEBUG("Displaying sequences that need to be " <<
+      "recompile condensed for foward condense");
+      stateSequence.displaySequence();
+      stateSequence1.displaySequence();
+      stateSequence2.displaySequence();
+    */
+    int numberOfOriginalSteps = sequenceVector.numberOfSteps();
+
     TS_ASSERT(sequenceVector.condenseVector());
+    TS_ASSERT_EQUALS(sequenceVector.numberOfSteps(),
+                     numberOfOriginalSteps);
+
+    TS_ASSERT_EQUALS(sequenceVector.numberOfSequences(), 4);
+
+    TS_ASSERT_EQUALS(sequenceVector.getSequenceVector()[0].getIntegerSequence(),
+                     std::vector<int>({}));
+    TS_ASSERT_EQUALS(sequenceVector.getSequenceVector()[1].getIntegerSequence(),
+                     std::vector<int>({}));
+    TS_ASSERT_EQUALS(sequenceVector.getSequenceVector()[2].getIntegerSequence(),
+                     std::vector<int>({ 14, 12, 4, 12, 8 }));
+    TS_ASSERT_EQUALS(sequenceVector.getSequenceVector()[3].getIntegerSequence(),
+                     std::vector<int>({0, 8}));    
   }
 
 
