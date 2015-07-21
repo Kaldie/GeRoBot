@@ -265,16 +265,38 @@ bool Condensor::handleBackwardCorrispondingSequences(
 bool Condensor::recompile(
     CompileSet* i_compileSet,
     PinStateSequenceVector::iterator* i_endSequence) {
+  // if the integerSequence does not have any values, return
+  if (i_compileSet->integerSequence.size() == 0)
+    return false;
+
   // find reoccurences in the remaining integer list
+  Condensor::requiredReduction;
+  int repititionInSequence = 0;
+  for (int repSeize = i_compileSet->integerSequence.size();
+       repSeize > Condensor::requiredReduction;
+       --repSeize) { // for a specific size
+    for (int offset = 0;
+         offset < (i_compileSet->integerSequence.size() - 2 * repsize);
+         offset++) {  // with a
+
   LOG_DEBUG("Adding a new sequence!");
-  if (i_compileSet->integerSequence.size() != 0) {
-    LOG_DEBUG("Size is: " << i_compileSet->integerSequence.size());
-    *i_endSequence = i_compileSet->sequenceVector->insert(
-        *i_endSequence, i_compileSet->stateSequence) + 1;
-  }
+  *i_endSequence = i_compileSet->sequenceVector->insert(
+      *i_endSequence, i_compileSet->stateSequence) + 1;
 
   // clean
   return true;
+}
+
+
+void Condensor::cleanCompileSet(CompileSet* i_compileSet) {
+  /*
+    this functions cleans the compile set,
+    so it will give good results for the next session!
+  */
+  std::vector<int>().swap(i_compileSet->integerSequence);
+  std::vector<int>().swap(i_compileSet->postIntegerSequence);
+  std::vector<int>().swap(i_compileSet->preIntegerSequence);
+  i_compileSet->stateSequence = StateSequence();
 }
 
 
@@ -282,7 +304,6 @@ bool Condensor::recompileSequenceVector(
     PinStateSequenceVector* i_sequenceVector) {
   LOG_DEBUG("Recompile condense!");
   CompileSet  compileSet;
-  LOG_DEBUG(compileSet.integerSequence.size());
   compileSet.currentSequence = i_sequenceVector->begin();
   compileSet.sequenceVector = i_sequenceVector;
   bool hasCondensed = false;
@@ -294,6 +315,9 @@ bool Condensor::recompileSequenceVector(
                                                          endOfCurrentSequence);
     hasCondensed |= recompile(&compileSet,
                               &endOfCurrentSequence);
+
+    cleanCompileSet(&compileSet);
+
     compileSet.currentSequence = endOfCurrentSequence;
   }
   LOG_DEBUG("Finished recompile sequence");
