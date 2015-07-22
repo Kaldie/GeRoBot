@@ -6,18 +6,18 @@
 
 
 
-# Main math makefile
+# Main makefile
 TOROOT=.
 PUGISRC = ./pugixml/src
 SHAREDFOLDERS = ./math ./arduino ./motor ./robot $(PUGISRC)
 UPLOADEDFOLDERS = ./arduinosketch
 include Makefile.config
 
-.PHONY: CLEAN ALL INSTALL CREATENECESSARYFOLDERS LINKHEADERS clean MACROHEADER
+.PHONY: CLEAN ALL INSTALL CREATENECESSARYFOLDERS LINKHEADERS clean MACROHEADER, PUGI
 
 ALL: INSTALL MACROHEADER SHAREDTARGET UPLOADEDTARGET
 
-INSTALL: CREATENECESSARYFOLDERS LINKHEADERS MACROHEADER SHAREDTARGET UPLOADEDTARGET
+INSTALL: CREATENECESSARYFOLDERS PUGI LINKHEADERS MACROHEADER SHAREDTARGET
 
 CREATENECESSARYFOLDERS:
 	@echo "Creating folders for objects and shared libs"
@@ -40,8 +40,9 @@ UNITTEST:
 	$(foreach FOLDER,$(SHAREDFOLDERS), cd $(FOLDER); cd unit_test; make unitTest; cd ../..;)
 
 PUGI:
-	SRCS := $(filter-out $(DSRCS), $(wildcard $(PUGISRC)/*.cpp))
-	shared
+	git submodule init
+	git submodule update
+	git submodule foreach 'git fetch origin; git checkout $(git rev-parse --abbrev-ref HEAD); git reset --hard origin/$$(git rev-parse --abbrev-ref HEAD); git submodule update --recursive; git clean -dfx'
 
 UPLOADEDTARGET:
 	$(foreach FOLDER,$(UPLOADEDFOLDERS), cd $(FOLDER); make -i upload; cd ..; )
