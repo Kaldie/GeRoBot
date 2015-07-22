@@ -269,15 +269,28 @@ bool Condensor::recompile(
   if (i_compileSet->integerSequence.size() == 0)
     return false;
 
-  // find reoccurences in the remaining integer list
-  Condensor::requiredReduction;
-  int repititionInSequence = 0;
-  for (int repSeize = i_compileSet->integerSequence.size();
-       repSeize > Condensor::requiredReduction;
-       --repSeize) { // for a specific size
-    for (int offset = 0;
-         offset < (i_compileSet->integerSequence.size() - 2 * repsize);
-         offset++) {  // with a
+  auto currentPosition = i_compileSet->integerSequence.begin();
+  int finds(1);
+  unsigned int maxSequenceSize(0);
+  for (unsigned int offset = 0;
+       offset < i_compileSet->integerSequence.size();
+       ++offset) {
+    maxSequenceSize = (i_compileSet->integerSequence.size() - offset) / 2;
+    currentPosition = i_compileSet->integerSequence.begin() + offset;
+    for (unsigned int sequenceSize = 1;
+         sequenceSize <= maxSequenceSize;
+         ++sequenceSize) {
+      finds = 1;
+      while (std::search(currentPosition, // starting from the start
+                         currentPosition + sequenceSize, 
+                         currentPosition + sequenceSize, 
+                         currentPosition + 2 * sequenceSize) == 
+             currentPosition + sequenceSize) {
+               ++finds;
+               currentPosition += sequenceSize;
+             }
+      }
+  }
 
   LOG_DEBUG("Adding a new sequence!");
   *i_endSequence = i_compileSet->sequenceVector->insert(
