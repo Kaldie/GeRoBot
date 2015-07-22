@@ -266,39 +266,128 @@ bool Condensor::recompile(
     CompileSet* i_compileSet,
     PinStateSequenceVector::iterator* i_endSequence) {
   // if the integerSequence does not have any values, return
+
+
   if (i_compileSet->integerSequence.size() == 0)
     return false;
 
-  auto currentPosition = i_compileSet->integerSequence.begin();
-  int finds(1);
-  unsigned int maxSequenceSize(0);
-  for (unsigned int offset = 0;
-       offset < i_compileSet->integerSequence.size();
-       ++offset) {
-    maxSequenceSize = (i_compileSet->integerSequence.size() - offset) / 2;
-    currentPosition = i_compileSet->integerSequence.begin() + offset;
-    for (unsigned int sequenceSize = 1;
-         sequenceSize <= maxSequenceSize;
-         ++sequenceSize) {
-      finds = 1;
-      while (std::search(currentPosition, // starting from the start
-                         currentPosition + sequenceSize, 
-                         currentPosition + sequenceSize, 
-                         currentPosition + 2 * sequenceSize) == 
-             currentPosition + sequenceSize) {
-               ++finds;
-               currentPosition += sequenceSize;
-             }
-      }
-  }
+  Condensor::RecurrenceVector recurenceVector =
+      findRecurrence(i_compileSet->integerSequence);
 
+  Condensor::RecurrenceVector::const_iterator maximumEffectRecurence =
+      findMaximumEffectRecurence(recurenceVector,
+                                 i_compileSet->integerSequence);
+  
   LOG_DEBUG("Adding a new sequence!");
   *i_endSequence = i_compileSet->sequenceVector->insert(
       *i_endSequence, i_compileSet->stateSequence) + 1;
-
-  // clean
   return true;
 }
+
+
+Condensor::RecurrenceVector Condensor::findRecurrence(
+    const std::vector<int>& i_vector) {
+  // Vector which stores the result of all the found recurrences
+  Condensor::RecurrenceVector resultVector;
+
+  // position which is currently investigated
+  auto currentPosition = i_vector.begin();
+
+  // number of recurrence found of the current sequence
+  int finds(1);
+
+  // Maximum size of sequences
+  unsigned int maxSequenceSize(0);
+
+  // for each possible offset
+  for (unsigned int offset = 0;
+       offset < i_vector.size() - 1;
+       ++offset) {
+    maxSequenceSize = (i_vector.size() - offset) / 2;
+    // for each possible sequences size that will fit
+    for (unsigned int sequenceSize = 1;
+         sequenceSize <= maxSequenceSize;
+         ++sequenceSize) {
+      currentPosition = i_vector.begin() + offset;
+      finds = 1;
+
+      // if the next block is equal to the first
+      while (std::search(currentPosition + sequenceSize,
+                         currentPosition + 2 * sequenceSize,
+                         currentPosition,
+                         currentPosition + sequenceSize) ==
+             currentPosition + sequenceSize) {
+        // add a find and update the current position
+        ++finds;
+        currentPosition += sequenceSize;
+        LOG_DEBUG("Found a re-occurence");
+
+        for (auto i = currentPosition;
+             i != currentPosition + sequenceSize;
+             ++i) {
+          LOG_DEBUG(*i << ", ");
+        }
+
+        if (std::distance(i_vector.begin(),
+                          currentPosition + sequenceSize) >=
+            static_cast<int>(i_vector.size())) {
+          break;
+        }
+      }
+
+      resultVector.push_back(std::make_tuple(
+          // begin of recurence sequence
+          i_vector.begin() + offset,
+           // end of recuring sequence
+          i_vector.begin() + offset + sequenceSize,
+          // end of last seen sequence
+          currentPosition + sequenceSize));
+    }
+  }
+  return resultVector;
+}
+
+
+Condensor::RecurrenceVector::const_iterator
+    Condensor::findMaximumEffectRecurence(
+        const Condensor::RecurrenceVector i_recurrenceVector,
+        const std::vector<int>& i_integerSequence) {
+  Condensor::RecurrenceVector::const_iterator result = i_recurrenceVector.end();
+
+  int currentResult(0),
+      maximumResult(0),
+      lengthOfSequence(0),
+      totalLength(0);
+
+  for (auto recurrence = i_recurrenceVector.begin();
+       recurrence != i_recurrenceVector.end();
+       ++recurrence
+       ) {
+    currentResult = 0;
+
+    if (std::get<0>(*recurrence) != i_integerSequence.begin()) {
+      currentResult -= 3;
+    }
+
+    if (std::get<2>(*recurrence) != i_integerSequence.end()) {
+      currentResult -= 3;
+    }
+
+    lengthOfSequence = std::distance(std::get<1>(*recurrence),
+                                     std::get<0>(*recurrence));
+
+    totalLength = std::distance(std::get<2>(*recurrence),
+                                    std::get<0>(*recurrence));
+    currentResult += totalLength - lengthOfSequence;
+
+    if (currentResult > maximumResult) {
+      maximumResult = currentResult;
+      result = recurrence;
+    }
+  }
+  return result;
+}
+
 
 
 void Condensor::cleanCompileSet(CompileSet* i_compileSet) {
@@ -350,7 +439,7 @@ bool Condensor::internalCondense(PinStateSequenceVector* i_sequenceVector) {
   return internalyCondesed;
 }
 
- 
+
 bool Condensor::mergeCondense(PinStateSequenceVector* i_sequenceVector,
                               const bool& i_removeFromVector /*= false*/) {
   bool hasCondensed = false;
