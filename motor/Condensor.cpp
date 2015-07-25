@@ -271,13 +271,23 @@ bool Condensor::recompile(
   if (i_compileSet->integerSequence.size() == 0)
     return false;
 
+  // finding recurences in the vector
   Condensor::RecurrenceVector recurenceVector =
       findRecurrence(i_compileSet->integerSequence);
 
+  // finding the recurence that has the most effect
   Condensor::RecurrenceVector::const_iterator maximumEffectRecurence =
       findMaximumEffectRecurence(recurenceVector,
                                  i_compileSet->integerSequence);
-  
+
+  /*
+    finaly recompile the state sequence to something nice
+   if it makes sense
+  */
+  bool hasRecompiled = handleRecurence(recurenceVector,
+                                       maximumEffectRecurence,
+                                       i_compileSet);
+                                       
   LOG_DEBUG("Adding a new sequence!");
   *i_endSequence = i_compileSet->sequenceVector->insert(
       *i_endSequence, i_compileSet->stateSequence) + 1;
@@ -301,13 +311,16 @@ Condensor::RecurrenceVector Condensor::findRecurrence(
 
   // for each possible offset
   for (unsigned int offset = 0;
-       offset < i_vector.size() - 1;
+       offset <= i_vector.size() - 1;
        ++offset) {
     maxSequenceSize = (i_vector.size() - offset) / 2;
+    LOG_DEBUG("Max recurence size : " << maxSequenceSize);
     // for each possible sequences size that will fit
     for (unsigned int sequenceSize = 1;
          sequenceSize <= maxSequenceSize;
          ++sequenceSize) {
+      LOG_DEBUG("Testing offset: " << offset <<
+                " and sequence size: " << sequenceSize);
       currentPosition = i_vector.begin() + offset;
       finds = 1;
 
@@ -331,10 +344,12 @@ Condensor::RecurrenceVector Condensor::findRecurrence(
         if (std::distance(i_vector.begin(),
                           currentPosition + sequenceSize) >=
             static_cast<int>(i_vector.size())) {
-          break;
+          continue;
         }
       }
 
+      if (finds > 1) {
+      LOG_DEBUG("Adding result to the staple");
       resultVector.push_back(std::make_tuple(
           // begin of recurence sequence
           i_vector.begin() + offset,
@@ -342,6 +357,7 @@ Condensor::RecurrenceVector Condensor::findRecurrence(
           i_vector.begin() + offset + sequenceSize,
           // end of last seen sequence
           currentPosition + sequenceSize));
+      }
     }
   }
   return resultVector;
@@ -366,20 +382,28 @@ Condensor::RecurrenceVector::const_iterator
     currentResult = 0;
 
     if (std::get<0>(*recurrence) != i_integerSequence.begin()) {
-      currentResult -= 3;
+      LOG_DEBUG("minus " << Condensor::statePenalty <<
+                " because we need to make a sequence at the begin");
+      currentResult -= Condensor::statePenalty;
     }
 
     if (std::get<2>(*recurrence) != i_integerSequence.end()) {
-      currentResult -= 3;
+            LOG_DEBUG("minus " << Condensor::statePenalty <<
+                      " because we need to make a sequence at the end");
+      currentResult -= Condensor::statePenalty;
     }
 
-    lengthOfSequence = std::distance(std::get<1>(*recurrence),
-                                     std::get<0>(*recurrence));
+    lengthOfSequence = std::distance(std::get<0>(*recurrence),
+                                     std::get<1>(*recurrence));
 
-    totalLength = std::distance(std::get<2>(*recurrence),
-                                    std::get<0>(*recurrence));
+    LOG_DEBUG("Length of the sequence is: " << lengthOfSequence);
+    totalLength = std::distance(std::get<0>(*recurrence),
+                                std::get<2>(*recurrence));
+    
+    LOG_DEBUG("Total length it will replace is: " << totalLength);
     currentResult += totalLength - lengthOfSequence;
 
+    LOG_DEBUG("A sequence has a score of: " << currentResult);
     if (currentResult > maximumResult) {
       maximumResult = currentResult;
       result = recurrence;
@@ -389,6 +413,90 @@ Condensor::RecurrenceVector::const_iterator
 }
 
 
+bool Condensor::handleRecurence(
+    const Condensor::RecurrenceVector& recurenceVector,
+    const Condensor::RecurrenceVector::const_iterator& maximumEffectRecurence,
+    CompileSet* i_compileSet) {
+  // If the max effect is pointing to the end, no luck
+  if (maximumEffectRecurence == recurenceVector.end())
+    return false;
+
+  StateSequence newSequence;
+
+  // if the recuring sequence does not start at the beginning
+  if (std::get<0>(*maximumEffectRecurence) !=
+      i_compileSet->integerSequence.begin()) {
+    LOG_DEBUG("Creating a start sequence.");
+    newSequence = StateSequence();
+    PinStateVector pinStateVector =
+        i_compileSet->stateSequence.getPinStateVector();
+
+    // remove the states from the stateVector
+    pinStateVector.erase(
+        pinStateVector.begin() +
+        (std::get<0>(*maximumEffectRecurence) -
+         i_compileSet->integerSequence.begin()),
+        pinStateVector.end());
+
+    // set this pin vector to the current state sequence
+    newSequence.setPinStateVector(pinStateVector);
+    newSequence.setNumberOfRepetitions(1);
+
+    // insert the new sequence in the vector
+    i_compileSet->currentSequence =
+        i_compileSet->sequenceVector->insert(
+            i_compileSet->currentSequence,
+            newSequence);
+
+    // reload the pin state vector
+    pinStateVector =
+        i_compileSet->stateSequence.getPinStateVector();
+
+    // updating the replacement state sequence
+    pinStateVector.erase(pinStateVector.begin(),
+                         pinStateVector.begin() +
+                         (std::get<0>(*maximumEffectRecurence) -
+                          i_compileSet->integerSequence.begin()));
+    i_compileSet->stateSequence.setPinStateVector(pinStateVector);
+  }
+
+  if (std::get<2>(*maximumEffectRecurence) !=
+      i_compileSet->integerSequence.end()) {
+    LOG_DEBUG("Creating a end sequence.");
+    newSequence = StateSequence();
+    PinStateVector pinStateVector =
+        i_compileSet->stateSequence.getPinStateVector();
+    // remove the states from the stateVector
+    pinStateVector.erase(pinStateVector.begin(),
+                         pinStateVector.end() -
+                         (i_compileSet->integerSequence.end() -
+                          std::get<2>(*maximumEffectRecurence)));
+    
+    // set this pin vector to the current state sequence
+    newSequence.setPinStateVector(pinStateVector);
+    newSequence.setNumberOfRepetitions(1);
+
+    // insert the new sequence in the vector
+    i_compileSet->currentSequence =
+        i_compileSet->sequenceVector->insert(
+            i_compileSet->currentSequence,
+            newSequence) -1;
+
+    // reload the pin state vector
+    pinStateVector =
+        i_compileSet->stateSequence.getPinStateVector();
+
+    // updating the replacement state sequence
+    pinStateVector.erase(pinStateVector.end() -
+                         (i_compileSet->integerSequence.end() -
+                          std::get<2>(*maximumEffectRecurence)),
+                         pinStateVector.end());
+    i_compileSet->stateSequence.setPinStateVector(pinStateVector);
+  }
+
+  // clean up
+  return true;
+}
 
 void Condensor::cleanCompileSet(CompileSet* i_compileSet) {
   /*

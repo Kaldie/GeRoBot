@@ -75,7 +75,13 @@ class Condensor {
           const Condensor::RecurrenceVector i_recurrenceVector,
           const std::vector<int>& i_integerSequence);
 
-  static const int requiredReduction = 3;
+  // recompile the investigated sequence if it makes sense
+  static bool handleRecurence(
+      const Condensor::RecurrenceVector& recurenceVector,
+      const Condensor::RecurrenceVector::const_iterator& maximumEffectRecurence,
+      CompileSet* i_compileSet);
+                         
+  static const int statePenalty = 3;
 
  public:
   static bool recompileSequenceVector(PinStateSequenceVector* i_sequenceVector);
