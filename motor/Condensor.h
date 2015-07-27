@@ -5,11 +5,10 @@
 
 #include <StateSequence.h>
 
-class Condensor {
+namespace Condensor {
   // Condensor will reduce the sizes of the sequence and sequence vectors
- private:
   /*
-    Condensor is a pure static class,
+    Condensor is a namespace which is all about condensing the sequence vector,
     The recompile method needs alot of info that is passed along several methods
     Therefore a data struct is designed to pass it happely along as a pointer
     making the methods nice and short/ readable
@@ -54,39 +53,51 @@ class Condensor {
     has corrisponding sequences with previous and sequential sequence.
     These will be used to condense the vector
   */
-  static bool handleForwardCorrispondingSequences(CompileSet* i_compileSet);
+  bool handleForwardCorrispondingSequences(CompileSet* i_compileSet);
 
-  static bool handleBackwardCorrispondingSequences(
+  bool handleBackwardCorrispondingSequences(
       CompileSet* i_compileSet);
 
-  static void cleanCompileSet(CompileSet* i_compileSet);
+  void cleanCompileSet(CompileSet* i_compileSet);
 
-  static bool recompile(CompileSet* i_compileSet);
+  bool recompile(CompileSet* i_compileSet);
 
   // finds sequence with 1 repitition, sets the pre and post integer sequences
-  static void prepareSequences(
+  void prepareSequences(
       CompileSet* i_compileSet);
 
   // find sequence which are repeated in the sequence
-  static std::vector<RecurrenceResult> findRecurrence(
+  std::vector<RecurrenceResult> findRecurrence(
       const std::vector<int>& i_vector);
 
   // for the repition which has the most effect to replace
-  static Condensor::RecurrenceVector::const_iterator findMaximumEffectRecurence(
+  Condensor::RecurrenceVector::const_iterator findMaximumEffectRecurence(
           const Condensor::RecurrenceVector& i_recurrenceVector,
           const std::vector<int>& i_integerSequence);
 
   // recompile the investigated sequence if it makes sense
-  static bool handleRecurence(
+  bool handleRecurence(
       const Condensor::RecurrenceVector::const_iterator& maximumEffectRecurence,
       CompileSet* i_compileSet);
-                         
-  static const int statePenalty = 3;
 
- public:
-  static bool recompileSequenceVector(PinStateSequenceVector* i_sequenceVector);
-  static bool internalCondense(PinStateSequenceVector* i_sequenceVector);
-  static bool mergeCondense(PinStateSequenceVector* i_sequenceVector,
+  void splitSequence(CompileSet* i_compileSet,
+                     StateSequence* i_stateSequence,
+                     const std::vector<int>::const_iterator& i_split,
+                     bool i_leaveStart);
+
+  // insertion position relative to current sequence
+  void addSequenceToVector(CompileSet* i_compileSet,
+                           const int& insertionPosition,
+                           StateSequence* i_newSequence);
+
+  void updateCurrentState(CompileSet* i_compileSet,
+                          const RecurrenceResult& maximumEffectRecurence);
+
+  const int statePenalty = 3;
+
+  bool recompileSequenceVector(PinStateSequenceVector* i_sequenceVector);
+  bool internalCondense(PinStateSequenceVector* i_sequenceVector);
+  bool mergeCondense(PinStateSequenceVector* i_sequenceVector,
                      const bool& i_removeFromVector = false);
 };
 

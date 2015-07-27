@@ -13,7 +13,7 @@ void Condensor::prepareSequences(
   PinStateSequenceVector::iterator currentSequence =
       i_compileSet->currentSequence;
   int numberOfRecompiledSequences = 0;
-  
+
   // do this at least untill the end of the vector
   while (currentSequence != i_compileSet->sequenceVector->end()) {
     LOG_DEBUG("Start prepareSequence while loop");
@@ -40,10 +40,10 @@ void Condensor::prepareSequences(
 
     // creation of a pin state vector which will be used
     PinStateVector pinStateVector;
-    LOG_DEBUG("Start gather sequence while loop");
+    LOG_DEBUG("Start gather sequences");
     while (currentSequence != i_compileSet->sequenceVector->end() &&
            currentSequence->getNumberOfRepetitions() == 1) {
-      LOG_DEBUG("insert into integer sequence");
+      LOG_DEBUG("Add current integer sequence to the rest.");
       std::vector<int> thisIntegerSequence =
           currentSequence->getIntegerSequence();
 
@@ -52,20 +52,20 @@ void Condensor::prepareSequences(
           thisIntegerSequence.begin(),
           thisIntegerSequence.end());
 
-      LOG_DEBUG("Insert into pin state vector");
+      LOG_DEBUG("Add current state sequences to the rest.");
       // add its pin state to the whole list
       pinStateVector.insert(pinStateVector.end(),
                             currentSequence->getPinStateVector().begin(),
                             currentSequence->getPinStateVector().end());
+      LOG_DEBUG("This speed is: " << currentSequence->getSpeed());
+      // calculating the average speed in a sec
+      averageSpeed += currentSequence->getSpeed();
 
-      // cleaning up the sequence
+      LOG_DEBUG("cleaning up the current sequence.");
       currentSequence->setNumberOfRepetitions(0);
       currentSequence->setPinStateVector(PinStateVector());
       ++currentSequence;
       ++numberOfRecompiledSequences;
-
-      // calculating the average speed in a sec
-      averageSpeed+=currentSequence->getSpeed();
     }
 
     // the new representing sequence is set now
@@ -294,11 +294,11 @@ bool Condensor::recompile(
 
 Condensor::RecurrenceVector Condensor::findRecurrence(
     const std::vector<int>& i_vector) {
-  // Vector which stores the result of all the found recurrences
+  // Vector which stores the bestRecurrence of all the found recurrences
   Condensor::RecurrenceVector resultVector;
 
   // position which is currently investigated
-  auto currentPosition = i_vector.begin();
+  std::vector<int>::const_iterator currentPosition;
 
   // number of recurrence found of the current sequence
   int finds(1);
@@ -310,6 +310,7 @@ Condensor::RecurrenceVector Condensor::findRecurrence(
   for (unsigned int offset = 0;
        offset <= i_vector.size() - 1;
        ++offset) {
+    // in the remainer at least 2 sequence should fit
     maxSequenceSize = (i_vector.size() - offset) / 2;
     LOG_DEBUG("Max recurence size : " << maxSequenceSize);
     // for each possible sequences size that will fit
@@ -318,9 +319,9 @@ Condensor::RecurrenceVector Condensor::findRecurrence(
          ++sequenceSize) {
       LOG_DEBUG("Testing offset: " << offset <<
                 " and sequence size: " << sequenceSize);
+
       currentPosition = i_vector.begin() + offset;
       finds = 1;
-
       // if the next block is equal to the first
       while (std::search(currentPosition + sequenceSize,
                          currentPosition + 2 * sequenceSize,
@@ -338,6 +339,7 @@ Condensor::RecurrenceVector Condensor::findRecurrence(
           LOG_DEBUG(*i << ", ");
         }
 
+        // check if we are still within bounds
         if (std::distance(i_vector.begin(),
                           currentPosition + sequenceSize) >=
             static_cast<int>(i_vector.size())) {
@@ -346,7 +348,7 @@ Condensor::RecurrenceVector Condensor::findRecurrence(
       }
 
       if (finds > 1) {
-      LOG_DEBUG("Adding result to the staple");
+      LOG_DEBUG("Adding re to the staple");
       resultVector.push_back(std::make_tuple(
           // begin of recurence sequence
           i_vector.begin() + offset,
@@ -365,10 +367,10 @@ Condensor::RecurrenceVector::const_iterator
     Condensor::findMaximumEffectRecurence(
         const Condensor::RecurrenceVector& i_recurrenceVector,
         const std::vector<int>& i_integerSequence) {
-  Condensor::RecurrenceVector::const_iterator result = i_recurrenceVector.end();
+  Condensor::RecurrenceVector::const_iterator bestRecurrence = i_recurrenceVector.end();
 
-  int currentResult(0),
-      maximumResult(0),
+  int currentScore(0),
+      maximumScore(0),
       lengthOfSequence(0),
       totalLength(0);
 
@@ -376,18 +378,18 @@ Condensor::RecurrenceVector::const_iterator
        recurrence != i_recurrenceVector.end();
        ++recurrence
        ) {
-    currentResult = 0;
+    currentScore = 0;
 
     if (std::get<0>(*recurrence) != i_integerSequence.begin()) {
       LOG_DEBUG("minus " << Condensor::statePenalty <<
                 " because we need to make a sequence at the begin");
-      currentResult -= Condensor::statePenalty;
+      currentScore -= Condensor::statePenalty;
     }
 
     if (std::get<2>(*recurrence) != i_integerSequence.end()) {
       LOG_DEBUG("minus " << Condensor::statePenalty <<
                 " because we need to make a sequence at the end");
-      currentResult -= Condensor::statePenalty;
+      currentScore -= Condensor::statePenalty;
     }
 
     lengthOfSequence = std::distance(std::get<0>(*recurrence),
@@ -398,132 +400,133 @@ Condensor::RecurrenceVector::const_iterator
                                 std::get<2>(*recurrence));
     
     LOG_DEBUG("Total length it will replace is: " << totalLength);
-    currentResult += totalLength - lengthOfSequence;
+    currentScore += totalLength - lengthOfSequence;
 
-    LOG_DEBUG("A sequence has a score of: " << currentResult);
-    if (currentResult >= maximumResult) {
-      LOG_DEBUG("Setting current result as the result!");
-      maximumResult = currentResult;
-      result = recurrence;
+    LOG_DEBUG("A sequence has a score of: " << currentScore);
+    if (currentScore >= maximumScore) {
+      LOG_DEBUG("Setting current recurence as the best recurrence!");
+      maximumScore = currentScore;
+      bestRecurrence = recurrence;
     }
   }
-  return result;
+  return bestRecurrence;
 }
 
 
 bool Condensor::handleRecurence(
     const Condensor::RecurrenceVector::const_iterator& maximumEffectRecurence,
     CompileSet* i_compileSet) {
-  StateSequence newSequence;
-
   // if the recuring sequence does not start at the beginning
   if (std::get<0>(*maximumEffectRecurence) !=
       i_compileSet->integerSequence.begin()) {
     LOG_DEBUG("Creating a start sequence.");
+    StateSequence newSequence;
+    splitSequence(i_compileSet,
+                  &newSequence,
+                  std::get<0>(*maximumEffectRecurence),
+                  /*erase begin = */ false);
 
-    newSequence = StateSequence();
-    PinStateVector pinStateVector =
-        i_compileSet->stateSequence.getPinStateVector();
-
-    // remove the states from the stateVector
-    LOG_DEBUG("Erase bit of the state vector");
-    pinStateVector.erase(
-        pinStateVector.begin() +
-        (std::get<0>(*maximumEffectRecurence) -
-         i_compileSet->integerSequence.begin()),
-        pinStateVector.end());
-
-    // set this pin vector to the current state sequence
-    newSequence.setPinStateVector(pinStateVector);
-    newSequence.setNumberOfRepetitions(1);
-
-    // insert the new sequence in the vector
-    int distance = std::distance(i_compileSet->currentSequence,
-                                 i_compileSet->endSequence);
-
-    LOG_DEBUG("Need to recompile the iterators -> distance: " <<
-              distance);
-
-    LOG_DEBUG("Insert a sequence to the vector");
-    i_compileSet->currentSequence =
-        i_compileSet->sequenceVector->insert(
-            i_compileSet->currentSequence + 1,
-            newSequence) - 1;
-
-    // relocation make iterators invalid, reset them
-    i_compileSet->endSequence = i_compileSet->currentSequence + distance + 1;
-
-    LOG_DEBUG("Size of the new vector: " <<
-              i_compileSet->sequenceVector->size());
-
-    LOG_DEBUG("New distance of pre and post "<<
-              std::distance(i_compileSet->currentSequence,
-                            i_compileSet->endSequence));
-
-              // reload the pin state vector
-    pinStateVector =
-        i_compileSet->stateSequence.getPinStateVector();
-
-    // updating the replacement state sequence
-    LOG_DEBUG("Erase bit of the pin state vector");
-    pinStateVector.erase(pinStateVector.begin(),
-                         pinStateVector.begin() +
-                         (std::get<0>(*maximumEffectRecurence) -
-                          i_compileSet->integerSequence.begin()));
-    i_compileSet->stateSequence.setPinStateVector(pinStateVector);
-
-    if (i_compileSet->endSequence == i_compileSet->sequenceVector->end()) {
-      LOG_DEBUG("end of the investigation is end of sequence vector");
-    }
+    addSequenceToVector(i_compileSet,
+                        1,  // distance from currentSequence to newly inserted
+                        &newSequence);
   }
 
   if (std::get<2>(*maximumEffectRecurence) !=
       i_compileSet->integerSequence.end()) {
     LOG_DEBUG("Creating a end sequence.");
-    newSequence = StateSequence();
-    PinStateVector pinStateVector =
-        i_compileSet->stateSequence.getPinStateVector();
+    StateSequence newSequence;
+    splitSequence(i_compileSet,
+                  &newSequence,
+                  std::get<2>(*maximumEffectRecurence),
+                  /*erase_begin = */ true);
 
-    // remove the states from the stateVector
-    pinStateVector.erase(pinStateVector.begin(),
-                         pinStateVector.end() -
-                         (i_compileSet->integerSequence.end() -
-                          std::get<2>(*maximumEffectRecurence)));
-    
-    // set this pin vector to the current state sequence
-    newSequence.setPinStateVector(pinStateVector);
-    newSequence.setNumberOfRepetitions(1);
-
-    int distance = std::distance(i_compileSet->endSequence,
-                                 i_compileSet->currentSequence);
-
-    LOG_DEBUG("Need to recompile the iterators -> distance: " <<
-              distance);
-
-    // insert the new sequence in the vector
-    i_compileSet->endSequence =
-        i_compileSet->sequenceVector->insert(
-            i_compileSet->endSequence,
-            newSequence) + 1;
-
-    i_compileSet->currentSequence = i_compileSet->endSequence - distance -1;
-    // reload the pin state vector
-    pinStateVector =
-        i_compileSet->stateSequence.getPinStateVector();
-
-    // updating the replacement state sequence
-    pinStateVector.erase(pinStateVector.end() -
-                         (i_compileSet->integerSequence.end() -
-                          std::get<2>(*maximumEffectRecurence)),
-                         pinStateVector.end());
-    i_compileSet->stateSequence.setPinStateVector(pinStateVector);
+     addSequenceToVector(i_compileSet,
+                         std::distance(i_compileSet->endSequence,
+                                       i_compileSet->currentSequence),
+                        &newSequence);
   }
-
+  
+  // Update current state after adding pre and post state if necessary
+  updateCurrentState(i_compileSet,
+                     *maximumEffectRecurence);
   // clean up
   return true;
 }
 
-void Condensor::cleanCompileSet(CompileSet* i_compileSet) {
+
+void Condensor::splitSequence(CompileSet* i_compileSet,
+                              StateSequence* i_newSequence,
+                              const std::vector<int>::const_iterator& i_split,
+                              bool i_eraseStart) {
+  PinStateVector pinStateVector =
+      i_compileSet->stateSequence.getPinStateVector();
+
+  LOG_DEBUG("Erase bit of the state vector");
+  if (i_eraseStart) {
+    // remove the states from the stateVector
+    pinStateVector.erase(pinStateVector.begin(),
+                         pinStateVector.end() -
+                         (i_compileSet->integerSequence.end() - i_split));
+  } else {
+    pinStateVector.erase(
+        pinStateVector.begin() +
+        (i_split - i_compileSet->integerSequence.begin()),
+        pinStateVector.end());
+  }
+  // set this pin vector to the current state sequence
+  i_newSequence->setPinStateVector(pinStateVector);
+  i_newSequence->setNumberOfRepetitions(1);
+}
+
+
+void Condensor::addSequenceToVector(CompileSet* i_compileSet,
+                                    const int& insertionPosition,
+                                    StateSequence* newSequence) {
+    int distance = std::distance(i_compileSet->currentSequence,
+                                 i_compileSet->endSequence);
+
+    LOG_DEBUG("Distance between iterators: " <<
+              distance);
+
+    LOG_DEBUG("Insert a sequence to the vector");
+    i_compileSet->currentSequence =
+        i_compileSet->sequenceVector->insert(
+            i_compileSet->currentSequence + insertionPosition, *newSequence)
+        - insertionPosition;
+
+    // relocation make iterators invalid, reset them
+    i_compileSet->endSequence = i_compileSet->currentSequence + distance + 1;
+}
+
+
+void Condensor::updateCurrentState(
+    CompileSet* i_compileSet,
+    const RecurrenceResult& maximumEffectRecurence) {
+  // reload the pin state vector
+  PinStateVector pinStateVector =
+      i_compileSet->stateSequence.getPinStateVector();
+
+  auto begin =
+      pinStateVector.begin() +
+      (std::get<0>(maximumEffectRecurence) -
+       i_compileSet->integerSequence.begin());
+
+  auto end = pinStateVector.begin() +
+      (std::get<1>(maximumEffectRecurence) -
+       i_compileSet->integerSequence.begin());
+
+  PinStateVector newPinStateVector(begin, end);
+  i_compileSet->stateSequence.setPinStateVector(newPinStateVector);
+  int totalDistance = std::distance(std::get<2>(maximumEffectRecurence),
+                                    std::get<0>(maximumEffectRecurence));
+
+  int sequenceDistance = std::distance(end, begin);
+  i_compileSet->stateSequence.setNumberOfRepetitions(
+      totalDistance / sequenceDistance);
+}
+
+
+    void Condensor::cleanCompileSet(CompileSet* i_compileSet) {
   /*
     this functions cleans the compile set,
     so it will give good results for the next session!
