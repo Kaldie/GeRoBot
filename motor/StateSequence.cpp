@@ -446,7 +446,7 @@ bool StateSequence::condenseSequence() {
                       sequencePosition + newSequenceSize,
                       m_pinStateVector.begin(),
                       StateSequence::areEqualState)) {
-        LOG_DEBUG("New partial vector would not fit!");
+        LOG_DEBUG("Partial vector does not represent the whole vector!");
         break;
       }
     }

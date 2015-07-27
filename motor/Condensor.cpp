@@ -5,7 +5,7 @@
 #include <SequenceVector.h>
 #include <Condensor.h>
 
-PinStateSequenceVector::iterator Condensor::prepareSequences(
+void Condensor::prepareSequences(
     CompileSet* i_compileSet) {
   int averageSpeed(0);
 
@@ -13,7 +13,7 @@ PinStateSequenceVector::iterator Condensor::prepareSequences(
   PinStateSequenceVector::iterator currentSequence =
       i_compileSet->currentSequence;
   int numberOfRecompiledSequences = 0;
-
+  
   // do this at least untill the end of the vector
   while (currentSequence != i_compileSet->sequenceVector->end()) {
     LOG_DEBUG("Start prepareSequence while loop");
@@ -28,15 +28,14 @@ PinStateSequenceVector::iterator Condensor::prepareSequences(
     // if it is the first one
     // if possible set the m_preIntegerSequence
     if (currentSequence != i_compileSet->sequenceVector->begin()) {
-      if ((currentSequence-1)->getNumberOfRepetitions() == 0) {
-        continue;
+      if ((currentSequence-1)->getNumberOfRepetitions() != 0) {
+        LOG_DEBUG("Setting preIntegerSequence, its size is: " <<
+                  i_compileSet->preIntegerSequence.size());
+        i_compileSet->preIntegerSequence =
+            (currentSequence-1)->getIntegerSequence();
+      } else {
+        LOG_DEBUG("Cannot add a preIntegerSequence, due to rep = 0");
       }
-
-      LOG_DEBUG("Setting preIntegerSequence, its size is: " <<
-                i_compileSet->preIntegerSequence.size());
-
-      i_compileSet->preIntegerSequence =
-          (currentSequence-1)->getIntegerSequence();
     }
 
     // creation of a pin state vector which will be used
@@ -45,12 +44,13 @@ PinStateSequenceVector::iterator Condensor::prepareSequences(
     while (currentSequence != i_compileSet->sequenceVector->end() &&
            currentSequence->getNumberOfRepetitions() == 1) {
       LOG_DEBUG("insert into integer sequence");
-      std::vector<int> thisIntegerSequence = currentSequence->getIntegerSequence();
+      std::vector<int> thisIntegerSequence =
+          currentSequence->getIntegerSequence();
+
       i_compileSet->integerSequence.insert(
           i_compileSet->integerSequence.end(),
           thisIntegerSequence.begin(),
           thisIntegerSequence.end());
-
 
       LOG_DEBUG("Insert into pin state vector");
       // add its pin state to the whole list
@@ -83,15 +83,15 @@ PinStateSequenceVector::iterator Condensor::prepareSequences(
     }
 
     // break the while loop because we set everything allright for 1 shot
-    LOG_DEBUG("This is break!");
-    break;  // end while loop
-  }
-  return currentSequence;
+    LOG_DEBUG("This is break!");  // Break out the first while loop
+    break;
+    }
+  // Setting the end sequence indicating the ++sequence we will be optimising
+  i_compileSet->endSequence = currentSequence;
 }
 
 
-bool Condensor::handleForwardCorrispondingSequences(
-    CompileSet* i_compileSet) {
+bool Condensor::handleForwardCorrispondingSequences(CompileSet* i_compileSet) {
   // checking that there is a pre intger sequence
   if (i_compileSet->preIntegerSequence.size() == 0) {
     LOG_DEBUG("pre integer sequence size is 0");
@@ -146,10 +146,7 @@ bool Condensor::handleForwardCorrispondingSequences(
     LOG_ERROR("This should be optimised somewhere else!");
   }
 
-
   // Increase the previous sequence numberOfRepititions with numberOfFinds
-  if ( i_compileSet->sequenceVector->begin()== (i_compileSet->currentSequence))
-    LOG_ERROR("error");
   auto previousSequence = (i_compileSet->currentSequence-1);
   previousSequence->setNumberOfRepetitions(
       previousSequence->getNumberOfRepetitions() + numberOfFinds);
@@ -174,15 +171,14 @@ bool Condensor::handleForwardCorrispondingSequences(
 
 
 bool Condensor::handleBackwardCorrispondingSequences(
-    CompileSet* i_compileSet,
-    PinStateSequenceVector::iterator i_endSequence) {
+    CompileSet* i_compileSet) {
   // checking precondition
   if (i_compileSet->postIntegerSequence.size() == 0) {
     LOG_DEBUG("post interger Sequence size is 0");
     return false;
   }
 
-  if (i_endSequence == i_compileSet->sequenceVector->end()) {
+  if (i_compileSet->endSequence == i_compileSet->sequenceVector->end()) {
     LOG_DEBUG("End sequence is equal to the end of the state sequence vector");
     return false;
   }
@@ -237,12 +233,13 @@ bool Condensor::handleBackwardCorrispondingSequences(
   }
 
   LOG_DEBUG("Old number of reps: " <<
-            i_endSequence->getNumberOfRepetitions());
+            i_compileSet->endSequence->getNumberOfRepetitions());
+
   // Increase the previous sequence numberOfRepititions with numberOfFinds
-  i_endSequence->setNumberOfRepetitions(
-      i_endSequence->getNumberOfRepetitions() + numberOfFinds);
+  i_compileSet->endSequence->setNumberOfRepetitions(
+      i_compileSet->endSequence->getNumberOfRepetitions() + numberOfFinds);
   LOG_DEBUG("New number of reps: " <<
-            i_endSequence->getNumberOfRepetitions());
+            i_compileSet->endSequence->getNumberOfRepetitions());
 
   // remove the integer states fromt he current integer sequence list
   i_compileSet->integerSequence.erase(begin,
@@ -263,11 +260,8 @@ bool Condensor::handleBackwardCorrispondingSequences(
 
 
 bool Condensor::recompile(
-    CompileSet* i_compileSet,
-    PinStateSequenceVector::iterator* i_endSequence) {
+    CompileSet* i_compileSet) {
   // if the integerSequence does not have any values, return
-
-
   if (i_compileSet->integerSequence.size() == 0)
     return false;
 
@@ -280,17 +274,20 @@ bool Condensor::recompile(
       findMaximumEffectRecurence(recurenceVector,
                                  i_compileSet->integerSequence);
 
-  /*
-    finaly recompile the state sequence to something nice
-   if it makes sense
-  */
-  bool hasRecompiled = handleRecurence(recurenceVector,
-                                       maximumEffectRecurence,
-                                       i_compileSet);
-                                       
+  // If the max effect is pointing to the end, no luck
+  if (maximumEffectRecurence != recurenceVector.end()) {
+    /*
+      finaly recompile the state sequence to something nice
+      if it makes sense
+    */
+    bool hasRecompiled = handleRecurence(maximumEffectRecurence,
+                                         i_compileSet);
+  }
+
   LOG_DEBUG("Adding a new sequence!");
-  *i_endSequence = i_compileSet->sequenceVector->insert(
-      *i_endSequence, i_compileSet->stateSequence) + 1;
+    i_compileSet->endSequence = i_compileSet->sequenceVector->insert(
+        i_compileSet->endSequence, i_compileSet->stateSequence) + 1;
+  LOG_DEBUG("Yay done");
   return true;
 }
 
@@ -366,7 +363,7 @@ Condensor::RecurrenceVector Condensor::findRecurrence(
 
 Condensor::RecurrenceVector::const_iterator
     Condensor::findMaximumEffectRecurence(
-        const Condensor::RecurrenceVector i_recurrenceVector,
+        const Condensor::RecurrenceVector& i_recurrenceVector,
         const std::vector<int>& i_integerSequence) {
   Condensor::RecurrenceVector::const_iterator result = i_recurrenceVector.end();
 
@@ -388,8 +385,8 @@ Condensor::RecurrenceVector::const_iterator
     }
 
     if (std::get<2>(*recurrence) != i_integerSequence.end()) {
-            LOG_DEBUG("minus " << Condensor::statePenalty <<
-                      " because we need to make a sequence at the end");
+      LOG_DEBUG("minus " << Condensor::statePenalty <<
+                " because we need to make a sequence at the end");
       currentResult -= Condensor::statePenalty;
     }
 
@@ -404,7 +401,8 @@ Condensor::RecurrenceVector::const_iterator
     currentResult += totalLength - lengthOfSequence;
 
     LOG_DEBUG("A sequence has a score of: " << currentResult);
-    if (currentResult > maximumResult) {
+    if (currentResult >= maximumResult) {
+      LOG_DEBUG("Setting current result as the result!");
       maximumResult = currentResult;
       result = recurrence;
     }
@@ -414,24 +412,21 @@ Condensor::RecurrenceVector::const_iterator
 
 
 bool Condensor::handleRecurence(
-    const Condensor::RecurrenceVector& recurenceVector,
     const Condensor::RecurrenceVector::const_iterator& maximumEffectRecurence,
     CompileSet* i_compileSet) {
-  // If the max effect is pointing to the end, no luck
-  if (maximumEffectRecurence == recurenceVector.end())
-    return false;
-
   StateSequence newSequence;
 
   // if the recuring sequence does not start at the beginning
   if (std::get<0>(*maximumEffectRecurence) !=
       i_compileSet->integerSequence.begin()) {
     LOG_DEBUG("Creating a start sequence.");
+
     newSequence = StateSequence();
     PinStateVector pinStateVector =
         i_compileSet->stateSequence.getPinStateVector();
 
     // remove the states from the stateVector
+    LOG_DEBUG("Erase bit of the state vector");
     pinStateVector.erase(
         pinStateVector.begin() +
         (std::get<0>(*maximumEffectRecurence) -
@@ -443,21 +438,43 @@ bool Condensor::handleRecurence(
     newSequence.setNumberOfRepetitions(1);
 
     // insert the new sequence in the vector
+    int distance = std::distance(i_compileSet->currentSequence,
+                                 i_compileSet->endSequence);
+
+    LOG_DEBUG("Need to recompile the iterators -> distance: " <<
+              distance);
+
+    LOG_DEBUG("Insert a sequence to the vector");
     i_compileSet->currentSequence =
         i_compileSet->sequenceVector->insert(
-            i_compileSet->currentSequence,
-            newSequence);
+            i_compileSet->currentSequence + 1,
+            newSequence) - 1;
 
-    // reload the pin state vector
+    // relocation make iterators invalid, reset them
+    i_compileSet->endSequence = i_compileSet->currentSequence + distance + 1;
+
+    LOG_DEBUG("Size of the new vector: " <<
+              i_compileSet->sequenceVector->size());
+
+    LOG_DEBUG("New distance of pre and post "<<
+              std::distance(i_compileSet->currentSequence,
+                            i_compileSet->endSequence));
+
+              // reload the pin state vector
     pinStateVector =
         i_compileSet->stateSequence.getPinStateVector();
 
     // updating the replacement state sequence
+    LOG_DEBUG("Erase bit of the pin state vector");
     pinStateVector.erase(pinStateVector.begin(),
                          pinStateVector.begin() +
                          (std::get<0>(*maximumEffectRecurence) -
                           i_compileSet->integerSequence.begin()));
     i_compileSet->stateSequence.setPinStateVector(pinStateVector);
+
+    if (i_compileSet->endSequence == i_compileSet->sequenceVector->end()) {
+      LOG_DEBUG("end of the investigation is end of sequence vector");
+    }
   }
 
   if (std::get<2>(*maximumEffectRecurence) !=
@@ -466,6 +483,7 @@ bool Condensor::handleRecurence(
     newSequence = StateSequence();
     PinStateVector pinStateVector =
         i_compileSet->stateSequence.getPinStateVector();
+
     // remove the states from the stateVector
     pinStateVector.erase(pinStateVector.begin(),
                          pinStateVector.end() -
@@ -476,12 +494,19 @@ bool Condensor::handleRecurence(
     newSequence.setPinStateVector(pinStateVector);
     newSequence.setNumberOfRepetitions(1);
 
-    // insert the new sequence in the vector
-    i_compileSet->currentSequence =
-        i_compileSet->sequenceVector->insert(
-            i_compileSet->currentSequence,
-            newSequence) -1;
+    int distance = std::distance(i_compileSet->endSequence,
+                                 i_compileSet->currentSequence);
 
+    LOG_DEBUG("Need to recompile the iterators -> distance: " <<
+              distance);
+
+    // insert the new sequence in the vector
+    i_compileSet->endSequence =
+        i_compileSet->sequenceVector->insert(
+            i_compileSet->endSequence,
+            newSequence) + 1;
+
+    i_compileSet->currentSequence = i_compileSet->endSequence - distance -1;
     // reload the pin state vector
     pinStateVector =
         i_compileSet->stateSequence.getPinStateVector();
@@ -515,20 +540,19 @@ bool Condensor::recompileSequenceVector(
   LOG_DEBUG("Recompile condense!");
   CompileSet  compileSet;
   compileSet.currentSequence = i_sequenceVector->begin();
+  compileSet.endSequence = i_sequenceVector->end();
   compileSet.sequenceVector = i_sequenceVector;
   bool hasCondensed = false;
   PinStateSequenceVector::iterator endOfCurrentSequence;
   while (compileSet.currentSequence != i_sequenceVector->end()) {
-    endOfCurrentSequence = prepareSequences(&compileSet);
+    prepareSequences(&compileSet);
     hasCondensed |= handleForwardCorrispondingSequences(&compileSet);
-    hasCondensed |= handleBackwardCorrispondingSequences(&compileSet,
-                                                         endOfCurrentSequence);
-    hasCondensed |= recompile(&compileSet,
-                              &endOfCurrentSequence);
+    hasCondensed |= handleBackwardCorrispondingSequences(&compileSet);
+    hasCondensed |= recompile(&compileSet);
 
     cleanCompileSet(&compileSet);
 
-    compileSet.currentSequence = endOfCurrentSequence;
+    compileSet.currentSequence = compileSet.endSequence;
   }
   LOG_DEBUG("Finished recompile sequence");
   return hasCondensed;

@@ -27,6 +27,7 @@ class Condensor {
 
     // Iterator, which indicates the current investigated state
     PinStateSequenceVector::iterator currentSequence;
+    PinStateSequenceVector::iterator endSequence;
 
     //  Pointer to the sequence vector which need to be reduced
     PinStateSequenceVector* sequenceVector;
@@ -41,11 +42,13 @@ class Condensor {
   */
   typedef
       std::tuple<
-      std::vector<int>::const_iterator,  // start of the sequence
-      std::vector<int>::const_iterator,  // end of the sequence
+      std::vector<int>::const_iterator,  // start of the integer sequence
+      std::vector<int>::const_iterator,  // end of the integer sequence
       std::vector<int>::const_iterator>  // end which the last occurence ends
       RecurrenceResult;
+
   typedef std::vector<RecurrenceResult> RecurrenceVector;
+
   /*
     functions that will find if the given sequence vector
     has corrisponding sequences with previous and sequential sequence.
@@ -54,16 +57,14 @@ class Condensor {
   static bool handleForwardCorrispondingSequences(CompileSet* i_compileSet);
 
   static bool handleBackwardCorrispondingSequences(
-      CompileSet* i_compileSet,
-      PinStateSequenceVector::iterator i_endSequence);
+      CompileSet* i_compileSet);
 
   static void cleanCompileSet(CompileSet* i_compileSet);
 
-  static bool recompile(CompileSet* i_compileSet,
-                        PinStateSequenceVector::iterator* i_endSequence);
+  static bool recompile(CompileSet* i_compileSet);
 
   // finds sequence with 1 repitition, sets the pre and post integer sequences
-  static PinStateSequenceVector::iterator prepareSequences(
+  static void prepareSequences(
       CompileSet* i_compileSet);
 
   // find sequence which are repeated in the sequence
@@ -72,12 +73,11 @@ class Condensor {
 
   // for the repition which has the most effect to replace
   static Condensor::RecurrenceVector::const_iterator findMaximumEffectRecurence(
-          const Condensor::RecurrenceVector i_recurrenceVector,
+          const Condensor::RecurrenceVector& i_recurrenceVector,
           const std::vector<int>& i_integerSequence);
 
   // recompile the investigated sequence if it makes sense
   static bool handleRecurence(
-      const Condensor::RecurrenceVector& recurenceVector,
       const Condensor::RecurrenceVector::const_iterator& maximumEffectRecurence,
       CompileSet* i_compileSet);
                          

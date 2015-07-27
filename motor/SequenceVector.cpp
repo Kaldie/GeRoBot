@@ -88,7 +88,6 @@ bool SequenceVector::condenseVector(
   bool mergedCondensed = Condensor::mergeCondense(&m_sequenceVector,
                                                   i_removeFromVector);
   bool recompileCondensed = Condensor::recompileSequenceVector(&m_sequenceVector);
-
   // let it be known that at least it is a bit shorter!
   return internalyCondesed | mergedCondensed | recompileCondensed;
 }

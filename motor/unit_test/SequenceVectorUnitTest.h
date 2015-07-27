@@ -33,6 +33,7 @@ class SequenceVectorUnitTest : public CxxTest::TestSuite {
 
 
   void testAppendPinState() {
+    LOG_DEBUG("Test: testAppendPinState");
     pinState1.displayPinState();
     TS_ASSERT(sequenceVector.addToSequence(pinState1));
     TS_ASSERT(sequenceVector.addToSequence(pinState2));
@@ -50,6 +51,7 @@ class SequenceVectorUnitTest : public CxxTest::TestSuite {
 
 
   void testCount() {
+    LOG_DEBUG("Test Count");
     sequenceVector.addToSequence(pinState1);
     sequenceVector.addToSequence(pinState2);
     TS_ASSERT_EQUALS(sequenceVector.numberOfSteps(),
@@ -80,6 +82,7 @@ class SequenceVectorUnitTest : public CxxTest::TestSuite {
   }
 
   void testIsNormalised() {
+    LOG_DEBUG("testAppendPinState");
     sequenceVector.addToSequence(PinState({1, 2, 3, 4, 5, 6}), true);
     sequenceVector.addToSequence(PinState({/*1,*/ 2, 3, 4, 5, 6}), true);
     TS_ASSERT(!sequenceVector.isNormilized());
@@ -97,6 +100,7 @@ class SequenceVectorUnitTest : public CxxTest::TestSuite {
   }
 
   void testNormalise() {
+    LOG_DEBUG("Test normalise");
     sequenceVector.addToSequence(PinState({1, 2, 3, 4, 5, 6}), true);
     sequenceVector.addToSequence(PinState({/*1,*/ 2, 3, 4, 5, 6}), true);
     TS_ASSERT(!sequenceVector.isNormilized());
@@ -108,6 +112,7 @@ class SequenceVectorUnitTest : public CxxTest::TestSuite {
 
 
   void testInternalCondense() {
+    LOG_DEBUG("Test internal condense!");
     sequenceVector.addToSequence(PinState({1, 2, 3, 4, 5, 6}), true);
     sequenceVector.addToSequence(PinState({1, 2, 3, 4, 5, 6}), true);
     TS_ASSERT_EQUALS(1, sequenceVector.begin()->getNumberOfRepetitions());
@@ -122,6 +127,7 @@ class SequenceVectorUnitTest : public CxxTest::TestSuite {
 
 
   void testMergeCondenseCondense() {
+    LOG_DEBUG("Test merge condense");
     StateSequence newStateSequence1(
         3000, 1,
         PinStateVector({PinState({1, 2, 3, 4, 5, 6})}));
@@ -360,6 +366,8 @@ class SequenceVectorUnitTest : public CxxTest::TestSuite {
                      std::vector<int>({}));
     TS_ASSERT_EQUALS(sequenceVector.getSequenceVector()[1].getIntegerSequence(),
                      std::vector<int>({}));
+    for (auto& i : sequenceVector.getSequenceVector())
+      i.displaySequence();
     /*
       TS_ASSERT_EQUALS(sequenceVector.getSequenceVector()[2].getIntegerSequence(),
                      std::vector<int>({ 14, 12, 4, 12, 8 }));
