@@ -228,7 +228,9 @@ class SequenceVectorUnitTest : public CxxTest::TestSuite {
     TS_ASSERT(sequenceVector.condenseVector());
     TS_ASSERT_EQUALS(sequenceVector.numberOfSteps(),
                      numberOfOriginalSteps);
-
+    for (auto& i : sequenceVector.getSequenceVector())
+      i.displaySequence();
+    
     TS_ASSERT_EQUALS(sequenceVector.numberOfSequences(), 4);
     TS_ASSERT_EQUALS(sequenceVector.getSequenceVector()[0].getIntegerSequence(),
                      std::vector<int>({0, 8}));
@@ -299,6 +301,9 @@ class SequenceVectorUnitTest : public CxxTest::TestSuite {
     TS_ASSERT_EQUALS(sequenceVector.numberOfSteps(),
                      numberOfOriginalSteps);
 
+    for (auto& i:sequenceVector.getSequenceVector())
+      i.displaySequence();
+    
     TS_ASSERT_EQUALS(sequenceVector.numberOfSequences(), 4);
 
     TS_ASSERT_EQUALS(sequenceVector.getSequenceVector()[0].getIntegerSequence(),
@@ -335,6 +340,22 @@ class SequenceVectorUnitTest : public CxxTest::TestSuite {
     pinState2.update(3, 1);
     pinState2.update(1, 1);
     pinStatevector.push_back(pinState2);
+    pinState2.update(3, 0);
+    pinState2.update(1, 0);
+    pinStatevector.push_back(pinState2);
+        pinState2.update(3, 1);
+    pinState2.update(1, 1);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(3, 0);
+    pinState2.update(1, 0);
+    pinStatevector.push_back(pinState2);
+        pinState2.update(3, 1);
+    pinState2.update(1, 1);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(3, 0);
+    pinState2.update(1, 0);
+    pinStatevector.push_back(pinState2);
+        pinStatevector.push_back(pinState2);
 
     stateSequence.setPinStateVector(pinStatevector);
     stateSequence.setNumberOfRepetitions(1);

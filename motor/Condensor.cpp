@@ -273,22 +273,19 @@ bool Condensor::recompile(
   Condensor::RecurrenceVector::const_iterator maximumEffectRecurence =
       findMaximumEffectRecurence(recurenceVector,
                                  i_compileSet->integerSequence);
-
+  bool hasAddedEndSequence = false;
   // If the max effect is pointing to the end, no luck
   if (maximumEffectRecurence != recurenceVector.end()) {
     /*
       finaly recompile the state sequence to something nice
       if it makes sense
     */
-    bool hasRecompiled = handleRecurence(maximumEffectRecurence,
-                                         i_compileSet);
+    hasAddedEndSequence = handleRecurence(maximumEffectRecurence,
+                                          i_compileSet);
   }
 
-  LOG_DEBUG("Adding a new sequence!");
-    i_compileSet->endSequence = i_compileSet->sequenceVector->insert(
-        i_compileSet->endSequence, i_compileSet->stateSequence) + 1;
   LOG_DEBUG("Yay done");
-  return true;
+  return hasAddedEndSequence;
 }
 
 
@@ -341,9 +338,14 @@ Condensor::RecurrenceVector Condensor::findRecurrence(
 
         // check if we are still within bounds
         if (std::distance(i_vector.begin(),
-                          currentPosition + sequenceSize) >=
+                          currentPosition + 2 * sequenceSize) >
             static_cast<int>(i_vector.size())) {
-          continue;
+          break;
+        } else {
+          LOG_DEBUG("Vector size: " << i_vector.size());
+          LOG_DEBUG("End position " <<
+                    std::distance(i_vector.begin(),
+                                  currentPosition + sequenceSize));
         }
       }
 
@@ -417,6 +419,7 @@ bool Condensor::handleRecurence(
     const Condensor::RecurrenceVector::const_iterator& maximumEffectRecurence,
     CompileSet* i_compileSet) {
   // if the recuring sequence does not start at the beginning
+  bool hasAddedEndSequence = false;
   if (std::get<0>(*maximumEffectRecurence) !=
       i_compileSet->integerSequence.begin()) {
     LOG_DEBUG("Creating a start sequence.");
@@ -425,9 +428,10 @@ bool Condensor::handleRecurence(
                   &newSequence,
                   std::get<0>(*maximumEffectRecurence),
                   /*erase begin = */ false);
-
+    // adding sequence to the vector
     addSequenceToVector(i_compileSet,
-                        1,  // distance from currentSequence to newly inserted
+                        std::distance(i_compileSet->currentSequence,
+                                      i_compileSet->endSequence),
                         &newSequence);
   }
 
@@ -439,18 +443,18 @@ bool Condensor::handleRecurence(
                   &newSequence,
                   std::get<2>(*maximumEffectRecurence),
                   /*erase_begin = */ true);
-
-     addSequenceToVector(i_compileSet,
-                         std::distance(i_compileSet->endSequence,
-                                       i_compileSet->currentSequence),
+    // adding sequence to the vector
+    addSequenceToVector(i_compileSet,
+                        std::distance(i_compileSet->currentSequence,
+                                      i_compileSet->endSequence),
                         &newSequence);
+    hasAddedEndSequence = true;
   }
   
   // Update current state after adding pre and post state if necessary
   updateCurrentState(i_compileSet,
                      *maximumEffectRecurence);
-  // clean up
-  return true;
+  return hasAddedEndSequence;
 }
 
 
@@ -488,7 +492,11 @@ void Condensor::addSequenceToVector(CompileSet* i_compileSet,
     LOG_DEBUG("Distance between iterators: " <<
               distance);
 
-    LOG_DEBUG("Insert a sequence to the vector");
+    int positionInVector = std::distance(
+        i_compileSet->sequenceVector->begin(),
+        i_compileSet->currentSequence + insertionPosition);
+                                         
+    LOG_DEBUG("Insert a sequence to the vector @ " << positionInVector);
     i_compileSet->currentSequence =
         i_compileSet->sequenceVector->insert(
             i_compileSet->currentSequence + insertionPosition, *newSequence)
@@ -526,7 +534,7 @@ void Condensor::updateCurrentState(
 }
 
 
-    void Condensor::cleanCompileSet(CompileSet* i_compileSet) {
+void Condensor::cleanCompileSet(CompileSet* i_compileSet) {
   /*
     this functions cleans the compile set,
     so it will give good results for the next session!
@@ -548,11 +556,29 @@ bool Condensor::recompileSequenceVector(
   bool hasCondensed = false;
   PinStateSequenceVector::iterator endOfCurrentSequence;
   while (compileSet.currentSequence != i_sequenceVector->end()) {
+    // Look for sequence with 1 repitition
     prepareSequences(&compileSet);
+
+    // if current sequence is end, did not find
+    if (compileSet.currentSequence == i_sequenceVector->end()) {
+      continue;
+    } else {
+      LOG_DEBUG("Start internal recompile");
+    }
+
     hasCondensed |= handleForwardCorrispondingSequences(&compileSet);
     hasCondensed |= handleBackwardCorrispondingSequences(&compileSet);
-    hasCondensed |= recompile(&compileSet);
+    bool hasInsertedAtEnd= recompile(&compileSet);
 
+    LOG_DEBUG("Distance between current and end :" <<
+              std::distance(compileSet.currentSequence,
+                            compileSet.endSequence));
+    addSequenceToVector(
+        &compileSet,
+        std::distance(compileSet.currentSequence,
+            compileSet.endSequence) - hasInsertedAtEnd,
+        &compileSet.stateSequence);
+    
     cleanCompileSet(&compileSet);
 
     compileSet.currentSequence = compileSet.endSequence;
