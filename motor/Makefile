@@ -11,9 +11,9 @@ TOROOT= ..
 DSRCS= debug.cpp
 SRCS := $(filter-out $(DSRCS), $(wildcard *.cpp))
 
+#dependencies of other modules
+DEPENDENCY = ArduinoSerialConnection.o ArduinoMotorDriver.o Point2D.o Vector2D.o
 
-#LIBS=-lMathInterface -lArduinoInterface
-LIBS = -lArduinoInterface
 # define the executable file 
 MAIN = MotorInterface
 DEBUG = debug
