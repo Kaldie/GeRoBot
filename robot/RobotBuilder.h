@@ -3,7 +3,7 @@
 #define ROBOT_ROBOTBUILDER_H_
 
 #include <JointController.h>
-#include "./XMLBuilder.h"
+#include <XMLBuilder.h>
 
 class JointController;
 

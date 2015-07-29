@@ -1,7 +1,7 @@
 #ifndef JointControllerBUilder_H
 #define JointControllerBUilder_H
 
-#include "XMLBuilder.h"
+#include <XMLBuilder.h>
 #include <BaseJoint.h>
 #include <StepperDriver.h>
 

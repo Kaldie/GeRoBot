@@ -2,7 +2,7 @@
 #define JointControllerBuilder_H
 
 #include <JointController.h>
-#include "./XMLBuilder.h"
+#include <XMLBuilder.h>
 
 class JointControllerBuilder: public XMLBuilder {
   GETSET_NO_CONST(JointController,

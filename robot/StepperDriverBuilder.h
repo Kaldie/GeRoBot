@@ -1,7 +1,7 @@
 #ifndef StepperDriverBuilder_H
 #define StepperDriverBuilder_H
 
-#include "XMLBuilder.h"
+#include <XMLBuilder.h>
 #include <StepperDriver.h>
 
 class StepperDriverBuilder: public XMLBuilder
