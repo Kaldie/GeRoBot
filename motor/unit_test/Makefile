@@ -13,8 +13,10 @@ SRCS := $(filter-out $(DSRCS), $(wildcard ../*.cpp))
 
 UnitTests = $(wildcard *.h)
 
+DEPENDENCY = ArduinoSerialConnection.o ArduinoMotorDriver.o Point2D.o Vector2D.o
+
 #LIBS=-lMathInterface -lArduinoInterface
-LIBS = -lArduinoInterface -lMathInterface
+#LIBS = -lArduinoInterface -lMathInterface
 include $(TOROOT)/Makefile.config
 
 .DEFAULT_GOAL := unitTest

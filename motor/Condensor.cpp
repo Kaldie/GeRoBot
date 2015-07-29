@@ -565,22 +565,21 @@ bool Condensor::recompileSequenceVector(
     } else {
       LOG_DEBUG("Start internal recompile");
     }
+    // Notify that we recompiled the sequence vector
+    hasCondensed = true;
+    handleForwardCorrispondingSequences(&compileSet);
+    handleBackwardCorrispondingSequences(&compileSet);
 
-    hasCondensed |= handleForwardCorrispondingSequences(&compileSet);
-    hasCondensed |= handleBackwardCorrispondingSequences(&compileSet);
-    bool hasInsertedAtEnd= recompile(&compileSet);
+    bool hasInsertedAtEnd = recompile(&compileSet);
 
-    LOG_DEBUG("Distance between current and end :" <<
-              std::distance(compileSet.currentSequence,
-                            compileSet.endSequence));
     addSequenceToVector(
         &compileSet,
         std::distance(compileSet.currentSequence,
             compileSet.endSequence) - hasInsertedAtEnd,
         &compileSet.stateSequence);
-    
+    // clean up
     cleanCompileSet(&compileSet);
-
+    // set the current to the end, and start over again
     compileSet.currentSequence = compileSet.endSequence;
   }
   LOG_DEBUG("Finished recompile sequence");

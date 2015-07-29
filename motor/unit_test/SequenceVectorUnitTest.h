@@ -316,8 +316,12 @@ class SequenceVectorUnitTest : public CxxTest::TestSuite {
                      std::vector<int>({0, 8}));    
   }
 
-  void testRecompileCondense_internalRecompile() {
-    LOG_INFO("testRecompileCondense_internalRecompile");
+  void testRecompileCondense_internalRecompile_to_end() {
+    LOG_INFO("testRecompileCondense_internalRecompile_to_end");
+    /*
+      Simulating a sequence which can be condensed
+      by merging the last 2 steps and repeating
+    */
     // Simulating a ccw step
     PinStateVector pinStatevector;
     pinState2.update(3, 0);
@@ -343,20 +347,7 @@ class SequenceVectorUnitTest : public CxxTest::TestSuite {
     pinState2.update(3, 0);
     pinState2.update(1, 0);
     pinStatevector.push_back(pinState2);
-        pinState2.update(3, 1);
-    pinState2.update(1, 1);
-    pinStatevector.push_back(pinState2);
-    pinState2.update(3, 0);
-    pinState2.update(1, 0);
-    pinStatevector.push_back(pinState2);
-        pinState2.update(3, 1);
-    pinState2.update(1, 1);
-    pinStatevector.push_back(pinState2);
-    pinState2.update(3, 0);
-    pinState2.update(1, 0);
-    pinStatevector.push_back(pinState2);
-        pinStatevector.push_back(pinState2);
-
+    
     stateSequence.setPinStateVector(pinStatevector);
     stateSequence.setNumberOfRepetitions(1);
 
@@ -368,13 +359,142 @@ class SequenceVectorUnitTest : public CxxTest::TestSuite {
     for (auto& i : x)
       std::cout << i <<", ";
     std::cout << "." << std::endl;
-    /*
-      LOG_DEBUG("Displaying sequences that need to be " <<
-      "recompile condensed for foward condense");
 
-      stateSequence1.displaySequence();
-      stateSequence2.displaySequence();
+    int numberOfOriginalSteps = sequenceVector.numberOfSteps();
+
+    TS_ASSERT(sequenceVector.condenseVector());
+    TS_ASSERT_EQUALS(sequenceVector.numberOfSteps(),
+                     numberOfOriginalSteps);
+
+    TS_ASSERT_EQUALS(sequenceVector.numberOfSequences(), 3);
+
+    TS_ASSERT_EQUALS(sequenceVector.getSequenceVector()[0].getIntegerSequence(),
+                     std::vector<int>({}));
+    TS_ASSERT_EQUALS(sequenceVector.getSequenceVector()[1].getIntegerSequence(),
+                     std::vector<int>({6, 4}));
+    TS_ASSERT_EQUALS(sequenceVector.getSequenceVector()[2].getIntegerSequence(),
+                     std::vector<int>({14, 4}));
+  }
+
+  void testRecompileCondense_internalRecompile_to_begin() {
+    LOG_INFO("testRecompileCondense_internalRecompile_to_begin");
+    /*
+      Simulating a sequence which can be condensed
+      by merging the first 2 steps and repeating
     */
+    PinStateVector pinStatevector;
+    pinStatevector.push_back(pinState2);
+    pinState2.update(1, 0);
+    pinState2.update(3, 0);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(3, 1);
+    pinState2.update(1, 1);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(3, 0);
+    pinState2.update(1, 0);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(3, 1);
+    pinState2.update(1, 1);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(3, 0);
+    pinState2.update(1, 0);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(3, 1);
+    pinState2.update(1, 1);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(3, 0);
+    pinState2.update(1, 0);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(3, 0);
+    pinStatevector.push_back(pinState2);
+    stateSequence.setPinStateVector(pinStatevector);
+    stateSequence.setNumberOfRepetitions(1);
+
+    sequenceVector.setSequenceVector(
+        PinStateSequenceVector(
+            {stateSequence}));
+
+    std::vector<int> x = stateSequence.getIntegerSequence();
+
+    int numberOfOriginalSteps = sequenceVector.numberOfSteps();
+
+    TS_ASSERT(sequenceVector.condenseVector());
+    TS_ASSERT_EQUALS(sequenceVector.numberOfSteps(),
+                     numberOfOriginalSteps);
+
+    TS_ASSERT_EQUALS(sequenceVector.numberOfSequences(), 3);
+
+    TS_ASSERT_EQUALS(sequenceVector.getSequenceVector()[0].getIntegerSequence(),
+                     std::vector<int>({}));
+    TS_ASSERT_EQUALS(sequenceVector.getSequenceVector()[1].getIntegerSequence(),
+                     std::vector<int>({14, 4}));
+    TS_ASSERT_EQUALS(sequenceVector.getSequenceVector()[2].getIntegerSequence(),
+                     std::vector<int>({4}));
+  }
+
+
+  void testRecompileCondense_internalRecompile_to_middle() {
+    LOG_INFO("testRecompileCondense_internalRecompile_to_middle");
+    // Simulating a ccw step
+    PinStateVector pinStatevector;
+    pinState2.update(1, 0);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(1, 0);
+    pinState2.update(3, 0);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(3, 1);
+    pinState2.update(1, 1);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(3, 0);
+    pinState2.update(1, 0);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(3, 1);
+    pinState2.update(1, 1);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(3, 0);
+    pinState2.update(1, 0);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(3, 1);
+    pinState2.update(1, 1);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(3, 0);
+    pinState2.update(1, 0);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(3, 1);
+    pinState2.update(1, 1);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(3, 0);
+    pinState2.update(1, 0);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(3, 1);
+    pinState2.update(1, 1);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(3, 0);
+    pinState2.update(1, 0);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(3, 1);
+    pinState2.update(1, 1);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(3, 0);
+    pinState2.update(1, 0);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(3, 1);
+    pinState2.update(1, 1);
+    pinStatevector.push_back(pinState2);
+    pinState2.update(3, 0);
+    pinState2.update(1, 0);
+    pinStatevector.push_back(pinState2);
+
+    pinState2.update(3, 0);
+    pinStatevector.push_back(pinState2);
+    stateSequence.setPinStateVector(pinStatevector);
+    stateSequence.setNumberOfRepetitions(1);
+
+    sequenceVector.setSequenceVector(
+        PinStateSequenceVector(
+            {stateSequence}));
+
+    std::vector<int> x = stateSequence.getIntegerSequence();
     int numberOfOriginalSteps = sequenceVector.numberOfSteps();
 
     TS_ASSERT(sequenceVector.condenseVector());
@@ -386,18 +506,12 @@ class SequenceVectorUnitTest : public CxxTest::TestSuite {
     TS_ASSERT_EQUALS(sequenceVector.getSequenceVector()[0].getIntegerSequence(),
                      std::vector<int>({}));
     TS_ASSERT_EQUALS(sequenceVector.getSequenceVector()[1].getIntegerSequence(),
-                     std::vector<int>({}));
-    for (auto& i : sequenceVector.getSequenceVector())
-      i.displaySequence();
-    /*
-      TS_ASSERT_EQUALS(sequenceVector.getSequenceVector()[2].getIntegerSequence(),
-                     std::vector<int>({ 14, 12, 4, 12, 8 }));
+                     std::vector<int>({12, 4}));
+    TS_ASSERT_EQUALS(sequenceVector.getSequenceVector()[2].getIntegerSequence(),
+                     std::vector<int>({14, 4}));
     TS_ASSERT_EQUALS(sequenceVector.getSequenceVector()[3].getIntegerSequence(),
-                     std::vector<int>({0, 8}));
-    */
+                     std::vector<int>({4}));
   }
-
-  
 };
 
 #endif  // MOTOR_UNIT_TEST_SEQUENCEVECTORUNITTEST_H_
