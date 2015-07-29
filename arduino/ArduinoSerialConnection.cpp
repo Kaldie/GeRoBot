@@ -165,7 +165,7 @@ void ArduinoSerialConnection::serialWrite(const unsigned char* i_pointer,
   if (m_fileHandle == -1)
     openConnection();
   if (i_numberOfWrites == sizeof(int)) {
-    LOG_DEBUG("Writing: "<< *(int*)(i_pointer); << " as integer");
+    LOG_DEBUG("Writing: " << *(int*)(i_pointer) << " as integer");
   } else if (i_numberOfWrites == sizeof(char))
     LOG_DEBUG("Writing: "<< *i_pointer);
 
