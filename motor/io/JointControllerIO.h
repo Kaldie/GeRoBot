@@ -1,17 +1,17 @@
-#ifndef JointControllerBuilder_H
-#define JointControllerBuilder_H
+#ifndef JointControllerIO_H
+#define JointControllerIO_H
 
 #include <JointController.h>
 #include <XMLBuilder.h>
 
-class JointControllerBuilder: public XMLBuilder {
+class JointControllerIO: public XMLBuilder {
   GETSET_NO_CONST(JointController,
                     m_jointController,
                     JointController);
 
  private:
   // no default contructor!
-  JointControllerBuilder();
+  JointControllerIO();
   void addJoints();
   void parseJoint(const pugi::xml_node&);
   ArduinoMotorDriver parseActuator(const pugi::xml_node&);
@@ -19,10 +19,10 @@ class JointControllerBuilder: public XMLBuilder {
   bool updateJointNodes();
 
  public:
-  explicit JointControllerBuilder(const pugi::xml_node&);
+  explicit JointControllerIO(const pugi::xml_node&);
 
   virtual void build();
   bool update(const JointController& i_newJointController);
 };
 
-#endif // JointControllerBuilder
+#endif // JointControllerIO

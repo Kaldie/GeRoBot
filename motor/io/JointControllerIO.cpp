@@ -1,9 +1,8 @@
 #include <macroHeader.h>
-#include "JointControllerBuilder.h"
-#include "JointBuilder.h"
+#include "JointControllerIO.h"
+#include "JointIO.h"
 
-void JointControllerBuilder::build()
-{
+void JointControllerIO::build() {
   LOG_DEBUG("Building a Joint controller!");
   LOG_DEBUG("Joint controller node: " <<
             std::string(getNode().name()));
@@ -16,7 +15,7 @@ void JointControllerBuilder::build()
 }
 
 
-void JointControllerBuilder::addJoints(){
+void JointControllerIO::addJoints(){
   // Adding all the joints that
   LOG_DEBUG("Adding Joints");
 
@@ -35,14 +34,14 @@ void JointControllerBuilder::addJoints(){
 }
 
 
-void JointControllerBuilder::parseJoint(const pugi::xml_node& i_jointNode) {
-  JointBuilder jointBuilder(i_jointNode);
-  jointBuilder.build();
-  getJointController().addJoint(jointBuilder.getJointPointer());
+void JointControllerIO::parseJoint(const pugi::xml_node& i_jointNode) {
+  JointIO jointIO(i_jointNode);
+  jointIO.build();
+  getJointController().addJoint(jointIO.getJointPointer());
 }
 
 
-ArduinoMotorDriver JointControllerBuilder::parseActuator(
+ArduinoMotorDriver JointControllerIO::parseActuator(
     const pugi::xml_node& i_node) {
   if (std::string(getNodeFromPath(i_node, "./TYPE").text().as_string())
       != "Arduino")
@@ -60,7 +59,7 @@ ArduinoMotorDriver JointControllerBuilder::parseActuator(
 }
 
 
-bool JointControllerBuilder::update(
+bool JointControllerIO::update(
     const JointController& i_jointController) {
   bool hasSucceeded(true);
   setJointController(i_jointController);
@@ -70,7 +69,7 @@ bool JointControllerBuilder::update(
 }
 
 
-bool JointControllerBuilder::updateActuatorNode() {
+bool JointControllerIO::updateActuatorNode() {
   pugi::xml_node actuatorNode = getNodeFromPath("./ACTUATOR");
 
   getNodeFromPath(actuatorNode, "./REGULAR_EXPRESSION").text().
@@ -83,7 +82,7 @@ bool JointControllerBuilder::updateActuatorNode() {
 }
 
 
-bool JointControllerBuilder::updateJointNodes() {
+bool JointControllerIO::updateJointNodes() {
   bool hasSucceeded(true);
   JointPointerVector rotationalJointVector =
       m_jointController.getJoints(Rotational);
@@ -114,15 +113,15 @@ bool JointControllerBuilder::updateJointNodes() {
     }
 
 
-    JointBuilder jointBuilder(jointNode);
-    hasSucceeded &= jointBuilder.update(jointPointer);
+    JointIO jointIO(jointNode);
+    hasSucceeded &= jointIO.update(jointPointer);
   }
   return hasSucceeded;
 }
 
 
-JointControllerBuilder::JointControllerBuilder(const pugi::xml_node& i_node)
+JointControllerIO::JointControllerIO(const pugi::xml_node& i_node)
     : XMLBuilder(i_node) {
-  LOG_DEBUG("Creating a JointControllerBuilder with node: " << i_node.name());
+  LOG_DEBUG("Creating a JointControllerIO with node: " << i_node.name());
 }
 

@@ -7,19 +7,19 @@
 
 class JointController;
 
-class RobotBuilder: public XMLBuilder {
+class RobotIO: public XMLBuilder {
   // Properties
   GET(RobotPointer,
       m_robotPointer,
       RobotPointer);
 
  private:
-  RobotBuilder();
+  RobotIO();
   JointController parseJointController(const pugi::xml_node&);
   bool updateJointController(const JointController& i_jointController);
 
  public:
-  explicit RobotBuilder(const std::string&);
+  explicit RobotIO(const std::string&);
   virtual void build();
   virtual void displayTree();
   void setRobotPointer(Robot* i_robotPointer);

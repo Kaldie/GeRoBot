@@ -1,17 +1,17 @@
 // Copyright [2015] Ruud Cools
 #include <macroHeader.h>
-#include "./RobotBuilder.h"
-#include "./JointControllerBuilder.h"
+#include "./RobotIO.h"
+#include "./JointControllerIO.h"
 #include "./Robot.h"
 
-RobotBuilder::RobotBuilder(const std::string& i_fileName)
+RobotIO::RobotIO(const std::string& i_fileName)
     : XMLBuilder(i_fileName) {
   m_robotPointer.reset(new Robot);
   XMLBuilder::build();
 }
 
 
-void RobotBuilder::build() {
+void RobotIO::build() {
   // need to call the xml builder build function to load the root node of the document given by the file name.
   LOG_DEBUG("Building a robot from file name: " << getFileName());
   LOG_DEBUG("Root node is: " << getNode().name());
@@ -21,15 +21,15 @@ void RobotBuilder::build() {
 }
 
 
-JointController RobotBuilder::parseJointController(
+JointController RobotIO::parseJointController(
     const pugi::xml_node& i_node) {
-  JointControllerBuilder jointControllerBuilder(i_node);
-  jointControllerBuilder.build();
-  return jointControllerBuilder.getJointController();
+  JointControllerIO jointControllerIO(i_node);
+  jointControllerIO.build();
+  return jointControllerIO.getJointController();
 }
 
 
-void RobotBuilder::displayTree() {
+void RobotIO::displayTree() {
   LOG_DEBUG("Finding root node!");
   pugi::xml_node node = getNode();
   LOG_DEBUG("Root node found!");
@@ -50,28 +50,28 @@ void RobotBuilder::displayTree() {
 }
 
 
-void RobotBuilder::setRobotPointer(Robot* i_robotPointer) {
+void RobotIO::setRobotPointer(Robot* i_robotPointer) {
   m_robotPointer.reset(i_robotPointer);
 }
 
 
 
-bool RobotBuilder::update(const RobotPointer& i_robotPointer) {
+bool RobotIO::update(const RobotPointer& i_robotPointer) {
   m_robotPointer = i_robotPointer;
   return updateJointController(m_robotPointer->getJointController());
 }
 
 
-bool RobotBuilder::updateJointController(
+bool RobotIO::updateJointController(
     const JointController& i_jointController) {
-  JointControllerBuilder jointControllerBuilder(
+  JointControllerIO jointControllerIO(
       getNodeFromPath("./ROBOT/JOINTCONTROLLER"));
 
-  return jointControllerBuilder.update(m_robotPointer->getJointController());
+  return jointControllerIO.update(m_robotPointer->getJointController());
 }
 
 
-bool RobotBuilder::store(const std::string& i_fileName) {
+bool RobotIO::store(const std::string& i_fileName) {
   // check if this one is the owner of the document tree!
   if (!getHasLoaded())
     return false;

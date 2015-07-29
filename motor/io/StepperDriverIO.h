@@ -1,22 +1,22 @@
-#ifndef StepperDriverBuilder_H
-#define StepperDriverBuilder_H
+#ifndef StepperDriverIO_H
+#define StepperDriverIO_H
 
 #include <XMLBuilder.h>
 #include <StepperDriver.h>
 
-class StepperDriverBuilder: public XMLBuilder
+class StepperDriverIO: public XMLBuilder
 {
   GETSET(StepperDriver,m_stepperDriver,StepperDriver);
   
  private:
   //No default construction!
-  StepperDriverBuilder();
+  StepperDriverIO();
 	bool updatePins(const PinVector& i_stepperDriver);
 
  public:
   virtual void build();
 	bool update(const BaseMotor* i_stepperDriver);
-  StepperDriverBuilder(const pugi::xml_node&);
+  StepperDriverIO(const pugi::xml_node&);
 };
 
-#endif // StepperDriverBuilder
+#endif // StepperDriverIO

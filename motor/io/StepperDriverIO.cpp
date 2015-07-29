@@ -1,7 +1,7 @@
 #include <macroHeader.h>
-#include "StepperDriverBuilder.h"
+#include "StepperDriverIO.h"
 
-void StepperDriverBuilder::build()
+void StepperDriverIO::build()
 {
   LOG_DEBUG("Buildiing a stepperdriver!");
   std::string actuatorType=getNode().first_child().text().as_string();
@@ -25,7 +25,7 @@ void StepperDriverBuilder::build()
 }
 
 
-bool StepperDriverBuilder::update(const BaseMotor* i_stepperDriver){
+bool StepperDriverIO::update(const BaseMotor* i_stepperDriver){
 	bool hasSucceded(true);
 	hasSucceded&=updatePins(i_stepperDriver->getCurrentPinState().getPinVector());
 	getNodeFromPath("./DEFAULT_DIRECTION").text().set(i_stepperDriver->getDefaultDirection().c_str());
@@ -34,7 +34,7 @@ bool StepperDriverBuilder::update(const BaseMotor* i_stepperDriver){
 }
 
 
-bool StepperDriverBuilder::updatePins(const PinVector& i_pinVector){
+bool StepperDriverIO::updatePins(const PinVector& i_pinVector){
 	//Update pin numbers
 	pugi::xml_node pinValueNode=getNodeFromPath("./PINS/VALUE");
 	PinVector::const_iterator pinIterator=i_pinVector.begin();
@@ -60,7 +60,7 @@ bool StepperDriverBuilder::updatePins(const PinVector& i_pinVector){
 }		
 
 	
-StepperDriverBuilder::StepperDriverBuilder(const pugi::xml_node& i_node):
+StepperDriverIO::StepperDriverIO(const pugi::xml_node& i_node):
   XMLBuilder(i_node)
 {}
 

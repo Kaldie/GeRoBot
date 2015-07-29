@@ -5,7 +5,7 @@
 #
 
 
-TOROOT= ..
+TOROOT= ../..
 
 # define the C source files
 DSRCS= debug.cpp debug2.cpp
@@ -17,5 +17,5 @@ DEPENDENCY = XMLBuilder.o
 # define the executable file 
 MAIN = RobotInterface
 DEBUG = debug
-include ../Makefile.config
-OBJS := $(OBJS) $(TOROOT)/$(OBJECTFOLDER)/pugixml.o
+include $(TOROOT)/Makefile.config
+

@@ -3,11 +3,11 @@
 #include <TranslationalJoint.h>
 #include <RotationalJoint.h>
 #include <StepperDriver.h>
-#include "./JointBuilder.h"
-#include "./StepperDriverBuilder.h"
+#include "./JointIO.h"
+#include "./StepperDriverIO.h"
 
 
-void JointBuilder::build() {
+void JointIO::build() {
   LOG_DEBUG("Building a joint");
   pugi::xml_node jointNode = getNode();
 
@@ -72,19 +72,19 @@ void JointBuilder::build() {
   }
 }
 
-StepperDriver JointBuilder::parseStepperDriver(const pugi::xml_node& i_node) {
-  StepperDriverBuilder stepperDriverBuilder(i_node);
-  stepperDriverBuilder.build();
-  return stepperDriverBuilder.getStepperDriver();
+StepperDriver JointIO::parseStepperDriver(const pugi::xml_node& i_node) {
+  StepperDriverIO stepperDriverIO(i_node);
+  stepperDriverIO.build();
+  return stepperDriverIO.getStepperDriver();
 }
 
 
-JointBuilder::JointBuilder(const pugi::xml_node& i_node) {
+JointIO::JointIO(const pugi::xml_node& i_node) {
   setNode(i_node);
 }
 
 
-bool JointBuilder::update(const JointPointer& i_jointPointer) {
+bool JointIO::update(const JointPointer& i_jointPointer) {
   if (i_jointPointer->getMovementType() == Rotational)
     getNodeFromPath("./MOVEMENT_TYPE").text().set("ROTATIONAL");
   else if (i_jointPointer->getMovementType() == Translational)
@@ -117,9 +117,9 @@ bool JointBuilder::update(const JointPointer& i_jointPointer) {
     directionConversionNode.text().set((itr->first+","+itr->second).c_str());
   }
 
-  StepperDriverBuilder stepperDriverBuilder(getNodeFromPath("./ACTUATOR"));
+  StepperDriverIO stepperDriverIO(getNodeFromPath("./ACTUATOR"));
   bool hasSucceeded(true);
-  hasSucceeded&=stepperDriverBuilder.update(i_jointPointer->getMotor());
+  hasSucceeded&=stepperDriverIO.update(i_jointPointer->getMotor());
 
   return hasSucceeded;
 }

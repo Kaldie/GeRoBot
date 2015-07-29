@@ -7,17 +7,17 @@
 
 typedef std::shared_ptr<BaseJoint> JointPointer;
 
-class JointBuilder: public XMLBuilder {
+class JointIO: public XMLBuilder {
   GETSET(JointPointer, m_jointPointer, JointPointer);
 
  private:
   // No default contructor!!
-  JointBuilder();
+  JointIO();
   StepperDriver parseStepperDriver(const pugi::xml_node&);
 
  public:
   virtual void build();
-  explicit JointBuilder(const pugi::xml_node&);
+  explicit JointIO(const pugi::xml_node&);
   bool update(const JointPointer& i_jointPointer);
 };
 
