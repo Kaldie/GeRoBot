@@ -11,7 +11,8 @@ TOROOT= ..
 DSRCS= debug.cpp debug2.cpp
 SRCS := $(filter-out $(DSRCS), $(wildcard *.cpp))
 
-LIBS=-lMathInterface -lMotorInterface -lArduinoInterface
+DEPENDENCY = XMLBuilder.o
+
 
 # define the executable file 
 MAIN = RobotInterface
