@@ -7,17 +7,18 @@
 
 
 # Main makefile
-TOROOT=.
+TOROOT= $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 PUGISRC = ./pugixml/src
-SHAREDFOLDERS = ./math ./arduino ./motor ./robot $(PUGISRC) ./util/xml .
+SHAREDFOLDERS = ./math ./arduino ./motor ./motor/io ./util/xml $(PUGISRC)
 UPLOADEDFOLDERS = ./arduinosketch
+MAIN = GeoRobot
 include Makefile.config
+
+OBJS := $(wildcard bin/objects/*.o)
 
 .PHONY: CLEAN ALL INSTALL CREATENECESSARYFOLDERS LINKHEADERS clean MACROHEADER PUGI
 
-ALL: INSTALL MACROHEADER SHAREDTARGET UPLOADEDTARGET
-
-INSTALL: CREATENECESSARYFOLDERS PUGI LINKHEADERS MACROHEADER SHAREDTARGET
+ALL: CREATENECESSARYFOLDERS PUGI LINKHEADERS MACROHEADER SHAREDTARGET MACROHEADER SHAREDTARGET UPLOADEDTARGET
 
 CREATENECESSARYFOLDERS:
 	@echo "Creating folders for objects and shared libs"
@@ -30,14 +31,15 @@ MACROHEADER: $(TOROOT)/$(INCLUDEFOLDER)/macroHeader.h.gch
 
 LINKHEADERS:
 	@echo "Creating symbolic links for all .h files in the project"
-	$(foreach FOLDER,$(SHAREDFOLDERS), $(foreach HFILE,$(wildcard $(FOLDER)/*.h),$(LINK) .$(HFILE) $(INCLUDEFOLDER); ))
-	$(foreach FOLDER,$(SHAREDFOLDERS), $(foreach HFILE,$(wildcard $(FOLDER)/*.hpp),$(LINK) .$(HFILE) $(INCLUDEFOLDER); ))
+	$(foreach FOLDER,$(SHAREDFOLDERS), $(foreach HFILE,$(wildcard $(FOLDER)/*.h),$(LINK) .$(HFILE) $(INCLUDEFOLDER);))
+	$(foreach FOLDER,$(SHAREDFOLDERS), $(foreach HFILE,$(wildcard $(FOLDER)/*.hpp),$(LINK) .$(HFILE) $(INCLUDEFOLDER);))
 
 SHAREDTARGET:
-	$(foreach FOLDER,$(SHAREDFOLDERS), cd $(FOLDER); make shared; cd ..; )
+	$(foreach FOLDER,$(SHAREDFOLDERS), cd $(FOLDER); $(MAKE); cd $(TOROOT);)
+	$(MAKE) shared
 
 UNITTEST:
-	$(foreach FOLDER,$(SHAREDFOLDERS), cd $(FOLDER); cd unit_test; make unitTest; cd ../..;)
+	$(foreach FOLDER,$(SHAREDFOLDERS), cd $(FOLDER); cd unit_test; $(MAKE) unitTest; cd ../..;)
 
 PUGI:
 	git submodule init
@@ -48,12 +50,13 @@ UPLOADEDTARGET:
 	$(foreach FOLDER,$(UPLOADEDFOLDERS), cd $(FOLDER); make -i upload; cd ..; )
 
 CLEAN:
-	$(foreach FOLDER,$(UPLOADEDFOLDERS), cd $(FOLDER); make clean; cd ..;)
-	$(foreach FOLDER,$(SHAREDFOLDERS), cd $(FOLDER); make clean; cd ..;)
-	$(RM) macroHeader.h.gch
+	$(foreach FOLDER,$(UPLOADEDFOLDERS), cd $(FOLDER); make clean; cd $(TOROOT);)
+	$(foreach FOLDER,$(SHAREDFOLDERS), cd $(FOLDER); make clean; cd $(TOROOT);)
+	$(RM) $(INCLUDEFOLDER)/macroHeader.h.gch
 
-clean:
-	@echo "Dumb fuck...no clean in the root or it will be like realy clean!"
+#clean:
+#	@echo "Dumb fuck...no clean in the root or it will be like realy clean!"
 
+.DEFAULT_GOAL := SHAREDTARGET
 # End of the main math makefile
 
