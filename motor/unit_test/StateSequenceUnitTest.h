@@ -301,43 +301,6 @@ class PinStateSequenceTestSuite : public CxxTest::TestSuite {
     TS_ASSERT(!pinStateSequence2.mergePinStateSequence(&pinStateSequence4));
   }
 
-  void testSequenceNormalisation() {
-    LOG_INFO("testSequenceNormalisation");
-    PinState pinState1({1, 2, 3});
-    pinState1.update(1, 0);
-    pinState1.update(2, 1);
-    pinState1.update(3, 0);
-
-    PinState pinState2({4, 5, 6});
-    pinState2.update(4, 1);
-    pinState2.update(5, 0);
-    pinState2.update(6, 1);
-
-    PinState pinState3({1, 2, 3});
-    pinState3.update(1, 1);
-    pinState3.update(2, 0);
-    pinState3.update(3, 1);
-
-    PinState pinState4({4, 5, 6});
-    pinState4.update(4, 0);
-    pinState4.update(5, 1);
-    pinState4.update(6, 0);
-
-    PinStateVector stateVector{pinState2,pinState3,pinState2};
-
-    StateSequence sequence;
-    sequence.addToSequence(stateVector);
-    TS_ASSERT_EQUALS(sequence.getIntegerSequence(),
-                     std::vector<int>({80, 10, 80}));
-
-    sequence.setStateForSequence(pinState1, true);
-    TS_ASSERT_EQUALS(sequence.getIntegerSequence(),
-                     std::vector<int>({84, 10, 90}));
-    sequence.setStateForSequence(pinState4, true);
-    TS_ASSERT_EQUALS(sequence.getIntegerSequence(),
-                     std::vector<int>({84, 90, 90}));
-  }
-
 
   void testPinStateSequenceMessage() {
     StateSequence stateSequence;
