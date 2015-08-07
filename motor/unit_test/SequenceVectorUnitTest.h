@@ -99,6 +99,29 @@ class SequenceVectorUnitTest : public CxxTest::TestSuite {
     TS_ASSERT(sequenceVector.isNormilized());
   }
 
+  
+  void testIsNormalisedAfterCondense() {
+    LOG_DEBUG("testAppendPinState");
+    sequenceVector.addToSequence(PinState({1, 2, 3, 4, 5, 6}), true);
+    sequenceVector.addToSequence(PinState({/*1,*/ 2, 3, 4, 5, 6}), true);
+    sequenceVector.condenseVector();
+    for (auto& i :sequenceVector.getSequenceVector()) {
+      i.displaySequence();
+    }
+    TS_ASSERT(!sequenceVector.isNormilized());
+
+    sequenceVector = SequenceVector();
+    PinState pinState = PinState({1, 2, 3, 4, 5, 6});
+    sequenceVector.addToSequence(pinState);
+    for (auto pin = pinState.getPinVector().begin();
+         pin != pinState.getPinVector().end();
+         pin++) {
+      pinState.update(*pin, !pinState.getPinState(*pin));
+    }
+    sequenceVector.addToSequence(pinState, true);
+    TS_ASSERT(sequenceVector.isNormilized());
+  }
+
   void testNormalise() {
     LOG_DEBUG("Test normalise");
     sequenceVector.addToSequence(PinState({1, 2, 3, 4, 5, 6}), true);
