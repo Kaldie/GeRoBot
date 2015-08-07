@@ -78,8 +78,12 @@ void Condensor::prepareSequences(
 
     // If it is possible fetch the following sequence
     if (currentSequence != i_compileSet->sequenceVector->end()) {
-      i_compileSet->postIntegerSequence =
-          currentSequence->getIntegerSequence();
+      if (currentSequence->getNumberOfRepetitions() != 0) {
+        i_compileSet->postIntegerSequence =
+            currentSequence->getIntegerSequence();
+      } else {
+        LOG_DEBUG("Cannot add a postIntegerSequence, due to rep = 0");
+      }
     }
 
     // break the while loop because we set everything allright for 1 shot
@@ -178,7 +182,8 @@ bool Condensor::handleBackwardCorrispondingSequences(
     return false;
   }
 
-  if (i_compileSet->endSequence == i_compileSet->sequenceVector->end()) {
+  if (i_compileSet->endSequence ==
+      i_compileSet->sequenceVector->end()) {
     LOG_DEBUG("End sequence is equal to the end of the state sequence vector");
     return false;
   }
@@ -195,6 +200,7 @@ bool Condensor::handleBackwardCorrispondingSequences(
   int numberOfFinds = 0;
   std::vector<int>::size_type postIntSize =
       i_compileSet->postIntegerSequence.size();
+
   auto begin = i_compileSet->integerSequence.end();
   auto end = i_compileSet->integerSequence.end() +
       postIntSize;
@@ -213,7 +219,7 @@ bool Condensor::handleBackwardCorrispondingSequences(
     ++numberOfFinds;
     // check if we are still within bounds in our next iteration
     if (i_compileSet->integerSequence.size() <
-        (numberOfFinds + 1) * i_compileSet->preIntegerSequence.size()) {
+        (numberOfFinds + 1) * i_compileSet->postIntegerSequence.size()) {
       break;
     }
   }
@@ -491,11 +497,11 @@ void Condensor::addSequenceToVector(CompileSet* i_compileSet,
 
     LOG_DEBUG("Distance between iterators: " <<
               distance);
-
+#if defined(DEBUG) || defined(DEBUG_FILE)
     int positionInVector = std::distance(
         i_compileSet->sequenceVector->begin(),
         i_compileSet->currentSequence + insertionPosition);
-                                         
+#endif
     LOG_DEBUG("Insert a sequence to the vector @ " << positionInVector);
     i_compileSet->currentSequence =
         i_compileSet->sequenceVector->insert(
