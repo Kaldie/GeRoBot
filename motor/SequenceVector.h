@@ -30,10 +30,15 @@ class SequenceVector {
   std::vector<StateSequence>::const_iterator end()
       const { return m_sequenceVector.end();};
 
-  // all consequtive sequences with 1 repetitions will be grouped in 1 sequence
-  // after this is done try to find repitions
+  /// Condense the sequence vector using Conderser.
+  /// @param[in] i_removeElements remove elements from the vector
+  /// turn false for speed, true for memory
   bool condenseVector(bool i_removeElements = false);
 
+  /// Add a pinstate to the last sequence of the vector
+  /// @param[in] i_pinState Pin state which will be added to the vector
+  /// @param[in] i_forceAdd
+  /// If there is 1 repition, add it even if it has mutual pin
   bool addToSequence(const PinState& i_pinState,
                      const bool& i_forceAdd = false) {
     return getLastSequence()->addToSequence(i_pinState,

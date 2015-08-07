@@ -6,8 +6,7 @@
 #include <Point2D.h>
 
 template <typename ActuatorType>
-class TranslationalJoint: public BaseJoint
-{
+class TranslationalJoint: public BaseJoint {
  private:
     ActuatorType m_actuator;
     virtual int getPositionModifier(const std::string&) const;
