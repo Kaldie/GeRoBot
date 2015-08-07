@@ -4,4 +4,5 @@ pugixml-1.4
 *moc_*
 /GUI/Makefile
 */unit_test/unitTest*
-
+.deps
+.idea
