@@ -1,34 +1,58 @@
-#ifndef Circle2D_H
-#define Circle2D_H
+// Copyright [2015] Ruud Cools
+
+#ifndef MATH_CIRCLE2D_H_
+#define MATH_CIRCLE2D_H_
 
 #include <Point2D.h>
-
-class Circle2D{
-	
-	GETSET(Point2D,m_firstPoint,FirstPoint);
-	GETSET(Point2D,m_secondPoint,SecondPoint);
-	GETSET(Point2D,m_centrePoint,CentrePoint);
+#include <macroHeader.h>
+class Circle2D {
+  GETSET(Point2D, m_firstPoint, FirstPoint);
+  GETSET(Point2D, m_secondPoint, SecondPoint);
+  GETSET(Point2D, m_centrePoint, CentrePoint);
 
  private:
-	Circle2D();
-	Point2D getCentrePoint(const Point2D& i_firstPoint,
-												 const Point2D& i_secondPointy,
-												 const double& i_radius,
-												 const bool& i_isClockwise);
+  Circle2D();
+
+  /**
+   * Calculate the centre point
+   * Centre point is calculated using stuff on:
+   * http://cs.stackexchange.com/questions/19970/find-the-centre-of-a-circle-given-two-points-lying-on-it-and-its-radius
+   * or
+   * http://math.stackexchange.com/questions/27535/how-to-find-center-of-an-arc-given-start-point-end-point-radius-and-arc-direc
+   */
+  Point2D getCentrePoint(const Point2D& i_firstPoint,
+                         const Point2D& i_secondPointy,
+                         const double& i_radius,
+                         const bool& i_isClockwise);
 
  public:
-	Circle2D(const Point2D& i_firstPoint,
-					 const Point2D& i_secondPoint,
-					 const Point2D& i_centrePoint);
+  /**
+   * Constructor using 3 Points2D
+   * @param[in] i_firsPoint Point2D that defines 1 point on the cirlce
+   * @param[in] i_secondPoint Point2D that defines the second point
+   * @param[in] i_centrePoint Point2D that defines the centre of the circle
+   */
+  Circle2D(const Point2D& i_firstPoint,
+           const Point2D& i_secondPoint,
+           const Point2D& i_centrePoint);
 
-	Circle2D(const Point2D& i_firstPoint,
-					 const Point2D& i_secondPoint,
-					 const double& i_radius,
-					 const bool& i_isClockwise =true);
+  /**
+   * Constructor using 2 Point2D, radius of the cirlce and if it is clockwise
+   * @param[in] i_firsPoint Point2D that defines 1 point on the cirlce
+   * @param[in] i_secondPoint Point2D that defines the second point
+   * @param[in] i_radius radius of the circle
+   * @param[in] Is the circle clockwise?
+   */
+  Circle2D(const Point2D& i_firstPoint,
+           const Point2D& i_secondPoint,
+           const double& i_radius,
+           const bool& i_isClockwise =true);
 
-	double radius() const;
+  /// returns the radius of the circle
+  double radius() const;
 
-	bool verifyPointOnCircle(const Point2D& i_point) const;
+  /// retuns if the point lies on the circle
+  bool isPointOnCircle(const Point2D& i_point) const;
 };
 
-#endif // Circle2D
+#endif  // MATH_CIRCLE2D_H_

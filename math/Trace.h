@@ -1,6 +1,6 @@
 // Copyright [2014] Ruud Cools
-#ifndef MOTOR_TRACE_H_
-#define MOTOR_TRACE_H_
+#ifndef MATH_TRACE_H_
+#define MATH_TRACE_H_
 
 #include <Point2D.h>
 #include <Line2D.h>
@@ -20,6 +20,7 @@ class Trace {
   bool isWithinRange(const Point2D&, const Point2D&) const;
   bool isWithinRange(const float&, const float&) const;
 
+  std::string getRotationDirection(const Point2D&, const Point2D&) const;
   // no default constructor!
   Trace();
   virtual ~Trace(){};
@@ -40,11 +41,28 @@ class Trace {
   bool isWithinBeginRange(const Point2D&) const;
   virtual Point2D intersectingPoint(const Point2D& i_currentPosition)const;
 
+  /**
+   * Get direction which the robot needs to rotate to.
+   * @param[in] i_currentPosition Point2D Current position of the robot
+   */
   std::string getRotationDirectionToEndPoint(const Point2D&) const;
-  std::string getRotationDirection(const Point2D&, const Point2D&) const;
 
-  std::string getTranslationDirectionToEndPoint(const Point2D&) const;
-  std::string getTranslationDirection(const Point2D&, const Point2D&) const;
+
+
+  /**
+   * Translation direction towards the end poin
+   * @param[in] i_currentPosition Point2D current position of the robot
+   */
+  std::string getTranslationDirectionToEndPoint(
+      const Point2D& i_currentPosition) const;
+
+  /**
+   * Return the direction which the joint needs to move
+   * @param[in] i_currentPosition Point2D, position the robot is now
+   * @param[in] i_desiredPosition Point2D, position the robot needs to go
+   */
+  std::string getTranslationDirection(const Point2D& i_currentPosition,
+                                      const Point2D& i_desiredPosition) const;
 };
 
-#endif  // MOTOR_TRACE_H_
+#endif  // MATH_TRACE_H_

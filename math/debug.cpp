@@ -8,65 +8,29 @@
 #include <Arc2D.h>
 #include <Circle2D.h>
 
-void testByteBuffer()
-{
-	ByteBuffer<int> byteBuffer(100);
-	
-	for(int i=0;i<100;i++)
-		byteBuffer.set(i);
-	for(int j=99;j>-1;j--)
-		assert(byteBuffer.get()==99-j);
-}
-    
-void testPoint2D(){
-	//test equal operator
-	assert(Point2D(1.15,3.1415)==Point2D(1.15,3.1415));
-	assert(Point2D(1.15,3.1415)!=Point2D(5.15,3.1415));
-	
-	//reduction
-	assert((Point2D(10,10)-Point2D(3,4))==Point2D(7,6));
-	assert((Point2D(10,10)-Point2D(3,4))!=Point2D(6,6));
-
-	//addition
-	assert(Point2D(5,4)+Point2D(2,3)==Point2D(7,7));
-	assert(Point2D(5,4)+Point2D(2,3)!=Point2D(5,7));
-
-	//mutiplication by a constant
-	assert(Point2D(5,4)*2==Point2D(10,8));
-	assert(Point2D(5,4)*2!=Point2D(9,8));
-	
-	//Angle to origin
-	assert(Point2D(100,100).getAngleToOrigin()+0.0001>PI/4);
-	assert(Point2D(100,100).getAngleToOrigin()-0.0001<PI/4);
-
-	//Angle between points
-	assert(Point2D(10,0).getAngleBetweenPoints(Point2D(0,10))+0.0001>PI/-2);
-	assert(Point2D(10,0).getAngleBetweenPoints(Point2D(0,10))-0.0001<PI/-2);
-}
-
 void testCircle(){
-	Point2D firstPoint(0,1),secondPoint(1,0),centrePoint(0,0);
+  Point2D firstPoint(0,1),secondPoint(1,0),centrePoint(0,0);
 
-	Circle2D circle(firstPoint,secondPoint,centrePoint);
-	assert(circle.radius()==1);
-	assert(circle.verifyPointOnCircle(Point2D(-1,0)));
+  Circle2D circle(firstPoint,secondPoint,centrePoint);
+  assert(circle.radius()==1);
+  assert(circle.verifyPointOnCircle(Point2D(-1,0)));
 
-	circle.setFirstPoint(Point2D(0,10));
-	circle.setSecondPoint(Point2D(10,0));
-	assert(circle.radius()==10);
-	assert(!circle.verifyPointOnCircle(Point2D(-1,0)));
+  circle.setFirstPoint(Point2D(0,10));
+  circle.setSecondPoint(Point2D(10,0));
+  assert(circle.radius()==10);
+  assert(!circle.verifyPointOnCircle(Point2D(-1,0)));
 
-	Circle2D circle2(Point2D(1,2),Point2D(2,1),1);
-	assert(circle2.getCentrePoint()==Point2D(1,1));
+  Circle2D circle2(Point2D(1, 2), Point2D(2, 1), 1);
+  assert(circle2.getCentrePoint() == Point2D(1, 1));
 	
-	try{
-		Circle2D(firstPoint,Point2D(10,0),centrePoint);
-		assert(false=="Previous statement should trown an first point defines another radius then the second point error!");
-	}
-	catch(std::runtime_error)
-		{
-			LOG_DEBUG("Caught the could not make circle with bad points exception!");
-		}
+  try {
+    Circle2D(firstPoint, Point2D(10, 0), centrePoint);
+    assert(false == "Previous statement should trown an first point defines another radius then the second point error!");
+  }
+  catch(std::runtime_error)
+  {
+    LOG_DEBUG("Caught the could not make circle with bad points exception!");
+  }
 }
 
 
