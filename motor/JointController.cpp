@@ -8,8 +8,9 @@
 #include <BaseMotor.h>
 
 JointController::JointController()
-    :m_actuator(ArduinoMotorDriver("/dev/ttyUSB*"))
-{}
+    :m_actuator(ArduinoMotorDriver("/dev/ttyUSB*")) {
+  LOG_DEBUG("yay2");
+}
 
 JointController::~JointController()
 {}
@@ -195,8 +196,8 @@ void JointController::actuate() {
        pinStateSequenceIterator++) {
 #ifdef NDEBUG
     pinStateSequenceIterator->displaySequence();
-#endif /*NDEBUG statement that shows the sequences */
-    // Get the integer sequence of this pin state
+#endif  /// NDEBUG statement that shows the sequences
+    /// Get the integer sequence of this pin state
     if (pinStateSequenceIterator->getNumberOfRepetitions() > 0) {
       m_actuator.upload(pinStateSequenceIterator->createArduinoBuffer());
     }
@@ -206,7 +207,7 @@ void JointController::actuate() {
          i != x.end();
          i++)
       LOG_DEBUG(*i);
-#endif /*Shows the actual message passed though the arduino driver */
+#endif  /// Shows the actual message passed though the arduino driver
   }
   m_actuator.actuate();
   resetPinStateSequence();

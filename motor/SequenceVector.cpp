@@ -38,7 +38,10 @@ void SequenceVector::normalise(const bool i_condenseVector /* = false*/) {
     currentSequence->setStateForSequence(thisPinState,
                                          true,    // extent
                                          false);  // override
-    thisPinState = currentSequence->getPinStateVector().back();
+    if (currentSequence->getPinStateVector().size() > 0) {
+      thisPinState = currentSequence->getPinStateVector().back();
+    }
+    
     if (currentSequence != m_sequenceVector.end()) {
       thisPinState = *currentSequence->getPinStateVector().begin();
     } else {
