@@ -21,7 +21,8 @@ class Trace {
   bool isWithinRange(const float&, const float&) const;
 
   std::string getRotationDirection(const Point2D&, const Point2D&) const;
-  // no default constructor!
+
+  /// no default constructor!
   Trace();
   virtual ~Trace(){};
 
@@ -39,15 +40,13 @@ class Trace {
 
   bool isWithinEndRange(const Point2D&) const;
   bool isWithinBeginRange(const Point2D&) const;
-  virtual Point2D intersectingPoint(const Point2D& i_currentPosition)const;
+  virtual Point2D intersectingPoint(const Point2D& i_currentPosition) const;
 
   /**
    * Get direction which the robot needs to rotate to.
    * @param[in] i_currentPosition Point2D Current position of the robot
    */
   std::string getRotationDirectionToEndPoint(const Point2D&) const;
-
-
 
   /**
    * Translation direction towards the end poin

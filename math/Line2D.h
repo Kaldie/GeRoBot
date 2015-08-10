@@ -1,23 +1,31 @@
-#ifndef Line2D_h
-#define Line2D_h
+// Copyright [2015] Ruud Cools
 
-#include "Point2D.h"
+#ifndef MATH_LINE2D_H_
+#define MATH_LINE2D_H_
 
-class Line2D
-{
+#include "./Point2D.h"
+
+class Line2D {
  private:
-  GETSET(Point2D,m_startPoint,StartPoint);
-  GETSET(Point2D,m_endPoint,EndPoint);
-  
+  GETSET(Point2D, m_startPoint, StartPoint);
+  GETSET(Point2D, m_endPoint, EndPoint);
+
  public:
-	bool operator==(const Line2D& i_rhs) const;
-	
+  bool operator==(const Line2D& i_rhs) const;
+
   Line2D();
-	Line2D(Point2D i_startPoint, Point2D i_endPoint);
-	
-	Point2D getIntersectingPoint(const Line2D&) const;
-	Point2D getIntersectingPoint(const Point2D&) const;
-	float getLength();
+  Line2D(Point2D i_startPoint,
+         Point2D i_endPoint);
+
+  /// Get the intersection of the two lines
+  Point2D getIntersectingPoint(const Line2D&) const;
+
+  /// get the intersection of the line and the point
+  /// Where the point defines a line through origin
+  Point2D getIntersectingPoint(const Point2D&) const;
+
+  /// Get the length of the line defined by the two points
+  double getLength();
 };
 
-#endif
+#endif  // MATH_LINE2D_H_

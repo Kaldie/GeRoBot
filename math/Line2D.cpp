@@ -64,8 +64,7 @@ Point2D Line2D::getIntersectingPoint(const Point2D &i_point) const
   return getIntersectingPoint(line);
 }
 
-float Line2D::getLength()
-{
+double Line2D::getLength() {
   return Magnitude(m_endPoint-m_startPoint);
 }
 

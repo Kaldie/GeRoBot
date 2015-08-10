@@ -24,12 +24,11 @@ class LineTraceCalculator: public BaseTraceCalculator {
   bool correctRotation(const Trace*,
                        Point2D&) const;
   bool correctTranslation(const Trace*,
-                          Point2D&)const;
+                          Point2D&) const;
   bool hasStepped();
   void prepareNextStep();
 
  public:
-
   // Calculation method
   virtual void calculateTrace(const Trace*,
                               Point2D&);
