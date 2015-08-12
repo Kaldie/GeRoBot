@@ -14,23 +14,23 @@ class BaseJoint {
     virtual int getPositionModifier(const std::string&) const =0;
 
  protected:
-    GETSET(float, m_currentPosition, Position)
+    GETSET(double, m_currentPosition, Position)
     GETSET(double, m_movementPerStep, MovementPerStep)
-    GET(std::vector<float>, m_range, Range)
+    GET(std::vector<double>, m_range, Range)
     GETSET(MovementType, m_movementType, MovementType)
     GETSET(DirectionConversionMap,
            m_directionConversion,
            DirectionConversionMap)
 
     virtual BaseJoint* cloneImpl() const = 0;
-    void isInRange(float i_jointPosition);
+    void isInRange(double i_jointPosition);
 
  public:
     /**
      * Set the range of the joint
-     * @param[in] i_rangeVector Vector<float> 2 entries, start and end of the range of the joint
+     * @param[in] i_rangeVector Vector<double> 2 entries, start and end of the range of the joint
      */
-    void setRange(const std::vector<float>& i_rangeVector);
+    void setRange(const std::vector<double>& i_rangeVector);
 
     /**
      * Convert the direction the joint moves to the direction the motor has to move.
@@ -79,16 +79,16 @@ class BaseJoint {
 
     BaseJoint();
     
-    BaseJoint(const float& i_currentPosition,
-              const float& i_movementPerStep);
+    BaseJoint(const double& i_currentPosition,
+              const double& i_movementPerStep);
 
-    BaseJoint(const float& i_currentPosition,
-              const float& i_movementType,
+    BaseJoint(const double& i_currentPosition,
+              const double& i_movementType,
               const DirectionConversionMap& i_directionConverionMap);
 
-    BaseJoint(const float& i_currentPosition,
-              const float& i_movementPerStep,
-              const std::vector<float> i_rangeVector,
+    BaseJoint(const double& i_currentPosition,
+              const double& i_movementPerStep,
+              const std::vector<double> i_rangeVector,
               const MovementType& i_movementType,
               const DirectionConversionMap& i_directionConverionMap);
 

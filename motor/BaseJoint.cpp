@@ -4,7 +4,7 @@
 #include "BaseJoint.h"
 
 
-void BaseJoint::setRange(const std::vector<float>& i_range) {
+void BaseJoint::setRange(const std::vector<double>& i_range) {
   if (i_range.size() != 2)
     LOG_ERROR("Size of range vector should be 2, not : "
               << i_range.size());
@@ -16,8 +16,8 @@ void BaseJoint::setRange(const std::vector<float>& i_range) {
 }
 
 
-void BaseJoint::isInRange(float i_attemptedPosition) {
-  const std::vector<float> thisRange = getRange();
+void BaseJoint::isInRange(double i_attemptedPosition) {
+  const std::vector<double> thisRange = getRange();
   if (i_attemptedPosition > thisRange[1] or
      i_attemptedPosition < thisRange[0]) {
     LOG_ERROR("Position is not in the range of the joint: " <<
@@ -83,8 +83,8 @@ BaseJoint::BaseJoint()
 {}
 
 
-BaseJoint::BaseJoint(const float& i_currentPosition,
-                     const float& i_movementPerStep)
+BaseJoint::BaseJoint(const double& i_currentPosition,
+                     const double& i_movementPerStep)
     :BaseJoint(i_currentPosition,
                i_movementPerStep,
                {-90.0, 90.0},
@@ -94,8 +94,8 @@ BaseJoint::BaseJoint(const float& i_currentPosition,
 {}
 
 
-BaseJoint::BaseJoint(const float& i_currentPosition,
-                     const float& i_movementPerStep,
+BaseJoint::BaseJoint(const double& i_currentPosition,
+                     const double& i_movementPerStep,
                      const DirectionConversionMap& i_directionConversionMap)
     :BaseJoint(i_currentPosition,
                i_movementPerStep,
@@ -105,9 +105,9 @@ BaseJoint::BaseJoint(const float& i_currentPosition,
 {}
 
 
-BaseJoint::BaseJoint(const float& i_currentPosition,
-                     const float& i_movementPerStep,
-                     const std::vector<float> i_range,
+BaseJoint::BaseJoint(const double& i_currentPosition,
+                     const double& i_movementPerStep,
+                     const std::vector<double> i_range,
                      const MovementType& i_movementType,
                      const DirectionConversionMap& i_directionConversion)
     :m_currentPosition(i_currentPosition),

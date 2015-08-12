@@ -32,15 +32,15 @@ class RotationalJoint: public BaseJoint {
     // Constructors
     RotationalJoint();
 
-    RotationalJoint(const float& ,
-                    const float&);
+    RotationalJoint(const double& ,
+                    const double&);
     
-    RotationalJoint(const float& i_currentPosition,
-                    const float& i_movementPerStep,
+    RotationalJoint(const double& i_currentPosition,
+                    const double& i_movementPerStep,
                     ActuatorType& i_actuator);
 
-    RotationalJoint(const float&,
-                    const float&,
+    RotationalJoint(const double&,
+                    const double&,
                     const DirectionConversionMap&,
                     ActuatorType&);
 
@@ -57,8 +57,8 @@ RotationalJoint<ActuatorType>::RotationalJoint()
 
 
 template <class ActuatorType>
-RotationalJoint<ActuatorType>::RotationalJoint(const float& i_currentPosition,
-                                               const float& i_movementPerStep)
+RotationalJoint<ActuatorType>::RotationalJoint(const double& i_currentPosition,
+                                               const double& i_movementPerStep)
 : BaseJoint(i_currentPosition,
             i_movementPerStep) {
   setMovementType(Rotational);
@@ -66,8 +66,8 @@ RotationalJoint<ActuatorType>::RotationalJoint(const float& i_currentPosition,
 
 
 template <class ActuatorType>
-RotationalJoint<ActuatorType>::RotationalJoint(const float& i_currentPosition,
-                                               const float& i_movementPerStep,
+RotationalJoint<ActuatorType>::RotationalJoint(const double& i_currentPosition,
+                                               const double& i_movementPerStep,
                                                ActuatorType& i_actuator)
 : BaseJoint(i_currentPosition,
             i_movementPerStep),
@@ -77,8 +77,8 @@ RotationalJoint<ActuatorType>::RotationalJoint(const float& i_currentPosition,
 
 
 template <class ActuatorType>
-RotationalJoint<ActuatorType>::RotationalJoint(const float& i_currentPosition,
-                                               const float& i_movementPerStep,
+RotationalJoint<ActuatorType>::RotationalJoint(const double& i_currentPosition,
+                                               const double& i_movementPerStep,
                                                const DirectionConversionMap& i_directionConversionMap,
                                                ActuatorType& i_actuator)
 : BaseJoint(i_currentPosition,

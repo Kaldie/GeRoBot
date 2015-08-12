@@ -30,15 +30,15 @@ class TranslationalJoint: public BaseJoint {
     // Constructors
     TranslationalJoint();
 
-    TranslationalJoint(const float&,
-                       const float&);
+    TranslationalJoint(const double&,
+                       const double&);
 
-    TranslationalJoint(const float&,
-                       const float&,
+    TranslationalJoint(const double&,
+                       const double&,
                        const ActuatorType&);
 
-    TranslationalJoint(const float&,
-                       const float&,
+    TranslationalJoint(const double&,
+                       const double&,
                        const DirectionConversionMap&,
                        const ActuatorType&);
 
@@ -57,8 +57,8 @@ TranslationalJoint<ActuatorType>::TranslationalJoint()
 
 template <class ActuatorType>
 TranslationalJoint<ActuatorType>::
-  TranslationalJoint(const float& i_currentPosition,
-                     const float& i_movementPerStep)
+  TranslationalJoint(const double& i_currentPosition,
+                     const double& i_movementPerStep)
 : BaseJoint(i_currentPosition,
             i_movementPerStep,
             {{"IN", "CCW"}, {"OUT", "CW"}}) {
@@ -68,8 +68,8 @@ TranslationalJoint<ActuatorType>::
 
 template <class ActuatorType>
 TranslationalJoint<ActuatorType>::
-  TranslationalJoint(const float& i_currentPosition,
-                     const float& i_movementPerStep,
+  TranslationalJoint(const double& i_currentPosition,
+                     const double& i_movementPerStep,
                      const ActuatorType& i_actuator)
 : BaseJoint(i_currentPosition,
             i_movementPerStep,
@@ -80,8 +80,8 @@ TranslationalJoint<ActuatorType>::
 
 template <class ActuatorType>
 TranslationalJoint<ActuatorType>::
-  TranslationalJoint(const float& i_currentPosition,
-                     const float& i_movementPerStep,
+  TranslationalJoint(const double& i_currentPosition,
+                     const double& i_movementPerStep,
                      const DirectionConversionMap& i_directionConversionMap,
                      const ActuatorType& i_actuator)
 : BaseJoint(i_currentPosition,
