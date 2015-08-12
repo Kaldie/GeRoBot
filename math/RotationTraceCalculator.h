@@ -26,7 +26,7 @@ class RotationTraceCalculator: public LineTraceCalculator {
 
   /// Constructor with tolerance and joint controller
   RotationTraceCalculator(JointController* i_jointControllerPointer,
-                          const float& i_tolerance);
+                          const double& i_tolerance);
 };
 
 #endif  // MATH_ROTATIONTRACECALCULATOR_H_

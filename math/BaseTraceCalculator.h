@@ -7,10 +7,10 @@ class JointController;
 class Trace;
 
 class BaseTraceCalculator {
-  GETSET(float, m_tolerance, Tolerance);
+  GETSET(double, m_tolerance, Tolerance);
   GETSETPOINTER(JointController, m_jointController, JointController);
-  GETSET(float, m_translationTolerance, TranslationTolerance);
-  GETSET(float, m_rotationTolerance, RotationTolerance);
+  GETSET(double, m_translationTolerance, TranslationTolerance);
+  GETSET(double, m_rotationTolerance, RotationTolerance);
   GETSET(bool, m_writeLog, WriteLog);
   GETSET(std::string, m_logFileName, LogFileName);
 
@@ -62,7 +62,7 @@ class BaseTraceCalculator {
   BaseTraceCalculator(JointController*);
     
   BaseTraceCalculator(JointController*,
-                      const float& i_tolerance);
+                      const double& i_tolerance);
   virtual ~BaseTraceCalculator() {};
 };
 

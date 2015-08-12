@@ -28,7 +28,7 @@ BaseTraceCalculator::BaseTraceCalculator(JointController* i_jointController)
 }
 
 BaseTraceCalculator::BaseTraceCalculator(JointController* i_jointController,
-                                         const float& i_tolerance)
+                                         const double& i_tolerance)
     : m_tolerance(i_tolerance),
       m_jointController(i_jointController),
       m_translationTolerance(0.01),
@@ -84,7 +84,7 @@ std::vector<int> BaseTraceCalculator::getNumberOfSteps(
   
   Point2D endPoint = i_trace->getEndPoint();
   LOG_INFO("Translational movement per step: "<<
-           static_cast<float>(
+           static_cast<double>(
                m_jointController->getJoint(Translational)->
                getMovementPerStep()));
 
@@ -117,9 +117,9 @@ bool BaseTraceCalculator::shouldTranslate(const Trace& i_trace,
   /*
     Translate if the magnitude differs between the current point and the endpoint.
   */	
-  float pointMagnitude = Magnitude(i_point2D);
-  float endPointMagnitude = Magnitude(i_trace.getEndPoint());
-  float difference = std::abs(pointMagnitude-endPointMagnitude);
+  double pointMagnitude = Magnitude(i_point2D);
+  double endPointMagnitude = Magnitude(i_trace.getEndPoint());
+  double difference = std::abs(pointMagnitude-endPointMagnitude);
   bool shouldTranslate;
   
   if (difference>m_translationTolerance)
@@ -147,9 +147,9 @@ bool BaseTraceCalculator::shouldTranslate(const Trace& i_trace,
 
 bool BaseTraceCalculator::shouldRotate(const Trace& i_trace,
                                        const Point2D &i_point2D) const {
-  float pointAngle = i_point2D.getAlpha()*180/PI;
-  float endPointAngle = i_trace.getEndPoint().getAlpha()*180/PI;
-  float difference = std::abs(pointAngle-endPointAngle);
+  double pointAngle = i_point2D.getAlpha()*180/PI;
+  double endPointAngle = i_trace.getEndPoint().getAlpha()*180/PI;
+  double difference = std::abs(pointAngle-endPointAngle);
   bool shouldRotate;
 
   if (difference>m_rotationTolerance)

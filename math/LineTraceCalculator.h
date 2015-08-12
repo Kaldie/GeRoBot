@@ -38,7 +38,7 @@ class LineTraceCalculator: public BaseTraceCalculator {
   explicit LineTraceCalculator(JointController* i_jointControlerPointer);
 
   LineTraceCalculator(JointController*,
-                      const float& i_tolerance);
+                      const double& i_tolerance);
 
   // Copy constructor
   LineTraceCalculator(const LineTraceCalculator& obj);

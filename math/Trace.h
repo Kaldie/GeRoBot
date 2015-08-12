@@ -11,14 +11,14 @@ class Trace {
   GETSET(Point2D, m_startPoint, StartPoint);
   GETSET(Point2D, m_endPoint, EndPoint);
 
-  GETSET(float, m_rotationTolerance, RotationTolerance);
-  GETSET(float, m_translationTolerance, TranslationTolerance);
+  GETSET(double, m_rotationTolerance, RotationTolerance);
+  GETSET(double, m_translationTolerance, TranslationTolerance);
 
   bool isValidStartAndEndPoint(const Point2D*,
                                const Point2D*);
 
   bool isWithinRange(const Point2D&, const Point2D&) const;
-  bool isWithinRange(const float&, const float&) const;
+  bool isWithinRange(const double&, const double&) const;
 
   std::string getRotationDirection(const Point2D&, const Point2D&) const;
 

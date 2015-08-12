@@ -17,7 +17,7 @@ RotationTraceCalculator::RotationTraceCalculator(
 
 RotationTraceCalculator::RotationTraceCalculator(
     JointController* i_jointControllerPointer,
-    const float& i_tolerance)
+    const double& i_tolerance)
     : LineTraceCalculator(i_jointControllerPointer, i_tolerance)
 {}
 

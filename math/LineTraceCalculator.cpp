@@ -24,7 +24,7 @@ LineTraceCalculator::LineTraceCalculator(JointController* i_jointController)
 
 
 LineTraceCalculator::LineTraceCalculator(JointController* i_jointController,
-                                         const float& i_tolerance)
+                                         const double& i_tolerance)
     : BaseTraceCalculator(i_jointController,
                           i_tolerance),
       m_hasRotated(true),
@@ -124,7 +124,7 @@ void LineTraceCalculator::prepareTranslation(const Trace* i_trace,
 
 bool LineTraceCalculator::correctRotation(const Trace* i_trace,
                                           Point2D& i_point2D) const {
-  float jointPointDifference;
+  double jointPointDifference;
   const Point2D* destinationPoint;
 
   Point2D intersectingPoint;

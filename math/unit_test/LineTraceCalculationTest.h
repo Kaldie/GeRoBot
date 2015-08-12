@@ -11,7 +11,7 @@
 #include <Trace.h>
 #include <LineTraceCalculator.h>
 
-class LineTraceCalculatorTestSuite : public CxxTest::TestSuite {
+class LineTraceCalculationTest : public CxxTest::TestSuite {
  public:
   StepperDriver stepperDriver1;
   StepperDriver stepperDriver2;

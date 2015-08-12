@@ -53,8 +53,8 @@ bool Arc2D::isClockwise() const {
 
   validate();
 
-  float startAngle=(m_startPoint-m_circle2D.getCentrePoint()).getAlpha();
-  float stopAngle=(m_endPoint-m_circle2D.getCentrePoint()).getAlpha();
+  double startAngle=(m_startPoint-m_circle2D.getCentrePoint()).getAlpha();
+  double stopAngle=(m_endPoint-m_circle2D.getCentrePoint()).getAlpha();
   LOG_DEBUG("Start and stop angle is:  " <<
             startAngle << ", " << stopAngle << " .");
   LOG_DEBUG("startAngle <= PI: " << (startAngle <= (PI+0.000001)));
@@ -78,8 +78,8 @@ double Arc2D::arcLength(const Point2D& i_startPoint,
   m_circle2D.isPointOnCircle(i_startPoint);
   m_circle2D.isPointOnCircle(i_endPoint);
 
-  float startAngle=(i_startPoint-m_circle2D.getCentrePoint()).getAlpha();
-  float stopAngle=(i_endPoint-m_circle2D.getCentrePoint()).getAlpha();
+  double startAngle=(i_startPoint-m_circle2D.getCentrePoint()).getAlpha();
+  double stopAngle=(i_endPoint-m_circle2D.getCentrePoint()).getAlpha();
 
   LOG_DEBUG("Startpoint x,y: " << i_startPoint.x << ", " << i_startPoint.y);
   LOG_DEBUG("Endpoint x,y: " << i_endPoint.x << ", " << i_endPoint.y);

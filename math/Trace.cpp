@@ -51,8 +51,8 @@ Line2D Trace::getTraceLine() const {
   }
 }
 
-bool Trace::isWithinRange(const float &i_reference,
-                          const float &i_verification) const {
+bool Trace::isWithinRange(const double &i_reference,
+                          const double &i_verification) const {
   if (i_verification+TOLERANCE < i_reference)
     return false;
   else if (i_verification-TOLERANCE>i_reference)
@@ -84,8 +84,8 @@ bool Trace::isWithinBeginRange(const Point2D &i_point2D) const {
 std::string Trace::
   getRotationDirectionToEndPoint(Point2D const &i_point2D) const {
 #ifdef DEBUG
-  float pointAngle = i_point2D.getAlpha()*180/PI;
-  float endPointAngle = m_endPoint.getAlpha()*180/PI;
+  double pointAngle = i_point2D.getAlpha()*180/PI;
+  double endPointAngle = m_endPoint.getAlpha()*180/PI;
 
   LOG_INFO("robot angle: " << pointAngle
            << ", endpoint angle: " << endPointAngle);
@@ -96,8 +96,8 @@ std::string Trace::
 
 std::string Trace::getRotationDirection(Point2D const &i_currentPoint,
                                         Point2D const &i_desiredPoint) const {
-  float currentPointAngle = i_currentPoint.getAlpha()*180./PI;
-  float endPointAngle = m_endPoint.getAlpha()*180./PI;
+  double currentPointAngle = i_currentPoint.getAlpha()*180./PI;
+  double endPointAngle = m_endPoint.getAlpha()*180./PI;
   LOG_INFO(currentPointAngle << ", " << endPointAngle);
 
   if (currentPointAngle > endPointAngle)
@@ -111,8 +111,8 @@ std::string Trace::getRotationDirection(Point2D const &i_currentPoint,
 std::string Trace::
   getTranslationDirectionToEndPoint(Point2D const &i_point2D) const {
 #ifdef DEBUG
-  float currentPointMagnitude = Magnitude(i_point2D);
-  float endPointMagnitude = Magnitude(m_endPoint);
+  double currentPointMagnitude = Magnitude(i_point2D);
+  double endPointMagnitude = Magnitude(m_endPoint);
   LOG_INFO("Current magnitude:"  << currentPointMagnitude);
   LOG_INFO("desired magnitude: " << endPointMagnitude);
 #endif
@@ -123,8 +123,8 @@ std::string Trace::
 std::string Trace::
   getTranslationDirection(Point2D const &i_currentPoint,
                           Point2D const &i_desiredPoint) const {
-  float currentPointMagnitude = Magnitude(i_currentPoint);
-  float desiredPointMagnitude = Magnitude(i_desiredPoint);
+  double currentPointMagnitude = Magnitude(i_currentPoint);
+  double desiredPointMagnitude = Magnitude(i_desiredPoint);
 	
   if (currentPointMagnitude < desiredPointMagnitude)
     return "OUT";
