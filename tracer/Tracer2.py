@@ -51,12 +51,14 @@ class Trace (object) :
 
        "Position settings"
        #position of the head in x,y viewed from back of robot, where robot is (0,0)
-       self.__currentPosition = numpy.array([-50.00 ,30.00])
+       self.__currentPosition = numpy.array([-10.00 ,30.00])
 
        #rotation in degree where 0 is perpendicular to the work piece minus angle ccw and positive cw
-       self.__currentRotation = numpy.arctan2(30,-50)*180/numpy.pi
+       self.__currentRotation = numpy.arctan2(self.__currentPosition[1],
+                                              self.__currentPosition[0])*180/numpy.pi
 
-       self.__currentExtension = (50*50+30*30)**0.5
+       self.__currentExtension = (self.__currentPosition[0] * self.__currentPosition[0] +
+                                 self.__currentPosition[1] * self.__currentPosition[1])**0.5
 
        self.__trace = []
 
@@ -141,6 +143,8 @@ class Trace (object) :
                 self.setSteps(direction,int(number))
 
     def setSteps(self,i_direction,i_numberOfSteps):
+        if i_numberOfSteps > 5:
+          print i_numberOfSteps
 	rotationDirections=["CCW","CW"]
 	translationDirections=["IN","OUT"]
 	DBG_MSG("Current position: %0.5f, %0.5f." % (self.__currentPosition[0], self.__currentPosition[1]))
@@ -170,11 +174,9 @@ class Trace (object) :
 
       self.__currentExtension += self.__transStep * translationPolarity * i_numberOfSteps
       
-
-
       DBG_MSG("New extension: " + str(self.__currentExtension))
       
-      self.__currentPosition =unitTranslation * self.__currentExtension
+      self.__currentPosition = unitTranslation * self.__currentExtension
 
       DBG_MSG("moved robot x: %0.2f and y: %0.2f." % (self.__currentPosition[0], self.__currentPosition[1]))
       self.__addPositionToTrace()
@@ -194,7 +196,6 @@ class Trace (object) :
       currentY=numpy.copy(self.__currentPosition[1])
 
       rotation = self.__rotStep * (numpy.pi / 180.) * rotationPolarity * i_numberOfSteps
-
       
       self.__currentPosition[0] = numpy.cos(rotation) * currentX - numpy.sin(rotation) * currentY
       self.__currentPosition[1] = numpy.sin(rotation) * currentX + numpy.cos(rotation) * currentY
