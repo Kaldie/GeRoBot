@@ -32,6 +32,7 @@ MACROHEADER: $(TOROOT)/$(INCLUDEFOLDER)/macroHeader.h.gch
 
 LINKHEADERS:
 	@echo "Creating symbolic links for all .h files in the project"
+	$(LINK) ../$(MACROHEADER) $(INCLUDEFOLDER)
 	$(foreach FOLDER,$(SHAREDFOLDERS), $(foreach HFILE,$(wildcard $(FOLDER)/*.h),$(LINK) .$(HFILE) $(INCLUDEFOLDER);))
 	$(foreach FOLDER,$(SHAREDFOLDERS), $(foreach HFILE,$(wildcard $(FOLDER)/*.hpp),$(LINK) .$(HFILE) $(INCLUDEFOLDER);))
 
