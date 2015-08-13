@@ -10,7 +10,7 @@
 #include <iostream>
 #include <map>
 #include <memory>
-
+#include <tuple>
 #include <string>
 #include <string.h>
 #include <stdexcept>
@@ -19,8 +19,6 @@
 #include <unistd.h>
 #include <vector>
 #include <iomanip>
-
-#include <pugixml.hpp>
 
 #define PIN_HIGH 1
 #define PIN_LOW 0
@@ -33,7 +31,7 @@
 #define PI 3.1415926535897932384626433
 #define TOLERANCE 0.1
 
-//#define DEBUG
+#define DEBUG
 // #define DEBUG_FILE
 
 // Create getter and setter for properties of a class
@@ -138,10 +136,16 @@ enum TRACE_TYPE {Line, Curve};
 
 enum GUIMovementMode {ToolMode, AxisMode};
 
-// Joint related types
+/// Smartpointer for base joint
 typedef std::shared_ptr<BaseJoint> JointPointer;
-typedef std::map<std::string, std::string> DirectionConversionMap;
+/// Vector of smartpointers of base joints
 typedef std::vector<JointPointer> JointPointerVector;
+
+/// conversion of motor direction to joint direction
+typedef std::map<std::string, std::string> DirectionConversionMap;
+
+/// type used in trace calculations
+typedef double traceType;
 
 // Robot related types
 typedef std::shared_ptr<Robot> RobotPointer;

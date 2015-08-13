@@ -9,7 +9,7 @@
 # Main makefile
 TOROOT= $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 PUGISRC = ./pugixml/src
-SHAREDFOLDERS = ./math ./arduino ./motor ./motor/io ./util/xml $(PUGISRC)
+SHAREDFOLDERS = ./math ./math/io ./arduino ./motor ./motor/io ./util/xml $(PUGISRC)
 UPLOADEDFOLDERS = ./arduinosketch
 MAIN = GeoRobot
 include Makefile.config

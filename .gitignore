@@ -6,3 +6,6 @@ pugixml-1.4
 */unit_test/unitTest*
 .deps
 .idea
+*debug*.cpp
+*test.cpp
+debug
