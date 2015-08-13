@@ -29,7 +29,7 @@ Arc2D::Arc2D(const Point2D& i_startPoint,
 
 Arc2D::Arc2D(const Point2D& i_startPoint,
              const Point2D& i_endPoint,
-             const double& i_radius,
+             const traceType& i_radius,
              const bool& i_isClockwise):
     m_startPoint(i_startPoint),
     m_endPoint(i_endPoint),
@@ -53,8 +53,8 @@ bool Arc2D::isClockwise() const {
 
   validate();
 
-  double startAngle=(m_startPoint-m_circle2D.getCentrePoint()).getAlpha();
-  double stopAngle=(m_endPoint-m_circle2D.getCentrePoint()).getAlpha();
+  traceType startAngle=(m_startPoint-m_circle2D.getCentrePoint()).getAlpha();
+  traceType stopAngle=(m_endPoint-m_circle2D.getCentrePoint()).getAlpha();
   LOG_DEBUG("Start and stop angle is:  " <<
             startAngle << ", " << stopAngle << " .");
   LOG_DEBUG("startAngle <= PI: " << (startAngle <= (PI+0.000001)));
@@ -72,18 +72,18 @@ bool Arc2D::isClockwise() const {
 }
 
 
-double Arc2D::arcLength(const Point2D& i_startPoint,
+traceType Arc2D::arcLength(const Point2D& i_startPoint,
                         const Point2D& i_endPoint) const  {
   validate();
   m_circle2D.isPointOnCircle(i_startPoint);
   m_circle2D.isPointOnCircle(i_endPoint);
 
-  double startAngle=(i_startPoint-m_circle2D.getCentrePoint()).getAlpha();
-  double stopAngle=(i_endPoint-m_circle2D.getCentrePoint()).getAlpha();
+  traceType startAngle=(i_startPoint-m_circle2D.getCentrePoint()).getAlpha();
+  traceType stopAngle=(i_endPoint-m_circle2D.getCentrePoint()).getAlpha();
 
   LOG_DEBUG("Startpoint x,y: " << i_startPoint.x << ", " << i_startPoint.y);
   LOG_DEBUG("Endpoint x,y: " << i_endPoint.x << ", " << i_endPoint.y);
-  double angle = startAngle - stopAngle;
+  traceType angle = startAngle - stopAngle;
   LOG_DEBUG("Anglular difference is: " << angle*(180/PI));
   LOG_DEBUG("is clockwise : " << isClockwise());
   LOG_DEBUG("Magnitude is: " << m_circle2D.radius());
@@ -100,6 +100,6 @@ double Arc2D::arcLength(const Point2D& i_startPoint,
 }
 
 
-double Arc2D::arcLength() const {
+traceType Arc2D::arcLength() const {
   return arcLength(m_startPoint, m_endPoint);
 }

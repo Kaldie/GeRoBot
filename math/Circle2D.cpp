@@ -20,7 +20,7 @@ Circle2D::Circle2D(const Point2D& i_firstPoint,
 
 Circle2D::Circle2D(const Point2D& i_firstPoint,
                    const Point2D& i_secondPoint,
-                   const double& i_radius,
+                   const traceType& i_radius,
                    const bool& i_isClockwise /*=true*/):
     m_firstPoint(i_firstPoint),
     m_secondPoint(i_secondPoint) {
@@ -33,7 +33,7 @@ Circle2D::Circle2D(const Point2D& i_firstPoint,
 
 Point2D Circle2D::getCentrePoint(const Point2D& i_firstPoint,
                                  const Point2D& i_secondPoint,
-                                 const double& i_radius,
+                                 const traceType& i_radius,
                                  const bool& i_isClockwise) {
   /**
    * Centre point is calculated using stuff on:
@@ -42,7 +42,7 @@ Point2D Circle2D::getCentrePoint(const Point2D& i_firstPoint,
    * http://math.stackexchange.com/questions/27535/how-to-find-center-of-an-arc-given-start-point-end-point-radius-and-arc-direc
    */
   Vector2D V = i_secondPoint - i_firstPoint;
-  double h = sqrt( (i_radius * i_radius) - (Magnitude(V) * Magnitude(V)) / 4);
+  traceType h = sqrt( (i_radius * i_radius) - (Magnitude(V) * Magnitude(V)) / 4);
   Vector2D unitH = 1 / Magnitude(V) * Vector2D(V.y,-1*V.x);
 
   Point2D centrePoint=i_firstPoint + 0.5 * V + h * unitH;
@@ -68,21 +68,20 @@ Point2D Circle2D::getCentrePoint(const Point2D& i_firstPoint,
 }
 
 
-double Circle2D::radius()const {
+traceType Circle2D::radius()const {
   return Magnitude(m_firstPoint-m_centrePoint);
 }
 
 
 bool Circle2D::isPointOnCircle(const Point2D& i_point) const {
-  double pointRadius=Magnitude(i_point-m_centrePoint);
-  double circleRadius=radius();
-  if((pointRadius+0.001>circleRadius) &&
-     pointRadius-0.001<circleRadius){
+  traceType pointRadius = Magnitude(i_point-m_centrePoint);
+  traceType circleRadius = radius();
+  if ((pointRadius+0.001 > circleRadius) &&
+     pointRadius-0.001 < circleRadius) {
     return true;
-  }
-  else{
-    LOG_DEBUG("Point radius: "<<pointRadius);
-    LOG_DEBUG("Circle radius: "<<circleRadius);
+  } else {
+    LOG_DEBUG("Point radius: " << pointRadius);
+    LOG_DEBUG("Circle radius: " << circleRadius);
     LOG_DEBUG("radius from start point and end point are not equal!");
 							
     return false;

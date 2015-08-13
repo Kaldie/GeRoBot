@@ -9,7 +9,7 @@ public:
   //construtor
   Point2D() {};
 
-  Point2D(double r, double s) : Vector2D(r, s) {};
+  Point2D(traceType r, traceType s) : Vector2D(r, s) {};
 
   Point2D& operator =(const Vector2D& v)
   {
@@ -18,16 +18,16 @@ public:
     return (*this);
   };
 
-  Point2D& operator *=(double t)
+  Point2D& operator *=(traceType t)
   {
     x *= t;
     y *= t;
     return (*this);
   };
 
-  Point2D& operator /=(double t)
+  Point2D& operator /=(traceType t)
   {
-    double f = 1.0/ t;
+    traceType f = 1.0/ t;
     x *= f;
     y *= f;
     return (*this);
@@ -53,34 +53,34 @@ public:
     return (Vector2D(x - p.x, y - p.y));
   };
 
-  Point2D operator *(double t) const
+  Point2D operator *(traceType t) const
   {
     return (Point2D(x * t, y * t));
   };
   
-  Point2D operator /(double t) const
+  Point2D operator /(traceType t) const
   {
-    double f = 1.0/ t;
+    traceType f = 1.0/ t;
     return (Point2D(x * f, y * f));
   };
 
   bool operator ==(const Point2D& i_other) const ;
-  double getAngleBetweenPoints(const Point2D&) const;
-  double getAngleToOrigin();
+  traceType getAngleBetweenPoints(const Point2D&) const;
+  traceType getAngleToOrigin();
 		
 };
 
 
-double Magnitude(const Vector2D& v);
+traceType Magnitude(const Vector2D& v);
 
-double InverseMag(const Vector2D& v);
+traceType InverseMag(const Vector2D& v);
 
-Vector2D operator *(double t, const Vector2D& v);
+Vector2D operator *(traceType t, const Vector2D& v);
 
-Point2D operator *(double t, const Point2D& p);
+Point2D operator *(traceType t, const Point2D& p);
 
-double Dot(const Vector2D& v1, const Vector2D& v2);
+traceType Dot(const Vector2D& v1, const Vector2D& v2);
 
-double SquaredMag(const Vector2D& v);
+traceType SquaredMag(const Vector2D& v);
 
 #endif

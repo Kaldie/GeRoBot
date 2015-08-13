@@ -34,12 +34,9 @@ class RotationTrace:public Trace {
   virtual bool isValidStartAndEndPosition(const Point2D&,
                                           const Point2D&) {return true;}
 
-  bool shouldAddExtremePoint(double& i_startAngle,
-                             double& i_stopAngle,
-                             double& i_extremePoint) const;
-
-  /// No default constructor allowed
-  RotationTrace();
+  bool shouldAddExtremePoint(traceType& i_startAngle,
+                             traceType& i_stopAngle,
+                             traceType& i_extremePoint) const;
 
  public:
   virtual Point2D intersectingPoint(const Point2D& i_currentPosition)const;
@@ -53,8 +50,15 @@ class RotationTrace:public Trace {
    */
   RotationTrace(const Point2D& i_startPoint,
                 const Point2D& i_endPoint,
-                const double& i_radius,
+                const traceType& i_radius,
                 const bool& i_isClockwise = true);
+
+  /**
+   * Default constructor
+   */
+  RotationTrace();
+
+
   /**
    * constructor
    * @param[in] i_startPoint Start point

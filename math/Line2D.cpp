@@ -17,9 +17,9 @@ Point2D Line2D::getIntersectingPoint(const Line2D &i_line2D) const {
   Point2D startPoint = i_line2D.getStartPoint();
   Point2D endPoint = i_line2D.getEndPoint();
   
-  double xTeller;
-  double yTeller;
-  double denominator;
+  traceType xTeller;
+  traceType yTeller;
+  traceType denominator;
 
   xTeller=(
       (m_startPoint.x * m_endPoint.y - m_startPoint.y * m_endPoint.x) *
@@ -55,7 +55,7 @@ Point2D Line2D::getIntersectingPoint(const Point2D &i_point) const {
   return getIntersectingPoint(line);
 }
 
-double Line2D::getLength() {
+traceType Line2D::getLength() {
   return Magnitude(m_endPoint-m_startPoint);
 }
 

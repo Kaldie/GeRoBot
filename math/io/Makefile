@@ -12,11 +12,13 @@ DSRCS= debug.cpp
 SRCS := $(filter-out $(DSRCS), $(wildcard *.cpp))
 
 
-#LIBS=-lMathInterface -lArduinoInterface
-LIBS = -lMotorInterface
+#dependencies of other modules
+DEPENDENCY = $(filter-out $(DOBJS), $(notdir $(wildcard $(TOROOT)/$(OBJECTFOLDER)/*.o)))
+
 # define the executable file 
-MAIN = MathInterface
 DEBUG = debug
 
 include $(TOROOT)/Makefile.config
+
+DEPENDENCY := $(filter-out $(DOBJS), $(DEPENDENCY))
 

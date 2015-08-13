@@ -25,7 +25,7 @@ class Line2D {
   Point2D getIntersectingPoint(const Point2D&) const;
 
   /// Get the length of the line defined by the two points
-  double getLength();
+  traceType getLength();
 };
 
 #endif  // MATH_LINE2D_H_

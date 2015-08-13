@@ -5,6 +5,11 @@
 #include <Line2D.h>
 #include "./Trace.h"
 
+Trace::Trace()
+    : Trace(Point2D(0, 0), Point2D(0, 0.01)) {
+}
+
+
 Trace::Trace(const Point2D& i_startPoint,
              const Point2D& i_endPoint):
     m_traceType(Line),
@@ -51,8 +56,8 @@ Line2D Trace::getTraceLine() const {
   }
 }
 
-bool Trace::isWithinRange(const double &i_reference,
-                          const double &i_verification) const {
+bool Trace::isWithinRange(const traceType &i_reference,
+                          const traceType &i_verification) const {
   if (i_verification+TOLERANCE < i_reference)
     return false;
   else if (i_verification-TOLERANCE>i_reference)
@@ -84,8 +89,8 @@ bool Trace::isWithinBeginRange(const Point2D &i_point2D) const {
 std::string Trace::
   getRotationDirectionToEndPoint(Point2D const &i_point2D) const {
 #ifdef DEBUG
-  double pointAngle = i_point2D.getAlpha()*180/PI;
-  double endPointAngle = m_endPoint.getAlpha()*180/PI;
+  traceType pointAngle = i_point2D.getAlpha()*180/PI;
+  traceType endPointAngle = m_endPoint.getAlpha()*180/PI;
 
   LOG_INFO("robot angle: " << pointAngle
            << ", endpoint angle: " << endPointAngle);
@@ -96,8 +101,8 @@ std::string Trace::
 
 std::string Trace::getRotationDirection(Point2D const &i_currentPoint,
                                         Point2D const &i_desiredPoint) const {
-  double currentPointAngle = i_currentPoint.getAlpha()*180./PI;
-  double endPointAngle = m_endPoint.getAlpha()*180./PI;
+  traceType currentPointAngle = i_currentPoint.getAlpha()*180./PI;
+  traceType endPointAngle = m_endPoint.getAlpha()*180./PI;
   LOG_INFO(currentPointAngle << ", " << endPointAngle);
 
   if (currentPointAngle > endPointAngle)
@@ -111,8 +116,8 @@ std::string Trace::getRotationDirection(Point2D const &i_currentPoint,
 std::string Trace::
   getTranslationDirectionToEndPoint(Point2D const &i_point2D) const {
 #ifdef DEBUG
-  double currentPointMagnitude = Magnitude(i_point2D);
-  double endPointMagnitude = Magnitude(m_endPoint);
+  traceType currentPointMagnitude = Magnitude(i_point2D);
+  traceType endPointMagnitude = Magnitude(m_endPoint);
   LOG_INFO("Current magnitude:"  << currentPointMagnitude);
   LOG_INFO("desired magnitude: " << endPointMagnitude);
 #endif
@@ -123,8 +128,8 @@ std::string Trace::
 std::string Trace::
   getTranslationDirection(Point2D const &i_currentPoint,
                           Point2D const &i_desiredPoint) const {
-  double currentPointMagnitude = Magnitude(i_currentPoint);
-  double desiredPointMagnitude = Magnitude(i_desiredPoint);
+  traceType currentPointMagnitude = Magnitude(i_currentPoint);
+  traceType desiredPointMagnitude = Magnitude(i_desiredPoint);
 	
   if (currentPointMagnitude < desiredPointMagnitude)
     return "OUT";

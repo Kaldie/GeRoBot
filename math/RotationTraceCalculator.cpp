@@ -17,7 +17,7 @@ RotationTraceCalculator::RotationTraceCalculator(
 
 RotationTraceCalculator::RotationTraceCalculator(
     JointController* i_jointControllerPointer,
-    const double& i_tolerance)
+    const traceType& i_tolerance)
     : LineTraceCalculator(i_jointControllerPointer, i_tolerance)
 {}
 
@@ -52,7 +52,7 @@ void RotationTraceCalculator::calculateTrace(
           predictStep(i_currentPosition, direction);
 
       if (getWriteLog())
-        writeToStepLog(direction, 1);
+        writeToStepLog(direction, 1, i_currentPosition);
 
       LOG_INFO("Translating: " << direction);
       // Correct the rotation, if nessesary!

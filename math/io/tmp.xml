@@ -1,13 +1,14 @@
-<Trace>
-  <Type>Line</Type>
-  <StartPoint>
-    <X>0</X>
-    <Y>10</Y>
-  </StartPoint>
-  <EndPoint>
-    <X>0</X>
-    <Y>10</Y>
-  </EndPoint>
-</Trace>
-
+<ROBOTBUILDER>
+  <Trace>
+    <Type>Line</Type>
+    <StartPoint>
+      <X>0</X>
+      <Y>10</Y>
+    </StartPoint>
+    <EndPoint>
+      <X>0</X>
+      <Y>13.2</Y>
+    </EndPoint>
+  </Trace>
+</ROBOTBUILDER>
 

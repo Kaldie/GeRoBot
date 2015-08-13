@@ -25,15 +25,15 @@ class Arc2D {
 
   Arc2D(const Point2D& i_startPoint,
         const Point2D& i_endPoint,
-        const double& i_radius,
+        const traceType& i_radius,
         const bool& i_isClockwise = true);
 
   bool isClockwise() const;
 
-  double arcLength(const Point2D& i_startPoint,
+  traceType arcLength(const Point2D& i_startPoint,
                    const Point2D& i_endPoint) const;
 
-  double arcLength() const;
+  traceType arcLength() const;
 };
 
 #endif  // MATH_ARC2D_H_

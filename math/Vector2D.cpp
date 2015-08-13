@@ -2,13 +2,13 @@
 #include "Vector2D.h"
 
 
-Vector2D& Vector2D::rotate(double angle)
+Vector2D& Vector2D::rotate(traceType angle)
 {
-    double s = sinf(angle);
-    double c = cosf(angle);
+    traceType s = sinf(angle);
+    traceType c = cosf(angle);
     
-    double nx = c * x - s * y;
-    double ny = s * x + c * y;
+    traceType nx = c * x - s * y;
+    traceType ny = s * x + c * y;
     
     x = nx;
     y = ny;
@@ -18,12 +18,12 @@ Vector2D& Vector2D::rotate(double angle)
 
 
 /// Get the angle of a vector, make sure its positive
-double Vector2D::getAlpha() const {
+traceType Vector2D::getAlpha() const {
   /**
    *  the domein of the atan is slighly different then we want it to be.
    *  So given the quadrant of the vector, add a value to put it in our wanted domein
    */    
-  double angle=atan2(y,x);
+  traceType angle=atan2(y,x);
   if(angle<0)
     angle+=2*PI;
 

@@ -22,7 +22,7 @@ class Circle2D {
    */
   Point2D getCentrePoint(const Point2D& i_firstPoint,
                          const Point2D& i_secondPointy,
-                         const double& i_radius,
+                         const traceType& i_radius,
                          const bool& i_isClockwise);
 
  public:
@@ -45,11 +45,11 @@ class Circle2D {
    */
   Circle2D(const Point2D& i_firstPoint,
            const Point2D& i_secondPoint,
-           const double& i_radius,
+           const traceType& i_radius,
            const bool& i_isClockwise =true);
 
   /// returns the radius of the circle
-  double radius() const;
+  traceType radius() const;
 
   /// retuns if the point lies on the circle
   bool isPointOnCircle(const Point2D& i_point) const;

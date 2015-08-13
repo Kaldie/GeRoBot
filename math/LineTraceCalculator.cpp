@@ -24,7 +24,7 @@ LineTraceCalculator::LineTraceCalculator(JointController* i_jointController)
 
 
 LineTraceCalculator::LineTraceCalculator(JointController* i_jointController,
-                                         const double& i_tolerance)
+                                         const traceType& i_tolerance)
     : BaseTraceCalculator(i_jointController,
                           i_tolerance),
       m_hasRotated(true),
@@ -84,7 +84,7 @@ void LineTraceCalculator::prepareRotation(const Trace* i_trace,
   getJointController()->getJoint(Rotational)->predictStep(i_point2D, direction);
 
   if (getWriteLog())
-    writeToStepLog(direction, 1);
+    writeToStepLog(direction, 1, i_point2D);
 
   // user needs to know :)
   LOG_INFO("Rotating: " << direction);
@@ -109,7 +109,7 @@ void LineTraceCalculator::prepareTranslation(const Trace* i_trace,
       predictStep(i_point2D, direction);
 
   if (getWriteLog())
-    writeToStepLog(direction, 1);
+    writeToStepLog(direction, 1, i_point2D);
 
   LOG_INFO("Translating: " << direction);
 
@@ -124,7 +124,7 @@ void LineTraceCalculator::prepareTranslation(const Trace* i_trace,
 
 bool LineTraceCalculator::correctRotation(const Trace* i_trace,
                                           Point2D& i_point2D) const {
-  double jointPointDifference;
+  traceType jointPointDifference;
   const Point2D* destinationPoint;
 
   Point2D intersectingPoint;
@@ -138,11 +138,11 @@ bool LineTraceCalculator::correctRotation(const Trace* i_trace,
   }
 
   /* The distance to the enpoint after the correction is applied*/
-  double distenceEndPointIntersectingPoint =
+  traceType distenceEndPointIntersectingPoint =
       Magnitude(intersectingPoint-i_trace->getEndPoint());
 
   /* The distance traveled in this correction*/
-  double distanceBeginPointIntersectingPoint =
+  traceType distanceBeginPointIntersectingPoint =
       Magnitude(intersectingPoint-i_point2D);
 
   if (distenceEndPointIntersectingPoint < distanceBeginPointIntersectingPoint) {
@@ -184,7 +184,7 @@ bool LineTraceCalculator::correctRotation(const Trace* i_trace,
              numberOfSteps << " in the " <<
              translationDirection << " direction");
     if (getWriteLog())
-      writeToStepLog(translationDirection, numberOfSteps);
+      writeToStepLog(translationDirection, numberOfSteps, i_point2D);
     return true;
 
   } else {
@@ -210,9 +210,9 @@ bool LineTraceCalculator::correctTranslation(const Trace* i_trace,
   if (intersectingPoint == Point2D(0, 0))
     return false;
 
-  double currentRotation = i_point2D.getAlpha();
-  double intersectingAngle = intersectingPoint.getAlpha();
-  double endPointAngle = i_trace->getEndPoint().getAlpha();
+  traceType currentRotation = i_point2D.getAlpha();
+  traceType intersectingAngle = intersectingPoint.getAlpha();
+  traceType endPointAngle = i_trace->getEndPoint().getAlpha();
 
   LOG_INFO("Distination point: " << intersectingPoint.x <<
            ", " << intersectingPoint.y);
@@ -220,21 +220,21 @@ bool LineTraceCalculator::correctTranslation(const Trace* i_trace,
   LOG_INFO("DistinationPoint rotation: " << intersectingAngle*180.0/PI);
 
   /* The distance to the enpoint after the correction is applied*/
-  double distenceEndPointIntersectingPoint =
+  traceType distenceEndPointIntersectingPoint =
       std::abs(endPointAngle-intersectingAngle);
 
   // The distance traveled in this correction
-  double distanceBeginPointIntersectingPoint =
+  traceType distanceBeginPointIntersectingPoint =
       std::abs(currentRotation-intersectingAngle);
 
-  // double distinationPointRotation=intersectingPoint.getAlpha();
-  // double jointAngleDifference=currentRotation-distinationPointRotation;
+  // traceType distinationPointRotation=intersectingPoint.getAlpha();
+  // traceType jointAngleDifference=currentRotation-distinationPointRotation;
 
   LOG_INFO("Joint angle difference: " <<
            distanceBeginPointIntersectingPoint*(PI/180));
 
   // Anglular distance for the correction
-  double jointPointDifference;
+  traceType jointPointDifference;
 
   // Position the joint is aiming for
   Point2D destinationPoint;
@@ -274,7 +274,7 @@ bool LineTraceCalculator::correctTranslation(const Trace* i_trace,
                                     numberOfSteps);
 
     if (getWriteLog())
-      writeToStepLog(rotationDirection, numberOfSteps);
+      writeToStepLog(rotationDirection, numberOfSteps, i_point2D);
 
     return true;
   }

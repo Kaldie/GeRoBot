@@ -11,23 +11,22 @@ class Trace {
   GETSET(Point2D, m_startPoint, StartPoint);
   GETSET(Point2D, m_endPoint, EndPoint);
 
-  GETSET(double, m_rotationTolerance, RotationTolerance);
-  GETSET(double, m_translationTolerance, TranslationTolerance);
+  GETSET(traceType, m_rotationTolerance, RotationTolerance);
+  GETSET(traceType, m_translationTolerance, TranslationTolerance);
 
   bool isValidStartAndEndPoint(const Point2D*,
                                const Point2D*);
 
   bool isWithinRange(const Point2D&, const Point2D&) const;
-  bool isWithinRange(const double&, const double&) const;
+  bool isWithinRange(const traceType&, const traceType&) const;
 
   std::string getRotationDirection(const Point2D&, const Point2D&) const;
 
-  /// no default constructor!
+ public:
+  // constructors
   Trace();
   virtual ~Trace(){};
 
- public:
-  // constructors
   Trace(const Point2D& i_startPoint,
         const Point2D& i_endPoint);
 

@@ -18,7 +18,7 @@ class TraceIO: public XMLBuilder {
  public:
   virtual void build();
   explicit TraceIO(const pugi::xml_node&);
-  explicit TraceIO(const std::string i_fileName);
+  explicit TraceIO(const std::string& i_fileName);
   virtual bool update(const TracePointer& i_tracePointer);
 };
 

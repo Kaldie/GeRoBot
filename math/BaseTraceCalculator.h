@@ -7,10 +7,10 @@ class JointController;
 class Trace;
 
 class BaseTraceCalculator {
-  GETSET(double, m_tolerance, Tolerance);
+  GETSET(traceType, m_tolerance, Tolerance);
   GETSETPOINTER(JointController, m_jointController, JointController);
-  GETSET(double, m_translationTolerance, TranslationTolerance);
-  GETSET(double, m_rotationTolerance, RotationTolerance);
+  GETSET(traceType, m_translationTolerance, TranslationTolerance);
+  GETSET(traceType, m_rotationTolerance, RotationTolerance);
   GETSET(bool, m_writeLog, WriteLog);
   GETSET(std::string, m_logFileName, LogFileName);
 
@@ -53,8 +53,9 @@ class BaseTraceCalculator {
      The location can be set with setFileLocation(const std::string&)
      The necessary switch is setWriteLog(true)
   */
-  void writeToStepLog(const std::string, // direction
-                      const int) const;  // number of steps
+  void writeToStepLog(const std::string&,  // direction
+                      const int&,
+                      const Point2D& i_newPosition) const;  // number of steps
 
   // Constructors
   BaseTraceCalculator();
@@ -62,7 +63,7 @@ class BaseTraceCalculator {
   BaseTraceCalculator(JointController*);
     
   BaseTraceCalculator(JointController*,
-                      const double& i_tolerance);
+                      const traceType& i_tolerance);
   virtual ~BaseTraceCalculator() {};
 };
 
