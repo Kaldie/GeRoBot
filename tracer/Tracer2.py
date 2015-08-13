@@ -51,7 +51,7 @@ class Trace (object) :
 
        "Position settings"
        #position of the head in x,y viewed from back of robot, where robot is (0,0)
-       self.__currentPosition = numpy.array([-10.00 ,30.00])
+       self.__currentPosition = numpy.array([-00.00 ,50.00])
 
        #rotation in degree where 0 is perpendicular to the work piece minus angle ccw and positive cw
        self.__currentRotation = numpy.arctan2(self.__currentPosition[1],
@@ -61,7 +61,8 @@ class Trace (object) :
                                  self.__currentPosition[1] * self.__currentPosition[1])**0.5
 
        self.__trace = []
-
+       self.__newTrace = []
+       self.__addPositionToTrace()
 
     def __str__(self):
       nameString = "Robot with 2 motors: {motorTypeList}\n\tAt position x:{x:0.2f} mm,\t y{y:0.2f} mm\n\tRotated {rotation:0.2f}".\
@@ -138,9 +139,11 @@ class Trace (object) :
 	with open(i_fileName,'r') as stepFile:
             DBG_MSG('lala')
             for line in stepFile.readlines():
-                direction, number = line.strip().split(',')
+                direction, number, newX,newY = line.strip().split(',')
                 DBG_MSG( "setting {0}, step(s) in {1} direction".format(number,direction))
                 self.setSteps(direction,int(number))
+                self.__addCalculatedPosition([float(newX),float(newY)])
+
 
     def setSteps(self,i_direction,i_numberOfSteps):
         if i_numberOfSteps > 5:
@@ -166,8 +169,8 @@ class Trace (object) :
 
       DBG_MSG( "Starting translation")
       DBG_MSG (self.__currentRotation)
-      unitTranslation = numpy.array([numpy.cos(self.__currentRotation * (numpy.pi / 180)), 
-                                     numpy.sin(self.__currentRotation * (numpy.pi / 180))])
+      unitTranslation = numpy.array([numpy.cos(self.__currentRotation * (numpy.pi / 180.)), 
+                                     numpy.sin(self.__currentRotation * (numpy.pi / 180.))])
       
       DBG_MSG("Current extension: " + str(self.__currentExtension))
       DBG_MSG("Current rotation: " + str(self.__currentRotation))
@@ -209,16 +212,21 @@ class Trace (object) :
     def __addPositionToTrace(self):
       DBG_MSG( "Current Position Robot: x: {x:0.2f}, y: {y:0.2f}.".\
           format(x = self.__currentPosition[0], y = self.__currentPosition[1]))
-
       self.__trace.append(numpy.copy(self.__currentPosition))
+      
+
+    def __addCalculatedPosition(self, i_position):
+            self.__newTrace.append(numpy.copy(i_position))
+
 
     def plotTrace(self):
         from matplotlib.pyplot import plot,show,figure,Circle
 	myFigure=figure()
 	myAxes=myFigure.add_subplot(111)
-        circle1=Circle((-30,30),20,color='r')
-	myAxes.plot(zip(*self.__trace)[0], zip(*self.__trace)[1],'.-')
-
+        circle1=Circle((-30.,30.),20.,color='r')
+	myAxes.plot(zip(*self.__trace)[0], zip(*self.__trace)[1], 'g.-')
+	myAxes.plot(zip(*self.__newTrace)[0], zip(*self.__newTrace)[1], 'b.-')
+        
 	myAxes.plot([0,-44.1369],[0,15.8587])
 	myAxes.plot([0,-15.8587],[0,44.1369])
         myAxes.set_ylim([-100,100])
