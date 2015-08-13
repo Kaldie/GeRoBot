@@ -8,14 +8,14 @@
 TOROOT= ../..
 
 # define the C source files
-DSRCS= debug.cpp debug2.cpp
-SRCS := $(filter-out $(DSRCS), $(wildcard *.cpp))
+DSRCS= debug.cpp 
 
-DEPENDENCY = XMLBuilder.o
-
+#dependencies of other modules
+DEPENDENCY = $(wildcard $(TOROOT)/$(OBJECTFOLDER)/*.o)
 
 # define the executable file 
-MAIN = RobotInterface
+MAIN = MotorInterface
 DEBUG = debug
+
 include $(TOROOT)/Makefile.config
 

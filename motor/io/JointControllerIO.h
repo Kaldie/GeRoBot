@@ -6,8 +6,8 @@
 
 class JointControllerIO: public XMLBuilder {
   GETSET_NO_CONST(JointController,
-                    m_jointController,
-                    JointController);
+                  m_jointController,
+                  JointController);
 
  private:
   // no default contructor!

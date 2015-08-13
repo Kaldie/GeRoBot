@@ -35,9 +35,9 @@ void JointIO::build() {
         LOG_ERROR("Movement type: " << movementType << " is not correct!");
       }
       jointPointer->setMovementPerStep(
-          getNodeFromPath(jointNode, "./MOVEMENT_PER_STEP").text().as_float());
+          getNodeFromPath(jointNode, "./MOVEMENT_PER_STEP").text().as_double());
       jointPointer->setPosition(
-          getNodeFromPath(jointNode, "./DEFAULT_POSITION").text().as_float());
+          getNodeFromPath(jointNode, "./DEFAULT_POSITION").text().as_double());
 
       LOG_DEBUG("Joint type: " << jointPointer->getMovementType());
       LOG_DEBUG("Default position: " << jointPointer->getPosition());
@@ -45,7 +45,7 @@ void JointIO::build() {
       *(jointPointer->getMotor()) =
           parseStepperDriver(getNodeFromPath(jointNode, "./ACTUATOR"));
 
-      std::vector<float> range = getFloatList(jointNode, "./RANGE", 2);
+      std::vector<double> range = getDoubleList(jointNode, "./RANGE", 2);
       jointPointer->setRange(range);
       std::vector<std::string> directionConversionStringVector
           = getStringList(jointNode,
