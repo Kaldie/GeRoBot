@@ -1,5 +1,6 @@
 #ifndef XMLBuilder_H
 #define XMLBuilder_H
+#include <pugixml.hpp>
 
 class XMLBuilder {
  private:
@@ -54,7 +55,7 @@ class XMLBuilder {
 
   virtual bool store(const std::string& i_fileName);
 
-  XMLBuilder(const std::string&);
+  explicit XMLBuilder(const std::string&);
   explicit XMLBuilder(const pugi::xml_node&);
   virtual ~XMLBuilder();
 };
