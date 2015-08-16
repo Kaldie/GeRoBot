@@ -16,6 +16,7 @@ class Point2DIO: public XMLBuilder {
  public:
   virtual void build();
   explicit Point2DIO(const pugi::xml_node&);
+  bool addPointNode(const std::string& i_pointName);
   bool update(const Point2D& i_point2D);
 };
 

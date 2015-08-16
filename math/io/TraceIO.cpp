@@ -1,7 +1,5 @@
 // Copyright [2015] Ruud Cools
 #include <macroHeader.h>
-#include <TranslationalJoint.h>
-
 #include <RotationTrace.h>
 #include "./TraceIO.h"
 #include "./Point2DIO.h"
@@ -9,9 +7,8 @@
 
 void TraceIO::build() {
   LOG_DEBUG("Building a Trace");
-  LOG_DEBUG("Buildiing a Trace!");
   std::string traceType = getNode().first_child().text().as_string();
-  if (traceType == "Line") {
+  if (isLineTrace()) {
     m_tracePointer = std::make_shared<Trace>();
     m_tracePointer->setTraceType(Line);
   } else if (traceType == "Curve") {
@@ -44,7 +41,6 @@ TraceIO::TraceIO(const std::string& i_fileName)
 
 bool TraceIO::update(const TracePointer& i_trace) {
   LOG_DEBUG("Updateing the Trace");
-  getNode().first_child().text().set("Line");
   if (i_trace->getTraceType() == Line) {
     getNode().first_child().text().set("Line");
   } else if (i_trace->getTraceType() == Curve) {
@@ -54,8 +50,22 @@ bool TraceIO::update(const TracePointer& i_trace) {
   }
   bool hasUpdated = true;
   Point2DIO point2DIO(getNodeFromPath("./StartPoint"));
+  LOG_DEBUG("Startpoint x,y: " << i_trace->getStartPoint().x << "," << i_trace->getStartPoint().y);
   hasUpdated &= point2DIO.update(i_trace->getStartPoint());
+  LOG_DEBUG("Endpoint x,y: " << i_trace->getEndPoint().x << "," << i_trace->getEndPoint().y);
   point2DIO.setNode(getNodeFromPath("./EndPoint"));
-  hasUpdated &= point2DIO.update(i_trace->getStartPoint());
+  hasUpdated &= point2DIO.update(i_trace->getEndPoint());
   return true;
+}
+
+
+bool TraceIO::isLineTrace() const {
+  std::string traceType = getNode().first_child().text().as_string();
+  if (traceType == "Line") {
+    return true;
+  } else if (traceType == "Curve") {
+    return false;
+  } else {
+    LOG_ERROR("Unknown trace type: " << traceType);
+  }
 }

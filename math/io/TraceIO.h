@@ -15,6 +15,13 @@ class TraceIO: public XMLBuilder {
   // No default contructor!!
   TraceIO();
 
+ protected:
+  /**
+   * Returns if the node is a line trace
+   * The is determined based on the first child of the trace node which hold its type
+   */
+  bool isLineTrace() const;
+
  public:
   virtual void build();
   explicit TraceIO(const pugi::xml_node&);
