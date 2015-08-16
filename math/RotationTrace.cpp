@@ -7,7 +7,7 @@
 
 RotationTrace::RotationTrace()
     : Trace(Point2D(0, 0), Point2D(0, 0.1), Curve),
-      m_arc(Arc2D(Point2D(0, 0), Point2D(0, 0.1), Point2D(1, 0.1)))
+      m_arc(Arc2D(Point2D(-1, 0), Point2D(0, 1), Point2D(0, 0)))
 {}
 
 RotationTrace::RotationTrace(const Point2D& i_startPoint,
