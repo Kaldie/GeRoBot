@@ -2,10 +2,8 @@
 #ifndef GUI_ROBOTMOVEMENTWIDGET_H_
 #define GUI_ROBOTMOVEMENTWIDGET_H_
 
-#include <QMainWindow>
 #include <QWidget>
 #include <Point2D.h>
-#include <macroHeader.h>
 #include "./ui_RobotMovementWidget.h"
 
 class QAction;
