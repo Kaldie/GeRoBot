@@ -11,8 +11,8 @@ class Trace {
   GETSET(Point2D, m_startPoint, StartPoint);
   GETSET(Point2D, m_endPoint, EndPoint);
 
-  GETSET(traceType, m_rotationTolerance, RotationTolerance);
-  GETSET(traceType, m_translationTolerance, TranslationTolerance);
+  GETSET(double, m_rotationTolerance, RotationTolerance);
+  GETSET(double, m_translationTolerance, TranslationTolerance);
 
   bool isValidStartAndEndPoint(const Point2D*,
                                const Point2D*);
@@ -61,6 +61,8 @@ class Trace {
    */
   std::string getTranslationDirection(const Point2D& i_currentPosition,
                                       const Point2D& i_desiredPosition) const;
+
+  virtual std::vector<Point2D*> getPointPointers();
 };
 
 #endif  // MATH_TRACE_H_

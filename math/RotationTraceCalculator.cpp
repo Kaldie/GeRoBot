@@ -37,8 +37,8 @@ void RotationTraceCalculator::calculateTrace(
       itr++) {
     startPointOfThisTrace = i_currentPosition;
 
-    LOG_DEBUG("Arc endPoint x, y: " << itr->getArc().getEndPoint().x <<
-              ", " << itr->getArc().getEndPoint().y);
+    LOG_DEBUG("Arc endPoint x, y: " << itr->getArc().getSecondPoint().x <<
+              ", " << itr->getArc().getSecondPoint().y);
 
     LineTraceCalculator::calculateTrace(&(*itr), i_currentPosition);
 

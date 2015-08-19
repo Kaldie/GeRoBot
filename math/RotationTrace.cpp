@@ -28,7 +28,7 @@ RotationTrace::RotationTrace(const Point2D& i_startPoint,
 
 
 RotationTrace::RotationTrace(const Arc2D& i_arc)
-    : Trace(i_arc.getStartPoint(), i_arc.getEndPoint(), Curve),
+    : Trace(i_arc.getFirstPoint(), i_arc.getSecondPoint(), Curve),
       m_arc(i_arc)
 {}
 
@@ -40,13 +40,13 @@ Point2D RotationTrace::intersectingPoint(
      check out:
      http://stackoverflow.com/questions/1073336/circle-line-collision-detection
   */
-  Vector2D f = (-1*this->m_arc.getCircle2D().getCentrePoint());
+  Vector2D f = (-1*this->m_arc.getCentrePoint());
   Point2D d = i_currentPosition;
 
   traceType a = Dot(d, d);
   traceType b = 2*(Dot(f, d));
   traceType c =
-      Dot(f, f) - m_arc.getCircle2D().radius()*m_arc.getCircle2D().radius();
+      Dot(f, f) - m_arc.radius() * m_arc.radius();
 
   traceType discriminant = b * b - 4 * a * c;  // squared
 
@@ -88,9 +88,9 @@ void RotationTrace::getExtremePoints(Point2D& i_firstPoint,
    * minimum or maximum
    */
 
-  Point2D centrePoint = m_arc.getCircle2D().getCentrePoint();
+  Point2D centrePoint = m_arc.getCentrePoint();
   traceType centreMagnitude = Magnitude(centrePoint);
-  traceType radius = m_arc.getCircle2D().radius();
+  traceType radius = m_arc.radius();
   if (centreMagnitude != 0) {
     traceType rotationAngle = asin(radius/centreMagnitude);
     LOG_DEBUG("Rotation angle: " << rotationAngle*180/PI);
@@ -113,7 +113,7 @@ void RotationTrace::getExtremePoints(Point2D& i_firstPoint,
 std::vector<RotationTrace> RotationTrace::getNecessaryTraces() const {
   Point2D firstExtreme, secondExtreme;
   getExtremePoints(firstExtreme, secondExtreme);
-  Point2D centrePoint = m_arc.getCircle2D().getCentrePoint();
+  Point2D centrePoint = m_arc.getCentrePoint();
 
   traceType firstExtremeAngle=(firstExtreme-centrePoint).getAlpha();
   traceType secondExtremeAngle=(secondExtreme-centrePoint).getAlpha();
@@ -127,7 +127,7 @@ std::vector<RotationTrace> RotationTrace::getNecessaryTraces() const {
     itermediateTraces.push_back(
         RotationTrace(startPoint,
                       firstExtreme,
-                      m_arc.getCircle2D().getCentrePoint()));
+                      m_arc.getCentrePoint()));
 
     startPoint = firstExtreme;
   }
@@ -135,14 +135,14 @@ std::vector<RotationTrace> RotationTrace::getNecessaryTraces() const {
     itermediateTraces.push_back(
         RotationTrace(startPoint,
                       secondExtreme,
-                      m_arc.getCircle2D().getCentrePoint()));
+                      m_arc.getCentrePoint()));
     startPoint = secondExtreme;
   }
 
   itermediateTraces.push_back(
       RotationTrace(startPoint,
                     getEndPoint(),
-                    m_arc.getCircle2D().getCentrePoint()));
+                    m_arc.getCentrePoint()));
   return itermediateTraces;
 }
 
@@ -174,4 +174,9 @@ bool RotationTrace::shouldAddExtremePoint(traceType& i_startAngle,
     else
       return false;
   }
+}
+
+
+std::vector<Point2D*> RotationTrace::getPointPointers() {
+  return m_arc.getPointPointers();
 }

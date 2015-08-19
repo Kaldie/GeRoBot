@@ -143,3 +143,10 @@ std::string Trace::
 Point2D Trace::intersectingPoint(const Point2D& i_currentPoint)const {
   return getTraceLine().getIntersectingPoint(i_currentPoint);
 }
+
+std::vector<Point2D*> Trace::getPointPointers() {
+  std::vector<Point2D*> points;
+  points.push_back(&m_startPoint);
+  points.push_back(&m_endPoint);
+  return points;
+}
