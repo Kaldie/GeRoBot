@@ -43,10 +43,10 @@ class RotationTraceCalculatorTest : public CxxTest::TestSuite {
     jointController.getJoint(Rotational)->setMovementPerStep(0.01);
 
     trace.setRotationTolerance(
-        jointController.getJoint(Rotational)->getMovementPerStep()*1.5);
+        jointController.getJoint(Rotational)->getMovementPerStep()*1);
 
     trace.setTranslationTolerance(
-        jointController.getJoint(Translational)->getMovementPerStep()*1.5);
+        jointController.getJoint(Translational)->getMovementPerStep()*1);
 
     jointController.getJoint(Translational)->getMotor()->setHoldMotor(true);
     jointController.getJoint(Rotational)->getMotor()->setHoldMotor(true);

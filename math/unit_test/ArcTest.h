@@ -19,18 +19,14 @@ class ArcTest : public CxxTest::TestSuite {
     TS_ASSERT_DELTA(arc.arcLength(), PI / 2.0, 0.0001);
     TS_ASSERT(arc.isClockwise());
 
-    arc.setStartPoint(Point2D(-2, 0));
-    arc.setEndPoint(Point2D(2, 0));
-    arc.setCircle2D(Circle2D(Point2D(-2, 0),
-                             Point2D(2, 0),
-                             Point2D(0, 0)));
+    arc.setFirstPoint(Point2D(-2, 0));
+    arc.setSecondPoint(Point2D(2, 0));
+    arc.setCentrePoint(Point2D(0, 0));
 
     TS_ASSERT_DELTA(arc.arcLength(), 2*PI, 0.0001);
     TS_ASSERT(arc.isClockwise());
 
-    Circle2D newCircle = arc.getCircle2D();
-    newCircle.setCentrePoint(Point2D(0, 10));
-    arc.setCircle2D(newCircle);
+    arc.setCentrePoint(Point2D(0, 10));
     TS_ASSERT(!arc.isClockwise());
 
     TS_ASSERT_THROWS(Arc2D arc2(Point2D(0, 1),
@@ -43,7 +39,7 @@ class ArcTest : public CxxTest::TestSuite {
                4,
                true);
     TS_ASSERT(arc3.isClockwise());
-    TS_ASSERT_EQUALS(arc3.getCircle2D().getCentrePoint(),
+    TS_ASSERT_EQUALS(arc3.getCentrePoint(),
                      Point2D(0, 0));
 
     Arc2D arc4(Point2D(0, 4),
@@ -52,7 +48,7 @@ class ArcTest : public CxxTest::TestSuite {
                false);
 
     TS_ASSERT(!arc4.isClockwise());
-    TS_ASSERT_EQUALS(arc4.getCircle2D().getCentrePoint(),
+    TS_ASSERT_EQUALS(arc4.getCentrePoint(),
                      Point2D(4, 4));
   }
 };
