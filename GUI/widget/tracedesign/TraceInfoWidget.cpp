@@ -7,7 +7,7 @@
 #include "./TraceInfoWidget.h"
 
 TraceInfoWidget::TraceInfoWidget(QWidget *parent)
-        : QWidget(parent) {
+  : QWidget(parent), m_trace(NULL) {
         initialise();
 }
 
@@ -44,33 +44,47 @@ void TraceInfoWidget::initialise() {
   trace(std::shared_ptr<Trace>(NULL));
 }
 
-void TraceInfoWidget::trace(const TracePointer& i_tracePointer) {
-  if (i_tracePointer) {
+void TraceInfoWidget::setTrace(TracePointer i_tracePointer) {
+  m_trace = i_tracePointer;
+  if (!m_trace) {
+    LOG_DEBUG("No pointer set. return after disableing");
+    traceTypeComboBox->setEnabled(false);
+    startPoint->setPoint(NULL);
+    endPoint->setPoint(NULL);
+    centralPoint->setPoint(NULL);
+  } else {
     LOG_DEBUG("Set a new Trace pointer");
     // enable trace combo box
     traceTypeComboBox->setEnabled(true);
 
-    // set the trace
-    m_trace = i_tracePointer;
-
-    // update the combo box
+    LOG_DEBUG("Set the trace type to: " << i_tracePointer->getTraceType());
     traceTypeComboBox->setCurrentIndex(m_trace->getTraceType());
     // Get the point pointers from the new trace
     std::vector<Point2D*> points;
+    LOG_DEBUG("Getting points now!");
     points = m_trace->getPointPointers();
 
-    // Try to dynamicly cast it to a rotation trace
-    RotationTracePointer rotationTracePointer =
-      std::dynamic_pointer_cast<RotationTrace>(m_trace);
     startPoint->setPoint(points[0]);
     endPoint->setPoint(points[1]);
+    LOG_DEBUG("Finished setting of start and end point.");
     if (points.size() < 2) {
+      LOG_DEBUG("Cannot set center point, it is a line trace!");
       centralPoint->setEnabled(false);
     } else {
       centralPoint->setEnabled(true);
       centralPoint->setPoint(points[2]);
+      centralPoint->updateView();
     }
-  } else {
-    traceTypeComboBox->setEnabled(false);
   }
+  LOG_DEBUG("Emit has new position");
+  emit startPoint->hasNewPosition();
+  emit endPoint->hasNewPosition();
+  emit centralPoint->hasNewPosition();
+}
+
+void TraceInfoWidget::updateTrace() {
+  LOG_DEBUG("Update trace!");
+  if (traceTypeComboBox->currentIndex() == m_trace->getTraceType())
+    LOG_DEBUG("Trace does not have to be reset!");
+
 }

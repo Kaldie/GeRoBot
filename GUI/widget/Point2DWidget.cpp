@@ -32,11 +32,16 @@ void Point2DWidget::initialise() {
 
 
 void Point2DWidget::updateView() {
+  LOG_DEBUG("Update point view.");
   if (!m_pointPointer) {
+    LOG_DEBUG("Pointer is invalid.");
     xPositionLineEdit->setEnabled(false);
     yPositionLineEdit->setEnabled(false);
     return;
   }
+  xPositionLineEdit->setEnabled(true);
+  yPositionLineEdit->setEnabled(true);
+
   QString textualRepresentation;
   textualRepresentation.setNum(m_pointPointer->x, 'g', Point2DWidget::m_precision);
   xPositionLineEdit->setText(textualRepresentation);

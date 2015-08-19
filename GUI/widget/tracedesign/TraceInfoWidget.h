@@ -18,14 +18,17 @@ class TraceInfoWidget: public QWidget {
   QComboBox* traceTypeComboBox = 0;
   QLabel* traceTypeLabel = 0;
 
- public:
-  // Constructor
-  explicit TraceInfoWidget(QWidget* parent = 0);
-  void trace(const TracePointer& i_tracePointer);
  private:
   TracePointer m_trace;
   void initialise();
 
-};
+ public:
+  // Constructor
+  explicit TraceInfoWidget(QWidget* parent = 0);
+
+  void trace(TracePointer i_tracePointer);
+
+ public slots:
+  void updateTrace();
 
 #endif  // GUI_TRACEINFOWIDGET_H_
