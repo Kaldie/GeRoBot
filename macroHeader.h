@@ -47,6 +47,18 @@ void set##property(const type& val) {                                   \
   varName = val;                                                        \
 };
 
+#define GETSETPROTECTED(type, varName, property)      \
+ protected:                                           \
+  type varName;                                       \
+ public:                                              \
+  const type& get##property() const {                 \
+    return varName;                                   \
+  };                                                  \
+                                                      \
+  void set##property(const type& val) {               \
+    varName = val;                                    \
+  };
+
 
 // Create getter and setter for properties of a class
 #define GETSET_NO_CONST(type, varName, property)                        \
