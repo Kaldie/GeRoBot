@@ -1,6 +1,10 @@
-#ifndef XMLBuilder_H
-#define XMLBuilder_H
+// Copyright [2015] Ruud Cools
+
+#ifndef UTIL_XML_XMLBUILDER_H_
+#define UTIL_XML_XMLBUILDER_H_
 #include <pugixml.hpp>
+#include <macroHeader.h>
+#include <memory>
 
 class XMLBuilder {
  private:
@@ -8,7 +12,7 @@ class XMLBuilder {
   GETSET(bool, m_hasLoaded, HasLoaded);
   GETSET(pugi::xml_node, m_node, Node);
 
-  pugi::xml_document* m_documentPointer;
+  std::shared_ptr<pugi::xml_document> m_documentPointer;
 
   template<class T>
       std::vector<T> getList(const pugi::xml_node&,
@@ -18,6 +22,7 @@ class XMLBuilder {
 
   // need to wrap the pugi::xml_text methods, they behave rediculus as function pointers....
   static float as_float(const pugi::xml_text& i_text) {return i_text.as_float();};
+  static double as_double(const pugi::xml_text& i_text) {return i_text.as_double();};
   static int as_int(const pugi::xml_text& i_text) {return i_text.as_int();};
   static std::string as_string(const pugi::xml_text& i_text) {return i_text.as_string();};
   static bool as_bool(const pugi::xml_text& i_text) {return i_text.as_bool();};
@@ -34,6 +39,10 @@ class XMLBuilder {
                               const std::string& i_xmlPath,
                               const int& i_numberOfEntries) const;
 
+  std::vector<double> getDoubleList(const pugi::xml_node& i_node,
+                                 const std::string& i_xmlPath,
+                                 const int& i_numberOfEntries) const;
+
   std::vector<float> getFloatList(const pugi::xml_node& i_node,
                                   const std::string& i_xmlPath,
                                   const int& i_numberOfEntries) const;
@@ -41,7 +50,7 @@ class XMLBuilder {
   std::vector<std::string> getStringList(const pugi::xml_node& i_node,
                                          const std::string& i_xmlPath,
                                          const int& i_numberOfEntries) const;
-    
+
   std::vector<bool> getBoolList(const pugi::xml_node& i_node,
                                 const std::string& i_xmlPath,
                                 const int& i_numberOfEntries) const;
@@ -55,12 +64,12 @@ class XMLBuilder {
 
   virtual bool store(const std::string& i_fileName);
 
-  explicit XMLBuilder(const std::string&);
+  XMLBuilder(const std::string&);
   explicit XMLBuilder(const pugi::xml_node&);
   virtual ~XMLBuilder();
 };
 
-#endif // XMLBuilder
+#endif // UTIL_XML_XMLBUILDER_H_
 
 
 

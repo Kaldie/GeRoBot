@@ -22,7 +22,7 @@ XMLBuilder::XMLBuilder(const pugi::xml_node& i_node)
 
 XMLBuilder::~XMLBuilder() {
   if (m_hasLoaded) {
-    delete m_documentPointer;
+    //delete m_documentPointer;
     LOG_DEBUG("Deleted document pointer!");
   } else {
     LOG_DEBUG("No document to be deleted!");
@@ -39,7 +39,7 @@ pugi::xml_node XMLBuilder::loadXMLFile() {
   if (m_fileName == "")
     LOG_ERROR("File name is not known!");
 
-  m_documentPointer = new pugi::xml_document;
+  m_documentPointer = std::make_shared<pugi::xml_document>();
 
   pugi::xml_parse_result result =
       m_documentPointer->load_file(m_fileName.c_str());
@@ -113,6 +113,16 @@ std::vector<int> XMLBuilder::getIntList(const pugi::xml_node& i_node,
                       i_xmlPath,
                       i_numberOfEntries,
                       &XMLBuilder::as_int);
+}
+
+
+std::vector<double> XMLBuilder::getDoubleList(const pugi::xml_node& i_node,
+                                           const std::string& i_xmlPath,
+                                           const int& i_numberOfEntries) const {
+  return getList<double>(i_node,
+                         i_xmlPath,
+                         i_numberOfEntries,
+                         &XMLBuilder::as_double);
 }
 
 
