@@ -1,34 +1,43 @@
- FORMS       = MainWindow.ui            \
-               RobotMovementWidget.ui
+ FORMS       = MainWindow.ui \
+    widget/RobotMovementWidget.ui \
+    widget/Point2DWidget.ui \
+    widget/tracedesign/TraceDesignWidget.ui
 
- HEADERS     = BaseRobotItem.h          \
-               BaseMotorItem.h          \
-               PinStateItem.h           \
-               BaseJointItem.h          \
-               JointControllerItem.h    \
-               BaseActuatorItem.h       \
-               RobotItem.h              \
-               RobotTreeModel.h         \
-               BasePropertyItem.h       \
-               RobotMovementWidget.h    \
-               RobotPositionWidget.h    \
-               MainWindow.h
+ HEADERS     = MainWindow.h \
+    core/BaseActuatorItem.h \
+    core/BaseJointItem.h \
+    core/BaseMotorItem.h \
+    core/BasePropertyItem.h \
+    core/BaseRobotItem.h \
+    core/JointControllerItem.h \
+    core/PinStateItem.h \
+    core/RobotItem.h \
+    widget/RobotMovementWidget.h \
+    widget/RobotPositionWidget.h \
+    core/RobotTreeModel.h \
+    widget/Point2DWidget.h \
+    widget/tracedesign/TraceDesignWidget.h \
+    widget/tracedesign/TraceInfoWidget.h
+
 
  RESOURCES   = RobotTreeModel.qrc
 
- SOURCES     = BaseRobotItem.cpp        \
-               BasePropertyItem.cpp     \
-               RobotItem.cpp            \
-               JointControllerItem.cpp  \
-               BaseActuatorItem.cpp     \
-               BaseMotorItem.cpp        \
-               PinStateItem.cpp         \
-               BaseJointItem.cpp        \
-               RobotTreeModel.cpp       \
-               RobotMovementWidget.cpp  \
-               RobotPositionWidget.cpp  \
-               MainWindow.cpp           \
-               main.cpp
+ SOURCES     = MainWindow.cpp           \
+               main.cpp \
+    core/BaseActuatorItem.cpp \
+    core/BaseJointItem.cpp \
+    core/BaseMotorItem.cpp \
+    core/BasePropertyItem.cpp \
+    core/BaseRobotItem.cpp \
+    core/JointControllerItem.cpp \
+    core/PinStateItem.cpp \
+    core/RobotItem.cpp \
+    core/RobotTreeModel.cpp \
+    widget/RobotMovementWidget.cpp \
+    widget/RobotPositionWidget.cpp \
+    widget/Point2DWidget.cpp \
+    widget/tracedesign/TraceDesignWidget.cpp \
+    widget/tracedesign/TraceInfoWidget.cpp
 
  CONFIG  += qt
  CONFIG += c++11
@@ -36,21 +45,16 @@
  QMAKE_CXXFLAGS += -Wfatal-errors
 
  QT += widgets
+ INCLUDEPATH += /home/ruud/project/gerobot/include/
 
- INCLUDEPATH += /home/ruud/Dropbox/Projects/GeRoArm/include/
+ LIBS += /home/ruud/project/gerobot/bin/lib/libGeRobot.so
 
- LIBS += /home/ruud/Projects/GeRoArm/bin/lib/libArduinoInterface.so
- LIBS += /home/ruud/Projects/GeRoArm/bin/lib/libMathInterface.so
- LIBS += /home/ruud/Projects/GeRoArm/bin/lib/libMotorInterface.so
- LIBS += /home/ruud/Projects/GeRoArm/bin/lib/libPugiXML.so
- LIBS += /home/ruud/Projects/GeRoArm/bin/lib/libRobotInterface.so
-
- QMAKE_RPATHDIR += /home/ruud/Projects/GeRoArm/bin/lib/
+ QMAKE_RPATHDIR += /home/ruud/project/gerobot/bin/lib/
 
  # install
- target.path = /home/ruud/Dropbox/Projects/GeRoArm/GUI/output
+ target.path = /home/ruud/projects/gerobot/GUI/output
  sources.files = $$FORMS $$HEADERS $$RESOURCES $$SOURCES *.pro *.txt
- sources.path = /home/ruud/Dropbox/Projects/GeRoArm/GUI
+ sources.path = /home/ruud/projects/gerobot/GUI
  INSTALLS += target sources
 
  symbian: include($$QT_SOURCE_TREE/examples/symbianpkgrules.pri)
