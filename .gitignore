@@ -1,11 +1,14 @@
 include
 bin
 pugixml-1.4
-*moc_*
+*moc*
 /GUI/Makefile
+*/output/*
 */unit_test/unitTest*
 .deps
 .idea
 *debug*.cpp
 *test.cpp
 debug
+*TAG*
+
