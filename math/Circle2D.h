@@ -5,10 +5,11 @@
 
 #include <Point2D.h>
 #include <macroHeader.h>
+
 class Circle2D {
-  GETSET(Point2D, m_firstPoint, FirstPoint);
-  GETSET(Point2D, m_secondPoint, SecondPoint);
-  GETSET(Point2D, m_centrePoint, CentrePoint);
+  GETSETPROTECTED(Point2D, m_firstPoint, FirstPoint);
+  GETSETPROTECTED(Point2D, m_secondPoint, SecondPoint);
+  GETSETPROTECTED(Point2D, m_centrePoint, CentrePoint);
 
  private:
   Circle2D();
@@ -24,6 +25,8 @@ class Circle2D {
                          const Point2D& i_secondPointy,
                          const traceType& i_radius,
                          const bool& i_isClockwise);
+ protected:
+  virtual void validate() const;
 
  public:
   /**
@@ -53,6 +56,8 @@ class Circle2D {
 
   /// retuns if the point lies on the circle
   bool isPointOnCircle(const Point2D& i_point) const;
+
+  std::vector<Point2D*> getPointPointers();
 };
 
 #endif  // MATH_CIRCLE2D_H_

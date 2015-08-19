@@ -12,9 +12,7 @@ Circle2D::Circle2D(const Point2D& i_firstPoint,
     m_firstPoint(i_firstPoint),
     m_secondPoint(i_secondPoint),
     m_centrePoint(i_centrePoint) {
-  if (!isPointOnCircle(m_firstPoint) ||
-      !isPointOnCircle(m_secondPoint))
-    LOG_ERROR("Radius defined by first and second point are not equal!");
+  validate();
 }
 
 
@@ -88,3 +86,17 @@ bool Circle2D::isPointOnCircle(const Point2D& i_point) const {
   }
 }
 
+std::vector<Point2D*> Circle2D::getPointPointers() {
+  std::vector<Point2D*> points;
+  points.push_back(&m_firstPoint);
+  points.push_back(&m_secondPoint);
+  points.push_back(&m_centrePoint);
+  return points;
+}
+
+
+void Circle2D::validate() const {
+  if (!isPointOnCircle(m_firstPoint) ||
+      !isPointOnCircle(m_secondPoint))
+    LOG_ERROR("Radius defined by first and second point are not equal!");
+}
