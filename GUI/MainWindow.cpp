@@ -4,12 +4,14 @@
 #include <Robot.h>
 #include <PinState.h>
 #include <QFileDialog>
-#include <RobotBuilder.h>
-#include "./RobotMovementWidget.h"
+#include <RobotIO.h>
+#include "./widget/RobotMovementWidget.h"
+#include "./widget/Point2DWidget.h"
+#include "./widget/tracedesign/TraceDesignWidget.h"
 #include "./MainWindow.h"
-#include "./RobotTreeModel.h"
-#include "./RobotItem.h"
-#include "./BasePropertyItem.h"
+#include "./core/RobotTreeModel.h"
+#include "./core/RobotItem.h"
+#include "./core/BasePropertyItem.h"
 
 
 MainWindow::MainWindow(const RobotPointer& i_robot,
@@ -49,8 +51,8 @@ bool MainWindow::initialise() {
 
   RobotPointer robotPointer =  m_modelPointer->getRobotPointer();
   robotMovementTab->layout()->addWidget(
-      new RobotMovementWidget(robotPointer, this));
-
+    new RobotMovementWidget(robotPointer, this));
+  traceDesignTab->layout()->addWidget(new TraceDesignWidget(this));
   return true;
 }
 
@@ -58,7 +60,7 @@ bool MainWindow::initialise() {
 bool MainWindow::saveRobot() {
   QString fileName = QFileDialog::getSaveFileName(this,
                                                   tr("Save Robot to XML"));
-  RobotBuilder robotBuilder("defaultRobot.xml");
+  RobotIO robotBuilder("defaultRobot.xml");
   //  m_modelPointer->getRobotPointer()
   robotBuilder.update(m_modelPointer->getRobotPointer());
   robotBuilder.store(fileName.toUtf8().constData());

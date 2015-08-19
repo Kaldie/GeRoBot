@@ -6,15 +6,13 @@
 #include <QModelIndex>
 #include <macroHeader.h>
 #include "./ui_MainWindow.h"
-#include "./RobotMovementWidget.h"
+#include "./widget/RobotMovementWidget.h"
 
 class QAction;
 class QTreeView;
-class QWidget;
 
-class MainWindow : public QMainWindow, private Ui::mainWindow {
+class MainWindow: public QMainWindow, private Ui::mainWindow {
   Q_OBJECT
-
   GETSET(RobotTreeModelPointer, m_modelPointer, ModelPointer);
 
  private:

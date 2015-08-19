@@ -39,7 +39,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>2</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -72,9 +72,15 @@
       </widget>
       <widget class="QWidget" name="robotMovementTab">
        <attribute name="title">
-        <string>Tab 2</string>
+        <string>Robot Calibration</string>
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout_2"/>
+      </widget>
+      <widget class="QWidget" name="traceDesignTab">
+       <attribute name="title">
+        <string>TraceDesign</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_2"/>
       </widget>
      </widget>
     </item>
