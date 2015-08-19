@@ -36,8 +36,8 @@ bool RotationTraceIO::update(const TracePointer& i_trace) {
   if (!pointer) {
     LOG_ERROR("Dynamic cast went wrong. Which is very unexpected!");
   }
-  Point2D centerPoint = pointer->getArc().getCircle2D().getCentrePoint();
+  //Point2D centerPoint = pointer->getArc().getCentrePoint();
   Point2DIO point2DIO((getNodeFromPath("./CenterPoint")));
-  hasUpdated &= point2DIO.update(i_trace->getStartPoint());
+  hasUpdated &= point2DIO.update(pointer->getArc().getCentrePoint());
   return hasUpdated;
 }
