@@ -8,14 +8,17 @@
 TOROOT= ../..
 
 # define the C source files
-DSRCS= debug.cpp 
+DSRCS= debug.cpp
+SRCS := $(filter-out $(DSRCS), $(wildcard *.cpp))
+
 
 #dependencies of other modules
-DEPENDENCY = $(wildcard $(TOROOT)/$(OBJECTFOLDER)/*.o)
+DEPENDENCY = $(filter-out $(DOBJS), $(notdir $(wildcard $(TOROOT)/$(OBJECTFOLDER)/*.o)))
 
 # define the executable file 
-MAIN = MotorInterface
 DEBUG = debug
 
 include $(TOROOT)/Makefile.config
+
+DEPENDENCY := $(filter-out $(DOBJS), $(DEPENDENCY))
 

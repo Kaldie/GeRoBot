@@ -35,7 +35,7 @@ class RotationalJointUnitTest : public CxxTest::TestSuite {
 
   void testPredictStep() {
     RotationalJoint<StepperDriver> rotationalJoint(90, 1);
-    rotationalJoint.setRange(std::vector<float>{0, 180});
+    rotationalJoint.setRange(std::vector<traceType>{0, 180});
     Point2D point(0, 50);
     for (int i = 0;
          i < 45;
@@ -48,7 +48,7 @@ class RotationalJointUnitTest : public CxxTest::TestSuite {
 
   void testPredictSteps() {
     RotationalJoint<StepperDriver> rotationalJoint(90, 1);
-    rotationalJoint.setRange(std::vector<float>{0, 180});
+    rotationalJoint.setRange(std::vector<traceType>{0, 180});
     Point2D point(0, 50);
 
     std::string direction("CW");
@@ -66,7 +66,7 @@ class RotationalJointUnitTest : public CxxTest::TestSuite {
     StepperDriver stepperDriver({5,7,4});
     RotationalJoint<StepperDriver> rotationalJoint(90, 1, stepperDriver);
     PinVector pinVector = rotationalJoint.getMotor()->getPins();
-    std::vector<float> rangeVector {0, 180};
+    std::vector<traceType> rangeVector {0, 180};
     int currentPosition = rotationalJoint.getPosition();
     rotationalJoint.setRange(rangeVector);
     

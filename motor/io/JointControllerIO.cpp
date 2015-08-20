@@ -51,10 +51,7 @@ ArduinoMotorDriver JointControllerIO::parseActuator(
       getNodeFromPath(i_node,
                       "./REGULAR_EXPRESSION").text().as_string();
   LOG_DEBUG("Serial port regular expression is: " << serialExpression);
-  bool hasReducedSpeed =
-      getNodeFromPath(i_node, "./REDUCED_SPEED").text().as_bool();
   ArduinoMotorDriver arduinoMotorDriver(serialExpression);
-  //  arduinoMotorDriver.setReducedSpeed(hasReducedSpeed);
   return arduinoMotorDriver;
 }
 
@@ -84,10 +81,10 @@ bool JointControllerIO::updateActuatorNode() {
 
 bool JointControllerIO::updateJointNodes() {
   bool hasSucceeded(true);
-  JointPointerVector rotationalJointVector =
+  JointController::JointPointerVector rotationalJointVector =
       m_jointController.getJoints(Rotational);
 
-  JointPointerVector translationalJointVector =
+  JointController::JointPointerVector translationalJointVector =
       m_jointController.getJoints(Translational);
   JointPointer jointPointer;
 

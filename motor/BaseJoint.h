@@ -9,6 +9,7 @@ class BaseJoint;
 
 
 class BaseJoint {
+
  private:
     // Pure virtual call!
     virtual int getPositionModifier(const std::string&) const =0;
@@ -26,6 +27,8 @@ class BaseJoint {
     void isInRange(double i_jointPosition);
 
  public:
+    typedef std::shared_ptr<BaseJoint> JointPointer;
+
     /**
      * Set the range of the joint
      * @param[in] i_rangeVector Vector<double> 2 entries, start and end of the range of the joint
@@ -93,5 +96,6 @@ class BaseJoint {
               const DirectionConversionMap& i_directionConverionMap);
 
     virtual ~BaseJoint(){};
+
 };
 #endif  // MOTOR_BASEJOINT_H_

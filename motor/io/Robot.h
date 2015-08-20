@@ -18,6 +18,7 @@ class Robot {
   GETSET_NO_CONST(JointController, m_jointController, JointController);
 
  public:
+  typedef std::shared_ptr<Robot> RobotPointer;
   bool hasValidConnection();
 
   Point2D* getPositionPointer() {return &m_currentPosition;}

@@ -71,7 +71,7 @@ class JointControllerTestSuite : public CxxTest::TestSuite {
         jointController.getSequenceVector();
     TS_ASSERT_EQUALS(pinStateVector.numberOfSequences(), 0);
     LOG_INFO("JointControlerUnitTest::test resetPinState");
-    JointPointer rotationalJointPointer = jointController.getJoint(Rotational);
+    BaseJoint::JointPointer rotationalJointPointer = jointController.getJoint(Rotational);
     jointController.moveStep(rotationalJointPointer, "CW", false);
     pinStateVector =
         jointController.getSequenceVector();
@@ -93,8 +93,8 @@ class JointControllerTestSuite : public CxxTest::TestSuite {
 
   void testMoveStep() {
     LOG_INFO("JointControlerUnitTest::test move step");
-    JointPointer rotationalJointPointer = jointController.getJoint(Rotational);
-    JointPointer translationJointPointer =
+    BaseJoint::JointPointer rotationalJointPointer = jointController.getJoint(Rotational);
+    BaseJoint::JointPointer translationJointPointer =
         jointController.getJoint(Translational);
 
     jointController.moveStep(rotationalJointPointer, "CCW", true);
@@ -125,8 +125,8 @@ class JointControllerTestSuite : public CxxTest::TestSuite {
 
   void testMoveSteps() {
     LOG_INFO("JointControlerUnitTest:: test move steps");
-    JointPointer rotationalJointPointer = jointController.getJoint(Rotational);
-    JointPointer translationJointPointer =
+    BaseJoint::JointPointer rotationalJointPointer = jointController.getJoint(Rotational);
+    BaseJoint::JointPointer translationJointPointer =
         jointController.getJoint(Translational);
 
     jointController.moveSteps(rotationalJointPointer, "CW", 5);

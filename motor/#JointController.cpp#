@@ -15,7 +15,7 @@ JointController::JointController()
 JointController::~JointController()
 {}
 
-bool JointController::validateJoint(const BaseJoint::JointPointer& i_baseJoint) const {
+bool JointController::validateJoint(const JointPointer& i_baseJoint) const {
   // pins should not be other then 2 t/m 7
   PinVector pins = i_baseJoint->getMotor()->getPins();
   for (PinVector::const_iterator itr = pins.begin();
@@ -32,10 +32,10 @@ bool JointController::validateJoint(const BaseJoint::JointPointer& i_baseJoint) 
 
 
 bool JointController::validateJointVector(
-    const JointController::JointPointerVector& i_jointVector) const {
+    const JointPointerVector& i_jointVector) const {
 
   // determines if the pinIterator-> is able to grow into a good JointVector
-  for (JointController::JointPointerVector::const_iterator itr = i_jointVector.begin();
+  for (JointPointerVector::const_iterator itr = i_jointVector.begin();
        itr != i_jointVector.end();
        itr++) {
     // All joints should be valid
@@ -63,7 +63,7 @@ bool JointController::validateJointVector(
     PinVector jointPins = (*jointIterator)->getMotor()->getPins();
     pinVector.insert(pinVector.end(), jointPins.begin(), jointPins.end());
   }
-  
+
   for (auto pinIterator = pinVector.begin();
        pinIterator != pinVector.end();
        pinIterator++) {
@@ -77,7 +77,7 @@ bool JointController::validateJointVector(
 }
 
 
-bool JointController::addJoint(const BaseJoint::JointPointer& i_joint) {
+bool JointController::addJoint(const JointPointer& i_joint) {
   /*
     This gonna be fun!!
     We want to store the joints in a pinIterator->, however they are defined as base joints
@@ -101,11 +101,11 @@ bool JointController::addJoint(const BaseJoint::JointPointer& i_joint) {
 }
 
 
-JointController::JointPointerVector JointController::getJoints(
+JointPointerVector JointController::getJoints(
     const MovementType &i_movementType) {
 
-  JointController::JointPointerVector requiredJoints;
-  for (JointController::JointPointerVector::iterator itr = m_jointPointerVector.begin();
+  JointPointerVector requiredJoints;
+  for (JointPointerVector::iterator itr = m_jointPointerVector.begin();
       itr != m_jointPointerVector.end();
       itr++) {
     if ((*itr)->getMovementType() == i_movementType) {
@@ -116,7 +116,7 @@ JointController::JointPointerVector JointController::getJoints(
 }
 
 
-BaseJoint::JointPointer& JointController::getJoint(const MovementType &i_movementType) {
+JointPointer& JointController::getJoint(const MovementType &i_movementType) {
   if (m_jointPointerVector.size() < 1)
     LOG_ERROR("No joints defined yet");
 
@@ -125,7 +125,7 @@ BaseJoint::JointPointer& JointController::getJoint(const MovementType &i_movemen
       return m_jointPointerVector[0];
 
   if (m_jointPointerVector.size() == 2)
-    for (JointController::JointPointerVector::iterator itr = m_jointPointerVector.begin();
+    for (JointPointerVector::iterator itr = m_jointPointerVector.begin();
          itr != m_jointPointerVector.end();
          itr++) {
       if ((*itr)->getMovementType() == i_movementType) {
@@ -141,8 +141,8 @@ void JointController::resetPinStateSequence() {
 }
 
 
-bool JointController::hasJoint(const BaseJoint::JointPointer& i_jointPointer) const {
-  for (JointController::JointPointerVector::const_iterator itr = m_jointPointerVector.begin();
+bool JointController::hasJoint(const JointPointer& i_jointPointer) const {
+  for (JointPointerVector::const_iterator itr = m_jointPointerVector.begin();
       itr != m_jointPointerVector.end();
       itr++) {
     if (i_jointPointer == (*itr))
@@ -152,7 +152,7 @@ bool JointController::hasJoint(const BaseJoint::JointPointer& i_jointPointer) co
 }
 
 
-void JointController::moveStep(BaseJoint::JointPointer& i_jointPointer,
+void JointController::moveStep(JointPointer& i_jointPointer,
                                const std::string& i_directionString,
                                const bool& i_appendToPreviousStep) {
   if (!hasJoint(i_jointPointer)) {
@@ -173,7 +173,7 @@ void JointController::moveStep(BaseJoint::JointPointer& i_jointPointer,
 }
 
 
-void JointController::moveSteps(BaseJoint::JointPointer& i_jointPointer,
+void JointController::moveSteps(JointPointer& i_jointPointer,
                                 const std::string& i_directionString,
                                 const int& i_numberOfSteps,
                                 const bool i_append /* = false */) {

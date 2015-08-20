@@ -35,7 +35,7 @@ class TranslationalJointUnitTest : public CxxTest::TestSuite {
 
   void testPredictStep() {
     TranslationalJoint<StepperDriver> translationalJoint(50, 1);
-    translationalJoint.setRange(std::vector<float>{50, 180});
+    translationalJoint.setRange(std::vector<traceType>{50, 180});
     Point2D point(0, 50);
     for (int i = 0;
          i < 45;
@@ -48,7 +48,7 @@ class TranslationalJointUnitTest : public CxxTest::TestSuite {
 
   void testPredictSteps() {
     TranslationalJoint<StepperDriver> translationalJoint(50, 1);
-    translationalJoint.setRange(std::vector<float>{50, 180});
+    translationalJoint.setRange(std::vector<traceType>{50, 180});
     Point2D point(0, 50);
 
     std::string direction("OUT");
@@ -64,7 +64,7 @@ class TranslationalJointUnitTest : public CxxTest::TestSuite {
     StepperDriver stepperDriver({5,7,4});
     TranslationalJoint<StepperDriver> translationalJoint(90, 1, stepperDriver);
     PinVector pinVector = translationalJoint.getMotor()->getPins();
-    std::vector<float> rangeVector {0, 180};
+    std::vector<traceType> rangeVector {0, 180};
     int currentPosition = translationalJoint.getPosition();
     translationalJoint.setRange(rangeVector);
 
