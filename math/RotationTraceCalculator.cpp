@@ -24,10 +24,10 @@ RotationTraceCalculator::RotationTraceCalculator(
 void RotationTraceCalculator::calculateTrace(
     const RotationTrace* i_rotationTrace,
     Point2D& i_currentPosition) {
-  if (i_rotationTrace->getTraceType() != Curve)
+  if (i_rotationTrace->getTraceType() != Trace::Curve)
     LOG_ERROR("Rotational trace calculator only works on rotational traces!"<<
               "\nvalue: " << i_rotationTrace->getTraceType() <<
-              " curve value: " << Curve);
+              " curve value: " << Trace::Curve);
   std::vector<RotationTrace> traces = i_rotationTrace->getNecessaryTraces();
   LOG_DEBUG("Number of traces: " << traces.size());
 

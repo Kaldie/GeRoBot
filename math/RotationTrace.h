@@ -40,7 +40,19 @@ class RotationTrace:public Trace {
 
     Point2D* getCentralPointFromArc() const;
 
-public:
+ public:
+
+    typedef std::shared_ptr<RotationTrace> RotationTracePointer;
+
+    /**
+     * Sugestion of its central point based on 2 Point2Ds
+     * This method suggest a point that can be validly used as a central point based on 2 other points
+     * This method can be used if, for instance, a LineTrace needs to be
+     * converted to a RotationTrace and no central point is defined yet.
+     */
+    static Point2D suggestCentralPoint(const Point2D& i_startPoint,
+                                       const Point2D& i_endPoint);
+
     virtual Point2D intersectingPoint(const Point2D& i_currentPosition)const;
 
     /**

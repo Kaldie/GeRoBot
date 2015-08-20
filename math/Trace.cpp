@@ -24,7 +24,7 @@ Trace::Trace(const Point2D& i_startPoint,
 
 Trace::Trace(const Point2D& i_startPoint,
              const Point2D& i_endPoint,
-             const TRACE_TYPE& i_traceType):
+             const Trace::TraceType& i_traceType):
     m_traceType(i_traceType),
     m_startPoint(i_startPoint),
     m_endPoint(i_endPoint),

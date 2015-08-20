@@ -23,11 +23,11 @@ void TraceListIO::build() {
 }
 
 
-TracePointer TraceListIO::handleTrace(const pugi::xml_node& i_node) const {
+Trace::TracePointer TraceListIO::handleTrace(const pugi::xml_node& i_node) const {
   TraceIO traceIO(i_node);
   traceIO.build();
-  TracePointer traceP = traceIO.getTracePointer();
-  if (traceP->getTraceType() == Curve) {
+  Trace::TracePointer traceP = traceIO.getTracePointer();
+  if (traceP->getTraceType() == Trace::Curve) {
     LOG_DEBUG("This trace is a rotation trace");
     RotationTraceIO rotationTraceIO(i_node);
     rotationTraceIO.build();
@@ -79,7 +79,7 @@ bool TraceListIO::removeNode(pugi::xml_node i_traceNode) {
 }
 
 
-pugi::xml_node TraceListIO::addTraceNode(const TracePointer& i_pointer) {
+pugi::xml_node TraceListIO::addTraceNode(const Trace::TracePointer& i_pointer) {
 
   pugi::xml_node documentNode = getNodeFromPath("./TraceList");
   pugi::xml_node traceNode = documentNode.append_child("Trace");
@@ -87,7 +87,7 @@ pugi::xml_node TraceListIO::addTraceNode(const TracePointer& i_pointer) {
   Point2DIO point2DIO(traceNode);
   point2DIO.addPointNode("StartPoint");
   point2DIO.addPointNode("EndPoint");
-  if (i_pointer->getTraceType() == Curve) {
+  if (i_pointer->getTraceType() == Trace::Curve) {
     point2DIO.addPointNode("CenterPoint");
   }
   return traceNode;
@@ -95,9 +95,9 @@ pugi::xml_node TraceListIO::addTraceNode(const TracePointer& i_pointer) {
 
 
 bool TraceListIO::updateNode(pugi::xml_node* i_node,
-                             const TracePointer i_pointer) {
+                             const Trace::TracePointer i_pointer) {
   bool hasSucceded = true;
-  if (i_pointer->getTraceType() == Curve) {
+  if (i_pointer->getTraceType() == Trace::Curve) {
     RotationTraceIO rotationTraceIO(*i_node);
     hasSucceded &= rotationTraceIO.update(i_pointer);
   } else {

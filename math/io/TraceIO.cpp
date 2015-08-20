@@ -10,10 +10,10 @@ void TraceIO::build() {
   std::string traceType = getNode().first_child().text().as_string();
   if (isLineTrace()) {
     m_tracePointer = std::make_shared<Trace>();
-    m_tracePointer->setTraceType(Line);
+    m_tracePointer->setTraceType(Trace::Line);
   } else if (traceType == "Curve") {
     m_tracePointer = std::make_shared<RotationTrace>();
-    m_tracePointer->setTraceType(Curve);
+    m_tracePointer->setTraceType(Trace::Curve);
   } else {
     LOG_ERROR("Unknown trace type: " << traceType);
   }
@@ -39,11 +39,11 @@ TraceIO::TraceIO(const std::string& i_fileName)
 }
 
 
-bool TraceIO::update(const TracePointer& i_trace) {
+bool TraceIO::update(const Trace::TracePointer& i_trace) {
   LOG_DEBUG("Updateing the Trace");
-  if (i_trace->getTraceType() == Line) {
+  if (i_trace->getTraceType() == Trace::Line) {
     getNode().first_child().text().set("Line");
-  } else if (i_trace->getTraceType() == Curve) {
+  } else if (i_trace->getTraceType() == Trace::Curve) {
     getNode().first_child().text().set("Curve");
   } else {
     LOG_ERROR("Type is not resolved!");

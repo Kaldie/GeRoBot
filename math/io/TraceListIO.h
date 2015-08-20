@@ -7,18 +7,10 @@
 #include "./TraceIO.h"
 #include "./RotationTraceIO.h"
 
-typedef std::vector<TracePointer> TracePointerVector;
 
 class TraceListIO: public XMLBuilder {
- GETSET(TracePointerVector, m_vector, Vector);
-
- private:
-  /// No default contructor!!
-  TraceListIO(){};
-  TracePointer handleTrace(const pugi::xml_node&) const;
-  bool updateNode(pugi::xml_node* i_node,
-                  const TracePointer i_pointer);
  public:
+  typedef std::vector<Trace::TracePointer> TracePointerVector;
   TraceListIO(const std::string&);
   /**
    * Remove the xml node from the document
@@ -32,7 +24,7 @@ class TraceListIO: public XMLBuilder {
    * This function is used to add a trace node based on the pointer
    * The node needs to be still updated to the pointer
    */
-  virtual pugi::xml_node addTraceNode(const TracePointer& i_pointer);
+  virtual pugi::xml_node addTraceNode(const Trace::TracePointer& i_pointer);
 
 
   /**
@@ -52,5 +44,13 @@ class TraceListIO: public XMLBuilder {
    */
   virtual bool store(std::string i_fileName);
 
+ private:
+  GETSET(TracePointerVector, m_vector, Vector);
+
+  /// No default contructor!!
+  TraceListIO(){};
+  Trace::TracePointer handleTrace(const pugi::xml_node&) const;
+  bool updateNode(pugi::xml_node* i_node,
+                  const Trace::TracePointer i_pointer);
 };
 #endif  // MATH_IO_TRACELISTIO_H_

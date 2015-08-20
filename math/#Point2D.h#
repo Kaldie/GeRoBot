@@ -57,7 +57,7 @@ public:
   {
     return (Point2D(x * t, y * t));
   };
-
+  
   Point2D operator /(traceType t) const
   {
     traceType f = 1.0/ t;
@@ -67,7 +67,7 @@ public:
   bool operator ==(const Point2D& i_other) const ;
   traceType getAngleBetweenPoints(const Point2D&) const;
   traceType getAngleToOrigin();
-
+		
 };
 
 

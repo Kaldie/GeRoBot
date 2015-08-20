@@ -1,14 +1,31 @@
 <ROBOTBUILDER>
-  <Trace>
-    <Type>Line</Type>
-    <StartPoint>
-      <X>0</X>
-      <Y>10</Y>
-    </StartPoint>
-    <EndPoint>
-      <X>0</X>
-      <Y>13.2</Y>
-    </EndPoint>
-  </Trace>
+  <TraceList>
+    <Trace>
+      <Type>Line</Type>
+	  <StartPoint>
+      	<X>0</X>
+     	<Y>10</Y>
+	  </StartPoint>
+      <EndPoint>
+        <X>0</X>
+        <Y>13.2</Y>
+      </EndPoint>
+    </Trace>
+    <Trace>
+      <Type>Curve</Type>
+      <StartPoint>
+        <X>0</X>
+        <Y>10</Y>
+      </StartPoint>
+      <EndPoint>
+        <X>0</X>
+        <Y>-10.0</Y>
+      </EndPoint>
+      <CenterPoint>
+        <X>0</X>
+        <Y>0</Y>
+      </CenterPoint>
+    </Trace>
+  </TraceList>
 </ROBOTBUILDER>
 

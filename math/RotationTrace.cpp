@@ -178,5 +178,17 @@ bool RotationTrace::shouldAddExtremePoint(traceType& i_startAngle,
 
 
 std::vector<Point2D*> RotationTrace::getPointPointers() {
-  return m_arc.getPointPointers();
+  std::vector<Point2D*> pointers = Trace::getPointPointers();
+  pointers.push_back(m_arc.getPointPointers()[2]);
+  return pointers;
+}
+
+
+Point2D RotationTrace::suggestCentralPoint(const Point2D& i_startPoint,
+                                           const Point2D& i_endPoint) {
+  LOG_DEBUG("start point: " << i_startPoint.x << ", " << i_startPoint.y);
+  LOG_DEBUG("end point: " << i_endPoint.x << ", " << i_endPoint.y);
+  Point2D xnew = i_endPoint + (i_startPoint - i_endPoint) * 0.5;
+  LOG_DEBUG("new point: " << xnew.x << ", " << xnew.y);
+  return xnew;
 }

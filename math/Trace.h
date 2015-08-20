@@ -6,23 +6,13 @@
 #include <Line2D.h>
 
 class Trace {
- private:
-  GETSET(TRACE_TYPE, m_traceType, TraceType);
-  GETSET(Point2D, m_startPoint, StartPoint);
-  GETSET(Point2D, m_endPoint, EndPoint);
-
-  GETSET(double, m_rotationTolerance, RotationTolerance);
-  GETSET(double, m_translationTolerance, TranslationTolerance);
-
-  bool isValidStartAndEndPoint(const Point2D*,
-                               const Point2D*);
-
-  bool isWithinRange(const Point2D&, const Point2D&) const;
-  bool isWithinRange(const traceType&, const traceType&) const;
-
-  std::string getRotationDirection(const Point2D&, const Point2D&) const;
-
  public:
+  // smart pointer definitions
+  typedef std::shared_ptr<Trace> TracePointer;
+  typedef std::weak_ptr<Trace> WeakTracePointer;
+
+  enum TraceType{Line,
+                 Curve};
   // constructors
   Trace();
   virtual ~Trace(){};
@@ -32,7 +22,7 @@ class Trace {
 
   Trace(const Point2D& i_startPoint,
         const Point2D& i_endPoint,
-        const TRACE_TYPE&);
+        const TraceType&);
 
   // Actual methods
   Line2D getTraceLine() const;
@@ -63,6 +53,19 @@ class Trace {
                                       const Point2D& i_desiredPosition) const;
 
   virtual std::vector<Point2D*> getPointPointers();
-};
 
+ private:
+  GETSET(TraceType, m_traceType, TraceType);
+  GETSET(Point2D, m_startPoint, StartPoint);
+  GETSET(Point2D, m_endPoint, EndPoint);
+  GETSET(double, m_rotationTolerance, RotationTolerance);
+  GETSET(double, m_translationTolerance, TranslationTolerance);
+
+  bool isValidStartAndEndPoint(const Point2D*,
+                               const Point2D*);
+
+  bool isWithinRange(const Point2D&, const Point2D&) const;
+  bool isWithinRange(const traceType&, const traceType&) const;
+  std::string getRotationDirection(const Point2D&, const Point2D&) const;
+};
 #endif  // MATH_TRACE_H_
