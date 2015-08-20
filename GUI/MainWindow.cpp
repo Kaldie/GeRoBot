@@ -5,17 +5,18 @@
 #include <PinState.h>
 #include <QFileDialog>
 #include <RobotIO.h>
-#include "./widget/RobotMovementWidget.h"
-#include "./widget/Point2DWidget.h"
-#include "./widget/tracedesign/TraceDesignWidget.h"
 #include "./MainWindow.h"
 #include "./core/RobotTreeModel.h"
 #include "./core/RobotItem.h"
 #include "./core/BasePropertyItem.h"
+#include "./widget/RobotMovementWidget.h"
+#include "./widget/Point2DWidget.h"
+#include "./widget/tracedesign/TraceDesignWidget.h"
+#include "./widget/tracedesign/TraceInfoWidget.h"
 
 
-MainWindow::MainWindow(const RobotPointer& i_robot,
-                         QWidget* parent/*=0*/):
+MainWindow::MainWindow(const Robot::RobotPointer& i_robot,
+                        QWidget* parent/*=0*/):
     QMainWindow(parent) {
   setupUi(this);
 
@@ -49,10 +50,18 @@ bool MainWindow::initialise() {
           this,
           SLOT(resizeColumnsToContents(const QModelIndex& /*modelIndex*/)));
 
-  RobotPointer robotPointer =  m_modelPointer->getRobotPointer();
+  Robot::RobotPointer robotPointer =  m_modelPointer->getRobotPointer();
   robotMovementTab->layout()->addWidget(
     new RobotMovementWidget(robotPointer, this));
   traceDesignTab->layout()->addWidget(new TraceDesignWidget(this));
+  /* REMOVE, altough it give a nice thingy to look at!
+  TraceInfoWidget* info = traceDesignTab->findChild<TraceInfoWidget*>();
+  if (!info) {
+    LOG_ERROR("fond no info");}
+  Trace::TracePointer x(std::make_shared<Trace>());
+  //LOG_DEBUG("Trace type: " << x->getTraceType());
+  info->updateTrace(x);
+  // END OF REMOVE!!! */
   return true;
 }
 
