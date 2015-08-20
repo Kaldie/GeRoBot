@@ -4,6 +4,7 @@
 
 #include <QWidget>
 #include <Point2D.h>
+#include <Robot.h>
 #include "./ui_RobotMovementWidget.h"
 
 class QAction;
@@ -13,7 +14,7 @@ class QWidget;
 class RobotMovementWidget: public QWidget, private Ui::RobotMovementWidget {
     Q_OBJECT
 
-    GET(RobotPointer, m_robotPointer, RobotPointer)
+    GET(Robot::RobotPointer, m_robotPointer, RobotPointer)
     GETSETPOINTER(Point2D, m_point2DPointer, Point)
     GETSET(GUIMovementMode, m_mode, MovementMode)
 
@@ -21,10 +22,10 @@ class RobotMovementWidget: public QWidget, private Ui::RobotMovementWidget {
     // Constructor
     explicit RobotMovementWidget(QWidget* parent = 0);
 
-    RobotMovementWidget(RobotPointer i_robotPointer,
+    RobotMovementWidget(Robot::RobotPointer i_robotPointer,
                         QWidget *parent = 0);
 
-    void setRobotPointer(RobotPointer i_robotPointer);
+    void setRobotPointer(Robot::RobotPointer i_robotPointer);
 
     ~RobotMovementWidget();
 

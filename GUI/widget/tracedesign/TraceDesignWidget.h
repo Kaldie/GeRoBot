@@ -4,16 +4,15 @@
 
 #include <QWidget>
 #include <TraceListIO.h>
+#include "./TraceInfoWidget.h"
 #include "./ui_TraceDesignWidget.h"
 
 class Point2DWidget;
 
 class TraceDesignWidget: public QWidget, private Ui::TraceDesignWidget {
     Q_OBJECT
-    GETSET(TracePointerVector, m_vector, Vector);  // Vector which hold the traces
-    Point2DWidget* startPoint;
-    Point2DWidget* endPoint;
-    Point2DWidget* centralPoint;
+    GETSET(Trace::TracePointer, m_currentTrace, CurrentTrace);
+    GETSET(TraceListIO::TracePointerVector, m_vector, Vector);  // Vector which hold the traces
 
  public:
     // Constructor
@@ -21,6 +20,12 @@ class TraceDesignWidget: public QWidget, private Ui::TraceDesignWidget {
 
  private:
     void initialise();
+    TraceInfoWidget* m_traceInfoWidget;
+
+ public slots:
+   void replaceTrace(Trace::TraceType);
+   void setCurrentTrace(Trace::WeakTracePointer);
+
 };
 
 #endif  // GUI_TRACEDESIGNWIDGET_H_

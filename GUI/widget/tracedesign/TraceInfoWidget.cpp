@@ -2,14 +2,21 @@
 
 #include <macroHeader.h>
 #include <Trace.h>
+#include <Circle2D.h>
+#include <RotationTrace.h>
+#include <QWidget>
 #include <QVBoxLayout>
+#include <QComboBox>
+#include <QLabel>
 #include "../Point2DWidget.h"
 #include "./TraceInfoWidget.h"
 
-TraceInfoWidget::TraceInfoWidget(QWidget *parent)
-  : QWidget(parent), m_trace(NULL) {
-        initialise();
+TraceInfoWidget::TraceInfoWidget(QWidget *parent /*=0*/,
+                                 Trace::TracePointer pointer /*nullptr*/)
+  :QWidget(parent) ,m_trace(pointer) {
+  initialise();
 }
+
 
 void TraceInfoWidget::initialise() {
   /**
@@ -28,6 +35,7 @@ void TraceInfoWidget::initialise() {
   centralPoint = new Point2DWidget(this);
   this->layout()->addWidget(centralPoint);
 
+  //set names of the points
   startPoint->setPointName(QString("StartP{oint"));
   endPoint->setPointName(QString("EndPoint"));
   centralPoint->setPointName(QString("CentralPoint"));
@@ -37,43 +45,54 @@ void TraceInfoWidget::initialise() {
    */
   traceTypeLabel = new QLabel("Trace Type", this);
   traceTypeComboBox = new QComboBox(this);
-  traceTypeComboBox->addItem("Line",QVariant(Line));
-  traceTypeComboBox->addItem("Curve",QVariant(Curve));
+  traceTypeComboBox->addItem("Line",QVariant(Trace::Line));
+  traceTypeComboBox->addItem("Curve",QVariant(Trace::Curve));
   this->layout()->addWidget(traceTypeLabel);
   this->layout()->addWidget(traceTypeComboBox);
-  trace(std::shared_ptr<Trace>(NULL));
+
+  // Set the first trace, which is a null ptr
+  showTraceInfo();
+
+  connect(traceTypeComboBox,SIGNAL(currentIndexChanged(int)),
+          this, SLOT(update()));
+  /*
+    connect(startPoint,SIGNAL(hasNewPosition()),
+          this, SLOT(update()));
+  connect(endPoint,SIGNAL(hasNewPosition()),
+          this, SLOT(update()));
+  connect(centralPoint,SIGNAL(hasNewPosition()),
+          this, SLOT(update()));
+  */
 }
 
-void TraceInfoWidget::setTrace(TracePointer i_tracePointer) {
-  m_trace = i_tracePointer;
-  if (!m_trace) {
-    LOG_DEBUG("No pointer set. return after disableing");
+
+void TraceInfoWidget::showTraceInfo() {
+  LOG_DEBUG("Show trace info");
+  Trace::TracePointer tracePointer = m_trace.lock();
+  if (!tracePointer) {
+    LOG_DEBUG("No pointer set. Set points to nullptr");
     traceTypeComboBox->setEnabled(false);
-    startPoint->setPoint(NULL);
-    endPoint->setPoint(NULL);
-    centralPoint->setPoint(NULL);
+    startPoint->setPoint(nullptr);
+    endPoint->setPoint(nullptr);
+    centralPoint->setPoint(nullptr);
   } else {
-    LOG_DEBUG("Set a new Trace pointer");
     // enable trace combo box
     traceTypeComboBox->setEnabled(true);
 
-    LOG_DEBUG("Set the trace type to: " << i_tracePointer->getTraceType());
-    traceTypeComboBox->setCurrentIndex(m_trace->getTraceType());
+    LOG_DEBUG("Set the trace type to: " << tracePointer->getTraceType());
+    traceTypeComboBox->setCurrentIndex(tracePointer->getTraceType());
     // Get the point pointers from the new trace
-    std::vector<Point2D*> points;
     LOG_DEBUG("Getting points now!");
-    points = m_trace->getPointPointers();
+    std::vector<Point2D*> points(tracePointer->getPointPointers());
 
     startPoint->setPoint(points[0]);
     endPoint->setPoint(points[1]);
-    LOG_DEBUG("Finished setting of start and end point.");
-    if (points.size() < 2) {
-      LOG_DEBUG("Cannot set center point, it is a line trace!");
+    if (points.size() <= 2) {
       centralPoint->setEnabled(false);
+      centralPoint->setPoint(nullptr);
     } else {
       centralPoint->setEnabled(true);
       centralPoint->setPoint(points[2]);
-      centralPoint->updateView();
     }
   }
   LOG_DEBUG("Emit has new position");
@@ -82,9 +101,51 @@ void TraceInfoWidget::setTrace(TracePointer i_tracePointer) {
   emit centralPoint->hasNewPosition();
 }
 
-void TraceInfoWidget::updateTrace() {
-  LOG_DEBUG("Update trace!");
-  if (traceTypeComboBox->currentIndex() == m_trace->getTraceType())
-    LOG_DEBUG("Trace does not have to be reset!");
 
+void TraceInfoWidget::update() {
+  LOG_DEBUG("Update");
+  Trace::TracePointer tracePointer = m_trace.lock();
+
+  if (tracePointer) {
+    updateCurrentTraceFromWidget(tracePointer);
+
+    LOG_DEBUG("Test if the new trace has the same type as the current.");
+    if (traceTypeComboBox->currentIndex() !=
+        tracePointer->getTraceType()) {
+      LOG_DEBUG("traceTypeComboBox indicate a different type is needed!");
+      LOG_DEBUG("Current start point" <<
+                tracePointer->getStartPoint().x << ", " << tracePointer->getStartPoint().y);
+      LOG_DEBUG("Current end point" <<
+                tracePointer->getEndPoint().x << ", " << tracePointer->getEndPoint().y);
+      emit requestTrace(static_cast<Trace::TraceType>(traceTypeComboBox->currentIndex()));
+      return;
+    }
+  }
+  showTraceInfo();
+  QWidget::update();
+}
+
+
+void TraceInfoWidget::setNewTracePointer(Trace::TracePointer& i_tracePointer) {
+  m_trace = i_tracePointer;
+  showTraceInfo();
+}
+
+
+void TraceInfoWidget::updateCurrentTraceFromWidget(Trace::TracePointer& i_tracePointer) {
+  if (!i_tracePointer)
+    return;
+
+  i_tracePointer->setStartPoint(*startPoint->getPoint());
+  i_tracePointer->setEndPoint(*endPoint->getPoint());
+
+  RotationTrace::RotationTracePointer rotationPointer =
+    std::dynamic_pointer_cast<RotationTrace>(i_tracePointer);
+  if(rotationPointer) {
+    if (centralPoint->getPoint()) {
+      Arc2D arc(rotationPointer->getArc());
+      arc.setCentrePoint(*centralPoint->getPoint());
+      rotationPointer->setArc(arc);
+    }
+  }
 }

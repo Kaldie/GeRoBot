@@ -9,7 +9,7 @@
 #include "./RobotMovementWidget.h"
 
 
-RobotMovementWidget::RobotMovementWidget(RobotPointer i_robotPointer,
+RobotMovementWidget::RobotMovementWidget(Robot::RobotPointer i_robotPointer,
                                          QWidget* parent/*=0*/)
     : QWidget(parent) {
   m_robotPointer = i_robotPointer;
@@ -31,7 +31,7 @@ RobotMovementWidget::~RobotMovementWidget() {
 }
 
 
-void RobotMovementWidget::setRobotPointer(RobotPointer i_robotPointer) {
+void RobotMovementWidget::setRobotPointer(Robot::RobotPointer i_robotPointer) {
   if (i_robotPointer.get() == 0)
     return;
 
