@@ -21,12 +21,11 @@ bool JointControllerItem::construct(){
 	for(int outerIndex=0;
 			outerIndex<2;
 			outerIndex++){
-		JointPointerVector baseJointVector=m_jointController->getJoints(movementTypes[outerIndex]);
-		for(JointPointerVector::iterator iter=baseJointVector.begin();
+		JointController::JointPointerVector baseJointVector=m_jointController->getJoints(movementTypes[outerIndex]);
+		for(auto iter=baseJointVector.begin();
 				iter!=baseJointVector.end();
 				iter++){
 			LOG_DEBUG("Insert a join child");
-			
 			LOG_DEBUG((*iter)->getPosition());
 
 			BaseJointItem* child = new BaseJointItem(this,(*iter));

@@ -40,7 +40,7 @@ class BaseRobotItem
 	virtual int rowCount();
 	
 	//normaly there will be only 2 columns
-	virtual int columnCount(){return 2;};
+    virtual int columnCount(){return 2;}
 
 	BaseRobotItem* parent();
 	bool setName(const QString&);

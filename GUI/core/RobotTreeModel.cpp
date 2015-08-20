@@ -6,8 +6,8 @@
 #include "./RobotItem.h"
 #include "./RobotTreeModel.h"
 
-RobotTreeModel ::RobotTreeModel(const RobotPointer& i_robotPointer,
-                                QObject *parent /*=0*/)
+RobotTreeModel::RobotTreeModel(const Robot::RobotPointer& i_robotPointer,
+                               QObject *parent /*=0*/)
     : QAbstractItemModel(parent) {
   m_headerData << "Property name" << "Value";
   rootItem = new BasePropertyItem("root", 0);
@@ -187,7 +187,7 @@ bool RobotTreeModel::setHeaderData(int section, Qt::Orientation orientation,
 }
 
 
-RobotPointer RobotTreeModel::getRobotPointer() {
+Robot::RobotPointer RobotTreeModel::getRobotPointer() {
   return static_cast<RobotItem*>(
       rootItem->getChildItems()[0])->getRobotPointer();
 }

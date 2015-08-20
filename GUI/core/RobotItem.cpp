@@ -10,7 +10,7 @@ const QList<QString> RobotItem::
   propertyList({"Speed", "CurrentPositionX", "CurrentPositionY"});
 
 RobotItem::RobotItem(BaseRobotItem* i_parent,
-                     RobotPointer i_robotPointer):
+                     Robot::RobotPointer i_robotPointer):
     BaseRobotItem("Robot", i_parent) {
   LOG_DEBUG(getElementName().toStdString());
   m_robotPointer = i_robotPointer;
@@ -63,7 +63,7 @@ bool RobotItem::setPropertyData(int i_row,
 }
 
 
-void RobotItem::setRobotPointer(RobotPointer i_robotPointer) {
+void RobotItem::setRobotPointer(Robot::RobotPointer i_robotPointer) {
   m_robotPointer = i_robotPointer;
 }
 
