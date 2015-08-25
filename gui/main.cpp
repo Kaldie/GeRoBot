@@ -7,7 +7,7 @@
 int main(int argc, char *argv[]) {
   Q_INIT_RESOURCE(RobotTreeModel);
 
-  RobotIO robotBuilder("/home/ruud/project/gerobot/GUI/defaultRobot.xml");
+  RobotIO robotBuilder("/home/ruud/project/gerobot/gui/defaultRobot.xml");
   robotBuilder.build();
 
   QApplication app(argc, argv);
