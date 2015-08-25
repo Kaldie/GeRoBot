@@ -13,24 +13,25 @@ class Point2DWidget: public QWidget, private Ui::Point2DWidget {
   GETSETPOINTER(Point2D, m_pointPointer, Point);
 
  public:
-    // Constructor
-    explicit Point2DWidget(QWidget* parent = 0);
+  // Constructor
+  explicit Point2DWidget(QWidget* parent = 0);
 
-    Point2DWidget(Point2D* i_pointer,
-                  QWidget *parent = 0);
+  Point2DWidget(Point2D* i_pointer,
+                QWidget *parent = 0);
+  void setPointName(const QString& i_pointName);
 
  private:
-   bool hasPoint;
-   void initialise();
-   static const int m_precision = 15;
+  bool hasPoint;
+  void initialise();
+  static const int m_precision = 15;
 
- public slots:
-   void updateView();
-   void updatePoint();
-   void setPointName(const QString& i_pointName);
+  private slots:
+    void updatePoint();
+
+    public slots:
+      void update();
 
  signals:
-   void hasNewPosition();
+      void hasNewPosition();
 };
-
 #endif  // GUI_WIDGET_POINT2DWIDGET_H_

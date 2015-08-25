@@ -24,14 +24,14 @@ void Point2DWidget::initialise() {
   /* custom signal to indicate the position is change
      is linked to update position widget
   */
-  connect(this, SIGNAL(hasNewPosition()), this, SLOT(updateView()));
+  connect(this, SIGNAL(hasNewPosition()), this, SLOT(update()));
   connect(yPositionLineEdit,SIGNAL(editingFinished()), this , SLOT(updatePoint()));
   connect(xPositionLineEdit,SIGNAL(editingFinished()), this , SLOT(updatePoint()));
-  updateView();
+  update();
 }
 
 
-void Point2DWidget::updateView() {
+void Point2DWidget::update() {
   LOG_DEBUG("Update point view.");
   if (!m_pointPointer) {
     LOG_DEBUG("Pointer is invalid.");
@@ -47,6 +47,7 @@ void Point2DWidget::updateView() {
   xPositionLineEdit->setText(textualRepresentation);
   textualRepresentation.setNum(m_pointPointer->y, 'g', Point2DWidget::m_precision);
   yPositionLineEdit->setText(textualRepresentation);
+  QWidget::update();
 }
 
 

@@ -45,10 +45,10 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="QLineEdit" name="yPositionLineEdit"/>
+      <widget class="QLineEdit" name="xPositionLineEdit"/>
      </item>
      <item>
-      <widget class="QLineEdit" name="xPositionLineEdit"/>
+      <widget class="QLineEdit" name="yPositionLineEdit"/>
      </item>
     </layout>
    </item>
