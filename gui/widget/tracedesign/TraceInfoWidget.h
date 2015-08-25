@@ -20,9 +20,9 @@ class TraceInfoWidget: public QWidget {
 
   QComboBox* traceTypeComboBox = 0;
   QLabel* traceTypeLabel = 0;
+
   void initialise();
   void showTraceInfo();
-  void updateCurrentTraceFromWidget(Trace::TracePointer& i_tracePointer);
 
  public:
   // Constructor
@@ -38,5 +38,9 @@ class TraceInfoWidget: public QWidget {
 
  public slots:
   virtual void update();
+
+ private slots:
+  void shouldRequestTraceUpdate();
+
 };
 #endif  // GUI_TRACEINFOWIDGET_H_

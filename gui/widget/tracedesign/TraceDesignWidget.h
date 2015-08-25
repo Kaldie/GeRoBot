@@ -8,10 +8,11 @@
 #include "./ui_TraceDesignWidget.h"
 
 class Point2DWidget;
+class QGraphicsView;
 
 class TraceDesignWidget: public QWidget, private Ui::TraceDesignWidget {
     Q_OBJECT
-    GETSET(Trace::TracePointer, m_currentTrace, CurrentTrace);
+    GETSET(int, m_index, Index);
     GETSET(TraceListIO::TracePointerVector, m_vector, Vector);  // Vector which hold the traces
 
  public:
@@ -21,10 +22,11 @@ class TraceDesignWidget: public QWidget, private Ui::TraceDesignWidget {
  private:
     void initialise();
     TraceInfoWidget* m_traceInfoWidget;
+    QGraphicsView* m_traceGraphView;
 
  public slots:
    void replaceTrace(Trace::TraceType);
-   void setCurrentTrace(Trace::WeakTracePointer);
+   void setCurrentIndex(const int& i_index);
 
 };
 
