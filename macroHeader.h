@@ -19,7 +19,7 @@
 #include <unistd.h>
 #include <vector>
 #include <iomanip>
-
+#include <cassert>
 #define PIN_HIGH 1
 #define PIN_LOW 0
 
@@ -144,24 +144,13 @@ class Robot;
 class RobotTreeModel;
 
 enum MovementType {None, Rotational, Translational};
-enum TRACE_TYPE {Line, Curve};
 
 enum GUIMovementMode {ToolMode, AxisMode};
-
-/// Smartpointer for base joint
-typedef std::shared_ptr<BaseJoint> JointPointer;
-/// Vector of smartpointers of base joints
-typedef std::vector<JointPointer> JointPointerVector;
 
 /// conversion of motor direction to joint direction
 typedef std::map<std::string, std::string> DirectionConversionMap;
 
 /// type used in trace calculations
 typedef double traceType;
-
-// Robot related types
-typedef std::shared_ptr<Robot> RobotPointer;
-typedef std::shared_ptr<RobotTreeModel> RobotTreeModelPointer;
-
 
 #endif  // MACROHEADER_H_
