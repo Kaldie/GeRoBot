@@ -3,9 +3,8 @@
 #ifndef MATH_ROTATIONTRACE_H_
 #define MATH_ROTATIONTRACE_H_
 
-#include <Arc2D.h>
 #include "./Trace.h"
-
+#include "./Arc2D.h"
 /**
  * Rotation trace is a track which defines a part of an arc.
  * Rotation trace can be defined in 2 manners:
@@ -24,10 +23,10 @@
  */
 
 class RotationTrace:public Trace {
-  GETSET(Arc2D, m_arc, Arc);
+  GETSET(Point2D, m_centrePoint, CentrePoint);
 
   /// The calculation will be done in parts, each part is a trace
-    GETSET(std::vector<RotationTrace>, m_partialTraceVector, PartialTraceVector);
+  GETSET(std::vector<RotationTrace>, m_partialTraceVector, PartialTraceVector);
 
  private:
     /// bockus function, all points are valid, if the trace can be constructed!
@@ -41,6 +40,7 @@ class RotationTrace:public Trace {
     Point2D* getCentralPointFromArc() const;
 
  public:
+    Arc2D getArc() const;
 
     typedef std::shared_ptr<RotationTrace> RotationTracePointer;
 
@@ -105,5 +105,8 @@ class RotationTrace:public Trace {
     std::vector<RotationTrace> getNecessaryTraces() const;
 
     std::vector<Point2D*> getPointPointers();
+
+    void getStartStopAngle(double* i_startAngle,
+                           double* i_stopAngle) const;
 };
 #endif  // MATH_ROTATIONTRACE_H_
