@@ -18,7 +18,8 @@
     widget/Point2DWidget.h \
     widget/tracedesign/TraceDesignWidget.h \
     widget/tracedesign/TraceInfoWidget.h \
-    widget/tracedesign/TraceGraphItem.h
+    widget/tracedesign/TraceGraphItem.h \
+    widget/tracedesign/RotationTraceGraphItem.h
 
 
  RESOURCES   = RobotTreeModel.qrc
@@ -39,7 +40,8 @@
     widget/Point2DWidget.cpp \
     widget/tracedesign/TraceDesignWidget.cpp \
     widget/tracedesign/TraceInfoWidget.cpp \
-    widget/tracedesign/TraceGraphItem.cpp
+    widget/tracedesign/TraceGraphItem.cpp \
+    widget/tracedesign/RotationTraceGraphItem.cpp
 
  CONFIG  += qt
  CONFIG += c++11

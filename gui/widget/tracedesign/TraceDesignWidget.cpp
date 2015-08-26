@@ -7,6 +7,7 @@
 #include "../Point2DWidget.h"
 #include "./TraceDesignWidget.h"
 #include "./TraceGraphItem.h"
+#include "./RotationTraceGraphItem.h"
 
 
 TraceDesignWidget::TraceDesignWidget(QWidget *parent)
@@ -33,7 +34,7 @@ void TraceDesignWidget::initialise() {
 
   QGraphicsScene* scene = new QGraphicsScene;
   scene->setSceneRect(-100,-100,200,200);
-  scene->setItemIndexMethod(QGraphicsScene::BspTreeIndex);
+  //  scene->setItemIndexMethod(QGraphicsScene::BspTreeIndex);
   scene->addItem(new TraceGraphItem(m_vector[m_index]));
   m_traceGraphView = new QGraphicsView();
   m_traceGraphView->setScene(scene);
@@ -53,7 +54,7 @@ void TraceDesignWidget::initialise() {
   time->setInterval(500);
   connect(time,SIGNAL(timeout()),
           scene,SLOT(update()));
-  time->start();
+  //  time->start();
 }
 
 
@@ -62,7 +63,6 @@ void TraceDesignWidget::replaceTrace(Trace::TraceType i_type) {
 
   Trace::TracePointer tracePointer;
   if(i_type == Trace::Line) {
-    LOG_DEBUG("Create new Line trace");
     tracePointer = std::make_shared<Trace>();
   } else if (i_type == Trace::Curve) {
     tracePointer = std::make_shared<RotationTrace>();
@@ -70,44 +70,45 @@ void TraceDesignWidget::replaceTrace(Trace::TraceType i_type) {
     LOG_ERROR("Trace is bad");
   }
 
-  LOG_DEBUG("Setting points.");
   tracePointer->setStartPoint(m_vector[m_index]->getStartPoint());
   tracePointer->setEndPoint(m_vector[m_index]->getEndPoint());
-
+  TraceGraphItem* newGraphItem;
   if (i_type == Trace::Curve) {
-    RotationTrace::RotationTracePointer rotationTrace =
-      std::dynamic_pointer_cast<RotationTrace>(tracePointer);
-    // For some reason we need to test the dynamic cast
-    assert(rotationTrace);
-    LOG_DEBUG("StartPoint: " << rotationTrace->getStartPoint().x << ", " << rotationTrace->getStartPoint().y);
-    LOG_DEBUG("EndPoint: " << rotationTrace->getEndPoint().x << ", " << rotationTrace->getEndPoint().y);
     // this will be the new center point.
     Point2D centerPoint;
-    RotationTrace::RotationTracePointer currentRotationTrace =
-      std::dynamic_pointer_cast<RotationTrace>(m_vector[m_index]);
-    if (currentRotationTrace) {
+    RotationTrace::RotationTracePointer rotationTrace =
+      std::dynamic_pointer_cast<RotationTrace>(tracePointer);
+    assert(rotationTrace);
+    if (auto currentRotationTrace = std::dynamic_pointer_cast<RotationTrace>(m_vector[m_index])) {
       // it is a rotation trace, use that point
-      centerPoint = currentRotationTrace->getArc().getCentrePoint();
+      centerPoint = currentRotationTrace->getCentrePoint();
     } else {
       //Suggest one
       centerPoint = RotationTrace::suggestCentralPoint(tracePointer->getStartPoint(),
                                                        tracePointer->getEndPoint());
     }
-    Arc2D arc(rotationTrace->getArc());
-    arc.setCentrePoint(centerPoint);
-    rotationTrace->setArc(arc);
+    // For some reason we need to test the dynamic cast
+    rotationTrace->setCentrePoint(centerPoint);
+    newGraphItem = new RotationTraceGraphItem(rotationTrace);
+  } else {
+    newGraphItem = new TraceGraphItem(tracePointer);
   }
-
 
   m_vector[m_index].swap(tracePointer);
   m_traceInfoWidget->setNewTracePointer(m_vector[m_index]);
+
   QList<QGraphicsItem*> list =  m_traceGraphView->scene()->selectedItems();
+  TraceGraphItem* currentItem;
   if(list.size() != 1) {
-    dynamic_cast<TraceGraphItem*>(m_traceGraphView->scene()->items()[0])->setTrace(m_vector[m_index]);
+    currentItem = dynamic_cast<TraceGraphItem*>(m_traceGraphView->scene()->items()[0]);
     LOG_INFO("BooBo!!");
   } else {
-  dynamic_cast<TraceGraphItem*>(list[0])->setTrace(m_vector[m_index]);
+    currentItem = dynamic_cast<TraceGraphItem*>(list[0]);
   }
+  m_traceGraphView->scene()->removeItem(currentItem);
+  delete currentItem;
+  m_traceGraphView->scene()->addItem(newGraphItem);
+
   LOG_DEBUG("Number of shared pointers to current trace: " << m_vector[m_index].use_count());
   LOG_DEBUG("The swaped is still hold by: " << tracePointer.use_count());
 }

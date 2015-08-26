@@ -1,8 +1,8 @@
 #include <macroHeader.h>
 #include <QPainter>
-#include <QPainterPathStroker>
 #include <QPointF>
 #include <QVariant>
+#include <QtWidgets>
 #include <RotationTrace.h>
 #include "./TraceGraphItem.h"
 
@@ -11,10 +11,11 @@ TraceGraphItem::TraceGraphItem(Trace::TracePointer i_trace /*= 0*/)
    : m_isSelected(true), m_trace(i_trace) {
    setFlag(QGraphicsItem::ItemIsSelectable);
    setFlag(QGraphicsItem::ItemIsMovable);
+   setFlag(QGraphicsItem::ItemSendsGeometryChanges);
+   setCursor(Qt::OpenHandCursor);
    LOG_DEBUG("Constructing iteme");
    if (!i_trace)
       LOG_DEBUG("Trace is not valid!");
-   //   setFlag(QGraphicsItem::ItemSendsGeometryChanges);
    // todo setPos at the start point
 }
 
@@ -58,7 +59,7 @@ void TraceGraphItem::paint(QPainter *painter,
    }
    //   painter->drawEllipse(0,0,10,10);
    painter->drawPath(shape());
-   //   painter->drawRect(boundingRect());
+   painter->drawRect(boundingRect());
 }
 
 
@@ -67,11 +68,19 @@ QRectF TraceGraphItem::boundingRect() const {
    if (!trace) {
       return QRectF();
    }
-   QPointF adjust(1,1);
+
    QPointF start(0,0);
    QPointF end(trace->getEndPoint().x - trace->getStartPoint().x,
                -1 * (trace->getEndPoint().y - trace->getStartPoint().y));
-   return QRectF(start-adjust,end+adjust);
+   QPointF minPoint;
+   QPointF maxPoint;
+      minPoint.setX(std::min(start.x(), end.x()));
+      minPoint.setY(std::min(start.y(), end.y()));
+      maxPoint.setX(std::max(start.x(), end.x()));
+      maxPoint.setY(std::max(start.y(), end.y()));
+   QPointF adjust(2,2);
+   return QRectF(minPoint - adjust,
+                 maxPoint + adjust);
 }
 
 
@@ -82,64 +91,28 @@ QPainterPath TraceGraphItem::shape() const {
    }
 
    QPainterPath path;
-   if (trace->getTraceType() == Trace::Curve) {
-      LOG_DEBUG("Paint rotation trace");
-      RotationTrace::RotationTracePointer
-         rotationTrace(std::dynamic_pointer_cast<RotationTrace>(trace));
-      assert(rotationTrace);
-      Point2D centerPoint(*rotationTrace->getPointPointers()[2]);
-
-      int startAngle = (trace->getStartPoint() - centerPoint).getAlpha() *
-         double(180) / PI;
-      int endAngle = (trace->getEndPoint() - centerPoint).getAlpha() *
-         double(180) / PI;
-      if (startAngle < endAngle) {
-         path.moveTo(QPointF(trace->getStartPoint().x,
-                             -1 * trace->getStartPoint().y));
-      } else {
-         path.moveTo(QPointF(trace->getEndPoint().x,
-                             -1 * trace->getEndPoint().y));
-      }
-      int spanAngle = endAngle - startAngle;
-
-      double diff = std::abs(Magnitude(centerPoint - trace->getStartPoint()));
-
-      LOG_DEBUG("Start angle: " << startAngle / double(16));
-      LOG_DEBUG("End angle: " << endAngle / double(16));
-      LOG_DEBUG("Span angle: " << spanAngle / double(16));
-      LOG_DEBUG("Radius is: " << diff);
-      LOG_DEBUG("lala1: " << centerPoint.x - diff);
-      LOG_DEBUG("lala2: " << -1*(centerPoint.y - diff));
-      LOG_DEBUG("lala1: " << centerPoint.x + diff);
-      LOG_DEBUG("lala2: " << -1 * (centerPoint.y + diff));
-
-      QRectF rect(QPointF(centerPoint.x + diff,
-                          -1 * (centerPoint.y - diff)),
-                  QPointF(centerPoint.x - diff,
-                          -1 * (centerPoint.y + diff)));
-
-      path.arcTo(rect, startAngle, spanAngle);
-   } else if (trace->getTraceType() == Trace::Line) {
       LOG_DEBUG("Paint trace line!");
       QPointF start(0, 0);
       QPointF end(trace->getEndPoint().x - trace->getStartPoint().x,
-                  -1 * (trace->getEndPoint().y - trace->getStartPoint().y));
+                  -trace->getEndPoint().y - -trace->getStartPoint().y);
       path.moveTo(start);
       path.lineTo(end);
-   } else {
-      LOG_ERROR("Evil trace type found!");
-   }
    return path;
 }
 
 
-/*
+
 QVariant TraceGraphItem::itemChange(GraphicsItemChange change, const QVariant &value) {
    LOG_DEBUG("ItemChange is called!");
-   Trace::TracePointer trace(m_trace.lock());
-   if(change != QGraphicsItem::ItemPositionHasChanged || !trace) {
+   if(change != QGraphicsItem::ItemPositionHasChanged) {
       return QGraphicsItem::itemChange(change, value);
    }
+
+   Trace::TracePointer trace(m_trace.lock());
+   if (!trace) {
+      return QGraphicsItem::itemChange(change, value);
+   }
+
    LOG_DEBUG("Update start and stop position of the trace!");
    QPointF point = value.toPointF();
    LOG_DEBUG("New pos: " << point.x() << ", " << point.y());
@@ -147,9 +120,8 @@ QVariant TraceGraphItem::itemChange(GraphicsItemChange change, const QVariant &v
    Point2D endPoint = trace->getEndPoint() +
       (newStartPoint - trace->getStartPoint());
    LOG_DEBUG("New end pos: " << endPoint.x << ", " << endPoint.y);
+   prepareGeometryChange();
    trace->setEndPoint(endPoint);
    trace->setStartPoint(newStartPoint);
-   update();
    return QGraphicsItem::itemChange(change, value);
 }
-*/

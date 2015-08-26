@@ -21,7 +21,7 @@ class TraceGraphItem : public QGraphicsItem {
     * These will be visible if the trace is selected
     * The will enable the user to added the trace from the graph
     */
-   //void addEditPoint(Edge* i_editPoint);
+   //virtual void addEditPoint(Edge* i_editPoint);
 
    /**
     * Link this graph to a trace in the master widget
@@ -29,16 +29,18 @@ class TraceGraphItem : public QGraphicsItem {
    void setTrace(Trace::TracePointer);
 
    enum { Type = UserType + 1 };
-   int type() const Q_DECL_OVERRIDE { return Type; }
+   virtual int type() const Q_DECL_OVERRIDE { return Type; }
 
-   QRectF boundingRect() const Q_DECL_OVERRIDE;
-   QPainterPath shape() const Q_DECL_OVERRIDE;
-   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) Q_DECL_OVERRIDE;
+   virtual QRectF boundingRect() const Q_DECL_OVERRIDE;
+   virtual QPainterPath shape() const Q_DECL_OVERRIDE;
+   virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) Q_DECL_OVERRIDE;
 
  protected:
-   //   QVariant itemChange(GraphicsItemChange change, const QVariant &value) Q_DECL_OVERRIDE;
+   virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) Q_DECL_OVERRIDE;
 
-   // private:
+ private:
+   void startAndStopAngle(double* i_startAngle,
+                          double* i_stopAngle) const;
    //   QList<Edge *> edgeList;
    //   QPointF newPos;
    //   GraphWidget *graph;
