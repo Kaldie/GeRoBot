@@ -15,11 +15,7 @@ void RotationTraceIO::build() {
   if (!pointer) {
     LOG_ERROR("Dynamic cast did not go well!");
   }
-
-  Arc2D arc(pointer->getStartPoint(),
-            pointer->getEndPoint(),
-            point2DIO.getPoint2D());
-  pointer->setArc(arc);
+  pointer->setCentrePoint(point2DIO.getPoint2D());
   setTracePointer(pointer);
 }
 
