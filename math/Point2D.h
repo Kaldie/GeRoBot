@@ -11,6 +11,8 @@ public:
 
   Point2D(traceType r, traceType s) : Vector2D(r, s) {};
 
+  Point2D(const Vector2D& i_vector){x = i_vector.x; y = i_vector.y;}
+
   Point2D& operator =(const Vector2D& v)
   {
     x = v.x;
@@ -67,7 +69,6 @@ public:
   bool operator ==(const Point2D& i_other) const ;
   traceType getAngleBetweenPoints(const Point2D&) const;
   traceType getAngleToOrigin();
-
 };
 
 
