@@ -17,6 +17,7 @@
     core/RobotTreeModel.h \
     widget/Point2DWidget.h \
     widget/tracedesign/TraceDesignWidget.h \
+    widget/tracedesign/TraceGraphView.h \
     widget/tracedesign/TraceInfoWidget.h \
     widget/tracedesign/TraceGraphItem.h \
     widget/tracedesign/RotationTraceGraphItem.h
@@ -39,6 +40,7 @@
     widget/RobotPositionWidget.cpp \
     widget/Point2DWidget.cpp \
     widget/tracedesign/TraceDesignWidget.cpp \
+    widget/tracedesign/TraceGraphView.cpp \
     widget/tracedesign/TraceInfoWidget.cpp \
     widget/tracedesign/TraceGraphItem.cpp \
     widget/tracedesign/RotationTraceGraphItem.cpp

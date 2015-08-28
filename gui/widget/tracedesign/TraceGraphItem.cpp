@@ -16,13 +16,20 @@ TraceGraphItem::TraceGraphItem(Trace::TracePointer i_trace /*= 0*/)
    LOG_DEBUG("Constructing iteme");
    if (!i_trace)
       LOG_DEBUG("Trace is not valid!");
+   else
+      setPos(QPointF(i_trace->getStartPoint().x,
+                     -i_trace->getStartPoint().y));
    // todo setPos at the start point
 }
 
 
 void TraceGraphItem::setTrace(Trace::TracePointer i_trace){
    m_trace = i_trace;
+   setPos(QPointF(i_trace->getStartPoint().x,
+                  -i_trace->getStartPoint().y));
 }
+
+
 //void TraceGraphItem::addEditPoint(Edge* i_editPoint) {
 //   m_editPoints.addItem(i_editPoint);
 //}
@@ -103,7 +110,6 @@ QPainterPath TraceGraphItem::shape() const {
 
 
 QVariant TraceGraphItem::itemChange(GraphicsItemChange change, const QVariant &value) {
-   LOG_DEBUG("ItemChange is called!");
    if(change != QGraphicsItem::ItemPositionHasChanged) {
       return QGraphicsItem::itemChange(change, value);
    }

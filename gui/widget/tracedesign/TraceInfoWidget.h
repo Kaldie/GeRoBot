@@ -31,7 +31,7 @@ class TraceInfoWidget: public QWidget {
   /**
    *Based on the ComboBox, create a new trace and set it in
    */
-  void setNewTracePointer(Trace::TracePointer& i_ptr);
+  void setNewTracePointer(const Trace::TracePointer& i_ptr);
 
  signals:
   void requestTrace(Trace::TraceType);

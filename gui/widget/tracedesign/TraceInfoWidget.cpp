@@ -79,12 +79,14 @@ void TraceInfoWidget::update() {
     centralPoint->setPoint(nullptr);
     emit centralPoint->hasNewPosition();
   } else {
-    // enable trace combo box
+
+    LOG_DEBUG("Enable TraceType combobox if necessary");
     if (!traceTypeComboBox->isEnabled()) {
       traceTypeComboBox->setEnabled(true);
     }
 
-    // update the combo box if necessary
+
+    LOG_DEBUG("Update TraceType combobox if necessary");
     if (traceTypeComboBox->currentIndex() != tracePointer->getTraceType()) {
       traceTypeComboBox->setCurrentIndex(tracePointer->getTraceType());
     }
@@ -92,11 +94,16 @@ void TraceInfoWidget::update() {
     // Get the point pointers from the new trace
     LOG_DEBUG("Getting points now!");
     std::vector<Point2D*> points(tracePointer->getPointPointers());
+
     if (points[0] != startPoint->getPoint()) {
       startPoint->setPoint(points[0]);
+      LOG_DEBUG("Emit startPoint has new position");
       emit startPoint->hasNewPosition();
     } else if (*points[0] != *startPoint->getPoint()) {
+      LOG_DEBUG("Emit startPoint has new position");
       emit startPoint->hasNewPosition();
+    } else if (*points[0] == *startPoint->getPoint()) {
+      LOG_DEBUG("Start position is exactly the same!");
     }
 
     if (points[1] != endPoint->getPoint()) {
@@ -115,7 +122,6 @@ void TraceInfoWidget::update() {
       emit centralPoint->hasNewPosition();
     }
   }
-  QWidget::update();
 }
 
 
@@ -133,7 +139,7 @@ void TraceInfoWidget::shouldRequestTraceUpdate() {
 }
 
 
-void TraceInfoWidget::setNewTracePointer(Trace::TracePointer& i_tracePointer) {
+void TraceInfoWidget::setNewTracePointer(const Trace::TracePointer& i_tracePointer) {
   m_trace = i_tracePointer;
   update();
 }

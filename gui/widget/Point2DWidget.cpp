@@ -44,8 +44,10 @@ void Point2DWidget::update() {
 
   QString textualRepresentation;
   textualRepresentation.setNum(m_pointPointer->x, 'g', Point2DWidget::m_precision);
+  LOG_DEBUG("Write: " << textualRepresentation.toStdString() << " in x line edit");
   xPositionLineEdit->setText(textualRepresentation);
   textualRepresentation.setNum(m_pointPointer->y, 'g', Point2DWidget::m_precision);
+  LOG_DEBUG("Write: " << textualRepresentation.toStdString() << " in y line edit");
   yPositionLineEdit->setText(textualRepresentation);
   QWidget::update();
 }

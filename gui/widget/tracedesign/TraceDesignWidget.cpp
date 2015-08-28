@@ -7,6 +7,7 @@
 #include "../Point2DWidget.h"
 #include "./TraceDesignWidget.h"
 #include "./TraceGraphItem.h"
+#include "./TraceGraphView.h"
 #include "./RotationTraceGraphItem.h"
 
 
@@ -24,24 +25,15 @@ void TraceDesignWidget::initialise() {
   setupUi(this);
   m_traceInfoWidget = new TraceInfoWidget(this);
   pointFrame->layout()->addWidget(m_traceInfoWidget);
-  connect(m_traceInfoWidget, SIGNAL(requestTrace(Trace::TraceType)),
-          this, SLOT(replaceTrace(Trace::TraceType)));
 
   m_vector.push_back(std::make_shared<Trace>());
   m_index = 0;
   m_vector[m_index]->setEndPoint(Point2D(50,10));
   m_traceInfoWidget->setNewTracePointer(m_vector[m_index]);
 
-  QGraphicsScene* scene = new QGraphicsScene;
-  scene->setSceneRect(-100,-100,200,200);
-  //  scene->setItemIndexMethod(QGraphicsScene::BspTreeIndex);
-  scene->addItem(new TraceGraphItem(m_vector[m_index]));
-  m_traceGraphView = new QGraphicsView();
-  m_traceGraphView->setScene(scene);
-  m_traceGraphView->setRenderHint(QPainter::Antialiasing);
-  //  m_traceGraphView->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
-  //  m_traceGraphView->setDragMode(QGraphicsView::ScrollHandDrag);
-  LOG_DEBUG("Been here!");
+  m_traceGraphView = new TraceGraphView(this);
+  m_traceGraphView->addTraceItem(m_vector[m_index]);
+
   QLayout* layout = sceneFrame->layout();
   if (!layout) {
     sceneFrame->setLayout(new QVBoxLayout);
@@ -49,12 +41,13 @@ void TraceDesignWidget::initialise() {
   }
   layout->addWidget(m_traceGraphView);
 
-  LOG_DEBUG("Number of shared pointers to current trace: " << m_vector[m_index].use_count());
-  QTimer* time = new QTimer();
-  time->setInterval(500);
-  connect(time,SIGNAL(timeout()),
-          scene,SLOT(update()));
-  //  time->start();
+  // Connect the request new trace to replace trace
+  connect(m_traceInfoWidget, SIGNAL(requestTrace(Trace::TraceType)),
+          this, SLOT(replaceTrace(Trace::TraceType)));
+
+  // connect the scenes changed signal to info widget update slot
+  connect(m_traceGraphView->scene(), SIGNAL(changed(const QList<QRectF>&)),
+          m_traceInfoWidget, SLOT(update()));
 }
 
 
@@ -93,9 +86,12 @@ void TraceDesignWidget::replaceTrace(Trace::TraceType i_type) {
   } else {
     newGraphItem = new TraceGraphItem(tracePointer);
   }
-
+  // swap the old with the new
   m_vector[m_index].swap(tracePointer);
+
+  // update the info widget to show the new info
   m_traceInfoWidget->setNewTracePointer(m_vector[m_index]);
+  m_traceInfoWidget->update();
 
   QList<QGraphicsItem*> list =  m_traceGraphView->scene()->selectedItems();
   TraceGraphItem* currentItem;

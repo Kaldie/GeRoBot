@@ -8,7 +8,7 @@
 #include "./ui_TraceDesignWidget.h"
 
 class Point2DWidget;
-class QGraphicsView;
+class TraceGraphView;
 
 class TraceDesignWidget: public QWidget, private Ui::TraceDesignWidget {
     Q_OBJECT
@@ -22,7 +22,7 @@ class TraceDesignWidget: public QWidget, private Ui::TraceDesignWidget {
  private:
     void initialise();
     TraceInfoWidget* m_traceInfoWidget;
-    QGraphicsView* m_traceGraphView;
+    TraceGraphView* m_traceGraphView;
 
  public slots:
    void replaceTrace(Trace::TraceType);
