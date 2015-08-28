@@ -91,7 +91,7 @@ void TraceDesignWidget::replaceTrace(Trace::TraceType i_type) {
 
   // update the info widget to show the new info
   m_traceInfoWidget->setNewTracePointer(m_vector[m_index]);
-  m_traceInfoWidget->update();
+
 
   QList<QGraphicsItem*> list =  m_traceGraphView->scene()->selectedItems();
   TraceGraphItem* currentItem;
