@@ -98,29 +98,21 @@ void TraceInfoWidget::update() {
     if (points[0] != startPoint->getPoint()) {
       startPoint->setPoint(points[0]);
       LOG_DEBUG("Emit startPoint has new position");
-      emit startPoint->hasNewPosition();
-    } else if (*points[0] != *startPoint->getPoint()) {
-      LOG_DEBUG("Emit startPoint has new position");
-      emit startPoint->hasNewPosition();
-    } else if (*points[0] == *startPoint->getPoint()) {
-      LOG_DEBUG("Start position is exactly the same!");
     }
+    emit startPoint->hasNewPosition();
 
     if (points[1] != endPoint->getPoint()) {
       endPoint->setPoint(points[1]);
-      emit endPoint->hasNewPosition();
-    } else if (*points[1] != *endPoint->getPoint()) {
-      emit endPoint->hasNewPosition();
     }
+    emit endPoint->hasNewPosition();
 
     if (points.size() < 3) {
       centralPoint->setPoint(nullptr);
-      emit centralPoint->hasNewPosition();
     } else {
       centralPoint->setEnabled(true);
       centralPoint->setPoint(points[2]);
-      emit centralPoint->hasNewPosition();
     }
+    emit centralPoint->hasNewPosition();
   }
 }
 
