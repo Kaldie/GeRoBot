@@ -2,10 +2,10 @@
 #define Point2D_h
 
 #include "Vector2D.h"
+#include <QtCore/QPointF>
 
-class Point2D:public Vector2D
-{ 
-public:
+class Point2D:public Vector2D {
+ public:
   //construtor
   Point2D() {};
 
@@ -65,6 +65,12 @@ public:
     traceType f = 1.0/ t;
     return (Point2D(x * f, y * f));
   };
+
+  /**
+   * Cast the Point2D to a QT point.
+   * Due to changes in coordinate system we need to flip the y-axis
+   */
+  operator QPointF() const {return QPointF(x,-y);};
 
   bool operator ==(const Point2D& i_other) const ;
   traceType getAngleBetweenPoints(const Point2D&) const;
