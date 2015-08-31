@@ -29,7 +29,7 @@ void TraceDesignWidget::initialise() {
   m_vector.push_back(std::make_shared<Trace>());
   m_index = 0;
   m_vector[m_index]->setEndPoint(Point2D(50,10));
-  m_traceInfoWidget->setNewTracePointer(m_vector[m_index]);
+  //  m_traceInfoWidget->setNewTracePointer();//m_vector[m_index]);
 
   m_traceGraphView = new TraceGraphView(this);
   m_traceGraphView->addTraceItem(m_vector[m_index]);
@@ -48,6 +48,14 @@ void TraceDesignWidget::initialise() {
   // connect the scenes changed signal to info widget update slot
   connect(m_traceGraphView->scene(), SIGNAL(changed(const QList<QRectF>&)),
           m_traceInfoWidget, SLOT(update()));
+
+  // connect the scene the changed selection to the update trace from the info widget
+  connect(m_traceGraphView->scene(), SIGNAL(selectionChanged()),
+          this, SLOT(updateSelectedTrace()));
+
+  // connect the InfoWidget changed signal to the View widget update slot
+  connect(m_traceInfoWidget, SIGNAL(tracePositionChanged()),
+          m_traceGraphView, SLOT(updateSelectedItem()));
 }
 
 
@@ -104,6 +112,8 @@ void TraceDesignWidget::replaceTrace(Trace::TraceType i_type) {
   m_traceGraphView->scene()->removeItem(currentItem);
   delete currentItem;
   m_traceGraphView->scene()->addItem(newGraphItem);
+  newGraphItem->update();
+  //  m_traceGraphView->scene()->update();
 
   LOG_DEBUG("Number of shared pointers to current trace: " << m_vector[m_index].use_count());
   LOG_DEBUG("The swaped is still hold by: " << tracePointer.use_count());
@@ -112,4 +122,16 @@ void TraceDesignWidget::replaceTrace(Trace::TraceType i_type) {
 
 void TraceDesignWidget::setCurrentIndex(const int& i_newIndex) {
   m_index = i_newIndex;
+}
+
+
+
+void TraceDesignWidget::updateSelectedTrace() {
+  TraceGraphItem* item = m_traceGraphView->getSelectedTracePointer();
+  if (item) {
+    m_traceInfoWidget->setNewTracePointer(item->getTracePointer());
+  } else {
+    m_traceInfoWidget->setNewTracePointer(nullptr);
+  }
+
 }

@@ -19,14 +19,18 @@ class TraceDesignWidget: public QWidget, private Ui::TraceDesignWidget {
     // Constructor
     explicit TraceDesignWidget(QWidget* parent = 0);
 
+ public slots:
+   void replaceTrace(Trace::TraceType);
+   void setCurrentIndex(const int& i_index);
+
+
  private:
     void initialise();
     TraceInfoWidget* m_traceInfoWidget;
     TraceGraphView* m_traceGraphView;
 
- public slots:
-   void replaceTrace(Trace::TraceType);
-   void setCurrentIndex(const int& i_index);
+ private slots:
+   void updateSelectedTrace();
 
 };
 

@@ -17,16 +17,14 @@ TraceGraphItem::TraceGraphItem(Trace::TracePointer i_trace /*= 0*/)
    if (!i_trace)
       LOG_DEBUG("Trace is not valid!");
    else
-      setPos(QPointF(i_trace->getStartPoint().x,
-                     -i_trace->getStartPoint().y));
+      setPos(i_trace->getStartPoint());
    // todo setPos at the start point
 }
 
 
 void TraceGraphItem::setTrace(Trace::TracePointer i_trace){
    m_trace = i_trace;
-   setPos(QPointF(i_trace->getStartPoint().x,
-                  -i_trace->getStartPoint().y));
+   setPos(i_trace->getStartPoint());
 }
 
 
@@ -49,7 +47,7 @@ void TraceGraphItem::paint(QPainter *painter,
 
    QPen pen(Qt::black,1);
    pen.setCapStyle(Qt::RoundCap);
-   if (m_isSelected) {
+   if (isSelected()) {
       LOG_DEBUG("Make magic!!");
       pen.setColor(Qt::red);
       painter->setPen(pen);
@@ -113,7 +111,6 @@ QVariant TraceGraphItem::itemChange(GraphicsItemChange change, const QVariant &v
    if(change != QGraphicsItem::ItemPositionHasChanged) {
       return QGraphicsItem::itemChange(change, value);
    }
-
    Trace::TracePointer trace(m_trace.lock());
    if (!trace) {
       return QGraphicsItem::itemChange(change, value);
@@ -130,4 +127,17 @@ QVariant TraceGraphItem::itemChange(GraphicsItemChange change, const QVariant &v
    trace->setEndPoint(endPoint);
    trace->setStartPoint(newStartPoint);
    return QGraphicsItem::itemChange(change, value);
+}
+
+
+void TraceGraphItem::updatePosition() {
+   if (Trace::TracePointer trace = m_trace.lock()) {
+      LOG_DEBUG("Set the item to the new position is necessary!");
+      prepareGeometryChange();
+      if (pos() != trace->getStartPoint()){
+         setPos(trace->getStartPoint());
+      }
+      update();
+      scene()->update();
+   }
 }

@@ -7,26 +7,26 @@
 #include "./TraceGraphView.h"
 #include "./RotationTraceGraphItem.h"
 
-const int TraceGraphView::MinimalSpaceBetweenGrid = 20;
 const double TraceGraphView::LegendRatio = 0.2;
-const int TraceGraphView::OptimalNumberOfLines = 8;
+const int TraceGraphView::OptimalNumberOfLines = 1250;
 
 TraceGraphView::TraceGraphView(QWidget* i_parent)
-  : QGraphicsView(i_parent) {
+  : QGraphicsView(i_parent), m_gridSpacing(50) {
   initialise();
 }
 
 
 void TraceGraphView::initialise() {
   QGraphicsScene* scene = new QGraphicsScene;
-  scene->setSceneRect(-100,-100,200,200);
+
+  //  scene->setSceneRect(-100,-300,200,300);
   scene->setItemIndexMethod(QGraphicsScene::BspTreeIndex);
   setScene(scene);
   setRenderHint(QPainter::Antialiasing);
   setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
   setDragMode(QGraphicsView::RubberBandDrag);
-  setCacheMode(QGraphicsView::CacheBackground);
-
+  setCacheMode(QGraphicsView::CacheNone);
+  //  connect(
 }
 
 
@@ -78,6 +78,16 @@ bool TraceGraphView::replaceCurrentTrace(const Trace::TracePointer& i_newTrace) 
   scene()->removeItem(currentItem);
   delete currentItem;
   addTraceItem(i_newTrace);
+  return true;
+}
+
+
+void TraceGraphView::updateSelectedItem() {
+  if (TraceGraphItem* item = getSelectedTracePointer()) {
+    item->updatePosition();
+  } else {
+    LOG_DEBUG("Could not find the item");
+  }
 }
 
 
@@ -92,90 +102,72 @@ void TraceGraphView::setSelected(Trace::TracePointer i_trace) {
   item->setSelected(true);
 }
 
-
-void TraceGraphView::drawBackground(QPainter *painter, const QRectF &rect) {
-  // set the painter to make nice thingies
+void TraceGraphView::drawBackground(QPainter *painter, const QRectF &i_backgroundRect) {
   QPen pen(Qt::DashLine);
-  QColor color(Qt::black);
-  color.setAlpha(100);
-  pen.setColor(color);
+  QColor color(Qt::blue);
+  pen.setColor(color.lighter(180));
   pen.setCapStyle(Qt::RoundCap);
   painter->setPen(pen);
 
+  // check which is the biggest rect and use that 1
+  LOG_DEBUG("Size of background rect: " << i_backgroundRect.width() << " , " <<
+            i_backgroundRect.height());
+  LOG_DEBUG("Size of scene rect: " << scene()->sceneRect().width() << " , " <<
+        scene()->sceneRect().height());
+    LOG_DEBUG("Size of scene rect: " << size().width() << " , " <<
+        size().height());
+
   // draw lines of the grid
-  int numberOfLines = drawVerticalGrid(painter, rect);
-  drawHorizontalGrid(painter, rect);
-  // get the scalling of the view
-  QPointF ScalePoint(transform().map(QPointF(1,1)));
-  // get the "real" size of the grid
-  double gridSize = rect.width() / numberOfLines * ScalePoint.x();
-
-  //  QRectF legendSize = QRectF(rect
-  QPoint bottomLeft = rect.toRect().bottomLeft();
-  int legendHeight = static_cast<int>(rect.height() * TraceGraphView::LegendRatio);
-  int legendWidth = static_cast<int>(rect.width() * 1.25 * TraceGraphView::LegendRatio);
-  bottomLeft.ry() -= legendHeight;
-  bottomLeft.rx() -= legendWidth;
-
-  QRect legendRect = QRect(bottomLeft,
-                           QSize(legendWidth,
-                                 legendHeight));
-  // draw a legend to the view
-  drawLegend(legendRect,
-	     gridSize);
-
+  drawGrid(painter, i_backgroundRect);
+  painter->setBrush(Qt::red);
+  painter->drawEllipse(-2, -2, 4, 4);
+  painter->setBrush(Qt::NoBrush);
 }
 
 
-int TraceGraphView::drawVerticalGrid(QPainter *painter,
-                                     const QRectF &rect) {
-    // set the size of the axis that will be drawn
-  int sizeOfRect(rect.width());
-  int numberOfLines = TraceGraphView::OptimalNumberOfLines;
-  int spacing(0);
-  // set the spacing between the lines
-  for (;
-       numberOfLines > 0;
-       --numberOfLines) {
-    spacing = rect.width() / numberOfLines;
-    if (spacing > TraceGraphView::MinimalSpaceBetweenGrid)
-      break;
+void TraceGraphView::drawGrid(QPainter *painter,
+                              const QRectF &rect) {
+  // draw lines
+  QPointF start = rect.topLeft().toPoint();
+  QPointF end = rect.bottomRight().toPoint();
+  LOG_DEBUG("Draw grid!");
+  LOG_DEBUG(rect.topLeft().x() << " , " << rect.topLeft().y());
+  LOG_DEBUG(rect.bottomRight().x() << " , " << rect.bottomRight().y());
+  LOG_DEBUG(start.x() << " , " << start.y());
+  LOG_DEBUG(end.x() << " , " << end.y());
+
+  // draw vertical grid
+  for (int i = start.x();
+       i < end.x();
+       ++i) {
+    if (i % m_gridSpacing == 0) {
+      painter->drawLine(QLine(QPoint(i, rect.top()),
+                              QPoint(i, rect.bottom())));
+      i+= m_gridSpacing - 2;
+    }
   }
 
-  // draw lines
-  for (int i = rect.left();
-       i < rect.width();
-       i += spacing) {
-    painter->drawLine(QLine(QPoint(i,rect.top()),
-                            QPoint(i,rect.height())));
+  // draw horizontal grid
+  for (int i = start.y();
+       i < end.y();
+       ++i) {
+    if (i % m_gridSpacing == 0) {
+      painter->drawLine(QLine(QPoint(rect.left(), i),
+                              QPoint(rect.right(), i)));
+      i+= m_gridSpacing - 2;
+    }
   }
-  return numberOfLines;
 }
 
 
-int TraceGraphView::drawHorizontalGrid(QPainter *painter,
-                                       const QRectF &rect) {
-    // set the size of the axis that will be drawn
-  int sizeOfRect(rect.height());
-  int numberOfLines = TraceGraphView::OptimalNumberOfLines;
-  int spacing(0);
-  // set the spacing between the lines
-  for (;
-       numberOfLines > 0;
-       --numberOfLines) {
-    spacing = rect.height() / numberOfLines;
-    if (spacing > TraceGraphView::MinimalSpaceBetweenGrid)
-      break;
+TraceGraphItem* TraceGraphView::getSelectedTracePointer() {
+  QList<QGraphicsItem*> items = scene()->selectedItems();
+  if (items.size() == 1) {
+    if (TraceGraphItem* graphItem = dynamic_cast<TraceGraphItem*>(items[0])) {
+        return graphItem;
+      }
   }
-
-  // draw lines
-  for (int i = rect.top();
-       i < rect.height();
-       i += spacing) {
-    painter->drawLine(QLine(QPoint(rect.left(), i),
-                            QPoint(rect.width(), i)));
-  }
-  return numberOfLines;
+  return nullptr;
 }
 
 

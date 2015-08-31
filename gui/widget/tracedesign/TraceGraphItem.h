@@ -24,7 +24,7 @@ class TraceGraphItem : public QGraphicsItem {
    //virtual void addEditPoint(Edge* i_editPoint);
 
    /**
-    * Link this graph to a trace in the master widget
+    * Link this item to a trace in the master widget
     */
    void setTrace(Trace::TracePointer);
 
@@ -34,16 +34,14 @@ class TraceGraphItem : public QGraphicsItem {
    virtual QRectF boundingRect() const Q_DECL_OVERRIDE;
    virtual QPainterPath shape() const Q_DECL_OVERRIDE;
    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) Q_DECL_OVERRIDE;
+   void updatePosition();
 
  protected:
    virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) Q_DECL_OVERRIDE;
 
+
  private:
-   void startAndStopAngle(double* i_startAngle,
-                          double* i_stopAngle) const;
    //   QList<Edge *> edgeList;
-   //   QPointF newPos;
-   //   GraphWidget *graph;
 };
 
 #endif // GUI_WIDGET_TRACE_TRACEGRAPHITEM

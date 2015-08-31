@@ -59,6 +59,15 @@ class TraceGraphView : public QGraphicsView {
   void setSelected(Trace::TracePointer i_trace);
 
 
+  /**
+   * Get the selected TraceItem if there is one, otherwise return nullptr
+   * Simple function to make my life easier, life easy is important
+   */
+  TraceGraphItem* getSelectedTracePointer();
+
+ public slots:
+  void updateSelectedItem();
+
  protected:
   virtual void drawBackground(QPainter *painter, const QRectF &rect) Q_DECL_OVERRIDE;
 
@@ -87,14 +96,12 @@ class TraceGraphView : public QGraphicsView {
   /**
    * Draws a grid to the view
    */
-  int drawVerticalGrid(QPainter *painter,
-                       const QRectF &rect);
-  int drawHorizontalGrid(QPainter *painter,
-                         const QRectF &rect);
+  void drawGrid(QPainter *painter,
+                const QRectF &rect);
   /**
    * Size of the legend relative to the whole view
    */
-  static const int MinimalSpaceBetweenGrid;
+  int m_gridSpacing;
   static const double LegendRatio;
   static const int OptimalNumberOfLines;
 };

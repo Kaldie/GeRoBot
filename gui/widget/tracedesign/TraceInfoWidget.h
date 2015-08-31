@@ -13,34 +13,37 @@ class QLabel;
 class TraceInfoWidget: public QWidget {
   Q_OBJECT
   GETSET(Trace::WeakTracePointer, m_trace, WeakTracePointer);
- private:
-  Point2DWidget* startPoint = 0;
-  Point2DWidget* endPoint = 0;
-  Point2DWidget* centralPoint = 0;
 
-  QComboBox* traceTypeComboBox = 0;
-  QLabel* traceTypeLabel = 0;
+ private:
+  Point2DWidget* startPoint;
+  Point2DWidget* endPoint;
+  Point2DWidget* centralPoint;
+
+  QComboBox* traceTypeComboBox;
+  QLabel* traceTypeLabel;
 
   void initialise();
-  void showTraceInfo();
 
  public:
-  // Constructor
-  explicit TraceInfoWidget(QWidget* parent = 0,
+  /// Constructor
+  explicit TraceInfoWidget(QWidget* parent = nullptr,
                            Trace::TracePointer = nullptr);
   /**
-   *Based on the ComboBox, create a new trace and set it in
+   * Sets a new trace pointer as source and update() the widget
    */
   void setNewTracePointer(const Trace::TracePointer& i_ptr);
+  void setNewTracePointer(const Trace::WeakTracePointer& i_ptr);
 
  signals:
   void requestTrace(Trace::TraceType);
+  void tracePositionChanged();
 
  public slots:
   virtual void update();
 
  private slots:
   void shouldRequestTraceUpdate();
+  void shouldSignalHasNewPosition();
 
 };
 #endif  // GUI_TRACEINFOWIDGET_H_
