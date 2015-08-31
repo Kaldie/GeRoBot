@@ -19,6 +19,7 @@ QRectF RotationTraceGraphItem::boundingRect() const {
       return QRectF();
    }
 
+
    QPointF start(0,0);
    QPointF end(rotationTrace->getEndPoint().x - rotationTrace->getStartPoint().x,
                -1 * (rotationTrace->getEndPoint().y - rotationTrace->getStartPoint().y));
@@ -115,16 +116,14 @@ QPainterPath RotationTraceGraphItem::shape() const {
 
 
 QVariant RotationTraceGraphItem::itemChange(GraphicsItemChange change, const QVariant &value) {
-   LOG_DEBUG("ItemChange is called!");
    if(change != QGraphicsItem::ItemPositionHasChanged) {
       return QGraphicsItem::itemChange(change, value);
    }
 
    // distance moved
-
-
-
+   LOG_DEBUG("get a pointer");
    RotationTrace::RotationTracePointer rotationTrace(getPointer());
+   LOG_DEBUG("Pointer is gotten");
    if (!rotationTrace) {
       return QGraphicsItem::itemChange(change, value);
    }
