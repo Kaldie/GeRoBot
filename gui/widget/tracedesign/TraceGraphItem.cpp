@@ -22,7 +22,7 @@ TraceGraphItem::TraceGraphItem(Trace::TracePointer i_trace /*= 0*/)
 }
 
 
-void TraceGraphItem::setTrace(Trace::TracePointer i_trace){
+void TraceGraphItem::setTrace(const Trace::TracePointer& i_trace){
    m_trace = i_trace;
    setPos(i_trace->getStartPoint());
 }
@@ -127,6 +127,18 @@ QVariant TraceGraphItem::itemChange(GraphicsItemChange change, const QVariant &v
    trace->setEndPoint(endPoint);
    trace->setStartPoint(newStartPoint);
    return QGraphicsItem::itemChange(change, value);
+}
+
+
+
+  void TraceGraphItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event) {
+  QMenu *menu = new QMenu;
+  menu->addAction("Action 2");
+  menu->popup(event->screenPos());
+  //  connect(menu, SIGNAL(triggered(QAction *)),
+  //      this, SLOT(triggered(QAction *)));
+  menu->popup(event->screenPos());
+  //connect(pasteAct, SIGNAL(triggered()), this, SLOT(paste()));
 }
 
 

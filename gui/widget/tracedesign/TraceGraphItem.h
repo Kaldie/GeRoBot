@@ -1,14 +1,15 @@
 #ifndef GUI_WIDGET_TRACE_TRACEGRAPHITEM
 #define GUI_WIDGET_TRACE_TRACEGRAPHITEM
 
-#include <QGraphicsItem>
+#include <QGraphicsObject>
 #include <QList>
 #include <Trace.h>
 class TraceGraphEditPoint;
 class GraphWidget;
 class QGraphicsSceneMouseEvent;
 
-class TraceGraphItem : public QGraphicsItem {
+class TraceGraphItem : public QGraphicsObject {
+   Q_OBJECT
    //   GETSET(QList<TraceGraphEditPoint*>, m_editPoints, EditPoints);
    GETSET(bool, m_isSelected, isSelected);
    GETSET(Trace::WeakTracePointer, m_trace, TracePointer);
@@ -26,22 +27,27 @@ class TraceGraphItem : public QGraphicsItem {
    /**
     * Link this item to a trace in the master widget
     */
-   void setTrace(Trace::TracePointer);
+   void setTrace(const Trace::TracePointer&);
 
    enum { Type = UserType + 1 };
    virtual int type() const Q_DECL_OVERRIDE { return Type; }
 
    virtual QRectF boundingRect() const Q_DECL_OVERRIDE;
    virtual QPainterPath shape() const Q_DECL_OVERRIDE;
-   virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) Q_DECL_OVERRIDE;
+   virtual void paint(QPainter *painter,
+                      const QStyleOptionGraphicsItem *option,
+                      QWidget *widget) Q_DECL_OVERRIDE;
    void updatePosition();
 
  protected:
    virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) Q_DECL_OVERRIDE;
-
+   void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) Q_DECL_OVERRIDE;
 
  private:
    //   QList<Edge *> edgeList;
+   // signals:
+   //   void removeThis(Trace::TracePointer);
+
 };
 
 #endif // GUI_WIDGET_TRACE_TRACEGRAPHITEM

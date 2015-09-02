@@ -1,6 +1,7 @@
 #ifndef GUI_WIDGET_TRACE_ROTATIONTRACEGRAPHITEM_H_
 #define GUI_WIDGET_TRACE_ROTATIONTRACEGRAPHITEM_H_
 
+#include <RotationTrace.h>
 #include "./TraceGraphItem.h"
 
 class TraceGraphEditPoint;
@@ -8,7 +9,7 @@ class GraphWidget;
 class QGraphicsSceneMouseEvent;
 
 class RotationTraceGraphItem : public TraceGraphItem {
-
+ Q_OBJECT
  public:
    RotationTraceGraphItem(Trace::TracePointer = nullptr);
 

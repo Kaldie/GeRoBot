@@ -3,7 +3,6 @@
 #include <QPointF>
 #include <QVariant>
 #include <QtWidgets>
-#include <RotationTrace.h>
 #include "./RotationTraceGraphItem.h"
 
 
