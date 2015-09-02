@@ -51,6 +51,15 @@ class Point2DTest : public CxxTest::TestSuite {
     TS_ASSERT_DELTA(Point2D(-10, 0).getAngleBetweenPoints(Point2D(0, 10)),
                     PI * 0.5, 0.0001);
   }
+
+  void testQPointFCast() {
+    Point2D point(10.0,-10.0);
+    QPointF qPoint = point;
+    TS_ASSERT_EQUALS(QPointF(10.0,10.0),
+                     qPoint);
+    TS_ASSERT_DIFFERS(QPointF(10.0,-10.0),
+                     qPoint);
+  }
 };
 
 #endif  // MATH_UNIT_TEST_POINT2DTEST_H_
