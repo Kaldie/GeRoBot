@@ -30,10 +30,10 @@ void TraceGraphView::initialise() {
 }
 
 
-void TraceGraphView::addTraceItem(const Trace::TracePointer& i_trace) {
+TraceGraphItem* TraceGraphView::addTraceItem(const Trace::TracePointer& i_trace) {
   if (!i_trace) {
     setSelected(nullptr);
-    return;
+    return nullptr;
   }
 
   TraceGraphItem* newGraphItem;
@@ -45,22 +45,28 @@ void TraceGraphView::addTraceItem(const Trace::TracePointer& i_trace) {
   } else {
     newGraphItem = new TraceGraphItem(i_trace);
   }
+  newGraphItem->setSelected(true);
   scene()->addItem(newGraphItem);
+  return newGraphItem;
 }
 
 
 bool TraceGraphView::removeTraceItem(const Trace::TracePointer& i_trace) {
   bool hasRemoved(false);
-  TraceGraphItem* item(nullptr);
-  findItem(i_trace,
-	   item);
+  TraceGraphItem* item(findItem(i_trace));
   if (item) {
     // remove item from the scene and receive ownership
     scene()->removeItem(item);
+    if (item->getTracePointer().lock()->getTraceType() == Trace::Curve)
+      LOG_DEBUG("Removed a curve");
+    if (item->getTracePointer().lock()->getTraceType() == Trace::Line)
+      LOG_DEBUG("Removed a line");
     // delete from heap
     delete item;
     // indicate that we have deleted an item
     hasRemoved = true;
+  } else {
+    LOG_DEBUG("Trace was not found and therfor not removed");
   }
   return hasRemoved;
 }
@@ -83,7 +89,7 @@ bool TraceGraphView::replaceCurrentTrace(const Trace::TracePointer& i_newTrace) 
 
 
 void TraceGraphView::updateSelectedItem() {
-  if (TraceGraphItem* item = getSelectedTracePointer()) {
+  if (TraceGraphItem* item = getSelectedTraceGraphItem()) {
     item->updatePosition();
   } else {
     LOG_DEBUG("Could not find the item");
@@ -91,10 +97,9 @@ void TraceGraphView::updateSelectedItem() {
 }
 
 
-void TraceGraphView::setSelected(Trace::TracePointer i_trace) {
+void TraceGraphView::setSelected(const Trace::TracePointer& i_trace) {
   TraceGraphItem* item(nullptr);
-  findItem(i_trace,
-	   item);
+  item = findItem(i_trace);
   // see if the item is actually found
   if (!item) {
     return;
@@ -160,7 +165,7 @@ void TraceGraphView::drawGrid(QPainter *painter,
 }
 
 
-TraceGraphItem* TraceGraphView::getSelectedTracePointer() {
+TraceGraphItem* TraceGraphView::getSelectedTraceGraphItem() {
   QList<QGraphicsItem*> items = scene()->selectedItems();
   if (items.size() == 1) {
     if (TraceGraphItem* graphItem = dynamic_cast<TraceGraphItem*>(items[0])) {
@@ -171,22 +176,28 @@ TraceGraphItem* TraceGraphView::getSelectedTracePointer() {
 }
 
 
-void TraceGraphView::findItem(const Trace::TracePointer& i_pointer,
-			      TraceGraphItem* i_output) const {
-  i_output = nullptr;
+TraceGraphItem* TraceGraphView::
+  findItem(const Trace::TracePointer& i_pointer) const {
+  TraceGraphItem* output = nullptr;
   for (auto& qGraphicsItem : items()) {
+    LOG_DEBUG("Found an item");
     // Cast the item to a trace graph item
-    TraceGraphItem* item = dynamic_cast<TraceGraphItem*>(qGraphicsItem);
+    output = dynamic_cast<TraceGraphItem*>(qGraphicsItem);
     // Check if it worked otherwise go on
-    if (!item) {
+    if (!output) {
+      LOG_DEBUG("Item could not be cast");
       continue;
+    } else {
+      LOG_DEBUG("Item could be cast, checking if it fits");
     }
+
     // Get the underlaying trace pointer
-    Trace::TracePointer currentPointer(item->getTracePointer().lock());
+    Trace::TracePointer currentPointer(output->getTracePointer().lock());
     if ( currentPointer == i_pointer) {
       // return the item
-      i_output = item;
-      return;
+      LOG_DEBUG("Found an item and returning it");
+      return output;
     }
   }
+  return nullptr;
 }
