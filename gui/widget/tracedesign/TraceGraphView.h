@@ -33,7 +33,7 @@ class TraceGraphView : public QGraphicsView {
    * This item will be added to the scene will be set as selected
    * This function signals traceChanged(Trace::TracePointer)
    */
-  void addTraceItem(const Trace::TracePointer& i_trace);
+  TraceGraphItem* addTraceItem(const Trace::TracePointer& i_trace);
 
   /**
    * Removes a TraceGraphItem from the scene.
@@ -56,14 +56,14 @@ class TraceGraphView : public QGraphicsView {
   /**
    * Set the corrisponding TraceGraphitem as selected and update the scene
    */
-  void setSelected(Trace::TracePointer i_trace);
+  void setSelected(const Trace::TracePointer& i_trace);
 
 
   /**
    * Get the selected TraceItem if there is one, otherwise return nullptr
    * Simple function to make my life easier, life easy is important
    */
-  TraceGraphItem* getSelectedTracePointer();
+  TraceGraphItem* getSelectedTraceGraphItem();
 
  public slots:
   void updateSelectedItem();
@@ -87,11 +87,10 @@ class TraceGraphView : public QGraphicsView {
    * This function will search all the items in the scene to find a TraceGraphItem
    * which shares the managed object indicated by i_pointer
    * @param[in] i_pointer shared pointer that indicates the wanted item
-   * @param[out] i_output TraceGraphitem which displays the same managed object as the shaped pointer.
+   * @param[out] TraceGraphitem which displays the same managed object as the shaped pointer.
    * Outputs a nullptr if none can be found
    */
-  void findItem(const Trace::TracePointer& i_pointer,
-		TraceGraphItem* i_output) const;
+  TraceGraphItem* findItem(const Trace::TracePointer& i_pointer) const;
 
   /**
    * Draws a grid to the view
