@@ -13,7 +13,6 @@
 
 TraceDesignWidget::TraceDesignWidget(QWidget *parent)
     : QWidget(parent),
-      m_index(0),
       m_vector(),
       m_traceInfoWidget(nullptr),
       m_traceGraphView(nullptr) {
@@ -23,23 +22,23 @@ TraceDesignWidget::TraceDesignWidget(QWidget *parent)
 
 void TraceDesignWidget::initialise() {
   setupUi(this);
+  // create info widget and add to the design widget
   m_traceInfoWidget = new TraceInfoWidget(this);
   pointFrame->layout()->addWidget(m_traceInfoWidget);
-
-  m_vector.push_back(std::make_shared<Trace>());
-  m_index = 0;
-  m_vector[m_index]->setEndPoint(Point2D(50,10));
-  //  m_traceInfoWidget->setNewTracePointer();//m_vector[m_index]);
-
+  // Create view widget and add to design widget
   m_traceGraphView = new TraceGraphView(this);
-  m_traceGraphView->addTraceItem(m_vector[m_index]);
-
-  QLayout* layout = sceneFrame->layout();
-  if (!layout) {
+  // We do not know if there is a layout....
+  if (QLayout* layout = sceneFrame->layout()) {
+    layout->addWidget(m_traceGraphView);
+  } else {
     sceneFrame->setLayout(new QVBoxLayout);
-    layout = sceneFrame->layout();
+    sceneFrame->layout()->addWidget(m_traceGraphView);
   }
-  layout->addWidget(m_traceGraphView);
+
+  // add a single trace for debug puposes
+  addTrace(std::make_shared<Trace>());
+  m_vector[0]->setEndPoint(Point2D(50,10));
+
 
   // Connect the request new trace to replace trace
   connect(m_traceInfoWidget, SIGNAL(requestTrace(Trace::TraceType)),
@@ -51,87 +50,149 @@ void TraceDesignWidget::initialise() {
 
   // connect the scene the changed selection to the update trace from the info widget
   connect(m_traceGraphView->scene(), SIGNAL(selectionChanged()),
-          this, SLOT(updateSelectedTrace()));
+           this, SLOT(setSelectedTrace()));
 
   // connect the InfoWidget changed signal to the View widget update slot
   connect(m_traceInfoWidget, SIGNAL(tracePositionChanged()),
           m_traceGraphView, SLOT(updateSelectedItem()));
+
+  // connect the add trace button to the add trace slots
+  connect(addCurveButton,SIGNAL(clicked()),
+          this, SLOT(addTraceFromButton()));
+  connect(addLineButton,SIGNAL(clicked()),
+          this, SLOT(addTraceFromButton()));
 }
 
 
 void TraceDesignWidget::replaceTrace(Trace::TraceType i_type) {
   LOG_DEBUG("Replacing the trace");
-
+  // this will be the new trace pointer
   Trace::TracePointer tracePointer;
+
+  // Create one with the correct type
   if(i_type == Trace::Line) {
     tracePointer = std::make_shared<Trace>();
   } else if (i_type == Trace::Curve) {
     tracePointer = std::make_shared<RotationTrace>();
   } else {
-    LOG_ERROR("Trace is bad");
+    LOG_ERROR("Trace type is unknown!");
   }
-
-  tracePointer->setStartPoint(m_vector[m_index]->getStartPoint());
-  tracePointer->setEndPoint(m_vector[m_index]->getEndPoint());
-  TraceGraphItem* newGraphItem;
+  // get the Trace::TracePointer from the vector
+  int currentIndex = getSelectedIndex();
+  if (currentIndex == m_vector.size()) {
+    LOG_ERROR("did not find a selected item!");
+  }
+  // set the right start and stop point
+  tracePointer->setStartPoint(m_vector[currentIndex]->getStartPoint());
+  tracePointer->setEndPoint(m_vector[currentIndex]->getEndPoint());
+  // Add the center point if it is a RotationTrace
   if (i_type == Trace::Curve) {
-    // this will be the new center point.
-    Point2D centerPoint;
     RotationTrace::RotationTracePointer rotationTrace =
       std::dynamic_pointer_cast<RotationTrace>(tracePointer);
     assert(rotationTrace);
-    if (auto currentRotationTrace = std::dynamic_pointer_cast<RotationTrace>(m_vector[m_index])) {
+    // this will be the new center point.
+    Point2D centerPoint;
+    if (auto currentRotationTrace =
+        std::dynamic_pointer_cast<RotationTrace>(m_vector[currentIndex])) {
       // it is a rotation trace, use that point
       centerPoint = currentRotationTrace->getCentrePoint();
     } else {
       //Suggest one
-      centerPoint = RotationTrace::suggestCentralPoint(tracePointer->getStartPoint(),
-                                                       tracePointer->getEndPoint());
+      centerPoint =
+        RotationTrace::suggestCentralPoint(tracePointer->getStartPoint(),
+                                           tracePointer->getEndPoint());
     }
-    // For some reason we need to test the dynamic cast
     rotationTrace->setCentrePoint(centerPoint);
-    newGraphItem = new RotationTraceGraphItem(rotationTrace);
-  } else {
-    newGraphItem = new TraceGraphItem(tracePointer);
   }
-  // swap the old with the new
-  m_vector[m_index].swap(tracePointer);
-
-  // update the info widget to show the new info
-  m_traceInfoWidget->setNewTracePointer(m_vector[m_index]);
-
-
-  QList<QGraphicsItem*> list =  m_traceGraphView->scene()->selectedItems();
-  TraceGraphItem* currentItem;
-  if(list.size() != 1) {
-    currentItem = dynamic_cast<TraceGraphItem*>(m_traceGraphView->scene()->items()[0]);
-    LOG_INFO("BooBo!!");
-  } else {
-    currentItem = dynamic_cast<TraceGraphItem*>(list[0]);
-  }
-  m_traceGraphView->scene()->removeItem(currentItem);
-  delete currentItem;
-  m_traceGraphView->scene()->addItem(newGraphItem);
-  newGraphItem->update();
-  //  m_traceGraphView->scene()->update();
-
-  LOG_DEBUG("Number of shared pointers to current trace: " << m_vector[m_index].use_count());
+  LOG_DEBUG("Current index : " << currentIndex);
+  removeTrace(m_vector[currentIndex]);
+  // remove the item from the view
+  addTrace(tracePointer);
+  //  LOG_DEBUG("Number of shared pointers to current trace: " << m_vector[currentIndex].use_count());
   LOG_DEBUG("The swaped is still hold by: " << tracePointer.use_count());
+  LOG_DEBUG("Length of the vector is: " << m_vector.size());
 }
 
 
-void TraceDesignWidget::setCurrentIndex(const int& i_newIndex) {
-  m_index = i_newIndex;
-}
-
-
-
-void TraceDesignWidget::updateSelectedTrace() {
-  TraceGraphItem* item = m_traceGraphView->getSelectedTracePointer();
+void TraceDesignWidget::setSelectedTrace() {
+  TraceGraphItem* item = m_traceGraphView->getSelectedTraceGraphItem();
   if (item) {
     m_traceInfoWidget->setNewTracePointer(item->getTracePointer());
   } else {
     m_traceInfoWidget->setNewTracePointer(nullptr);
   }
+}
 
+
+int TraceDesignWidget::getSelectedIndex() const {
+  // create an empty Trace:TracePointer
+  Trace::TracePointer currentTracePointer(nullptr);
+  // if we can get the current selected TraceGraphItem
+  if (TraceGraphItem* currentTraceItem =
+      m_traceGraphView->getSelectedTraceGraphItem()) {
+    // get its Trace::TracePointer
+    Trace::TracePointer itemPointer = currentTraceItem->
+      getTracePointer().lock();
+    // search that pointer in the vector
+    auto vectorIterator = std::find(m_vector.begin(),
+                                    m_vector.end(),
+                                    itemPointer);
+    // if it is not found at the end of the vector
+    if (vectorIterator != m_vector.end()) {
+      return std::distance(m_vector.begin(), vectorIterator);
+    } else {
+      return m_vector.size();
+    }
+  }
+  return m_vector.size();
+}
+
+
+void TraceDesignWidget::addTraceFromButton() {
+  Trace::TracePointer newTrace;
+
+  // use sender to check which button was pressed
+  if (sender() == addLineButton) {
+    newTrace = std::make_shared<Trace>(Point2D(0,0),
+                                       Point2D(10,10));
+  } else if (sender() == addCurveButton) {
+    newTrace = std::make_shared<RotationTrace>(Point2D(-10,0),
+                                               Point2D(10,0),
+                                               Point2D(0,0));
+  } else {
+    LOG_DEBUG("Sender did not return a known button!");
+  }
+  addTrace(newTrace);
+}
+
+
+void TraceDesignWidget::addTrace(Trace::TracePointer newTrace) {
+ // push the new trace to the vector
+  m_vector.push_back(newTrace);
+  // make a new trace graph item and push it to the view
+  TraceGraphItem* item = m_traceGraphView->addTraceItem(newTrace);
+  setSelectedTrace();
+  LOG_DEBUG("Bad thingy: " << item);
+  //  connect(item, SIGNAL(removeThis(Trace::TracePointer),
+  //                   this, SLOT(removeTrace(Trace::TracePointer);
+}
+
+
+void TraceDesignWidget::removeTrace(Trace::TracePointer i_pointer) {
+  auto vectorIterator = std::find(m_vector.begin(),
+                                  m_vector.end(),
+                                  i_pointer);
+  if (vectorIterator == m_vector.end()) {
+    return;
+  }
+  if (i_pointer->getTraceType()==Trace::Curve)
+    LOG_DEBUG("Trying to remove a curve");
+  else
+    LOG_DEBUG("Trying to remove a line");
+  // remove the item from the view
+  m_traceGraphView->removeTraceItem(i_pointer);
+  // remove the item from the info widget
+  m_traceInfoWidget->setNewTracePointer(nullptr);
+  // remove the item from the vector
+  m_vector.erase(vectorIterator);
 }

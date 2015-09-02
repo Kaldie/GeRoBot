@@ -12,7 +12,6 @@ class TraceGraphView;
 
 class TraceDesignWidget: public QWidget, private Ui::TraceDesignWidget {
     Q_OBJECT
-    GETSET(int, m_index, Index);
     GETSET(TraceListIO::TracePointerVector, m_vector, Vector);  // Vector which hold the traces
 
  public:
@@ -20,17 +19,28 @@ class TraceDesignWidget: public QWidget, private Ui::TraceDesignWidget {
     explicit TraceDesignWidget(QWidget* parent = 0);
 
  public slots:
+   void addTrace(Trace::TracePointer);
+   void removeTrace(Trace::TracePointer);
    void replaceTrace(Trace::TraceType);
-   void setCurrentIndex(const int& i_index);
-
 
  private:
-    void initialise();
-    TraceInfoWidget* m_traceInfoWidget;
-    TraceGraphView* m_traceGraphView;
+   /**
+    * Set up the gui and creat an example trace for show and debugging purposes
+    */
+   void initialise();
+   /// The infowidget
+   TraceInfoWidget* m_traceInfoWidget;
+   /// The view widget
+   TraceGraphView* m_traceGraphView;
+
+   /**
+    * Get the same Trace::TracePointer as selected in the view
+    */
+    int getSelectedIndex() const;
 
  private slots:
-   void updateSelectedTrace();
+   void setSelectedTrace();
+   void addTraceFromButton();
 
 };
 
