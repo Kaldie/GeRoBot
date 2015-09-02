@@ -104,6 +104,7 @@ void TraceGraphView::setSelected(const Trace::TracePointer& i_trace) {
   if (!item) {
     return;
   }
+  scene()->clearSelection();
   item->setSelected(true);
 }
 

@@ -6,6 +6,9 @@
 #include <RotationTrace.h>
 #include "./TraceGraphItem.h"
 
+const QString TraceGraphItem::RemoveTraceActionText("Remove Trace");
+const QString TraceGraphItem::ConvertToLineActionText("Convert to Line");
+const QString TraceGraphItem::ConvertToCurveActionText("Convert to Curve");
 
 TraceGraphItem::TraceGraphItem(Trace::TracePointer i_trace /*= 0*/)
    : m_isSelected(true), m_trace(i_trace) {
@@ -59,7 +62,7 @@ void TraceGraphItem::paint(QPainter *painter,
       pen.setWidth(1);
       painter->setPen(pen);
       //      for (auto x: m_editPoints) {
-         //         x.setHide(true);
+      //         x.setHide(true);
       //      }
    }
    //   painter->drawEllipse(0,0,10,10);
@@ -79,10 +82,10 @@ QRectF TraceGraphItem::boundingRect() const {
                -1 * (trace->getEndPoint().y - trace->getStartPoint().y));
    QPointF minPoint;
    QPointF maxPoint;
-      minPoint.setX(std::min(start.x(), end.x()));
-      minPoint.setY(std::min(start.y(), end.y()));
-      maxPoint.setX(std::max(start.x(), end.x()));
-      maxPoint.setY(std::max(start.y(), end.y()));
+   minPoint.setX(std::min(start.x(), end.x()));
+   minPoint.setY(std::min(start.y(), end.y()));
+   maxPoint.setX(std::max(start.x(), end.x()));
+   maxPoint.setY(std::max(start.y(), end.y()));
    QPointF adjust(2,2);
    return QRectF(minPoint - adjust,
                  maxPoint + adjust);
@@ -96,12 +99,12 @@ QPainterPath TraceGraphItem::shape() const {
    }
 
    QPainterPath path;
-      LOG_DEBUG("Paint trace line!");
-      QPointF start(0, 0);
-      QPointF end(trace->getEndPoint().x - trace->getStartPoint().x,
-                  -trace->getEndPoint().y - -trace->getStartPoint().y);
-      path.moveTo(start);
-      path.lineTo(end);
+   LOG_DEBUG("Paint trace line!");
+   QPointF start(0, 0);
+   QPointF end(trace->getEndPoint().x - trace->getStartPoint().x,
+               -trace->getEndPoint().y - -trace->getStartPoint().y);
+   path.moveTo(start);
+   path.lineTo(end);
    return path;
 }
 
@@ -131,14 +134,28 @@ QVariant TraceGraphItem::itemChange(GraphicsItemChange change, const QVariant &v
 
 
 
-  void TraceGraphItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event) {
-  QMenu *menu = new QMenu;
-  menu->addAction("Action 2");
-  menu->popup(event->screenPos());
-  //  connect(menu, SIGNAL(triggered(QAction *)),
-  //      this, SLOT(triggered(QAction *)));
-  menu->popup(event->screenPos());
-  //connect(pasteAct, SIGNAL(triggered()), this, SLOT(paste()));
+void TraceGraphItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event) {
+   QMenu *menu = new QMenu;
+   // add removal of traces
+   menu->addAction(TraceGraphItem::RemoveTraceActionText,
+                   this, SLOT(handleTrigger()), QKeySequence::Delete);
+
+   // add conversion of trace to the oppisite site
+   if (m_trace.lock()->getTraceType() == Trace::Curve) {
+      menu->addAction(TraceGraphItem::ConvertToLineActionText,
+                      this, SLOT(handleTrigger()));
+   } else if (m_trace.lock()->getTraceType() == Trace::Line) {
+      menu->addAction(TraceGraphItem::ConvertToCurveActionText,
+                      this, SLOT(handleTrigger()));
+   } else {
+      LOG_ERROR("Unknown trace type");
+   }
+
+   menu->popup(event->screenPos());
+   //  connect(menu, SIGNAL(triggered(QAction *)),
+   //      this, SLOT(triggered(QAction *)));
+   //  menu->popup(event->screenPos());
+   //connect(pasteAct, SIGNAL(triggered()), this, SLOT(paste()));
 }
 
 
@@ -151,5 +168,27 @@ void TraceGraphItem::updatePosition() {
       }
       update();
       scene()->update();
+   }
+}
+
+
+void TraceGraphItem::handleTrigger() {
+   QAction* action = dynamic_cast<QAction*>(sender());
+   LOG_DEBUG("menu says hi");
+   if (!action) {
+      LOG_ERROR("Action is not resolved. Do not call this function directly.");
+   }
+   if (action->text() == TraceGraphItem::RemoveTraceActionText) {
+      LOG_DEBUG("Emit signal to make this trace be removed");
+      //      scene()->setSelected(m_trace.lock());
+      emit removeThisTrace(m_trace.lock());
+   } else if (action->text() == TraceGraphItem::ConvertToLineActionText) {
+      LOG_DEBUG("Emit signal to make convert this trace");
+      emit convertThisTrace(m_trace.lock(), Trace::Line);
+   } else if (action->text() == TraceGraphItem::ConvertToCurveActionText) {
+      LOG_DEBUG("Emit signal to make convert this trace");
+      emit convertThisTrace(m_trace.lock(), Trace::Curve);
+   } else {
+      LOG_ERROR("Action: '" << action->text().toStdString() << "' is not resolved!");
    }
 }

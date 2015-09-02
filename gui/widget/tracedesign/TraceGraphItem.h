@@ -39,15 +39,21 @@ class TraceGraphItem : public QGraphicsObject {
                       QWidget *widget) Q_DECL_OVERRIDE;
    void updatePosition();
 
+ signals:
+   void removeThisTrace(Trace::TracePointer);
+   void convertThisTrace(Trace::TracePointer, Trace::TraceType);
+
  protected:
    virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) Q_DECL_OVERRIDE;
    void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) Q_DECL_OVERRIDE;
 
- private:
-   //   QList<Edge *> edgeList;
-   // signals:
-   //   void removeThis(Trace::TracePointer);
+ private slots:
+    void handleTrigger();
 
+ private:
+    static const QString RemoveTraceActionText;
+    static const QString ConvertToLineActionText;
+    static const QString ConvertToCurveActionText;
 };
 
 #endif // GUI_WIDGET_TRACE_TRACEGRAPHITEM
