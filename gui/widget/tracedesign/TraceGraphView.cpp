@@ -6,6 +6,8 @@
 #include <QPen>
 #include "./TraceGraphView.h"
 #include "./RotationTraceGraphItem.h"
+#include "./TraceGraphPoint.h"
+
 
 const double TraceGraphView::LegendRatio = 0.2;
 const int TraceGraphView::OptimalNumberOfLines = 1250;
@@ -167,11 +169,20 @@ void TraceGraphView::drawGrid(QPainter *painter,
 
 
 TraceGraphItem* TraceGraphView::getSelectedTraceGraphItem() {
-  QList<QGraphicsItem*> items = scene()->selectedItems();
-  if (items.size() == 1) {
-    if (TraceGraphItem* graphItem = dynamic_cast<TraceGraphItem*>(items[0])) {
-        return graphItem;
+  QList<TraceGraphItem*> traceItems;
+  for (auto& item : scene()->selectedItems()) {
+    if (TraceGraphItem* newTraceItem = dynamic_cast<TraceGraphItem*>(item)) {
+      traceItems.append(newTraceItem);
+    } else if (TraceGraphPoint* newTracePoint = dynamic_cast<TraceGraphPoint*>(item)) {
+      TraceGraphItem* parent = static_cast<TraceGraphItem*>(newTracePoint->parentItem());
+      if (!traceItems.contains(parent)) {
+        traceItems.append(parent);
       }
+    }
+  }
+
+  if (traceItems.size() == 1) {
+    return traceItems[0];
   }
   return nullptr;
 }

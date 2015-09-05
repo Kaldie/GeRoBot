@@ -4,14 +4,13 @@
 #include <QGraphicsObject>
 #include <QList>
 #include <Trace.h>
+
 class TraceGraphEditPoint;
 class GraphWidget;
 class QGraphicsSceneMouseEvent;
 
 class TraceGraphItem : public QGraphicsObject {
    Q_OBJECT
-   //   GETSET(QList<TraceGraphEditPoint*>, m_editPoints, EditPoints);
-   GETSET(bool, m_isSelected, isSelected);
    GETSET(Trace::WeakTracePointer, m_trace, TracePointer);
 
  public:

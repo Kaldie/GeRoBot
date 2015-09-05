@@ -8,7 +8,7 @@
 
 RotationTraceGraphItem::RotationTraceGraphItem(Trace::TracePointer i_trace /*= 0*/)
   : TraceGraphItem(i_trace) {
-   // todo setPos at the start point
+   LOG_DEBUG("Constructing a Rotation trace!");   // todo setPos at the start point
 }
 
 

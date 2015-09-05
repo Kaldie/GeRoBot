@@ -5,13 +5,14 @@
 #include <QtWidgets>
 #include <RotationTrace.h>
 #include "./TraceGraphItem.h"
+#include "./TraceGraphPoint.h"
 
 const QString TraceGraphItem::RemoveTraceActionText("Remove Trace");
 const QString TraceGraphItem::ConvertToLineActionText("Convert to Line");
 const QString TraceGraphItem::ConvertToCurveActionText("Convert to Curve");
 
 TraceGraphItem::TraceGraphItem(Trace::TracePointer i_trace /*= 0*/)
-   : m_isSelected(true), m_trace(i_trace) {
+   : m_trace(i_trace) {
    setFlag(QGraphicsItem::ItemIsSelectable);
    setFlag(QGraphicsItem::ItemIsMovable);
    setFlag(QGraphicsItem::ItemSendsGeometryChanges);
@@ -21,6 +22,8 @@ TraceGraphItem::TraceGraphItem(Trace::TracePointer i_trace /*= 0*/)
       LOG_DEBUG("Trace is not valid!");
    else
       setPos(i_trace->getStartPoint());
+   new TraceGraphPoint(this,TraceGraphPoint::StartPoint);
+   new TraceGraphPoint(this,TraceGraphPoint::EndPoint);
    // todo setPos at the start point
 }
 
@@ -29,11 +32,6 @@ void TraceGraphItem::setTrace(const Trace::TracePointer& i_trace){
    m_trace = i_trace;
    setPos(i_trace->getStartPoint());
 }
-
-
-//void TraceGraphItem::addEditPoint(Edge* i_editPoint) {
-//   m_editPoints.addItem(i_editPoint);
-//}
 
 
 void TraceGraphItem::paint(QPainter *painter,
@@ -53,21 +51,22 @@ void TraceGraphItem::paint(QPainter *painter,
    if (isSelected()) {
       LOG_DEBUG("Make magic!!");
       pen.setColor(Qt::red);
+      pen.setWidth(2);
       painter->setPen(pen);
-      //      for (auto x: m_editPoints) {
-      // x.setHide(false);
-      // x.update();
-      //      }
+      for (auto x: childItems()) {
+         LOG_DEBUG("updating a point item");
+         x->show();
+      }
    } else {
       pen.setWidth(1);
       painter->setPen(pen);
-      //      for (auto x: m_editPoints) {
-      //         x.setHide(true);
-      //      }
+      for (auto x: childItems()) {
+         //         x->setVisible(false);
+      }
    }
    //   painter->drawEllipse(0,0,10,10);
    painter->drawPath(shape());
-   painter->drawRect(boundingRect());
+   //   painter->drawRect(boundingRect());
 }
 
 
@@ -129,6 +128,15 @@ QVariant TraceGraphItem::itemChange(GraphicsItemChange change, const QVariant &v
    prepareGeometryChange();
    trace->setEndPoint(endPoint);
    trace->setStartPoint(newStartPoint);
+
+   for (auto& x : childItems()) {
+      TraceGraphPoint* point = dynamic_cast<TraceGraphPoint*>(x);
+      if (point) {
+         LOG_DEBUG("updateing the point from the item");
+         point->updatePositionOnScene();
+      }
+   }
+
    return QGraphicsItem::itemChange(change, value);
 }
 
@@ -167,7 +175,6 @@ void TraceGraphItem::updatePosition() {
          setPos(trace->getStartPoint());
       }
       update();
-      scene()->update();
    }
 }
 

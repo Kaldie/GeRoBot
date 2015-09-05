@@ -1,0 +1,1152 @@
+[DEBUG] (JointController.cpp:12): yay2
+[DEBUG] (XMLBuilder.cpp:47): showing tree!
+[INFO] (XMLBuilder.cpp:50): Load result: No error
+[DEBUG] (RobotIO.cpp:16): Building a robot from file name: /home/ruud/project/gerobot/gui/defaultRobot.xml
+[DEBUG] (RobotIO.cpp:17): Root node is: ROBOTBUILDER
+[DEBUG] (XMLBuilder.cpp:71): JOINTCONTROLLER
+[DEBUG] (JointController.cpp:12): yay2
+[DEBUG] (JointControllerIO.cpp:122): Creating a JointControllerIO with node: JOINTCONTROLLER
+[DEBUG] (JointControllerIO.cpp:6): Building a Joint controller!
+[DEBUG] (JointControllerIO.cpp:8): Joint controller node: JOINTCONTROLLER
+[DEBUG] (JointControllerIO.cpp:20): Adding Joints
+[DEBUG] (XMLBuilder.cpp:71): JOINT
+[DEBUG] (JointControllerIO.cpp:26): JOINT
+[DEBUG] (JointControllerIO.cpp:30): adding a joint!!
+[DEBUG] (JointIO.cpp:11): Building a joint
+[DEBUG] (JointIO.cpp:71): Joint Build is finshed!
+[DEBUG] (JointIO.cpp:19): Found 1
+[DEBUG] (XMLBuilder.cpp:71): MOVEMENT_TYPE
+[DEBUG] (JointIO.cpp:27): Building a rotational joint!
+[INFO] (PinState.cpp:34): Setting: 2 to: 1
+[INFO] (PinState.cpp:34): Setting: 3 to: 1
+[INFO] (PinState.cpp:34): Setting: 4 to: 1
+[INFO] (PinState.cpp:34): Setting: 2 to: 1
+[INFO] (PinState.cpp:34): Setting: 3 to: 1
+[INFO] (PinState.cpp:34): Setting: 4 to: 1
+[DEBUG] (XMLBuilder.cpp:71): MOVEMENT_PER_STEP
+[DEBUG] (XMLBuilder.cpp:71): DEFAULT_POSITION
+[DEBUG] (JointIO.cpp:42): Joint type: 1
+[DEBUG] (JointIO.cpp:43): Default position: 90
+[DEBUG] (XMLBuilder.cpp:71): ACTUATOR
+[INFO] (PinState.cpp:34): Setting: 2 to: 1
+[INFO] (PinState.cpp:34): Setting: 3 to: 1
+[INFO] (PinState.cpp:34): Setting: 4 to: 1
+[DEBUG] (StepperDriverIO.cpp:6): Buildiing a stepperdriver!
+[DEBUG] (XMLBuilder.cpp:97): Value: 5
+[DEBUG] (XMLBuilder.cpp:97): Value: 6
+[DEBUG] (XMLBuilder.cpp:97): Value: 7
+[INFO] (PinState.cpp:34): Setting: 5 to: 1
+[INFO] (PinState.cpp:34): Setting: 6 to: 1
+[INFO] (PinState.cpp:34): Setting: 7 to: 1
+[DEBUG] (XMLBuilder.cpp:71): DEFAULT_DIRECTION
+[DEBUG] (StepperDriverIO.cpp:18): Default direction is: CCW
+[DEBUG] (XMLBuilder.cpp:71): HOLD_MOTOR
+[DEBUG] (StepperDriverIO.cpp:20): Hold motor: 1
+[DEBUG] (XMLBuilder.cpp:28): No document to be deleted!
+[DEBUG] (XMLBuilder.cpp:97): Value: 0
+[DEBUG] (XMLBuilder.cpp:97): Value: 185
+[DEBUG] (XMLBuilder.cpp:97): Value: CW,CCW
+[DEBUG] (XMLBuilder.cpp:97): Value: CCW,CW
+[DEBUG] (JointIO.cpp:61): Direction CW will be converted to CCW
+[DEBUG] (JointIO.cpp:61): Direction CCW will be converted to CW
+[DEBUG] (JointIO.cpp:69): Construction of the pointer is finished!
+[DEBUG] (JointIO.cpp:71): Joint Build is finshed!
+[DEBUG] (JointController.cpp:97): Resetting pin state sequence
+[INFO] (JointController.cpp:98): Current size: 1
+[DEBUG] (SequenceVector.cpp:22): Printing number of sequences!0
+[DEBUG] (XMLBuilder.cpp:28): No document to be deleted!
+[DEBUG] (JointControllerIO.cpp:26): JOINT
+[DEBUG] (JointControllerIO.cpp:30): adding a joint!!
+[DEBUG] (JointIO.cpp:11): Building a joint
+[DEBUG] (JointIO.cpp:71): Joint Build is finshed!
+[DEBUG] (JointIO.cpp:19): Found 1
+[DEBUG] (XMLBuilder.cpp:71): MOVEMENT_TYPE
+[DEBUG] (JointIO.cpp:31): Building a translational joint!
+[INFO] (PinState.cpp:34): Setting: 2 to: 1
+[INFO] (PinState.cpp:34): Setting: 3 to: 1
+[INFO] (PinState.cpp:34): Setting: 4 to: 1
+[INFO] (PinState.cpp:34): Setting: 2 to: 1
+[INFO] (PinState.cpp:34): Setting: 3 to: 1
+[INFO] (PinState.cpp:34): Setting: 4 to: 1
+[INFO] (../../include/TranslationalJoint.h:135): movement per step 1: 0.01
+[INFO] (../../include/TranslationalJoint.h:136): movement per step 1: 0.01
+[DEBUG] (XMLBuilder.cpp:71): MOVEMENT_PER_STEP
+[DEBUG] (XMLBuilder.cpp:71): DEFAULT_POSITION
+[DEBUG] (JointIO.cpp:42): Joint type: 2
+[DEBUG] (JointIO.cpp:43): Default position: 50
+[DEBUG] (XMLBuilder.cpp:71): ACTUATOR
+[INFO] (PinState.cpp:34): Setting: 2 to: 1
+[INFO] (PinState.cpp:34): Setting: 3 to: 1
+[INFO] (PinState.cpp:34): Setting: 4 to: 1
+[DEBUG] (StepperDriverIO.cpp:6): Buildiing a stepperdriver!
+[DEBUG] (XMLBuilder.cpp:97): Value: 2
+[DEBUG] (XMLBuilder.cpp:97): Value: 3
+[DEBUG] (XMLBuilder.cpp:97): Value: 4
+[INFO] (PinState.cpp:34): Setting: 2 to: 1
+[INFO] (PinState.cpp:34): Setting: 3 to: 1
+[INFO] (PinState.cpp:34): Setting: 4 to: 1
+[DEBUG] (XMLBuilder.cpp:71): DEFAULT_DIRECTION
+[DEBUG] (StepperDriverIO.cpp:18): Default direction is: CCW
+[DEBUG] (XMLBuilder.cpp:71): HOLD_MOTOR
+[DEBUG] (StepperDriverIO.cpp:20): Hold motor: 1
+[DEBUG] (XMLBuilder.cpp:28): No document to be deleted!
+[DEBUG] (XMLBuilder.cpp:97): Value: 50
+[DEBUG] (XMLBuilder.cpp:97): Value: 1000
+[DEBUG] (XMLBuilder.cpp:97): Value: IN,CCW
+[DEBUG] (XMLBuilder.cpp:97): Value: OUT,CW
+[DEBUG] (JointIO.cpp:61): Direction IN will be converted to CCW
+[DEBUG] (JointIO.cpp:61): Direction OUT will be converted to CW
+[DEBUG] (JointIO.cpp:69): Construction of the pointer is finished!
+[DEBUG] (JointIO.cpp:71): Joint Build is finshed!
+[DEBUG] (JointController.cpp:97): Resetting pin state sequence
+[INFO] (JointController.cpp:98): Current size: 2
+[DEBUG] (SequenceVector.cpp:22): Printing number of sequences!0
+[DEBUG] (XMLBuilder.cpp:28): No document to be deleted!
+[DEBUG] (XMLBuilder.cpp:71): ACTUATOR
+[DEBUG] (XMLBuilder.cpp:71): TYPE
+[DEBUG] (XMLBuilder.cpp:71): REGULAR_EXPRESSION
+[DEBUG] (JointControllerIO.cpp:53): Serial port regular expression is: /dev/ttyUSB*
+[DEBUG] (JointControllerIO.cpp:14): Joint controller node: JOINTCONTROLLER
+[DEBUG] (XMLBuilder.cpp:28): No document to be deleted!
+[DEBUG] (../../core/BasePropertyItem.cpp:8): root
+[DEBUG] (../../core/RobotItem.cpp:15): Robot
+[DEBUG] (../../core/BasePropertyItem.cpp:8): Speed
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/BasePropertyItem.cpp:8): CurrentPositionX
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/BasePropertyItem.cpp:8): CurrentPositionY
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/RobotItem.cpp:73): Property childeren are sucessfully created
+[DEBUG] (../../core/RobotItem.cpp:77): Adding new Joint controller!
+[DEBUG] (../../core/JointControllerItem.cpp:13): JointController
+[DEBUG] (../../core/JointControllerItem.cpp:28): Insert a join child
+[DEBUG] (../../core/JointControllerItem.cpp:29): 90
+[DEBUG] (../../core/BaseJointItem.cpp:13): BaseJoint
+[DEBUG] (../../core/BaseJointItem.cpp:15): Current position: 90
+[DEBUG] (../../core/BaseJointItem.cpp:116): Add base motor child
+[DEBUG] (../../core/BaseMotorItem.cpp:12): BaseMotor
+[DEBUG] (../../core/BaseMotorItem.cpp:65): Create pin state and add to child!
+[DEBUG] (../../core/PinStateItem.cpp:12): PinState
+[DEBUG] (../../core/BasePropertyItem.cpp:8): NumericValue
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/PinStateItem.cpp:71): 5
+[DEBUG] (../../core/BasePropertyItem.cpp:8): 5
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/PinStateItem.cpp:71): 6
+[DEBUG] (../../core/BasePropertyItem.cpp:8): 6
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/PinStateItem.cpp:71): 7
+[DEBUG] (../../core/BasePropertyItem.cpp:8): 7
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/BasePropertyItem.cpp:8): DefaultDirection
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/BasePropertyItem.cpp:8): HoldMotor
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/BasePropertyItem.cpp:8): Position
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/BasePropertyItem.cpp:8): MovementPerStep
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/BasePropertyItem.cpp:8): LowerRange
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/BasePropertyItem.cpp:8): UpperRange
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/BasePropertyItem.cpp:8): MovementType
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/JointControllerItem.cpp:28): Insert a join child
+[DEBUG] (../../core/JointControllerItem.cpp:29): 50
+[DEBUG] (../../core/BaseJointItem.cpp:13): BaseJoint
+[DEBUG] (../../core/BaseJointItem.cpp:15): Current position: 50
+[DEBUG] (../../core/BaseJointItem.cpp:116): Add base motor child
+[DEBUG] (../../core/BaseMotorItem.cpp:12): BaseMotor
+[DEBUG] (../../core/BaseMotorItem.cpp:65): Create pin state and add to child!
+[DEBUG] (../../core/PinStateItem.cpp:12): PinState
+[DEBUG] (../../core/BasePropertyItem.cpp:8): NumericValue
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/PinStateItem.cpp:71): 2
+[DEBUG] (../../core/BasePropertyItem.cpp:8): 2
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/PinStateItem.cpp:71): 3
+[DEBUG] (../../core/BasePropertyItem.cpp:8): 3
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/PinStateItem.cpp:71): 4
+[DEBUG] (../../core/BasePropertyItem.cpp:8): 4
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/BasePropertyItem.cpp:8): DefaultDirection
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/BasePropertyItem.cpp:8): HoldMotor
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/BasePropertyItem.cpp:8): Position
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/BasePropertyItem.cpp:8): MovementPerStep
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/BasePropertyItem.cpp:8): LowerRange
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/BasePropertyItem.cpp:8): UpperRange
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/BasePropertyItem.cpp:8): MovementType
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/JointControllerItem.cpp:46): Add Arduino Actuator
+[DEBUG] (../../core/BaseActuatorItem.cpp:13): BaseActuatorItem
+[DEBUG] (../../core/BasePropertyItem.cpp:8): SerialRegularExpression
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/BasePropertyItem.cpp:8): ReducedSpeed
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/BasePropertyItem.cpp:8): BufferSize
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/BaseRobotItem.cpp:104): Insert child
+[DEBUG] (../../core/RobotTreeModel.cpp:18): 0
+[DEBUG] (../../widget/RobotMovementWidget.cpp:162): Updating Simulation and Actuation Radio buttons!
+[DEBUG] (../../widget/RobotMovementWidget.cpp:175): Found robot pointer!
+[DEBUG] (../../widget/RobotMovementWidget.cpp:162): Updating Simulation and Actuation Radio buttons!
+[DEBUG] (../../widget/RobotMovementWidget.cpp:175): Found robot pointer!
+[DEBUG] (../../widget/RobotMovementWidget.cpp:162): Updating Simulation and Actuation Radio buttons!
+[DEBUG] (../../widget/RobotMovementWidget.cpp:175): Found robot pointer!
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:39): Pointer is invalid.
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:39): Pointer is invalid.
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:39): Pointer is invalid.
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:77): Updating widget to show the info!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:84): No pointer set. Set points to nullptr
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:39): Pointer is invalid.
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:39): Pointer is invalid.
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:39): Pointer is invalid.
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:20): Constructing iteme
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:22): Constructing a TraceGraphPoint
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:76): Updating the position on the scene of this Point
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:22): Constructing a TraceGraphPoint
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:76): Updating the position on the scene of this Point
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:84): Update end point
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:110): Update trace position based on the current position of the point in the scene
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:122): Previouse end pos() : 0 , 0
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:123): New end pos() : 50 , -10
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:77): Updating widget to show the info!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:102): Getting points now!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:107): Emit startPoint has new position
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:52): Write: 0 in x line edit
+[DEBUG] (../../widget/Point2DWidget.cpp:59): Write: 0 in y line edit
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:52): Write: 50 in x line edit
+[DEBUG] (../../widget/Point2DWidget.cpp:59): Write: 10 in y line edit
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:39): Pointer is invalid.
+[DEBUG] (../../widget/tracedesign/TraceDesignWidget.cpp:125): Bad thingy: 0x1435f20
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:77): Updating widget to show the info!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:102): Getting points now!
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:39): Pointer is invalid.
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:122): Size of background rect: 364 , 379
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:124): Size of scene rect: 57 , 17
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:126): Size of scene rect: 366 , 381
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:141): Draw grid!
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:142): -157 , -194
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:143): 207 , 185
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:144): -157 , -194
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:145): 207 , 185
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:42): Painting a item.
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:52): Make magic!!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:57): updating a point item
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:57): updating a point item
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:101): Paint trace line!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:30): Paint an Point
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:30): Paint an Point
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:122): Size of background rect: 364 , 379
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:124): Size of scene rect: 57 , 17
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:126): Size of scene rect: 366 , 381
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:141): Draw grid!
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:142): -157 , -194
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:143): 207 , 185
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:144): -157 , -194
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:145): 207 , 185
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:42): Painting a item.
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:52): Make magic!!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:57): updating a point item
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:57): updating a point item
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:101): Paint trace line!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:101): Paint trace line!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:101): Paint trace line!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:101): Paint trace line!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:101): Paint trace line!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:101): Paint trace line!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:101): Paint trace line!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:101): Paint trace line!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:101): Paint trace line!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:101): Paint trace line!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:101): Paint trace line!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:101): Paint trace line!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:101): Paint trace line!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:77): Updating widget to show the info!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:102): Getting points now!
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:39): Pointer is invalid.
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:77): Updating widget to show the info!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:102): Getting points now!
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:39): Pointer is invalid.
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:122): Size of background rect: 60 , 20
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:124): Size of scene rect: 57 , 17
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:126): Size of scene rect: 366 , 381
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:141): Draw grid!
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:142): -6 , -14
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:143): 54 , 6
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:144): -6 , -14
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:145): 54 , 6
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:42): Painting a item.
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:101): Paint trace line!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:30): Paint an Point
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:77): Updating widget to show the info!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:102): Getting points now!
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:39): Pointer is invalid.
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:110): Update trace position based on the current position of the point in the scene
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:113): adjustedment : -3 , 4
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:121): Update start and stop position of the trace!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:123): New pos: 97, -16
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:127): New end pos: 50, 10
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:135): updateing the point from the item
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:76): Updating the position on the scene of this Point
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:135): updateing the point from the item
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:76): Updating the position on the scene of this Point
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:84): Update end point
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:110): Update trace position based on the current position of the point in the scene
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:122): Previouse end pos() : 50 , -10
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:123): New end pos() : -47 , 6
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:77): Updating widget to show the info!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:102): Getting points now!
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:52): Write: 97 in x line edit
+[DEBUG] (../../widget/Point2DWidget.cpp:59): Write: 16 in y line edit
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:39): Pointer is invalid.
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:122): Size of background rect: 364 , 379
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:124): Size of scene rect: 102.5 , 21.5
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:126): Size of scene rect: 366 , 381
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:141): Draw grid!
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:142): -134 , -196
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:143): 230 , 183
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:144): -134 , -196
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:145): 230 , 183
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:42): Painting a item.
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:101): Paint trace line!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:110): Update trace position based on the current position of the point in the scene
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:113): adjustedment : 16 , 5
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:121): Update start and stop position of the trace!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:123): New pos: 19, 1
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:127): New end pos: 50, 10
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:135): updateing the point from the item
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:76): Updating the position on the scene of this Point
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:135): updateing the point from the item
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:76): Updating the position on the scene of this Point
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:84): Update end point
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:110): Update trace position based on the current position of the point in the scene
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:122): Previouse end pos() : -47 , 6
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:123): New end pos() : 31 , -11
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:77): Updating widget to show the info!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:102): Getting points now!
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:52): Write: 19 in x line edit
+[DEBUG] (../../widget/Point2DWidget.cpp:59): Write: -1 in y line edit
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:39): Pointer is invalid.
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:122): Size of background rect: 166 , 44
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:124): Size of scene rect: 102.5 , 21.5
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:126): Size of scene rect: 366 , 381
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:141): Draw grid!
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:142): -34 , -31
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:143): 132 , 13
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:144): -34 , -31
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:145): 132 , 13
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:42): Painting a item.
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:101): Paint trace line!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:110): Update trace position based on the current position of the point in the scene
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:113): adjustedment : 10 , 11
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:121): Update start and stop position of the trace!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:123): New pos: 91, -10
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:127): New end pos: 50, 10
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:135): updateing the point from the item
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:76): Updating the position on the scene of this Point
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:135): updateing the point from the item
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:76): Updating the position on the scene of this Point
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:84): Update end point
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:110): Update trace position based on the current position of the point in the scene
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:122): Previouse end pos() : 31 , -11
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:123): New end pos() : -41 , -0
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:77): Updating widget to show the info!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:102): Getting points now!
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:52): Write: 91 in x line edit
+[DEBUG] (../../widget/Point2DWidget.cpp:59): Write: 10 in y line edit
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:39): Pointer is invalid.
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:122): Size of background rect: 154 , 32
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:124): Size of scene rect: 102.5 , 21.5
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:126): Size of scene rect: 366 , 381
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:141): Draw grid!
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:142): -26 , -27
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:143): 128 , 5
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:144): -26 , -27
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:145): 128 , 5
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:42): Painting a item.
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:101): Paint trace line!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:110): Update trace position based on the current position of the point in the scene
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:113): adjustedment : 3 , 17
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:121): Update start and stop position of the trace!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:123): New pos: 12, 7
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:127): New end pos: 50, 10
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:135): updateing the point from the item
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:76): Updating the position on the scene of this Point
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:135): updateing the point from the item
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:76): Updating the position on the scene of this Point
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:84): Update end point
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:110): Update trace position based on the current position of the point in the scene
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:122): Previouse end pos() : -41 , -0
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:123): New end pos() : 38 , -17
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:77): Updating widget to show the info!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:102): Getting points now!
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:52): Write: 12 in x line edit
+[DEBUG] (../../widget/Point2DWidget.cpp:59): Write: -7 in y line edit
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:39): Pointer is invalid.
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:122): Size of background rect: 364 , 379
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:124): Size of scene rect: 102.5 , 27
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:126): Size of scene rect: 366 , 381
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:141): Draw grid!
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:142): -134 , -193
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:143): 230 , 186
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:144): -134 , -193
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:145): 230 , 186
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:42): Painting a item.
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:101): Paint trace line!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:110): Update trace position based on the current position of the point in the scene
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:113): adjustedment : -5 , 27
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:121): Update start and stop position of the trace!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:123): New pos: 83, -0
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:127): New end pos: 50, 10
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:135): updateing the point from the item
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:76): Updating the position on the scene of this Point
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:135): updateing the point from the item
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:76): Updating the position on the scene of this Point
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:84): Update end point
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:110): Update trace position based on the current position of the point in the scene
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:122): Previouse end pos() : 38 , -17
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:123): New end pos() : -33 , -10
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:77): Updating widget to show the info!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:102): Getting points now!
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:52): Write: 83 in x line edit
+[DEBUG] (../../widget/Point2DWidget.cpp:59): Write: 0 in y line edit
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:39): Pointer is invalid.
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:122): Size of background rect: 152 , 34
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:124): Size of scene rect: 102.5 , 27
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:126): Size of scene rect: 366 , 381
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:141): Draw grid!
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:142): -25 , -23
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:143): 127 , 11
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:144): -25 , -23
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:145): 127 , 11
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:42): Painting a item.
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:101): Paint trace line!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:110): Update trace position based on the current position of the point in the scene
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:113): adjustedment : -12 , 33
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:121): Update start and stop position of the trace!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:123): New pos: 5, 13
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:127): New end pos: 50, 10
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:135): updateing the point from the item
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:76): Updating the position on the scene of this Point
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:135): updateing the point from the item
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:76): Updating the position on the scene of this Point
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:84): Update end point
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:110): Update trace position based on the current position of the point in the scene
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:122): Previouse end pos() : -33 , -10
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:123): New end pos() : 45 , -23
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:77): Updating widget to show the info!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:102): Getting points now!
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:52): Write: 5 in x line edit
+[DEBUG] (../../widget/Point2DWidget.cpp:59): Write: -13 in y line edit
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:39): Pointer is invalid.
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:122): Size of background rect: 364 , 379
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:124): Size of scene rect: 102.5 , 33
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:126): Size of scene rect: 366 , 381
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:141): Draw grid!
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:142): -134 , -190
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:143): 230 , 189
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:144): -134 , -190
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:145): 230 , 189
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:42): Painting a item.
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:101): Paint trace line!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:110): Update trace position based on the current position of the point in the scene
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:113): adjustedment : -18 , 42
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:121): Update start and stop position of the trace!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:123): New pos: 77, 9
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:127): New end pos: 50, 10
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:135): updateing the point from the item
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:76): Updating the position on the scene of this Point
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:135): updateing the point from the item
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:76): Updating the position on the scene of this Point
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:84): Update end point
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:110): Update trace position based on the current position of the point in the scene
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:122): Previouse end pos() : 45 , -23
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:123): New end pos() : -27 , -19
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:77): Updating widget to show the info!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:102): Getting points now!
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:52): Write: 77 in x line edit
+[DEBUG] (../../widget/Point2DWidget.cpp:59): Write: -9 in y line edit
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:39): Pointer is invalid.
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:122): Size of background rect: 154 , 37
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:124): Size of scene rect: 102.5 , 33
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:126): Size of scene rect: 366 , 381
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:141): Draw grid!
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:142): -26 , -20
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:143): 128 , 17
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:144): -26 , -20
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:145): 128 , 17
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:42): Painting a item.
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:101): Paint trace line!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:110): Update trace position based on the current position of the point in the scene
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:113): adjustedment : -22 , 48
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:121): Update start and stop position of the trace!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:123): New pos: 1, 19
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:127): New end pos: 50, 10
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:135): updateing the point from the item
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:76): Updating the position on the scene of this Point
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:135): updateing the point from the item
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:76): Updating the position on the scene of this Point
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:84): Update end point
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:110): Update trace position based on the current position of the point in the scene
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:122): Previouse end pos() : -27 , -19
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:123): New end pos() : 49 , -29
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:77): Updating widget to show the info!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:102): Getting points now!
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:52): Write: 1 in x line edit
+[DEBUG] (../../widget/Point2DWidget.cpp:59): Write: -19 in y line edit
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:39): Pointer is invalid.
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:122): Size of background rect: 364 , 379
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:124): Size of scene rect: 102.5 , 39
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:126): Size of scene rect: 366 , 381
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:141): Draw grid!
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:142): -134 , -187
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:143): 230 , 192
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:144): -134 , -187
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:145): 230 , 192
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:42): Painting a item.
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:101): Paint trace line!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:110): Update trace position based on the current position of the point in the scene
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:113): adjustedment : -26 , 55
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:121): Update start and stop position of the trace!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:123): New pos: 73, 16
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:127): New end pos: 50, 10
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:135): updateing the point from the item
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:76): Updating the position on the scene of this Point
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:135): updateing the point from the item
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:76): Updating the position on the scene of this Point
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:84): Update end point
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:110): Update trace position based on the current position of the point in the scene
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:122): Previouse end pos() : 49 , -29
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:123): New end pos() : -23 , -26
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:77): Updating widget to show the info!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:102): Getting points now!
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:52): Write: 73 in x line edit
+[DEBUG] (../../widget/Point2DWidget.cpp:59): Write: -16 in y line edit
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:39): Pointer is invalid.
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:122): Size of background rect: 154 , 42
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:124): Size of scene rect: 102.5 , 39
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:126): Size of scene rect: 366 , 381
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:141): Draw grid!
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:142): -26 , -19
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:143): 128 , 23
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:144): -26 , -19
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:145): 128 , 23
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:42): Painting a item.
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:101): Paint trace line!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:110): Update trace position based on the current position of the point in the scene
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:113): adjustedment : -27 , 59
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:121): Update start and stop position of the trace!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:123): New pos: 0, 23
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:127): New end pos: 50, 10
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:135): updateing the point from the item
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:76): Updating the position on the scene of this Point
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:135): updateing the point from the item
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:76): Updating the position on the scene of this Point
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:84): Update end point
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:110): Update trace position based on the current position of the point in the scene
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:122): Previouse end pos() : -23 , -26
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:123): New end pos() : 50 , -33
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:77): Updating widget to show the info!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:102): Getting points now!
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:52): Write: 0 in x line edit
+[DEBUG] (../../widget/Point2DWidget.cpp:59): Write: -23 in y line edit
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:39): Pointer is invalid.
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:122): Size of background rect: 364 , 379
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:124): Size of scene rect: 102.5 , 43
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:126): Size of scene rect: 366 , 381
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:141): Draw grid!
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:142): -134 , -185
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:143): 230 , 194
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:144): -134 , -185
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:145): 230 , 194
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:42): Painting a item.
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:101): Paint trace line!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:110): Update trace position based on the current position of the point in the scene
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:113): adjustedment : -31 , 64
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:121): Update start and stop position of the trace!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:123): New pos: 69, 21
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:127): New end pos: 50, 10
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:135): updateing the point from the item
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:76): Updating the position on the scene of this Point
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:135): updateing the point from the item
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:76): Updating the position on the scene of this Point
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:84): Update end point
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:110): Update trace position based on the current position of the point in the scene
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:122): Previouse end pos() : 50 , -33
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:123): New end pos() : -19 , -31
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:77): Updating widget to show the info!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:102): Getting points now!
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:52): Write: 69 in x line edit
+[DEBUG] (../../widget/Point2DWidget.cpp:59): Write: -21 in y line edit
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:39): Pointer is invalid.
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:122): Size of background rect: 148 , 45
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:124): Size of scene rect: 102.5 , 43
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:126): Size of scene rect: 366 , 381
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:141): Draw grid!
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:142): -23 , -18
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:143): 125 , 27
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:144): -23 , -18
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:145): 125 , 27
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:42): Painting a item.
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:101): Paint trace line!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:110): Update trace position based on the current position of the point in the scene
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:113): adjustedment : -31 , 65
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:121): Update start and stop position of the trace!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:123): New pos: 0, 24
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:127): New end pos: 50, 10
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:135): updateing the point from the item
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:76): Updating the position on the scene of this Point
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:135): updateing the point from the item
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:76): Updating the position on the scene of this Point
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:84): Update end point
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:110): Update trace position based on the current position of the point in the scene
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:122): Previouse end pos() : -19 , -31
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:123): New end pos() : 50 , -34
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:77): Updating widget to show the info!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:102): Getting points now!
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:52): Write: 0 in x line edit
+[DEBUG] (../../widget/Point2DWidget.cpp:59): Write: -24 in y line edit
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:39): Pointer is invalid.
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:122): Size of background rect: 364 , 379
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:124): Size of scene rect: 102.5 , 44
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:126): Size of scene rect: 366 , 381
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:141): Draw grid!
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:142): -134 , -185
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:143): 230 , 194
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:144): -134 , -185
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:145): 230 , 194
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:42): Painting a item.
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:101): Paint trace line!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:110): Update trace position based on the current position of the point in the scene
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:113): adjustedment : -31 , 66
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:121): Update start and stop position of the trace!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:123): New pos: 69, 22
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:127): New end pos: 50, 10
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:135): updateing the point from the item
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:76): Updating the position on the scene of this Point
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:135): updateing the point from the item
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:76): Updating the position on the scene of this Point
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:84): Update end point
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:110): Update trace position based on the current position of the point in the scene
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:122): Previouse end pos() : 50 , -34
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:123): New end pos() : -19 , -32
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:77): Updating widget to show the info!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:102): Getting points now!
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:52): Write: 69 in x line edit
+[DEBUG] (../../widget/Point2DWidget.cpp:59): Write: -22 in y line edit
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:39): Pointer is invalid.
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:122): Size of background rect: 148 , 46
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:124): Size of scene rect: 102.5 , 44
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:126): Size of scene rect: 366 , 381
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:141): Draw grid!
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:142): -23 , -18
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:143): 125 , 28
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:144): -23 , -18
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:145): 125 , 28
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:42): Painting a item.
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:101): Paint trace line!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:110): Update trace position based on the current position of the point in the scene
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:113): adjustedment : -31 , 65
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:121): Update start and stop position of the trace!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:123): New pos: 0, 23
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:127): New end pos: 50, 10
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:135): updateing the point from the item
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:76): Updating the position on the scene of this Point
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:135): updateing the point from the item
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:76): Updating the position on the scene of this Point
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:84): Update end point
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:110): Update trace position based on the current position of the point in the scene
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:122): Previouse end pos() : -19 , -32
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:123): New end pos() : 50 , -33
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:77): Updating widget to show the info!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:102): Getting points now!
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:52): Write: 0 in x line edit
+[DEBUG] (../../widget/Point2DWidget.cpp:59): Write: -23 in y line edit
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:39): Pointer is invalid.
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:122): Size of background rect: 148 , 45
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:124): Size of scene rect: 102.5 , 44
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:126): Size of scene rect: 366 , 381
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:141): Draw grid!
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:142): -25 , -16
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:143): 123 , 29
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:144): -25 , -16
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:145): 123 , 29
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:42): Painting a item.
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:101): Paint trace line!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:110): Update trace position based on the current position of the point in the scene
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:113): adjustedment : -31 , 64
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:121): Update start and stop position of the trace!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:123): New pos: 69, 21
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:127): New end pos: 50, 10
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:135): updateing the point from the item
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:76): Updating the position on the scene of this Point
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:135): updateing the point from the item
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:76): Updating the position on the scene of this Point
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:84): Update end point
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:110): Update trace position based on the current position of the point in the scene
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:122): Previouse end pos() : 50 , -33
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:123): New end pos() : -19 , -31
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:77): Updating widget to show the info!
+[DEBUG] (../../widget/tracedesign/TraceInfoWidget.cpp:102): Getting points now!
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:52): Write: 69 in x line edit
+[DEBUG] (../../widget/Point2DWidget.cpp:59): Write: -21 in y line edit
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:36): Update point view.
+[DEBUG] (../../widget/Point2DWidget.cpp:39): Pointer is invalid.
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:122): Size of background rect: 148 , 45
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:124): Size of scene rect: 102.5 , 44
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:126): Size of scene rect: 366 , 381
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:141): Draw grid!
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:142): -23 , -18
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:143): 125 , 27
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:144): -23 , -18
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:145): 125 , 27
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:42): Painting a item.
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:101): Paint trace line!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:122): Size of background rect: 364 , 379
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:124): Size of scene rect: 102.5 , 44
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:126): Size of scene rect: 366 , 381
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:141): Draw grid!
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:142): -134 , -185
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:143): 230 , 194
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:144): -134 , -185
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:145): 230 , 194
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:42): Painting a item.
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:101): Paint trace line!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:122): Size of background rect: 364 , 379
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:124): Size of scene rect: 102.5 , 44
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:126): Size of scene rect: 366 , 381
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:141): Draw grid!
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:142): -134 , -185
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:143): 230 , 194
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:144): -134 , -185
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:145): 230 , 194
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:42): Painting a item.
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:101): Paint trace line!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:122): Size of background rect: 364 , 379
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:124): Size of scene rect: 102.5 , 44
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:126): Size of scene rect: 366 , 381
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:141): Draw grid!
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:142): -134 , -185
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:143): 230 , 194
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:144): -134 , -185
+[DEBUG] (../../widget/tracedesign/TraceGraphView.cpp:145): 230 , 194
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:42): Painting a item.
+[DEBUG] (../../widget/tracedesign/TraceGraphItem.cpp:101): Paint trace line!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (../../widget/tracedesign/TraceGraphPoint.cpp:47): Create bouding box!
+[DEBUG] (XMLBuilder.cpp:26): Deleted document pointer!

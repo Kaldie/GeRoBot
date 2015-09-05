@@ -57,7 +57,7 @@ void TraceInfoWidget::initialise() {
   connect(traceTypeComboBox, SIGNAL(currentIndexChanged(int)),
           this, SLOT(shouldRequestTraceUpdate()));
 
-    // If the points are changed they emit a hasNewPosition signal
+  // If the points are changed they emit a hasNewPosition signal
   // This signal is connected to a slot which determins if it is a valid update()
   // If so, emit hasTraceUpdate()
   // if not, set the Point2DWidget to invalide and update to show it

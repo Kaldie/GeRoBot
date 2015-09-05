@@ -35,8 +35,9 @@ void TraceDesignWidget::initialise() {
     sceneFrame->layout()->addWidget(m_traceGraphView);
   }
   // add a single trace for debug puposes
-  addTrace(std::make_shared<Trace>());
-  m_vector[0]->setEndPoint(Point2D(50,10));
+  Trace::TracePointer trace = std::make_shared<Trace>();
+  trace->setEndPoint(Point2D(50,10));
+  addTrace(trace);
   // Connect the request new trace to replace trace
   connect(m_traceInfoWidget, SIGNAL(requestTrace(Trace::TraceType)),
           this, SLOT(replaceTrace(Trace::TraceType)));
@@ -121,7 +122,6 @@ void TraceDesignWidget::addTrace(Trace::TracePointer newTrace) {
   // make a new trace graph item and push it to the view
   TraceGraphItem* item = m_traceGraphView->addTraceItem(newTrace);
   setSelectedTrace();
-  m_traceGraphView->setSelected(newTrace);
   LOG_DEBUG("Bad thingy: " << item);
   // connect the remove this trace signal to remove trace from this widget
   connect(item, SIGNAL(removeThisTrace(Trace::TracePointer)),
@@ -156,6 +156,7 @@ void TraceDesignWidget::removeTrace(Trace::TracePointer i_pointer) {
 
 // replace the currenty selected trace
 void TraceDesignWidget::replaceTrace(Trace::TraceType i_type) {
+  LOG_DEBUG("Replace trace based on type. Type: " << i_type);
   replaceTrace(getSelectedIndex(), i_type);
 }
 
@@ -163,6 +164,7 @@ void TraceDesignWidget::replaceTrace(Trace::TraceType i_type) {
 // replace the trace which is indicated by the pointer
 void TraceDesignWidget::replaceTrace(Trace::TracePointer i_pointer,
                                      Trace::TraceType i_type) {
+  LOG_DEBUG("Replace trace based on pointer and type");
   replaceTrace(getIndex(i_pointer), i_type);
 }
 
@@ -178,11 +180,13 @@ void TraceDesignWidget::replaceTrace(const int& i_index,
   Trace::TracePointer tracePointer;
   // Create one with the correct type
   if(i_type == Trace::Line) {
+    LOG_DEBUG("Make a Line");
     tracePointer = std::make_shared<Trace>();
   } else if (i_type == Trace::Curve) {
+    LOG_DEBUG("Make a Curve");
     tracePointer = std::make_shared<RotationTrace>();
   } else {
-    LOG_ERROR("Trace type is unknown!");
+    LOG_ERROR("Trace type is unknown: " << i_type);
   }
   // create the perfect replacement
   setupReplacementPointer(tracePointer, i_index);
@@ -191,6 +195,7 @@ void TraceDesignWidget::replaceTrace(const int& i_index,
   // add the new
   addTrace(tracePointer);
   LOG_DEBUG("Current index : " << i_index);
+  LOG_DEBUG("New type: " << m_vector[i_index]->getTraceType());
   //  LOG_DEBUG("Number of shared pointers to current trace: " << m_vector[currentIndex].use_count());
   LOG_DEBUG("The swaped is still hold by: " << tracePointer.use_count());
   LOG_DEBUG("Length of the vector is: " << m_vector.size());
