@@ -19,6 +19,7 @@
     widget/Point2DWidget.h \
     widget/RobotMovementWidget.h \
     widget/RobotPositionWidget.h \
+    widget/tracedesign/TraceGraphPoint.h \
     widget/tracedesign/TraceGraphItem.h \
     widget/tracedesign/RotationTraceGraphItem.h \
     widget/tracedesign/TraceGraphView.h \
@@ -41,6 +42,7 @@
     widget/Point2DWidget.cpp \
     widget/RobotMovementWidget.cpp \
     widget/RobotPositionWidget.cpp \
+    widget/tracedesign/TraceGraphPoint.cpp \
     widget/tracedesign/TraceGraphItem.cpp \
     widget/tracedesign/RotationTraceGraphItem.cpp \
     widget/tracedesign/TraceGraphView.cpp \
