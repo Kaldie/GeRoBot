@@ -13,6 +13,8 @@ class Point2D:public Vector2D {
 
   Point2D(const Vector2D& i_vector){x = i_vector.x; y = i_vector.y;}
 
+  Point2D(const QPointF& i_point) {x = i_point.x(); y = -i_point.y();}
+
   Point2D& operator =(const Vector2D& v)
   {
     x = v.x;

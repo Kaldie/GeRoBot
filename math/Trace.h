@@ -6,6 +6,11 @@
 #include <Line2D.h>
 
 class Trace {
+  GETSET(traceType, m_traceType, TraceType);
+  GETSET(Point2D, m_startPoint, StartPoint);
+  GETSET(Point2D, m_endPoint, EndPoint);
+  GETSET(double, m_rotationTolerance, RotationTolerance);
+  GETSET(double, m_translationTolerance, TranslationTolerance);
  public:
   // smart pointer definitions
   typedef std::shared_ptr<Trace> TracePointer;
@@ -54,18 +59,14 @@ class Trace {
 
   virtual std::vector<Point2D*> getPointPointers();
 
- private:
-  GETSET(TraceType, m_traceType, TraceType);
-  GETSET(Point2D, m_startPoint, StartPoint);
-  GETSET(Point2D, m_endPoint, EndPoint);
-  GETSET(double, m_rotationTolerance, RotationTolerance);
-  GETSET(double, m_translationTolerance, TranslationTolerance);
+  std::string getRotationDirection(const Point2D&, const Point2D&) const;
 
+ private:
   bool isValidStartAndEndPoint(const Point2D*,
                                const Point2D*);
 
   bool isWithinRange(const Point2D&, const Point2D&) const;
   bool isWithinRange(const traceType&, const traceType&) const;
-  std::string getRotationDirection(const Point2D&, const Point2D&) const;
+
 };
 #endif  // MATH_TRACE_H_

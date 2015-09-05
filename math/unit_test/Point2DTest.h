@@ -60,6 +60,15 @@ class Point2DTest : public CxxTest::TestSuite {
     TS_ASSERT_DIFFERS(QPointF(10.0,-10.0),
                      qPoint);
   }
+
+  void testConstrucionFromQPointF() {
+    QPointF qPoint(-10,25);
+    Point2D point(qPoint);
+    TS_ASSERT_EQUALS(Point2D(-10.0, -25.0),
+                     point);
+    TS_ASSERT_DIFFERS(Point2D(10.0, 25.0),
+                     point);
+  }
 };
 
 #endif  // MATH_UNIT_TEST_POINT2DTEST_H_

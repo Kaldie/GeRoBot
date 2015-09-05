@@ -180,7 +180,6 @@ void JointController::moveSteps(BaseJoint::JointPointer& i_jointPointer,
   // Check if the joint controller has this joint
   if (!hasJoint(i_jointPointer))
     LOG_ERROR("Joint not avalaible in this controller!");
-  // TODO(Ruud): change this so it works with sequence vector
   i_jointPointer->getMotor()->moveSteps(i_directionString,
                                         i_numberOfSteps,
                                         m_sequenceVector);
