@@ -49,8 +49,18 @@ QRectF TraceGraphPoint::boundingRect() const {
                 -TraceGraphPoint::size * 0.5,
                 TraceGraphPoint::size,
                TraceGraphPoint::size);
-   rect.adjust(-1,-1,1,1);
+   rect.adjust(-2,-2,2,2);
    return rect;
+}
+
+
+void TraceGraphPoint::mousePressEvent(QGraphicsSceneMouseEvent* i_event) {
+  if (i_event->button() == Qt::LeftButton) {
+    // record the start position of the "Move"
+    m_startPointAtMouseDown = static_cast<TraceGraphItem*>(parentItem())->
+      getTracePointer().lock()->getStartPoint();
+  }
+  return QGraphicsItem::mousePressEvent(i_event);
 }
 
 
@@ -65,14 +75,6 @@ QVariant TraceGraphPoint::itemChange(GraphicsItemChange change,
   return QGraphicsItem::itemChange(change, point);
 }
 
-
-void TraceGraphPoint::mousePressEvent(QGraphicsSceneMouseEvent* i_event) {
-  if (i_event->button() == Qt::LeftButton) {
-    m_startPointAtMouseDown = static_cast<TraceGraphItem*>(parentItem())->
-      getTracePointer().lock()->getStartPoint();
-  }
-  return QGraphicsItem::mousePressEvent(i_event);
-}
 
 void TraceGraphPoint::updatePositionOnScene() {
   TraceGraphItem* parent = static_cast<TraceGraphItem*>(parentItem());
@@ -89,7 +91,7 @@ void TraceGraphPoint::updatePositionOnScene(const Trace::TracePointer& i_trace) 
   }
   case TraceGraphPoint::EndPoint : {
     if (i_trace->getEndPoint() != scenePos()) {
-      LOG_DEBUG("Update end point");
+      LOG_DEBUG("Update end point on scene");
       setPos(Point2D(i_trace->getEndPoint() - i_trace->getStartPoint()));
     }
     break;
@@ -98,7 +100,7 @@ void TraceGraphPoint::updatePositionOnScene(const Trace::TracePointer& i_trace) 
     if (RotationTrace::RotationTracePointer rotationTrace =
         std::dynamic_pointer_cast<RotationTrace>(i_trace)) {
       if (rotationTrace->getCentrePoint() != scenePos())
-      LOG_DEBUG("Update Center point");
+      LOG_DEBUG("Update Center point on scene");
       setPos(Point2D(rotationTrace->getCentrePoint() - i_trace->getStartPoint()));
     } else {
       LOG_ERROR("Could not convert the trace to a rotation" <<
@@ -116,28 +118,39 @@ void TraceGraphPoint::updatePositionOnScene(const Trace::TracePointer& i_trace) 
 void TraceGraphPoint::updateTracePosition(Trace::TracePointer& i_trace,
                                           QPointF& i_newPosition) {
   LOG_DEBUG("Update trace position based on the current position of the point in the scene");
+  LOG_DEBUG("Current Start point: " << i_trace->getStartPoint().x << " , " << i_trace->getStartPoint().y);
+  LOG_DEBUG("Current End point: " << i_trace->getEndPoint().x << " , " << i_trace->getEndPoint().y);
+
   switch (m_positionOnTrace) {
   case TraceGraphPoint::StartPoint : {
     LOG_DEBUG("Start Point At MouseDown" << m_startPointAtMouseDown.x()
               << " , " << m_startPointAtMouseDown.y());
-    QPointF scenePoint = i_newPosition + m_startPointAtMouseDown;
-    i_trace->setStartPoint(scenePoint);
-    parentItem()->setPos(i_trace->getStartPoint());
-    parentItem()->update();
+    Point2D newPoint = Point2D(i_newPosition) + m_startPointAtMouseDown;
+    correctTracePosition(i_trace, &newPoint);
+    i_trace->setStartPoint(newPoint);
+    parentItem()->setPos(newPoint);
     i_newPosition = QPointF(0, 0);
     break;
   }
   case TraceGraphPoint::EndPoint : {
-    LOG_DEBUG("Previouse end pos() : " << pos().x() << " , " << pos().y());
-    LOG_DEBUG("New end pos() : " << i_newPosition.x() << " , " << i_newPosition.y());
-    i_trace->setEndPoint(i_trace->getStartPoint() + Point2D(i_newPosition));
-    parentItem()->update();
+    Point2D point = i_trace->getStartPoint() + Point2D(i_newPosition);
+    LOG_DEBUG("New end pos() : " << point.x << " , " << point.y);
+    if (correctTracePosition(i_trace, &point)) {
+      LOG_DEBUG("Corrected end pos() : " << point.x  << " , " << point.y);
+    }
+    i_trace->setEndPoint(point);
+    i_newPosition = Point2D(i_trace->getEndPoint() - i_trace->getStartPoint());
     break;
   }
   case TraceGraphPoint::CenterPoint : {
     if (RotationTrace::RotationTracePointer rotationTrace =
-	std::dynamic_pointer_cast<RotationTrace>(i_trace)) {
-      rotationTrace->setCentrePoint(mapToScene(pos()));
+        std::dynamic_pointer_cast<RotationTrace>(i_trace)) {
+      LOG_DEBUG("Center point: " << rotationTrace->getCentrePoint().x << " , " << rotationTrace->getCentrePoint().y);
+      Point2D possibleStartPoint = i_trace->getStartPoint() + Point2D(i_newPosition);
+      if (correctTracePosition(i_trace, &possibleStartPoint)) {
+        rotationTrace->setCentrePoint(possibleStartPoint);
+      }
+      i_newPosition = Point2D(rotationTrace->getCentrePoint() - i_trace->getStartPoint());
     } else {
       LOG_ERROR("Could not convert the trace to a rotation" <<
 		" trace while the point was a center point!");
@@ -147,5 +160,92 @@ void TraceGraphPoint::updateTracePosition(Trace::TracePointer& i_trace,
   default : {
     LOG_ERROR("unknown PointPosition");
     break;
+  }}  // end switch
+
+  parentItem()->update();
+}
+
+
+bool TraceGraphPoint::correctTracePosition(Trace::TracePointer trace,
+                                           Point2D* i_newPoint) {
+  LOG_DEBUG("correctTracePosition");
+  // if it is a line, it is always ok
+  if (trace->getTraceType() == Trace::Line) {
+    LOG_DEBUG("No need to correct it, its a line");
+    return false;
+  }
+  // if it is a curve
+  RotationTrace::RotationTracePointer rotationTrace;
+  rotationTrace = std::dynamic_pointer_cast<RotationTrace>(trace);
+  if (!curveNeedsCorrection(rotationTrace, *i_newPoint)) {
+    return false;
+  }
+
+  LOG_DEBUG("Needing to fix it!");
+  // correcting it here
+  switch (m_positionOnTrace) {
+  case TraceGraphPoint::CenterPoint : {
+    // calculate the vector between the start and stop position
+    Vector2D betweenPoints = trace->getEndPoint() - trace->getStartPoint();
+    // calculate the vector perpendicular to it
+    Vector2D perpendicular(-betweenPoints.y, betweenPoints.x);
+    // calculate the point between the center point between the start and stop position
+    Point2D pointBetweenPoints = rotationTrace->getPointBetweenStartAndStopPosition();
+    *i_newPoint = pointBetweenPoints +
+      Vector2D::dotProduct(perpendicular.normalize(), *i_newPoint) * perpendicular;
+    break;
+  }
+  case TraceGraphPoint::StartPoint : {
+    // start point is handled the same as the end point
+  }
+  case TraceGraphPoint::EndPoint : {
+    LOG_DEBUG("Fixing the end or start point");
+    LOG_DEBUG("Point: " << i_newPoint->x << " , " << i_newPoint->y);
+    *i_newPoint = rotationTrace->intersectingPoint(*i_newPoint);
+    LOG_DEBUG("New point: " << i_newPoint->x << " , " << i_newPoint->y);
+    break;
+  }
+  default : {
+    LOG_ERROR("unknown PointPosition");
+    break;
   }}
+  return true;
+}
+
+
+bool TraceGraphPoint::curveNeedsCorrection(
+  const RotationTrace::RotationTracePointer& i_rotationTrace,
+  const Point2D& i_newPoint) const {
+  switch (m_positionOnTrace) {
+  case TraceGraphPoint::CenterPoint : {
+  try {
+    Circle2D(i_rotationTrace->getStartPoint(),
+             i_rotationTrace->getEndPoint(),
+             i_newPoint);
+    return false;
+  } catch (std::runtime_error) {}
+  return true;
+  break;
+  }
+  case TraceGraphPoint::StartPoint : {
+  try {
+    Circle2D(i_newPoint,
+             i_rotationTrace->getEndPoint(),
+             i_rotationTrace->getCentrePoint());
+    return false;
+  } catch (std::runtime_error) {}
+  return true;
+  break;
+  }
+  case TraceGraphPoint::EndPoint : {
+  try {
+    Circle2D(i_rotationTrace->getStartPoint(),
+             i_newPoint,
+             i_rotationTrace->getCentrePoint());
+    return false;
+  } catch (std::runtime_error) {}
+  return true;
+  break;
+  }}
+  return true;
 }

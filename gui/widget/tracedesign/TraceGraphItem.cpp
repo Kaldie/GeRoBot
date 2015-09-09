@@ -53,20 +53,11 @@ void TraceGraphItem::paint(QPainter *painter,
       pen.setColor(Qt::red);
       pen.setWidth(2);
       painter->setPen(pen);
-      for (auto x: childItems()) {
-         LOG_DEBUG("updating a point item");
-         x->show();
-      }
    } else {
       pen.setWidth(1);
       painter->setPen(pen);
-      for (auto x: childItems()) {
-         //         x->setVisible(false);
-      }
    }
-   //   painter->drawEllipse(0,0,10,10);
    painter->drawPath(shape());
-   //   painter->drawRect(boundingRect());
 }
 
 
@@ -119,24 +110,22 @@ QVariant TraceGraphItem::itemChange(GraphicsItemChange change, const QVariant &v
    }
 
    LOG_DEBUG("Update start and stop position of the trace!");
-   QPointF point = value.toPointF();
-   LOG_DEBUG("New pos: " << point.x() << ", " << point.y());
-   Point2D newStartPoint(point.x(), -1 * point.y());
+   Point2D newStartPoint(value.toPointF());
+   LOG_DEBUG("New pos: " << newStartPoint.x << ", " << newStartPoint.y);
    Point2D endPoint = trace->getEndPoint() +
       (newStartPoint - trace->getStartPoint());
    LOG_DEBUG("New end pos: " << endPoint.x << ", " << endPoint.y);
-   prepareGeometryChange();
+
    trace->setEndPoint(endPoint);
    trace->setStartPoint(newStartPoint);
-
-   for (auto& x : childItems()) {
-      TraceGraphPoint* point = dynamic_cast<TraceGraphPoint*>(x);
+   prepareGeometryChange();
+   for (auto& childItem : childItems()) {
+      TraceGraphPoint* point = dynamic_cast<TraceGraphPoint*>(childItem);
       if (point) {
-         LOG_DEBUG("updateing the point from the item");
+         LOG_DEBUG("this");
          point->updatePositionOnScene();
       }
    }
-
    return QGraphicsItem::itemChange(change, value);
 }
 
@@ -147,7 +136,6 @@ void TraceGraphItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event) {
    // add removal of traces
    menu->addAction(TraceGraphItem::RemoveTraceActionText,
                    this, SLOT(handleTrigger()), QKeySequence::Delete);
-
    // add conversion of trace to the oppisite site
    if (m_trace.lock()->getTraceType() == Trace::Curve) {
       menu->addAction(TraceGraphItem::ConvertToLineActionText,
@@ -158,12 +146,7 @@ void TraceGraphItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event) {
    } else {
       LOG_ERROR("Unknown trace type");
    }
-
    menu->popup(event->screenPos());
-   //  connect(menu, SIGNAL(triggered(QAction *)),
-   //      this, SLOT(triggered(QAction *)));
-   //  menu->popup(event->screenPos());
-   //connect(pasteAct, SIGNAL(triggered()), this, SLOT(paste()));
 }
 
 
@@ -173,6 +156,13 @@ void TraceGraphItem::updatePosition() {
       prepareGeometryChange();
       if (pos() != trace->getStartPoint()){
          setPos(trace->getStartPoint());
+      }
+      for (auto& x : childItems()) {
+         TraceGraphPoint* point = dynamic_cast<TraceGraphPoint*>(x);
+         if (point) {
+            LOG_DEBUG("updateing the point from the item");
+            point->updatePositionOnScene();
+         }
       }
       update();
    }

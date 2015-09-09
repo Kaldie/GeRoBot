@@ -4,11 +4,13 @@
 #include <QVariant>
 #include <QtWidgets>
 #include "./RotationTraceGraphItem.h"
+#include "./TraceGraphPoint.h"
 
 
 RotationTraceGraphItem::RotationTraceGraphItem(Trace::TracePointer i_trace /*= 0*/)
   : TraceGraphItem(i_trace) {
    LOG_DEBUG("Constructing a Rotation trace!");   // todo setPos at the start point
+   new TraceGraphPoint(this,TraceGraphPoint::CenterPoint);
 }
 
 
@@ -17,40 +19,39 @@ QRectF RotationTraceGraphItem::boundingRect() const {
    if (!rotationTrace) {
       return QRectF();
    }
-
-
    QPointF start(0,0);
-   QPointF end(rotationTrace->getEndPoint().x - rotationTrace->getStartPoint().x,
-               -1 * (rotationTrace->getEndPoint().y - rotationTrace->getStartPoint().y));
+   QPointF end(Point2D(rotationTrace->getEndPoint() -
+                       rotationTrace->getStartPoint()));
    QPointF minPoint, maxPoint;
    QList<QPointF> points;
    double startAngle, stopAngle, radius;
-   Point2D centerPoint = static_cast<Point2D>(rotationTrace->getCentrePoint() -
-                          rotationTrace->getStartPoint());
+   Point2D centerPoint = Point2D(rotationTrace->getCentrePoint() -
+                                 rotationTrace->getStartPoint());
    rotationTrace->getStartStopAngle(&startAngle,
                                     &stopAngle);
    radius = rotationTrace->getArc().radius();
    points.append(start);
    points.append(end);
+   points.append(centerPoint);
    if ((startAngle < 90 && 90 < stopAngle) ||
        (startAngle > 90 && 90 > stopAngle)) {
-      LOG_DEBUG("Add 90 degree point " << startAngle << " " << stopAngle);
+      //      LOG_DEBUG("Add 90 degree point " << startAngle << " " << stopAngle);
       points.append(QPointF(centerPoint.x, -centerPoint.y - radius));
    }
 
    if (((startAngle < 270) && (270 < stopAngle)) ||
        ((startAngle > 270) && (270 > stopAngle)) ) {
-      LOG_DEBUG("Add 270 point!" << startAngle << " " << stopAngle);
+      //      LOG_DEBUG("Add 270 point!" << startAngle << " " << stopAngle);
       points.append(QPointF(centerPoint.x, -centerPoint.y + radius));
    }
    if ((360 > startAngle && startAngle > 180 && stopAngle < 180) ||
        (360 > stopAngle && stopAngle > 180 && startAngle < 180)) {
-      LOG_DEBUG("Add 180 point!" << startAngle << " " << stopAngle);
+      //      LOG_DEBUG("Add 180 point!" << startAngle << " " << stopAngle);
       points.append(QPointF(centerPoint.x - radius,
                             -centerPoint.y));
    }
    if ((startAngle > 180) && (180 > stopAngle) && false) {
-      LOG_DEBUG("Add 180 point!" << startAngle << " " << stopAngle);
+      //      LOG_DEBUG("Add 180 point!" << startAngle << " " << stopAngle);
       points.append(QPointF(centerPoint.x - radius,
                             -centerPoint.y));
    }
@@ -76,7 +77,7 @@ QRectF RotationTraceGraphItem::boundingRect() const {
       }
    }
 
-   QPointF adjust(2,2);
+   QPointF adjust(3,3);
    return QRectF(minPoint - adjust,
                  maxPoint + adjust);
 }
@@ -118,23 +119,18 @@ QVariant RotationTraceGraphItem::itemChange(GraphicsItemChange change, const QVa
    if(change != QGraphicsItem::ItemPositionHasChanged) {
       return QGraphicsItem::itemChange(change, value);
    }
-
    // distance moved
-   LOG_DEBUG("get a pointer");
    RotationTrace::RotationTracePointer rotationTrace(getPointer());
-   LOG_DEBUG("Pointer is gotten");
    if (!rotationTrace) {
       return QGraphicsItem::itemChange(change, value);
    }
-   // distance the item is moved
-   QPointF point = value.toPointF();
-   Point2D newStartPoint(point.x(), -1 * point.y());
-   Point2D moved = newStartPoint - rotationTrace->getStartPoint();
    // call the base itemChange
-   TraceGraphItem::itemChange(change, value);
-   Point2D centralPoint = rotationTrace->getCentrePoint() + moved;
+   LOG_DEBUG("change: " << Point2D(value.toPointF()).x << " , " << Point2D(value.toPointF()).y);
+   Point2D centralPoint = rotationTrace->getCentrePoint() +
+      Point2D(value.toPointF()) - rotationTrace->getStartPoint();
    LOG_DEBUG("New centre pos: " << centralPoint.x << ", " << centralPoint.y);
    rotationTrace->setCentrePoint(centralPoint);
+   TraceGraphItem::itemChange(change, value);
    return QGraphicsItem::itemChange(change, value);
 }
 

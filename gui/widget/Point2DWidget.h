@@ -22,7 +22,7 @@ class Point2DWidget: public QWidget, private Ui::Point2DWidget {
 
  private:
   void initialise();
-  static const int m_precision = 15;
+  static const int m_precision = 5;
 
  private slots:
    void updatePoint();

@@ -35,8 +35,10 @@ void TraceDesignWidget::initialise() {
     sceneFrame->layout()->addWidget(m_traceGraphView);
   }
   // add a single trace for debug puposes
-  Trace::TracePointer trace = std::make_shared<Trace>();
-  trace->setEndPoint(Point2D(50,10));
+  RotationTrace::RotationTracePointer trace = std::make_shared<RotationTrace>();
+  trace->setStartPoint(Point2D(-100,0));
+  trace->setEndPoint(Point2D(100,0));
+  trace->setCentrePoint(Point2D(0,0));
   addTrace(trace);
   // Connect the request new trace to replace trace
   connect(m_traceInfoWidget, SIGNAL(requestTrace(Trace::TraceType)),
