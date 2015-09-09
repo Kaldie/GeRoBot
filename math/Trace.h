@@ -7,8 +7,8 @@
 
 class Trace {
   GETSET(traceType, m_traceType, TraceType);
-  GETSET(Point2D, m_startPoint, StartPoint);
-  GETSET(Point2D, m_endPoint, EndPoint);
+  GETSETPROTECTED(Point2D, m_startPoint, StartPoint);
+  GETSETPROTECTED(Point2D, m_endPoint, EndPoint);
   GETSET(double, m_rotationTolerance, RotationTolerance);
   GETSET(double, m_translationTolerance, TranslationTolerance);
  public:
@@ -34,6 +34,13 @@ class Trace {
 
   bool isWithinEndRange(const Point2D&) const;
   bool isWithinBeginRange(const Point2D&) const;
+
+  /**
+   * Given a point, determine the point on the
+   * trace which will be intersected by the position and the base
+   * This position is used to "correct" rotations or translation
+   * used to get nearer to the end point.
+   */
   virtual Point2D intersectingPoint(const Point2D& i_currentPosition) const;
 
   /**

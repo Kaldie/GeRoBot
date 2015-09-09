@@ -20,10 +20,6 @@ Point2D operator *(traceType t, const Point2D& p) {
   return (Point2D(t * p.x, t * p.y));
 }
 
-traceType Dot(const Vector2D& v1, const Vector2D& v2) {
-  return (v1 * v2);
-}
-
 
 traceType SquaredMag(const Vector2D& v) {
   return (v.x * v.x + v.y * v.y);

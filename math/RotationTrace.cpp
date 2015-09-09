@@ -7,7 +7,7 @@
 
 RotationTrace::RotationTrace()
   : Trace(Point2D(-1, 0), Point2D(1,0), Curve) {
-  Arc2D arc(getStartPoint(), getEndPoint(), Point2D(0,0));
+  Arc2D arc(m_startPoint, m_endPoint, Point2D(0,0));
   m_centrePoint = arc.getCentrePoint();
 }
 
@@ -35,8 +35,8 @@ RotationTrace::RotationTrace(const Arc2D& i_arc)
 }
 
 Arc2D RotationTrace::getArc() const {
-  return Arc2D(getStartPoint(),
-               getEndPoint(),
+  return Arc2D(m_startPoint,
+               m_endPoint,
                m_centrePoint);
 }
 
@@ -50,14 +50,15 @@ Point2D RotationTrace::intersectingPoint(
   */
 
   Vector2D f = (-1 * m_centrePoint);
-  Point2D d = i_currentPosition;
+  Point2D d = Vector2D(i_currentPosition.x,
+                       i_currentPosition.y);
 
-  traceType a = Dot(d, d);
-  traceType b = 2*(Dot(f, d));
+  traceType a = Vector2D::dotProduct(d, d);
+  traceType b = 2*(Vector2D::dotProduct(f, d));
 
   traceType radius = getArc().radius();
   traceType c =
-      Dot(f, f) - radius * radius;
+      Vector2D::dotProduct(f, f) - radius * radius;
 
   traceType discriminant = b * b - 4 * a * c;  // squared
 
@@ -125,8 +126,8 @@ std::vector<RotationTrace> RotationTrace::getNecessaryTraces() const {
 
   traceType firstExtremeAngle=(firstExtreme - m_centrePoint).getAlpha();
   traceType secondExtremeAngle=(secondExtreme - m_centrePoint).getAlpha();
-  traceType startAngle=(getStartPoint() - m_centrePoint).getAlpha();
-  traceType endPoint=(getEndPoint() - m_centrePoint).getAlpha();
+  traceType startAngle=(m_startPoint - m_centrePoint).getAlpha();
+  traceType endPoint=(m_endPoint - m_centrePoint).getAlpha();
 
   Point2D startPoint = getStartPoint();
 
@@ -149,7 +150,7 @@ std::vector<RotationTrace> RotationTrace::getNecessaryTraces() const {
 
   itermediateTraces.push_back(
       RotationTrace(startPoint,
-                    getEndPoint(),
+                    m_endPoint,
                     m_centrePoint));
   return itermediateTraces;
 }
@@ -191,6 +192,10 @@ std::vector<Point2D*> RotationTrace::getPointPointers() {
   return pointers;
 }
 
+Point2D RotationTrace::getPointBetweenStartAndStopPosition() const {
+  return RotationTrace::suggestCentralPoint(m_startPoint,
+                                            m_endPoint);
+}
 
 Point2D RotationTrace::suggestCentralPoint(const Point2D& i_startPoint,
                                            const Point2D& i_endPoint) {
@@ -204,8 +209,8 @@ Point2D RotationTrace::suggestCentralPoint(const Point2D& i_startPoint,
 
 void RotationTrace::getStartStopAngle(double* i_startAngle,
                                       double* i_stopAngle) const {
-  *i_startAngle = (getStartPoint() - m_centrePoint).getAlpha() *
+  *i_startAngle = (m_startPoint - m_centrePoint).getAlpha() *
     180. / PI;
-  *i_stopAngle = (getEndPoint() - m_centrePoint).getAlpha() *
+  *i_stopAngle = (m_endPoint - m_centrePoint).getAlpha() *
     180. / PI;
 }

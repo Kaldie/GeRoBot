@@ -88,8 +88,6 @@ Vector2D operator *(traceType t, const Vector2D& v);
 
 Point2D operator *(traceType t, const Point2D& p);
 
-traceType Dot(const Vector2D& v1, const Vector2D& v2);
-
 traceType SquaredMag(const Vector2D& v);
 
 #endif

@@ -45,6 +45,12 @@ class RotationTrace:public Trace {
     typedef std::shared_ptr<RotationTrace> RotationTracePointer;
 
     /**
+     * Get the point between the start and stop position.
+     * this point corrispond to the point which is used a suggestion
+     * in suggestCentralPoint()
+     */
+    Point2D getPointBetweenStartAndStopPosition() const;
+    /**
      * Sugestion of its central point based on 2 Point2Ds
      * This method suggest a point that can be validly used as a central point based on 2 other points
      * This method can be used if, for instance, a LineTrace needs to be
@@ -53,7 +59,7 @@ class RotationTrace:public Trace {
     static Point2D suggestCentralPoint(const Point2D& i_startPoint,
                                        const Point2D& i_endPoint);
 
-    virtual Point2D intersectingPoint(const Point2D& i_currentPosition)const;
+    virtual Point2D intersectingPoint(const Point2D& i_currentPosition) const;
 
     /**
      * constructor
