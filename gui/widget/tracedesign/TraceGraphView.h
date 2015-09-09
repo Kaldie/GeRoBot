@@ -77,8 +77,8 @@ class TraceGraphView : public QGraphicsView {
    * Based on the size of the exposed scene a legend indicating the real world size
    * needs to be plotted to give the user an indication on the size of it all.
    */
-  void drawLegend(const QRectF& i_legendSize,
-		  const double& i_gridSize){};
+  //  void drawLegend(const QRectF& i_legendSize,
+  //		  const double& i_gridSize){};
 
   void initialise();
 

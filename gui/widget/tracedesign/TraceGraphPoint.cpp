@@ -27,6 +27,8 @@ TraceGraphPoint::TraceGraphPoint(TraceGraphItem* i_parent,
 void TraceGraphPoint::paint(QPainter *painter,
 			    const QStyleOptionGraphicsItem *option,
 			    QWidget *widget) {
+  Q_UNUSED(option);
+  Q_UNUSED(widget);
   LOG_DEBUG("Paint an Point");
   QPen pen = painter->pen();
   pen.setCosmetic(true);

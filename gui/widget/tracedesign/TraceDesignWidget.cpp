@@ -172,7 +172,7 @@ void TraceDesignWidget::replaceTrace(Trace::TracePointer i_pointer,
 
 
 // Replace the trace based on the index and type
-void TraceDesignWidget::replaceTrace(const int& i_index,
+void TraceDesignWidget::replaceTrace(const unsigned int& i_index,
                                      const Trace::TraceType& i_type) {
   LOG_DEBUG("Replacing the trace");
   if (i_index == m_vector.size()) {

@@ -67,7 +67,7 @@ class TraceDesignWidget: public QWidget, private Ui::TraceDesignWidget {
     * @param[in] i_index index of the trace that needs to be replace in the vector
     * use getSelectedIndex or getIndex(const Trace::TracePointer&) to get the index
     */
-   void replaceTrace(const int& i_index,
+   void replaceTrace(const unsigned int& i_index,
 		     const Trace::TraceType& i_type);
 
    /**
