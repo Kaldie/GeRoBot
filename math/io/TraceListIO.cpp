@@ -43,7 +43,7 @@ TraceListIO::TraceListIO(const std::string& i_fileName)
 }
 
 
-bool TraceListIO::update(const TracePointerVector& i_traceVector) {
+bool TraceListIO::update(const Trace::TracePointerVector& i_traceVector) {
   bool hasSucceded = true;
   pugi::xml_node traceNode = getNodeFromPath("./TraceList").first_child();
   for (auto trace : i_traceVector) {

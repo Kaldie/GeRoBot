@@ -7,18 +7,15 @@
 
 TOROOT= ../..
 
-# define the C source files
+# Debug source file
 DSRCS= debug.cpp
+# get all the source except debug source
 SRCS := $(filter-out $(DSRCS), $(wildcard *.cpp))
 
-
-#dependencies of other modules
+#debug dependencies of other modules
 DEPENDENCY = $(filter-out $(DOBJS), $(notdir $(wildcard $(TOROOT)/$(OBJECTFOLDER)/*.o)))
 
 # define the executable file 
 DEBUG = debug
-
 include $(TOROOT)/Makefile.config
-
 DEPENDENCY := $(filter-out $(DOBJS), $(DEPENDENCY))
-

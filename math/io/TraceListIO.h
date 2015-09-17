@@ -4,13 +4,11 @@
 #define MATH_IO_TRACELISTIO_H_
 
 #include <XMLBuilder.h>
-#include "./TraceIO.h"
-#include "./RotationTraceIO.h"
+#include <Trace.h>
 
 
 class TraceListIO: public XMLBuilder {
  public:
-  typedef std::vector<Trace::TracePointer> TracePointerVector;
   TraceListIO(const std::string&);
   /**
    * Remove the xml node from the document
@@ -36,7 +34,7 @@ class TraceListIO: public XMLBuilder {
   /**
    * Update the xml document with all the traces in the list
    */
-  virtual bool update(const TracePointerVector& i_vector);
+  virtual bool update(const Trace::TracePointerVector& i_vector);
 
   /**
    * Stores the current Trace list into a xml file with the given file name
@@ -45,7 +43,7 @@ class TraceListIO: public XMLBuilder {
   virtual bool store(std::string i_fileName);
 
  private:
-  GETSET(TracePointerVector, m_vector, Vector);
+  GETSET(Trace::TracePointerVector, m_vector, Vector);
 
   /// No default contructor!!
   TraceListIO(){};
