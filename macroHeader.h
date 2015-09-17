@@ -78,10 +78,10 @@ void set##property(const type& val)                                     \
 
 // Create getter and setter for Pointers in a class
 #define GETSETPOINTER(type, varName, property)                          \
-  private:                                                              \
+protected:                                                              \
   type* varName;                                                        \
 public:                                                                 \
-type* get##property() const {                                            \
+type* get##property() const {                                           \
   return varName;                                                       \
 };                                                                      \
                                                                         \
