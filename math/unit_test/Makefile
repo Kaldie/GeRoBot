@@ -13,7 +13,7 @@ UnitTests = $(wildcard *.h)
 
 DEPENDENCY = StepperDriver.o ArduinoSerialConnection.o ArduinoMotorDriver.o \
              BaseMotor.o StateSequence.o PinState.o SequenceVector.o Condensor.o \
-             JointController.o BaseJoint.o
+             JointController.o BaseJoint.o Robot.o
 
 include $(TOROOT)/Makefile.config
 

@@ -13,22 +13,21 @@
 
 class LineTraceCalculationTest : public CxxTest::TestSuite {
  public:
-  StepperDriver stepperDriver1;
-  StepperDriver stepperDriver2;
-  RotationalJoint<StepperDriver> rotationalJoint;
-  TranslationalJoint<StepperDriver> translationalJoint;
-  JointController::JointControllerPointer jointControllerPointer;
-
+  Robot robot;
   void setUp() {
-    stepperDriver1.setPins({5, 6, 7});
-    stepperDriver2.setPins({2, 3, 4});
-
+    StepperDriver stepperDriver1({5, 6, 7});
+    StepperDriver stepperDriver2({2, 3, 4});
+    TranslationalJoint<StepperDriver> translationalJoint(50.0, 0.01);
+    RotationalJoint<StepperDriver> rotationalJoint(90.0, 0.01);
     (*rotationalJoint.getMotor()) = stepperDriver1;
     (*translationalJoint.getMotor()) = stepperDriver2;
     JointController jointController;
     jointController.addJoint(rotationalJoint.clone());
     jointController.addJoint(translationalJoint.clone());
-    jointControllerPointer = std::make_shared<JointController>(jointController);
+    robot.setJointController(std::make_shared<JointController>(jointController));
+    LOG_DEBUG("Number of joints: " << jointController.getNumberOfJoints());
+    LOG_DEBUG("Position: " << robot.getJointController()->resolveJoint(Rotational)->getPosition());
+    LOG_DEBUG("Number of joints: " << robot.getJointController()->getNumberOfJoints());
   }
 
   void testLineTraceCalculation() {
@@ -36,29 +35,23 @@ class LineTraceCalculationTest : public CxxTest::TestSuite {
     Point2D endPoint(-150, 50);
     Trace trace(startPoint, endPoint);
 
-    jointControllerPointer->resolveJoint(Translational)->setMovementPerStep(0.01);
-    jointControllerPointer->resolveJoint(Rotational)->setMovementPerStep(0.01);
-
     trace.setRotationTolerance(
-        jointControllerPointer->resolveJoint(Rotational)->getMovementPerStep()*1.5);
+        robot.getJointController()->resolveJoint(Rotational)->getMovementPerStep()*1.5);
 
     trace.setTranslationTolerance(
-        jointControllerPointer->resolveJoint(Translational)->getMovementPerStep()*1.5);
+        robot.getJointController()->resolveJoint(Translational)->getMovementPerStep()*1.5);
 
-    jointControllerPointer->resolveJoint(Translational)->getMotor()->setHoldMotor(true);
-    jointControllerPointer->resolveJoint(Rotational)->getMotor()->setHoldMotor(true);
-
-    LineTraceCalculator lineTraceCalculator(jointControllerPointer);
+    LineTraceCalculator lineTraceCalculator(&robot);
     lineTraceCalculator.setWriteLog(true);
-    lineTraceCalculator.calculateTrace(&trace, startPoint);
+    lineTraceCalculator.calculateTrace(trace);
 
     /// Tests
-    TS_ASSERT_EQUALS(jointControllerPointer->getSequenceVector().numberOfSequences(),
+    TS_ASSERT_EQUALS(robot.getJointController()->getSequenceVector().numberOfSequences(),
                      7411);
-    TS_ASSERT_EQUALS(jointControllerPointer->getSequenceVector().numberOfSteps(),
+    TS_ASSERT_EQUALS(robot.getJointController()->getSequenceVector().numberOfSteps(),
                      26458);
 
-    SequenceVector sequenceVector = jointControllerPointer->getSequenceVector();
+    SequenceVector sequenceVector = robot.getJointController()->getSequenceVector();
     
     /// testing condensing on this big vector
     sequenceVector.normalise();
@@ -83,10 +76,10 @@ class LineTraceCalculationTest : public CxxTest::TestSuite {
         numberOfEmptySequences += 1;
       totalNumberOfReps += sequence.getNumberOfRepetitions();
     }
-    
+
     TS_ASSERT_EQUALS(numberOfEmptySequences, 4647);
     TS_ASSERT_EQUALS(sequenceVector.numberOfSequences(), 9037);
-    
+
     double optimisedAverageRep = static_cast<float>(totalNumberOfReps)/
         (sequenceVector.numberOfSequences() - numberOfEmptySequences);
     /// check if the condensing improves information densitity
@@ -132,7 +125,7 @@ class LineTraceCalculationTest : public CxxTest::TestSuite {
     */
     try {
       LOG_DEBUG("here!!");
-      jointControllerPointer->actuate();
+      robot.getJointController()->actuate();
     } catch(std::runtime_error) {
       LOG_INFO("Could not find sizzle");
     }

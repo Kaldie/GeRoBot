@@ -14,57 +14,53 @@
 
 class RotationTraceCalculatorTest : public CxxTest::TestSuite {
  public:
-  StepperDriver stepperDriver1;
-  StepperDriver stepperDriver2;
-  RotationalJoint<StepperDriver> rotationalJoint;
-  TranslationalJoint<StepperDriver> translationalJoint;
-  JointController::JointControllerPointer jointControllerPointer;
-
+  Robot robot;
   void setUp() {
-    stepperDriver1.setPins({5, 6, 7});
-    stepperDriver2.setPins({2, 3, 4});
-
+    StepperDriver stepperDriver1({5, 6, 7});
+    StepperDriver stepperDriver2({2, 3, 4});
+    TranslationalJoint<StepperDriver> translationalJoint(50.0, 0.01);
+    RotationalJoint<StepperDriver> rotationalJoint(90.0, 0.01);
     (*rotationalJoint.getMotor()) = stepperDriver1;
     (*translationalJoint.getMotor()) = stepperDriver2;
     JointController jointController;
     jointController.addJoint(rotationalJoint.clone());
     jointController.addJoint(translationalJoint.clone());
-    jointControllerPointer =
-      std::make_shared<JointController>(jointController);
+    robot.setJointController(std::make_shared<JointController>(jointController));
   }
 
   void testRotationTraceCalculation() {
 
     Point2D startPoint(-10, 30);
-    Point2D endPoint(-50, 30);
+    Point2D endPoint(-10, 30);;
     Point2D centrePoint(-30, 30);
     RotationTrace trace(startPoint,
                         endPoint,
                         centrePoint);
-
-    jointControllerPointer->resolveJoint(Translational)->setMovementPerStep(0.01);
-    jointControllerPointer->resolveJoint(Rotational)->setMovementPerStep(0.01);
+    robot.setVirtualPosition(startPoint);
+    robot.setPosition(startPoint);
+    robot.getJointController()->resolveJoint(Translational)->setMovementPerStep(0.01);
+    robot.getJointController()->resolveJoint(Rotational)->setMovementPerStep(0.01);
 
     trace.setRotationTolerance(
-        jointControllerPointer->resolveJoint(Rotational)->getMovementPerStep()*1);
+        robot.getJointController()->resolveJoint(Rotational)->getMovementPerStep()*0.5);
 
     trace.setTranslationTolerance(
-        jointControllerPointer->resolveJoint(Translational)->getMovementPerStep()*1);
+        robot.getJointController()->resolveJoint(Translational)->getMovementPerStep()*0.5);
+    trace.setIsClockwise(true);
+    robot.getJointController()->resolveJoint(Translational)->getMotor()->setHoldMotor(true);
+    robot.getJointController()->resolveJoint(Rotational)->getMotor()->setHoldMotor(true);
 
-    jointControllerPointer->resolveJoint(Translational)->getMotor()->setHoldMotor(true);
-    jointControllerPointer->resolveJoint(Rotational)->getMotor()->setHoldMotor(true);
-
-    RotationTraceCalculator rotationTraceCalculator(jointControllerPointer);
+    RotationTraceCalculator rotationTraceCalculator(&robot);
     rotationTraceCalculator.setWriteLog(true);
-    rotationTraceCalculator.calculateTrace(&trace, startPoint);
+    rotationTraceCalculator.calculateTrace(trace);
 
     /// Tests
-    TS_ASSERT_EQUALS(jointControllerPointer->getSequenceVector().numberOfSequences(),
+    TS_ASSERT_EQUALS(robot.getJointController()->getSequenceVector().numberOfSequences(),
                      4904);
-    TS_ASSERT_EQUALS(jointControllerPointer->getSequenceVector().numberOfSteps(),
+    TS_ASSERT_EQUALS(robot.getJointController()->getSequenceVector().numberOfSteps(),
                      21948);
 
-    SequenceVector sequenceVector = jointControllerPointer->getSequenceVector();
+    SequenceVector sequenceVector = robot.getJointController()->getSequenceVector();
 
     /// testing condensing on this big vector
     sequenceVector.normalise();
@@ -126,7 +122,7 @@ class RotationTraceCalculatorTest : public CxxTest::TestSuite {
     */
     try {
       LOG_DEBUG("here!!");
-      jointControllerPointer->actuate();
+      robot.getJointController()->actuate();
     } catch(std::runtime_error) {
       LOG_INFO("Could not find sizzle");
     }
