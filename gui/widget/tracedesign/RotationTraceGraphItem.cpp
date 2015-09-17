@@ -19,42 +19,20 @@ QRectF RotationTraceGraphItem::boundingRect() const {
    if (!rotationTrace) {
       return QRectF();
    }
+   QPointF minPoint, maxPoint;
+   QList<QPointF> points;
    QPointF start(0,0);
    QPointF end(Point2D(rotationTrace->getEndPoint() -
                        rotationTrace->getStartPoint()));
-   QPointF minPoint, maxPoint;
-   QList<QPointF> points;
-   double startAngle, stopAngle, radius;
    Point2D centerPoint = Point2D(rotationTrace->getCentrePoint() -
                                  rotationTrace->getStartPoint());
-   rotationTrace->getStartStopAngle(&startAngle,
-                                    &stopAngle);
-   radius = rotationTrace->getArc().radius();
    points.append(start);
    points.append(end);
    points.append(centerPoint);
-   if ((startAngle < 90 && 90 < stopAngle) ||
-       (startAngle > 90 && 90 > stopAngle)) {
-      //      LOG_DEBUG("Add 90 degree point " << startAngle << " " << stopAngle);
-      points.append(QPointF(centerPoint.x, -centerPoint.y - radius));
-   }
 
-   if (((startAngle < 270) && (270 < stopAngle)) ||
-       ((startAngle > 270) && (270 > stopAngle)) ) {
-      //      LOG_DEBUG("Add 270 point!" << startAngle << " " << stopAngle);
-      points.append(QPointF(centerPoint.x, -centerPoint.y + radius));
-   }
-   if ((360 > startAngle && startAngle > 180 && stopAngle < 180) ||
-       (360 > stopAngle && stopAngle > 180 && startAngle < 180)) {
-      //      LOG_DEBUG("Add 180 point!" << startAngle << " " << stopAngle);
-      points.append(QPointF(centerPoint.x - radius,
-                            -centerPoint.y));
-   }
-   if ((startAngle > 180) && (180 > stopAngle) && false) {
-      //      LOG_DEBUG("Add 180 point!" << startAngle << " " << stopAngle);
-      points.append(QPointF(centerPoint.x - radius,
-                            -centerPoint.y));
-   }
+   // get the extreme points, points which lay on the curve at 90, 180, 270 and 0
+   getExtremePoints(nullptr, rotationTrace, &points);
+
    minPoint = points[0];
    maxPoint = points[1];
    double x(0.0);
@@ -95,7 +73,14 @@ QPainterPath RotationTraceGraphItem::shape() const {
    rotationTrace->getStartStopAngle(&startAngle,
                                     &stopAngle);
    centerPoint -= rotationTrace->getStartPoint();
-   double spanAngle = stopAngle - startAngle;
+   int sign;
+   if (rotationTrace->getIsClockwise())
+      sign = -1;
+   else
+      sign = 1;
+   double spanAngle = rotationTrace->getArc().spanAngle() * 180.0/PI * sign;
+   LOG_DEBUG("start angle: " << startAngle);
+   LOG_DEBUG("Span angle: " << spanAngle);
    double diff = rotationTrace->getArc().radius();
    QRectF rect(centerPoint.x - diff,
                -centerPoint.y - diff,
@@ -148,4 +133,48 @@ RotationTrace::RotationTracePointer RotationTraceGraphItem::getPointer() const{
   if (!rotationTrace)
      return nullptr;
   return rotationTrace;
+}
+
+
+void RotationTraceGraphItem::getExtremePoints(const double* i_angle,
+                                              const RotationTrace::RotationTracePointer& i_trace,
+                                              QList<QPointF>* i_list) const {
+   double startAngle, stopAngle, angle;
+   if (!i_angle) {
+      i_trace->getStartStopAngle(&startAngle, &stopAngle);
+      if (i_trace->getIsClockwise()) {
+         angle = startAngle;
+      } else {
+         angle = stopAngle;
+      }
+   } else {
+      angle = *i_angle;
+   }
+
+   double span = i_trace->getArc().spanAngle() * 180.0 / PI;
+   double radius = i_trace->getArc().radius();
+   Point2D centerPoint = Point2D(i_trace->getCentrePoint() -
+                                 i_trace->getStartPoint());
+   LOG_DEBUG("Angle: " << angle <<" , span: " << span);
+   if (angle < span) {
+      LOG_DEBUG("add 360 deg point");
+      // this means it goes through 0, the angle needs to be adjusted such that it will work
+      double alterAngle(angle + 360.0);
+      getExtremePoints(&alterAngle, i_trace, i_list);
+      i_list->append(QPointF(centerPoint.x + radius, -centerPoint.y));
+   }
+   // check if 90 is in the mix
+   if (angle > 90 && span > (angle - 90)) {
+      LOG_DEBUG("add 90 deg point");
+      i_list->append(QPointF(centerPoint.x, -centerPoint.y - radius));
+   }
+   if ( angle > 180 && span > angle - 180) {
+      LOG_DEBUG("add 180 deg point");
+      i_list->append(QPointF(centerPoint.x - radius,  -centerPoint.y));
+   }
+   if ( angle > 270 && span > angle - 270) {
+      LOG_DEBUG("add 270 deg point");
+      i_list->append(QPointF(centerPoint.x, -centerPoint.y + radius));
+   }
+
 }

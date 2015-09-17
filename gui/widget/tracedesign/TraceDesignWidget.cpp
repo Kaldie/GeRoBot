@@ -39,6 +39,7 @@ void TraceDesignWidget::initialise() {
   trace->setStartPoint(Point2D(-100,0));
   trace->setEndPoint(Point2D(100,0));
   trace->setCentrePoint(Point2D(0,0));
+  trace->setIsClockwise(false);
   addTrace(trace);
   // Connect the request new trace to replace trace
   connect(m_traceInfoWidget, SIGNAL(requestTrace(Trace::TraceType)),
@@ -131,6 +132,9 @@ void TraceDesignWidget::addTrace(Trace::TracePointer newTrace) {
   // connect the convert to something signal to the replaceTrace slot
   connect(item, SIGNAL(convertThisTrace(Trace::TracePointer, Trace::TraceType)),
           this, SLOT(replaceTrace(Trace::TracePointer,Trace::TraceType)));
+
+  connect(item, SIGNAL(convertDirection(Trace::TracePointer)),
+          this, SLOT(convertDirection(Trace::TracePointer)));
   //  connect(item, SIGNAL(removeThis(Trace::TracePointer),
   //                   this, SLOT(removeTrace(Trace::TracePointer);
 }
@@ -154,6 +158,18 @@ void TraceDesignWidget::removeTrace(Trace::TracePointer i_pointer) {
   // remove the item from the vector
   m_vector.erase(vectorIterator);
 }
+
+
+void TraceDesignWidget::convertDirection(Trace::TracePointer i_pointer) {
+  RotationTrace::RotationTracePointer rotationTrace = std::dynamic_pointer_cast<RotationTrace>(i_pointer);
+  if (rotationTrace) {
+    LOG_DEBUG("is currently clockwise: " << rotationTrace->getIsClockwise());
+    rotationTrace->setIsClockwise(!rotationTrace->getIsClockwise());
+    LOG_DEBUG("Novel is clockwise: " << rotationTrace->getIsClockwise());
+    m_traceGraphView->update();
+  }
+}
+
 
 
 // replace the currenty selected trace
@@ -238,5 +254,20 @@ void TraceDesignWidget::setupReplacementPointer(Trace::TracePointer i_replacemen
       RotationTrace::suggestCentralPoint(i_replacement->getStartPoint(),
                                          i_replacement->getEndPoint());
     rotationTrace->setCentrePoint(centerPoint);
+  }
+}
+
+
+void TraceDesignWidget::clearWidget() {
+  for (const auto& trace : m_vector) {
+    removeTrace(trace);
+  }
+}
+
+
+void TraceDesignWidget::resetWidget(const Trace::TracePointerVector& i_vector) {
+  clearWidget();
+  for (const auto& trace : i_vector) {
+    addTrace(trace);
   }
 }

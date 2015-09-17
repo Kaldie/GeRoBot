@@ -1,12 +1,12 @@
  // Copyright [2014] Ruud Cools
 #ifndef GUI_ROBOTMOVEMENTWIDGET_H_
 #define GUI_ROBOTMOVEMENTWIDGET_H_
-
+#include <macroHeader.h>
 #include <QWidget>
-#include <Point2D.h>
 #include <Robot.h>
 #include "./ui_RobotMovementWidget.h"
 
+class Point2D;
 class QAction;
 class QTreeView;
 class QWidget;

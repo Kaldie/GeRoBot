@@ -2,10 +2,12 @@
 #ifndef GUI_WIDGET_POINT2DWIDGET_H_
 #define GUI_WIDGET_POINT2DWIDGET_H_
 
-#include <Point2D.h>
+#include <macroHeader.h>
 #include <QWidget>
 #include "./ui_Point2DWidget.h"
 
+// forward declare
+class Point2D;
 
 class Point2DWidget: public QWidget, private Ui::Point2DWidget {
   Q_OBJECT

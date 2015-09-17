@@ -137,9 +137,7 @@ void TraceGraphPoint::updateTracePosition(Trace::TracePointer& i_trace,
   case TraceGraphPoint::EndPoint : {
     Point2D point = i_trace->getStartPoint() + Point2D(i_newPosition);
     LOG_DEBUG("New end pos() : " << point.x << " , " << point.y);
-    if (correctTracePosition(i_trace, &point)) {
-      LOG_DEBUG("Corrected end pos() : " << point.x  << " , " << point.y);
-    }
+    correctTracePosition(i_trace, &point);
     i_trace->setEndPoint(point);
     i_newPosition = Point2D(i_trace->getEndPoint() - i_trace->getStartPoint());
     break;
@@ -148,10 +146,11 @@ void TraceGraphPoint::updateTracePosition(Trace::TracePointer& i_trace,
     if (RotationTrace::RotationTracePointer rotationTrace =
         std::dynamic_pointer_cast<RotationTrace>(i_trace)) {
       LOG_DEBUG("Center point: " << rotationTrace->getCentrePoint().x << " , " << rotationTrace->getCentrePoint().y);
-      Point2D possibleStartPoint = i_trace->getStartPoint() + Point2D(i_newPosition);
-      if (correctTracePosition(i_trace, &possibleStartPoint)) {
-        rotationTrace->setCentrePoint(possibleStartPoint);
-      }
+      Point2D possibleCenterPoint = i_trace->getStartPoint() + Point2D(i_newPosition);
+      LOG_DEBUG("possibleCenterPoint: " << possibleCenterPoint.x << " , " << possibleCenterPoint.y);
+      correctTracePosition(i_trace, &possibleCenterPoint);
+      LOG_DEBUG("Corrected position: " << possibleCenterPoint.x << " , " << possibleCenterPoint.y);
+      rotationTrace->setCentrePoint(possibleCenterPoint);
       i_newPosition = Point2D(rotationTrace->getCentrePoint() - i_trace->getStartPoint());
     } else {
       LOG_ERROR("Could not convert the trace to a rotation" <<
@@ -190,11 +189,11 @@ bool TraceGraphPoint::correctTracePosition(Trace::TracePointer trace,
     // calculate the vector between the start and stop position
     Vector2D betweenPoints = trace->getEndPoint() - trace->getStartPoint();
     // calculate the vector perpendicular to it
-    Vector2D perpendicular(-betweenPoints.y, betweenPoints.x);
+    Vector2D perpendicular(betweenPoints.y, -betweenPoints.x);
     // calculate the point between the center point between the start and stop position
-    Point2D pointBetweenPoints = rotationTrace->getPointBetweenStartAndStopPosition();
-    *i_newPoint = pointBetweenPoints +
-      Vector2D::dotProduct(perpendicular.normalize(), *i_newPoint) * perpendicular;
+    *i_newPoint = rotationTrace->getPointBetweenStartAndStopPosition() +
+      Vector2D::dotProduct(*i_newPoint - rotationTrace->getPointBetweenStartAndStopPosition(),
+                           perpendicular.normalize()) * perpendicular.normalize();
     break;
   }
   case TraceGraphPoint::StartPoint : {

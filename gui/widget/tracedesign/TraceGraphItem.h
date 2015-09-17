@@ -1,6 +1,7 @@
-#ifndef GUI_WIDGET_TRACE_TRACEGRAPHITEM
+ #ifndef GUI_WIDGET_TRACE_TRACEGRAPHITEM
 #define GUI_WIDGET_TRACE_TRACEGRAPHITEM
 
+#include <macroHeader.h>
 #include <QGraphicsObject>
 #include <QList>
 #include <Trace.h>
@@ -41,6 +42,7 @@ class TraceGraphItem : public QGraphicsObject {
  signals:
    void removeThisTrace(Trace::TracePointer);
    void convertThisTrace(Trace::TracePointer, Trace::TraceType);
+   void convertDirection(Trace::TracePointer);
 
  protected:
    virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) Q_DECL_OVERRIDE;
@@ -53,6 +55,8 @@ class TraceGraphItem : public QGraphicsObject {
     static const QString RemoveTraceActionText;
     static const QString ConvertToLineActionText;
     static const QString ConvertToCurveActionText;
+    static const QString ConvertDirection;
+
 };
 
 #endif // GUI_WIDGET_TRACE_TRACEGRAPHITEM

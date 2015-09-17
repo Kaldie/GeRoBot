@@ -1,7 +1,7 @@
 // Copyright [2014] Ruud Cools
-
 #include <macroHeader.h>
 #include <QString>
+#include <Point2D.h>
 #include "./Point2DWidget.h"
 
 Point2DWidget::Point2DWidget(Point2D* i_point2D,

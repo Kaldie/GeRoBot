@@ -1,6 +1,7 @@
 #ifndef GUI_WIDGET_TRACEWIDGET_TRACEGRAPHSCENE_H_
 #define GUI_WIDGET_TRACEWIDGET_TRACEGRAPHSCENE_H_
 
+#include <macroHeader.h>
 #include <QGraphicsView>
 #include <QList>
 #include <Trace.h>
@@ -46,8 +47,7 @@ class TraceGraphView : public QGraphicsView {
    * Replace the current trace item with a new one defined by the trace
    * The current selected trace item is removed from the scene
    * A newly created trace item is added and set as selected
-   * @param[in] Trace::TracePointer a shared_ptr to added trace
-   * @param[out] bool indicates succes
+   * @param[in] i_newTrace a shared_ptr to added trace
    * if there are 0 or more then 1 items selected this will not work
    * false is returned
    */

@@ -2,6 +2,7 @@
 #ifndef GUI_TRACEINFOWIDGET_H_
 #define GUI_TRACEINFOWIDGET_H_
 
+#include <macroHeader.h>
 #include <QWidget>
 #include <Trace.h>
 

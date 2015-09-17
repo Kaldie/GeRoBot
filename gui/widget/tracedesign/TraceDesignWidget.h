@@ -1,9 +1,10 @@
- // Copyright [2014] Ruud Cools
+// Copyright [2014] Ruud Cools
 #ifndef GUI_TRACEDESIGNWIDGET_H_
 #define GUI_TRACEDESIGNWIDGET_H_
 
 #include <QWidget>
-#include <TraceListIO.h>
+#include <macroHeader.h>
+#include <Trace.h>
 #include "./TraceInfoWidget.h"
 #include "./ui_TraceDesignWidget.h"
 
@@ -11,13 +12,19 @@ class Point2DWidget;
 class TraceGraphView;
 
 class TraceDesignWidget: public QWidget, private Ui::TraceDesignWidget {
-    Q_OBJECT
-    GETSET(TraceListIO::TracePointerVector, m_vector, Vector);  // Vector which hold the traces
-
+  Q_OBJECT
+  GETSET(Trace::TracePointerVector, m_vector, Vector);  // Vector which hold the traces
  public:
     /// Constructor
     explicit TraceDesignWidget(QWidget* parent = 0);
-
+    /**
+     * Clearing the widget of the old stuff and showing the new stuff
+     */
+    void resetWidget(const Trace::TracePointerVector& i_vector);
+   /**
+    * clear the widget if all its Traces
+    */
+   void clearWidget();
  public slots:
    void addTrace(Trace::TracePointer);
    void removeTrace(Trace::TracePointer);
@@ -33,7 +40,11 @@ class TraceDesignWidget: public QWidget, private Ui::TraceDesignWidget {
      */
     void replaceTrace(Trace::TracePointer i_pointer,
 		      Trace::TraceType i_type);
-
+    /**
+     * Given the a pointer, change the direction of the trace.
+     * Only implemented for a rotation trace, change it from ccw to cw etc.
+     */
+    void convertDirection(Trace::TracePointer i_pointer);
  private:
    /**
     * Set up the gui and creat an example trace for show and debugging purposes
@@ -78,10 +89,10 @@ class TraceDesignWidget: public QWidget, private Ui::TraceDesignWidget {
     */
    void setupReplacementPointer(Trace::TracePointer i_replacement,
 				const int& i_index);
+
  private slots:
    void setSelectedTrace();
    void addTraceFromButton();
-
 };
 
 #endif  // GUI_TRACEDESIGNWIDGET_H_

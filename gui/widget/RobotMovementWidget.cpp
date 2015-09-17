@@ -1,5 +1,4 @@
 // Copyright [2014] Ruud Cools
-
 #include <macroHeader.h>
 #include <Point2D.h>
 #include <QtGui>

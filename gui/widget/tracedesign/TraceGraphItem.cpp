@@ -10,7 +10,7 @@
 const QString TraceGraphItem::RemoveTraceActionText("Remove Trace");
 const QString TraceGraphItem::ConvertToLineActionText("Convert to Line");
 const QString TraceGraphItem::ConvertToCurveActionText("Convert to Curve");
-
+const QString TraceGraphItem::ConvertDirection("Alter direction");
 TraceGraphItem::TraceGraphItem(Trace::TracePointer i_trace /*= 0*/)
    : m_trace(i_trace) {
    setFlag(QGraphicsItem::ItemIsSelectable);
@@ -140,6 +140,8 @@ void TraceGraphItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event) {
    if (m_trace.lock()->getTraceType() == Trace::Curve) {
       menu->addAction(TraceGraphItem::ConvertToLineActionText,
                       this, SLOT(handleTrigger()));
+      menu->addAction(TraceGraphItem::ConvertDirection,
+                      this, SLOT(handleTrigger()));
    } else if (m_trace.lock()->getTraceType() == Trace::Line) {
       menu->addAction(TraceGraphItem::ConvertToCurveActionText,
                       this, SLOT(handleTrigger()));
@@ -185,6 +187,9 @@ void TraceGraphItem::handleTrigger() {
    } else if (action->text() == TraceGraphItem::ConvertToCurveActionText) {
       LOG_DEBUG("Emit signal to make convert this trace");
       emit convertThisTrace(m_trace.lock(), Trace::Curve);
+   } else if (action->text() == TraceGraphItem::ConvertDirection) {
+      LOG_DEBUG("Emit signal to change direction");
+      emit convertDirection(m_trace.lock());
    } else {
       LOG_ERROR("Action: '" << action->text().toStdString() << "' is not resolved!");
    }
