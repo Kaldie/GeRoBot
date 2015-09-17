@@ -1,7 +1,6 @@
 #ifndef TREEMODEL_H
 #define TREEMODEL_H
 
-#include <macroHeader.h>
 #include <Robot.h>
 #include <QAbstractItemModel>
 #include <QModelIndex>
@@ -10,7 +9,7 @@
 class BaseRobotItem;
 
 class RobotTreeModel : public QAbstractItemModel {
-  Q_OBJECT
+  //  Q_OBJECT
 
  public:
   typedef std::shared_ptr<RobotTreeModel> RobotTreeModelPointer;

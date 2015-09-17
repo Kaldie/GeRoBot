@@ -11,19 +11,18 @@ class RobotItem:public BaseRobotItem
  private:
   const static QList<QString> propertyList;
 
-	RobotItem();
-	bool addJointControllerItem();
+  RobotItem();
+  bool addJointControllerItem();
 
  public:
-    RobotItem(BaseRobotItem* i_parent,
-              Robot::RobotPointer i_robotPointer);
+  RobotItem(BaseRobotItem* i_parent,
+	    Robot::RobotPointer i_robotPointer);
 
-    void setRobotPointer(Robot::RobotPointer i_robotPointer);
+  void setRobotPointer(Robot::RobotPointer i_robotPointer);
 
-	virtual QVariant getPropertyData(int i_row,int i_column) const;
-	virtual bool setPropertyData(int i_row,int i_column,const QVariant& i_data);
-	virtual bool construct();
-
+  virtual QVariant getPropertyData(int i_row,int i_column) const;
+  virtual bool setPropertyData(int i_row,int i_column,const QVariant& i_data);
+  virtual bool construct();
 };
 
 

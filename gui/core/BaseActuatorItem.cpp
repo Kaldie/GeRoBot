@@ -7,16 +7,16 @@ const QList<QString> BaseActuatorItem::
 propertyList({"SerialRegularExpression", "ReducedSpeed", "BufferSize"});
 
 BaseActuatorItem::BaseActuatorItem(BaseRobotItem* i_parent,
-                                   ArduinoMotorDriver* i_arduinoMotorDriver):
-    BaseRobotItem("BaseActuatorItem", i_parent),
-    m_arduinoMotorDriver(i_arduinoMotorDriver) {
+                                   ArduinoMotorDriver* i_arduinoMotorDriver)
+ : BaseRobotItem("BaseActuatorItem", i_parent),
+   m_arduinoMotorDriver(i_arduinoMotorDriver) {
   LOG_DEBUG(getElementName().toStdString());
   setNumberOfProperties(2);
 }
 
 QVariant BaseActuatorItem::getPropertyData(int i_row,
                                            int i_column) const {
-  if (i_column>1) {
+  if (i_column > 1) {
     return false;
   } else if (
       i_row ==

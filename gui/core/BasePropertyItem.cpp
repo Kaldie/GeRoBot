@@ -1,4 +1,5 @@
-
+// Copyright [2015] Ruud Cools
+#include <macroHeader.h>
 #include "BasePropertyItem.h"
 
 BasePropertyItem::BasePropertyItem(const QString& i_propertyName,

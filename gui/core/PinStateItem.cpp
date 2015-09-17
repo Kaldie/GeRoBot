@@ -1,3 +1,5 @@
+// Copyright [2015] Ruud Cools
+#include <macroHeader.h>
 #include "PinStateItem.h"
 #include <PinState.h>
 #include "BasePropertyItem.h"
@@ -5,17 +7,16 @@
 const QList<QString> PinStateItem::propertyList{"NumericValue"};
 
 PinStateItem::PinStateItem(BaseRobotItem* i_parent,
-                           PinState* i_pinState):
-	BaseRobotItem("PinState",i_parent),
-	m_pinState(i_pinState)
-{
+                           PinState* i_pinState)
+	: BaseRobotItem("PinState",i_parent),
+          m_pinState(i_pinState) {
 	LOG_DEBUG(getElementName().toStdString());
 	setNumberOfProperties(1);
 }
 
 bool PinStateItem::setPropertyData(int i_row,
-																	 int i_column,
-																	 const QVariant& i_data){
+				   int i_column,
+				   const QVariant& i_data){
 	if(!m_pinState)
 		return false;
 	
@@ -41,7 +42,7 @@ bool PinStateItem::setPropertyData(int i_row,
 
 
 QVariant PinStateItem::getPropertyData(int i_row,
-																			 int i_column)const
+				       int i_column)const
 {
 	
 	if(i_row==PinStateItem::propertyList.indexOf("NumericValue"))

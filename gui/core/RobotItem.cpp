@@ -9,6 +9,7 @@
 const QList<QString> RobotItem::
   propertyList({"Speed", "CurrentPositionX", "CurrentPositionY"});
 
+
 RobotItem::RobotItem(BaseRobotItem* i_parent,
                      Robot::RobotPointer i_robotPointer):
     BaseRobotItem("Robot", i_parent) {
@@ -16,6 +17,7 @@ RobotItem::RobotItem(BaseRobotItem* i_parent,
   m_robotPointer = i_robotPointer;
   setNumberOfProperties(3);
 }
+
 
 QVariant RobotItem::getPropertyData(int i_row, int i_column) const {
   if (i_row == RobotItem::propertyList.indexOf("Speed")) {
@@ -78,9 +80,10 @@ bool RobotItem::construct() {
   return addJointControllerItem();
 }
 
+
 bool RobotItem::addJointControllerItem() {
   JointControllerItem* child = new JointControllerItem(
-      this, &m_robotPointer->getJointController());
+      this, m_robotPointer->getJointController());
   child->construct();
   return insertChild(childCount(), child);
 }

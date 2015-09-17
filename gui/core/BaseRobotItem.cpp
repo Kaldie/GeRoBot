@@ -5,6 +5,7 @@
 	A container for items of robot parts which is derived from TreeItem
 */
 
+#include <macroHeader.h>
 #include <QStringList>
 #include "BaseRobotItem.h"
 #include "BasePropertyItem.h"
