@@ -24,6 +24,9 @@ class MainWindow: public QMainWindow, private Ui::mainWindow {
   public slots:
       bool saveRobot();
   void resizeColumnsToContents(const QModelIndex& /*modelIndex*/);
+  bool saveTraceDesign();
+  bool loadTraceDesign();
+  bool clearTraceDesign();
 };
 
 #endif  // GUI_MAINWINDOW_H_

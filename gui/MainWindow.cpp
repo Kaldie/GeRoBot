@@ -5,6 +5,7 @@
 #include <PinState.h>
 #include <QFileDialog>
 #include <RobotIO.h>
+#include <TraceListIO.h>
 #include "./MainWindow.h"
 #include "./core/RobotTreeModel.h"
 #include "./core/RobotItem.h"
@@ -43,7 +44,12 @@ bool MainWindow::initialise() {
   connect(exitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
   // Save robot action
   connect(saveAction, SIGNAL(triggered()), this, SLOT(saveRobot()));
-
+  // Save trace design action
+  connect(saveTraceAction, SIGNAL(triggered()), this, SLOT(saveTraceDesign()));
+  // Save trace design action
+  connect(loadTraceAction, SIGNAL(triggered()), this, SLOT(loadTraceDesign()));
+  // Clear trace design action
+  connect(clearTraceAction, SIGNAL(triggered()), this , SLOT(clearTraceDesign()));
   // On expand addapt size of the columns
   connect(configurationView,
           SIGNAL(expanded(const QModelIndex& /*modelIndex*/)),
@@ -54,24 +60,68 @@ bool MainWindow::initialise() {
   robotMovementTab->layout()->addWidget(
     new RobotMovementWidget(robotPointer, this));
   traceDesignTab->layout()->addWidget(new TraceDesignWidget(this));
-  /* REMOVE, altough it give a nice thingy to look at!
-  TraceInfoWidget* info = traceDesignTab->findChild<TraceInfoWidget*>();
-  if (!info) {
-    LOG_ERROR("fond no info");}
-  Trace::TracePointer x(std::make_shared<Trace>());
-  //LOG_DEBUG("Trace type: " << x->getTraceType());
-  info->updateTrace(x);
-  // END OF REMOVE!!! */
   return true;
 }
 
 
 bool MainWindow::saveRobot() {
-  QString fileName = QFileDialog::getSaveFileName(this,
-                                                  tr("Save Robot to XML"));
+  QString fileName =
+    QFileDialog::getSaveFileName(this,
+                                 tr("Save Robot to XML"));
   RobotIO robotBuilder("defaultRobot.xml");
   //  m_modelPointer->getRobotPointer()
   robotBuilder.update(m_modelPointer->getRobotPointer());
   robotBuilder.store(fileName.toUtf8().constData());
   return true;
+}
+
+
+bool MainWindow::saveTraceDesign() {
+ QString fileName =
+   QFileDialog::getSaveFileName(this,
+                                tr("Save Trace Design to XML"));
+  TraceListIO traceListIO("/home/ruud/project/gerobot/gui/defaultTraceDesign.xml");
+  LOG_DEBUG("Storing trace design at: " << fileName.toStdString());
+  if (TraceDesignWidget* traceWidget = findChild<TraceDesignWidget*>()) {
+    LOG_DEBUG("Updating and saving!");
+    Trace::TracePointerVector vector = traceWidget->getVector();
+    traceListIO.update(vector);
+    traceListIO.store(fileName.toStdString());
+  } else {
+    LOG_DEBUG(traceWidget);
+    return false;
+  }
+  return true;
+}
+
+
+bool MainWindow::loadTraceDesign() {
+ QString fileName =
+   QFileDialog::getOpenFileName(this,
+                                tr("Load Trace Design to XML"),
+                                "",
+                                "XML files (*.xml)");
+ if (fileName.isNull()) {
+   return false;
+ }
+ LOG_DEBUG("Selected file to load: " << fileName.toStdString());
+ TraceListIO traceListIO(fileName.toStdString());
+  traceListIO.build();
+  if (TraceDesignWidget* traceWidget = findChild<TraceDesignWidget*>()) {
+    traceWidget->resetWidget(traceListIO.getVector());
+  } else {
+    LOG_DEBUG(traceWidget);
+    return false;
+  }
+  return true;
+}
+
+
+bool MainWindow::clearTraceDesign() {
+ if (TraceDesignWidget* traceWidget = findChild<TraceDesignWidget*>()) {
+   traceWidget->clearWidget();
+  } else {
+    LOG_DEBUG(traceWidget);
+    return false;
+  }
 }

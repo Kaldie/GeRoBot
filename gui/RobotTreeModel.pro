@@ -53,15 +53,16 @@
 
  CONFIG  += qt
  CONFIG += c++11
-
+# QMAKE_MOC_OPTIONS = -f../../../include/macroHeader.h
  QMAKE_CXXFLAGS += -Wfatal-errors
+# QMAKE_CXXFLAGS += -H
 
  QT += widgets
  INCLUDEPATH += /home/ruud/project/gerobot/include/
 
  LIBS += /home/ruud/project/gerobot/bin/lib/libGeRobot.so
 
- QMAKE_RPATHDIR += /home/ruud/project/gerobot/bin/lib/
+ #QMAKE_RPATHDIR += /home/ruud/project/gerobot/bin/lib/
 
  # install
  target.path = /home/ruud/projects/gerobot/GUI/output
