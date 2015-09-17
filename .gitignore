@@ -3,6 +3,7 @@ bin
 pugixml-1.4
 *moc*
 /GUI/Makefile
+*/build*/
 */output/*
 */unit_test/unitTest*
 .deps
