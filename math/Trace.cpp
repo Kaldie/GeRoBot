@@ -17,8 +17,6 @@ Trace::Trace(const Point2D& i_startPoint,
     m_endPoint(i_endPoint),
     m_rotationTolerance(0.1),
     m_translationTolerance(0.1) {
-  if (!isValidStartAndEndPoint(&i_startPoint, &i_endPoint))
-    LOG_ERROR("Start and end position is the same and thus not valid!");
 }
 
 
@@ -30,21 +28,8 @@ Trace::Trace(const Point2D& i_startPoint,
     m_endPoint(i_endPoint),
     m_rotationTolerance(0.1),
     m_translationTolerance(0.1) {
-if (!isValidStartAndEndPoint(&i_startPoint,
-                             &i_endPoint))
-  LOG_ERROR("Start and end position is the same and thus not valid!");
 }
 
-
-bool Trace::isValidStartAndEndPoint(const Point2D *i_startPoint,
-                                    const Point2D * i_endPoint) {
-  if ((*i_startPoint) == (*i_endPoint)) {
-    LOG_WARNING("Start and end coordinates are the same!");
-    return false;
-  } else {
-    return true;
-  }
-}
 
 Line2D Trace::getTraceLine() const {
   if (m_traceType == Line) {
@@ -130,7 +115,7 @@ std::string Trace::
                           Point2D const &i_desiredPoint) const {
   traceType currentPointMagnitude = Magnitude(i_currentPoint);
   traceType desiredPointMagnitude = Magnitude(i_desiredPoint);
-	
+
   if (currentPointMagnitude < desiredPointMagnitude)
     return "OUT";
   else if (currentPointMagnitude>desiredPointMagnitude)
@@ -140,7 +125,7 @@ std::string Trace::
 }
 
 
-Point2D Trace::intersectingPoint(const Point2D& i_currentPoint)const {
+Point2D Trace::intersectingPoint(const Point2D& i_currentPoint) const {
   return getTraceLine().getIntersectingPoint(i_currentPoint);
 }
 

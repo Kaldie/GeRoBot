@@ -71,9 +71,6 @@ class Trace {
   std::string getRotationDirection(const Point2D&, const Point2D&) const;
 
  private:
-  bool isValidStartAndEndPoint(const Point2D*,
-                               const Point2D*);
-
   bool isWithinRange(const Point2D&, const Point2D&) const;
   bool isWithinRange(const traceType&, const traceType&) const;
 
