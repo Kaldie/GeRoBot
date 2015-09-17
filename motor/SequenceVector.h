@@ -3,8 +3,9 @@
 #ifndef MOTOR_SEQUENCEVECTOR_H_
 #define MOTOR_SEQUENCEVECTOR_H_
 
+#include "./StateSequence.h"
+
 typedef std::vector<StateSequence> PinStateSequenceVector;
-class StateSequence;
 
 class SequenceVector {
   GETSET(PinStateSequenceVector,

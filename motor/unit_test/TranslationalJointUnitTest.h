@@ -40,7 +40,7 @@ class TranslationalJointUnitTest : public CxxTest::TestSuite {
     for (int i = 0;
          i < 45;
          i++) {
-      translationalJoint.predictStep(point, "OUT");
+      translationalJoint.predictSteps(&point, "OUT", 1);
     }
     TS_ASSERT_EQUALS(point, Point2D(0, 95));
   }
@@ -53,10 +53,10 @@ class TranslationalJointUnitTest : public CxxTest::TestSuite {
 
     std::string direction("OUT");
     std::string contraDirection("IN");
-    translationalJoint.predictSteps(point, direction, 90);
+    translationalJoint.predictSteps(&point, direction, 90);
     LOG_DEBUG(point.x << ", "<< point.y);
     TS_ASSERT_EQUALS(point, Point2D(0, 140));
-    translationalJoint.predictSteps(point, contraDirection, 90);
+    translationalJoint.predictSteps(&point, contraDirection, 90);
     TS_ASSERT_EQUALS(point, Point2D(0, 50));
   }
 

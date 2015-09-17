@@ -40,7 +40,7 @@ class RotationalJointUnitTest : public CxxTest::TestSuite {
     for (int i = 0;
          i < 45;
          i++) {
-      rotationalJoint.predictStep(point, "CCW");
+      rotationalJoint.predictSteps(&point, "CCW", 1);
     }
     TS_ASSERT_EQUALS(point, Point2D(-35.3553, 35.3553));
   }
@@ -53,12 +53,11 @@ class RotationalJointUnitTest : public CxxTest::TestSuite {
 
     std::string direction("CW");
     std::string contraDirection("CCW");
-    rotationalJoint.predictSteps(point, direction, 90);
+    rotationalJoint.predictSteps(&point, direction, 90);
     LOG_DEBUG(point.x << ", "<< point.y);
     TS_ASSERT_EQUALS(point, Point2D(50, 0));
-    rotationalJoint.predictSteps(point, contraDirection, 90);
+    rotationalJoint.predictSteps(&point, contraDirection, 90);
     TS_ASSERT_EQUALS(point, Point2D(0, 50));
-    
   }
 
   void testClone() {
@@ -69,9 +68,6 @@ class RotationalJointUnitTest : public CxxTest::TestSuite {
     std::vector<traceType> rangeVector {0, 180};
     int currentPosition = rotationalJoint.getPosition();
     rotationalJoint.setRange(rangeVector);
-    
-    
-
 
     std::shared_ptr<BaseJoint> cloned = rotationalJoint.clone();
 

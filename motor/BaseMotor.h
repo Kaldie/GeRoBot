@@ -26,11 +26,11 @@ class BaseMotor {
 
   // Move steps
   virtual void moveStep(const std::string&,
-                        StateSequence&) =0;
+                        StateSequence*) =0;
 
   virtual void moveSteps(const std::string& i_motorDirection,
                          const int& i_numberOfSteps,
-                         SequenceVector& i_vector) =0;
+                         SequenceVector* i_vector) =0;
 
   virtual int numberOfStatesPerStep() const =0;
 

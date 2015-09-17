@@ -10,6 +10,14 @@
 class JointController {
  public:
   typedef std::vector<BaseJoint::JointPointer> JointPointerVector;
+  typedef std::shared_ptr<JointController> JointControllerPointer;
+  /// vector with the shared pointers to joints
+  GETSET(JointPointerVector, m_jointPointerVector, JointPointerVector);
+  /// The actuator
+  GETSET(ArduinoMotorDriver, m_actuator, Actuator);
+  /// Vector where all the sequences will be stored in!
+  GET(SequenceVector, m_sequenceVector, SequenceVector);
+ public:
   JointController();
   ~JointController();
 
@@ -20,55 +28,44 @@ class JointController {
   bool addJoint(const BaseJoint::JointPointer&);
 
   /**
-   * Pepare to move a step
-   * @param[in] jointPointer Joint that will move
-   * @param[in] direction Direction string of the movement
-   * @param[in] appendToPrevious try to append to the last stateSequence
-   */
-  void moveStep(BaseJoint::JointPointer& jointPointer,
-                const std::string& direction,
-                const bool& appendToPrevious);
-
-  /**
    * Prepare to move steps
-   * @param[in] i_jointPointer pointer to the joint that needs to move
-   * @param[in] direction string with the direction of movements
-   * @param[in] numberOfSteps number of steps that will be set
-   * @param[in] i_append try to append the steps to the last StateSequence of the SequenceVector
+   * @param[in] i_direction string with the direction of movements
+   * @param[in] i_numberOfSteps number of steps that will be set
    */
-  void moveSteps(BaseJoint::JointPointer& jointPointer,
-                 const std::string& direction,
-                 const int& numberOfSteps,
-                 const bool i_append = false);
-
-  /// Methods to retrieve the joint(s) of a specific type
-  JointPointerVector getJoints(const MovementType&);
-  BaseJoint::JointPointer& getJoint(const MovementType&);
+  void moveSteps(const std::string& i_direction,
+                 const int& i_numberOfSteps);
 
   /// Method to the Arduino actuator pointer
   ArduinoMotorDriver* getActuatorPointer() {return &m_actuator;}
+
+  /// Method which uploads the current sequence to the actuator
+  void uploadSequence();
 
   /// function which will make the robot move!
   void actuate();
 
   /**
    * Reducing the size of the vector
-   * @paramp[in] i_removeElements remove elements from the vector
+   * @param[in] i_removeElements remove elements from the vector
    * relay the call to the sequence vector SequenceVector::condenseVector()
    */
   bool condenseVector(bool i_removeElements = false) {
     return m_sequenceVector.condenseVector(i_removeElements);};
 
+  /**
+   * Resolve the joint based on the direction specified
+   * The method determines which joint is necesary based on the movement direction
+   * Means that each joint produces a specific motion
+   */
+  BaseJoint::JointPointer resolveJoint(const std::string& i_movementDirection);
+  /**
+   * Resolve the joint based on the movement type
+   * The method determines which joint is necesary based on the movement direction
+   * Means that each joint produces a specific motion
+   */
+  BaseJoint::JointPointer resolveJoint(const MovementType& i_movementType);
+
  private:
-  /// vector with the joints
-  GETSET(JointPointerVector, m_jointPointerVector, JointPointerVector);
-  GETSET(ArduinoMotorDriver, m_actuator, Actuator);
-
-  /// Vector where all the sequences will be stored in!
-  GET(SequenceVector,
-      m_sequenceVector,
-      SequenceVector);
-
   /**
    * returns the number of joints currently registed
    */
@@ -88,6 +85,9 @@ class JointController {
    * identifies if the joint is already registered
    */
   bool hasJoint(const BaseJoint::JointPointer&) const;
+
+  /// Method to retrieve the joint of the type
+  BaseJoint::JointPointer& getJoint(const MovementType&);
 };
 
 #endif  // MOTOR_JOINTCONTROLLER_H_

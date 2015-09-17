@@ -71,8 +71,7 @@ class JointControllerTestSuite : public CxxTest::TestSuite {
         jointController.getSequenceVector();
     TS_ASSERT_EQUALS(pinStateVector.numberOfSequences(), 0);
     LOG_INFO("JointControlerUnitTest::test resetPinState");
-    BaseJoint::JointPointer rotationalJointPointer = jointController.getJoint(Rotational);
-    jointController.moveStep(rotationalJointPointer, "CW", false);
+    jointController.moveSteps("CW", 1);
     pinStateVector =
         jointController.getSequenceVector();
 
@@ -93,12 +92,7 @@ class JointControllerTestSuite : public CxxTest::TestSuite {
 
   void testMoveStep() {
     LOG_INFO("JointControlerUnitTest::test move step");
-    BaseJoint::JointPointer rotationalJointPointer = jointController.getJoint(Rotational);
-    BaseJoint::JointPointer translationJointPointer =
-        jointController.getJoint(Translational);
-
-    jointController.moveStep(rotationalJointPointer, "CCW", true);
-
+    jointController.moveSteps("CCW", 1);
     TS_ASSERT_EQUALS(
         jointController.getSequenceVector().numberOfSequences(), 2);
     std::vector<int> integerSequence =
@@ -109,7 +103,7 @@ class JointControllerTestSuite : public CxxTest::TestSuite {
         (std::vector<int> {128, 0, 128, 160}));
 
     // step also with the other joint
-    jointController.moveStep(translationJointPointer, "OUT", true);
+    jointController.moveSteps( "OUT", 1);
 
     LOG_DEBUG("Test if the pin state has the same number of steps");
     TS_ASSERT_EQUALS(jointController.getSequenceVector().numberOfSequences(),
@@ -117,7 +111,6 @@ class JointControllerTestSuite : public CxxTest::TestSuite {
 
     integerSequence = (*(jointController.getSequenceVector().
                           end()-1)).getIntegerSequence();
-
     TS_ASSERT_EQUALS(
         integerSequence,
         (std::vector<int> {152, 8, 152, 188}));
@@ -125,11 +118,11 @@ class JointControllerTestSuite : public CxxTest::TestSuite {
 
   void testMoveSteps() {
     LOG_INFO("JointControlerUnitTest:: test move steps");
-    BaseJoint::JointPointer rotationalJointPointer = jointController.getJoint(Rotational);
+    BaseJoint::JointPointer rotationalJointPointer = jointController.resolveJoint(Rotational);
     BaseJoint::JointPointer translationJointPointer =
-        jointController.getJoint(Translational);
+        jointController.resolveJoint(Translational);
 
-    jointController.moveSteps(rotationalJointPointer, "CW", 5);
+    jointController.moveSteps("CW", 5);
     TS_ASSERT_EQUALS(
         jointController.getSequenceVector().numberOfSequences(), 4);
 

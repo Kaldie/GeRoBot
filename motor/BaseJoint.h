@@ -4,17 +4,10 @@
 #define MOTOR_BASEJOINT_H_
 
 class Point2D;
-// forward declare the class so we can create a type def JointPointer
-class BaseJoint;
-
+class SequenceVector;
+class BaseMotor;
 
 class BaseJoint {
-
- private:
-    // Pure virtual call!
-    virtual int getPositionModifier(const std::string&) const =0;
-
- protected:
     GETSET(double, m_currentPosition, Position)
     GETSET(double, m_movementPerStep, MovementPerStep)
     GET(std::vector<double>, m_range, Range)
@@ -22,10 +15,6 @@ class BaseJoint {
     GETSET(DirectionConversionMap,
            m_directionConversion,
            DirectionConversionMap)
-
-    virtual BaseJoint* cloneImpl() const = 0;
-    void isInRange(double i_jointPosition);
-
  public:
     typedef std::shared_ptr<BaseJoint> JointPointer;
 
@@ -38,7 +27,6 @@ class BaseJoint {
     /**
      * Convert the direction the joint moves to the direction the motor has to move.
      * @param[in] i_direction direction the joint has to move
-     * @param[out] direction the motor has to move to do it
      */
     const std::string convertDirection(const std::string i_direction)const;
 
@@ -54,24 +42,26 @@ class BaseJoint {
     */
 
     /**
-     * Predict a step
-     * method calls predictSteps with number of steps = 1
-     * @param[in/out] RobotPosition
-     * @param[in] Direction of movement
+     * Set actual steps
+     * This function updates the position of the joint
+     * Call this function when you have determined
+     * that setting the step is a great idea and want to actualise it
      */
-    virtual void predictStep(Point2D& io_currentPosition,
-                             const std::string& i_direction);
+    void moveSteps(const std::string& i_directionString,
+                   const int& i_numberOfSteps,
+                   SequenceVector* i_vector);
+
     /**
      * Predict a step
      * method calls predictSteps with number of steps = 1
-     * @param[in/out] RobotPosition
-     * @param[in] Direction of movement
+     * @param[in] io_robotPosition Current position of the robot
+     * @param[in] i_direction Direction of movement
      * @param[in] i_number number of steps
      */
-    virtual void predictSteps(Point2D& io_robotPosition,
+    // Actual methods!
+    virtual void predictSteps(Point2D* io_robotPosition,
                               const std::string& i_direction,
-                              const int& i_number) = 0;
-
+                              const int& i_number) const = 0;
     /**
      * Method to clone the joint and return a smart point to the cloned BaseJoint
      * Method call cloneImpl() which is pure virtual method.
@@ -80,22 +70,30 @@ class BaseJoint {
     std::shared_ptr<BaseJoint> clone() const {
       return std::shared_ptr<BaseJoint>( this->cloneImpl() ); }
 
+    /// default constructor
     BaseJoint();
-    
+    /// constructor with position and step size
     BaseJoint(const double& i_currentPosition,
               const double& i_movementPerStep);
-
+    /// Constructor with position, step size and direction conversion map
     BaseJoint(const double& i_currentPosition,
-              const double& i_movementType,
+              const double& i_movementPerStep,
               const DirectionConversionMap& i_directionConverionMap);
-
+    /// fully fledged constructor
     BaseJoint(const double& i_currentPosition,
               const double& i_movementPerStep,
               const std::vector<double> i_rangeVector,
               const MovementType& i_movementType,
               const DirectionConversionMap& i_directionConverionMap);
-
+    /// Mandatory virtual destructor
     virtual ~BaseJoint(){};
-
+ protected:
+    /// Pure virtual implementation of the clone implementation
+    virtual BaseJoint* cloneImpl() const = 0;
+    /// Is in range of the joint.
+    void isInRange(double i_jointPosition) const;
+ private:
+    /// Given a direction, give the modifier: does the position in or descrease
+    virtual int getPositionModifier(const std::string&) const = 0;
 };
 #endif  // MOTOR_BASEJOINT_H_

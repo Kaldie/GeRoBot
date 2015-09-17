@@ -16,9 +16,9 @@ class TranslationalJoint: public BaseJoint {
 
  public:
     // Actual methods!
-    virtual void predictSteps(Point2D&,
+    virtual void predictSteps(Point2D*,
                               const std::string&,
-                              const int&);
+                              const int&) const;
 
     virtual ActuatorType* getMotor() {return &m_actuator;};
 
@@ -47,18 +47,17 @@ class TranslationalJoint: public BaseJoint {
 
 
 // Constructors
-template <class ActuatorType>
-TranslationalJoint<ActuatorType>::TranslationalJoint()
-:BaseJoint() {
+template <class ActuatorType>TranslationalJoint<ActuatorType>::
+TranslationalJoint()
+ : BaseJoint() {
   setDirectionConversionMap({{"IN", "CCW"}, {"OUT", "CW"}});
   setMovementType(Translational);
 }
 
 
-template <class ActuatorType>
-TranslationalJoint<ActuatorType>::
-  TranslationalJoint(const double& i_currentPosition,
-                     const double& i_movementPerStep)
+template <class ActuatorType>TranslationalJoint<ActuatorType>::
+TranslationalJoint(const double& i_currentPosition,
+                   const double& i_movementPerStep)
 : BaseJoint(i_currentPosition,
             i_movementPerStep,
             {{"IN", "CCW"}, {"OUT", "CW"}}) {
@@ -105,17 +104,17 @@ int TranslationalJoint<ActuatorType>::
 
 
 template <class ActuatorType>
-void TranslationalJoint<ActuatorType>::
-  predictSteps(Point2D& o_position,
-               const std::string& i_directionString,
-               const int& i_numberOfSteps) {
-  double currentAngle = o_position.getAlpha();
-  double newLength = Magnitude(o_position)+getMovementPerStep() *
+void TranslationalJoint<ActuatorType>::predictSteps
+(Point2D* o_position,
+ const std::string& i_directionString,
+ const int& i_numberOfSteps) const {
+  double currentAngle = o_position->getAlpha();
+  double newLength = Magnitude(*o_position)+getMovementPerStep() *
       getPositionModifier(i_directionString) * i_numberOfSteps;
-  o_position.x = cos(currentAngle)*newLength;
-  o_position.y = sin(currentAngle)*newLength;
+  o_position->x = cos(currentAngle)*newLength;
+  o_position->y = sin(currentAngle)*newLength;
   LOG_INFO("Position after translation is: "
-           <<o_position.x << ", " << o_position.y);
+           <<o_position->x << ", " << o_position->y);
 }
 
 

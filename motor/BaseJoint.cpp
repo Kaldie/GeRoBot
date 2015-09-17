@@ -2,35 +2,28 @@
 
 #include <macroHeader.h>
 #include "BaseJoint.h"
-
+#include "./BaseMotor.h"
+#include "./SequenceVector.h"
 
 void BaseJoint::setRange(const std::vector<double>& i_range) {
   if (i_range.size() != 2)
     LOG_ERROR("Size of range vector should be 2, not : "
               << i_range.size());
-  m_range = i_range;
-
   // first range entry should smaller then the first!
-  if (m_range[0]>m_range[1])
+  if (i_range[0] > i_range[1])
     LOG_ERROR("first entry of the range should be smaller then the second!");
+  m_range = i_range;
 }
 
 
-void BaseJoint::isInRange(double i_attemptedPosition) {
-  const std::vector<double> thisRange = getRange();
-  if (i_attemptedPosition > thisRange[1] or
-     i_attemptedPosition < thisRange[0]) {
+void BaseJoint::isInRange(double i_attemptedPosition) const{
+  if (i_attemptedPosition > m_range[1] or
+     i_attemptedPosition < m_range[0]) {
     LOG_ERROR("Position is not in the range of the joint: " <<
               m_movementType <<
               "Intended position is: " << i_attemptedPosition<<
-              "Range: " << getRange()[0] << ", " << getRange()[1]);
+              "Range: " << m_range[0] << ", " << m_range[1]);
   }
-}
-
-
-void BaseJoint::predictStep(Point2D& o_position,
-                            const std::string& i_directionString) {
-  predictSteps(o_position, i_directionString, 1);
 }
 
 
@@ -56,30 +49,28 @@ const std::string BaseJoint::convertDirection(
 }
 
 
-/*
-BaseJoint& BaseJoint::operator=(const BaseJoint& rhs)
-{
-    if(&rhs==this)
-	return *this;
-
-    this->m_currentPosition=rhs.m_currentPosition;
-    this->m_movementPerStep=rhs.m_movementPerStep;
-    std::copy(std::begin(rhs.m_range),std::end(rhs.m_range),std::begin(this->m_range));
-    this->m_movementType=rhs.m_movementType;
-    this->m_directionConversion=rhs.m_directionConversion;
-    return *this;
+void BaseJoint::moveSteps(const std::string& i_directionString,
+                          const int& i_numberOfSteps,
+                          SequenceVector* i_vector) {
+  int positionModifier = getPositionModifier(i_directionString);
+  LOG_DEBUG("Position modifier is: "<< positionModifier);
+  LOG_DEBUG("Movement per step is: " << getMovementPerStep());
+  setPosition(m_currentPosition +
+              (getMovementPerStep() * positionModifier * i_numberOfSteps));
+  // tell the actuator to add some steps to sequenceVector
+  getMotor()->moveSteps(convertDirection(i_directionString),
+                       i_numberOfSteps,
+                       i_vector);
 }
-*/
+
 
 BaseJoint::BaseJoint()
     : BaseJoint(0,
                 0.01,
                 {-90.0, 90.0},
                 None,
-                {
-                  {"CCW","CCW"},
-                  {"CW","CW"}
-                })
+                {{"CCW","CCW"},
+                 {"CW","CW"}})
 {}
 
 

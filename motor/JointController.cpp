@@ -101,23 +101,8 @@ bool JointController::addJoint(const BaseJoint::JointPointer& i_joint) {
 }
 
 
-JointController::JointPointerVector JointController::getJoints(
-    const MovementType &i_movementType) {
-
-  JointController::JointPointerVector requiredJoints;
-  for (JointController::JointPointerVector::iterator itr = m_jointPointerVector.begin();
-      itr != m_jointPointerVector.end();
-      itr++) {
-    if ((*itr)->getMovementType() == i_movementType) {
-      requiredJoints.push_back((*itr));
-    }
-  }
-  return requiredJoints;
-}
-
-
 BaseJoint::JointPointer& JointController::getJoint(const MovementType &i_movementType) {
-  if (m_jointPointerVector.size() < 1)
+  if (m_jointPointerVector.size() == 0)
     LOG_ERROR("No joints defined yet");
 
   if (m_jointPointerVector.size() == 1)
@@ -142,7 +127,7 @@ void JointController::resetPinStateSequence() {
 
 
 bool JointController::hasJoint(const BaseJoint::JointPointer& i_jointPointer) const {
-  for (JointController::JointPointerVector::const_iterator itr = m_jointPointerVector.begin();
+  for (JointPointerVector::const_iterator itr = m_jointPointerVector.begin();
       itr != m_jointPointerVector.end();
       itr++) {
     if (i_jointPointer == (*itr))
@@ -152,62 +137,45 @@ bool JointController::hasJoint(const BaseJoint::JointPointer& i_jointPointer) co
 }
 
 
-void JointController::moveStep(BaseJoint::JointPointer& i_jointPointer,
-                               const std::string& i_directionString,
-                               const bool& i_appendToPreviousStep) {
-  if (!hasJoint(i_jointPointer)) {
-    LOG_ERROR("Joint not avalaible in this controller!");
-  }
-
-  std::string motorDirection =
-      i_jointPointer->convertDirection(i_directionString);
-
-  StateSequence stateSequence;
-  i_jointPointer->getMotor()->moveStep(motorDirection, stateSequence);
-
-  if (i_appendToPreviousStep) {
-    m_sequenceVector.appendStateSequence(stateSequence, true);
-  } else {
-    m_sequenceVector.appendStateSequence(stateSequence, false);
-  }
-}
-
-
-void JointController::moveSteps(BaseJoint::JointPointer& i_jointPointer,
-                                const std::string& i_directionString,
-                                const int& i_numberOfSteps,
-                                const bool i_append /* = false */) {
-  // Check if the joint controller has this joint
-  if (!hasJoint(i_jointPointer))
-    LOG_ERROR("Joint not avalaible in this controller!");
-  i_jointPointer->getMotor()->moveSteps(i_directionString,
-                                        i_numberOfSteps,
-                                        m_sequenceVector);
+void JointController::moveSteps(const std::string& i_directionString,
+                                const int& i_numberOfSteps) {
+  BaseJoint::JointPointer joint = resolveJoint(i_directionString);
+  joint->moveSteps(i_directionString, i_numberOfSteps, &m_sequenceVector);
 }
 
 
 //  Brief: Actuate the robot from the given pin state sequence
 void JointController::actuate() {
+  uploadSequence();
+  m_actuator.actuate();
+  resetPinStateSequence();
+}
+
+
+void JointController::uploadSequence() {
   m_sequenceVector.normalise();
   for (PinStateSequenceVector::const_iterator pinStateSequenceIterator
-           = m_sequenceVector.begin();
+         = m_sequenceVector.begin();
        pinStateSequenceIterator != m_sequenceVector.end();
        pinStateSequenceIterator++) {
-#ifdef NDEBUG
-    pinStateSequenceIterator->displaySequence();
-#endif  /// NDEBUG statement that shows the sequences
     /// Get the integer sequence of this pin state
     if (pinStateSequenceIterator->getNumberOfRepetitions() > 0) {
       m_actuator.upload(pinStateSequenceIterator->createArduinoBuffer());
     }
-#ifdef DEBUG
-    auto x = pinStateSequenceIterator->createArduinoBuffer();
-    for (auto i = x.begin();
-         i != x.end();
-         i++)
-      LOG_DEBUG(*i);
-#endif  /// Shows the actual message passed though the arduino driver
   }
-  m_actuator.actuate();
-  resetPinStateSequence();
+}
+
+
+BaseJoint::JointPointer JointController::resolveJoint(const std::string& i_movementDirection) {
+  if (i_movementDirection == "CCW" or i_movementDirection == "CW") {
+    return getJoint(Rotational);
+  }
+  if (i_movementDirection == "IN" or i_movementDirection == "OUT") {
+    return getJoint(Translational);
+  }
+  LOG_ERROR("Could not resolve movement direction: " << i_movementDirection);
+}
+
+BaseJoint::JointPointer JointController::resolveJoint(const MovementType& i_movementType) {
+  return getJoint(i_movementType);
 }
