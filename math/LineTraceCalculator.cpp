@@ -10,133 +10,112 @@
 
 
 LineTraceCalculator::LineTraceCalculator()
-    : BaseTraceCalculator(),
-      m_hasRotated(true),
-      m_hasTranslated(true)
+    : BaseTraceCalculator()
 {}
 
 
 LineTraceCalculator::LineTraceCalculator
-(const JointController::JointControllerPointer& i_jointController)
-    : BaseTraceCalculator(i_jointController),
-      m_hasRotated(true),
-      m_hasTranslated(true)
+(Robot* i_robotPointer)
+    : BaseTraceCalculator(i_robotPointer)
 {}
 
 
 LineTraceCalculator::LineTraceCalculator
-(const JointController::JointControllerPointer& i_jointController,
+(Robot* i_robotPointer,
  const traceType& i_tolerance)
-    : BaseTraceCalculator(i_jointController,
-                          i_tolerance),
-      m_hasRotated(true),
-      m_hasTranslated(true)
+    : BaseTraceCalculator(i_robotPointer,
+                          i_tolerance)
 {}
 
 
-void LineTraceCalculator::calculateTrace(const Trace* i_trace,
-                                         Point2D& i_point) {
+void LineTraceCalculator::calculateTrace(const Trace& i_trace) {
   // Setting the capacity of the vector to hold all the data
   int i = 0;
   bool hasStepped(true);
   do {
-    hasStepped = calculateStep(i_trace, i_point);
+    hasStepped = calculateStep(i_trace);
     i++;
   }while(hasStepped);  // and i<1000);
 }
 
 
-bool LineTraceCalculator::calculateStep(const Trace* i_trace,
-                                        Point2D& i_point2D) const {
+bool LineTraceCalculator::calculateStep(const Trace& i_trace) const {
   // keeping track if the robot is orded to translate or rotated
   bool hasStepped = false;
   // should rotate?
-  if (shouldRotate(*i_trace, i_point2D)) {
+  if (shouldRotate(i_trace,
+                   m_robot->getVirtualPosition())) {
     // add rotation to the delay list and correct translations
-    prepareRotation(i_trace,
-                    i_point2D);
+    prepareRotation(i_trace);
     hasStepped = true;
-  } else if (shouldTranslate(*i_trace, i_point2D)) {
-    prepareTranslation(i_trace, i_point2D);
+  } else if (shouldTranslate(i_trace,
+                             m_robot->getVirtualPosition())) {
+    prepareTranslation(i_trace);
     hasStepped = true;
   }
   return hasStepped;
 }
 
 
-void LineTraceCalculator::prepareRotation(const Trace* i_trace,
-                                          Point2D& i_point2D)const {
-  // Rotating
-  //    m_hasRotated=true;
+void LineTraceCalculator::prepareRotation(const Trace& i_trace)const {
   // Rotation direction
-  std::string direction = i_trace->getRotationDirectionToEndPoint(i_point2D);
-
-  // See where we end up after rotation
-  m_jointController->resolveJoint(Rotational)->predictSteps(&i_point2D, direction, 1);
-
-  if (getWriteLog())
-    writeToStepLog(direction, 1, i_point2D);
-
+  std::string direction =
+    i_trace.getRotationDirectionToEndPoint(m_robot->getVirtualPosition());
   // user needs to know :)
   LOG_INFO("Rotating: " << direction);
-
   // Correct the rotation
-  correctRotation(i_trace, i_point2D);
-
-  m_jointController->moveSteps(direction,
-                               1);
-}
-
-void LineTraceCalculator::prepareTranslation(const Trace* i_trace,
-                                             Point2D& i_point2D) const {
-  //    m_hasTranslated=true;
-  // identify the direction to move to
-  std::string direction = i_trace->getTranslationDirectionToEndPoint(i_point2D);
-
-  // Predict the step
-  m_jointController->resolveJoint(Translational)->
-    predictSteps(&i_point2D, direction ,1);
-
+  correctRotation(i_trace);
+  // Prepare a step
+  m_robot->prepareSteps(direction, 1);
   if (getWriteLog())
-    writeToStepLog(direction, 1, i_point2D);
+    writeToStepLog(direction, 1, m_robot->getVirtualPosition());
 
-  LOG_INFO("Translating: " << direction);
 
+}
+
+void LineTraceCalculator::prepareTranslation(const Trace& i_trace) const {
+  // identify the direction to move to
+  std::string direction =
+    i_trace.getTranslationDirectionToEndPoint(m_robot->getVirtualPosition());
   // Correct the rotation, if nessesary!
-  correctTranslation(i_trace, i_point2D);
-  m_jointController->moveSteps(direction, 1);
+  correctTranslation(i_trace);
+  // Predict the step
+  LOG_INFO("Translating: " << direction);
+  m_robot->prepareSteps(direction, 1);
+  if (getWriteLog())
+    writeToStepLog(direction, 1, m_robot->getVirtualPosition());
 }
 
 
-bool LineTraceCalculator::correctRotation(const Trace* i_trace,
-                                          Point2D& i_point2D) const {
-  traceType jointPointDifference;
-  const Point2D* destinationPoint;
-
+bool LineTraceCalculator::correctRotation(const Trace& i_trace) const {
   Point2D intersectingPoint;
-
+  Point2D currentRobotPosition = m_robot->getVirtualPosition();
   try {
-    intersectingPoint = i_trace->intersectingPoint(i_point2D);
+    intersectingPoint =
+      i_trace.intersectingPoint(currentRobotPosition);
   }
   catch(std::runtime_error) {
     LOG_DEBUG("Found no intersection reverting the old position!");
     return false;
   }
-
-  /* The distance to the enpoint after the correction is applied*/
+  LOG_DEBUG("point: " << currentRobotPosition.x
+            << " , "<< currentRobotPosition.y);
+  LOG_DEBUG("Intersecting point: " << intersectingPoint.x << " , "<< intersectingPoint.y);
+  // The distance to the enpoint after the correction is applied*/
   traceType distenceEndPointIntersectingPoint =
-      Magnitude(intersectingPoint-i_trace->getEndPoint());
-
-  /* The distance traveled in this correction*/
+      Magnitude(intersectingPoint - i_trace.getEndPoint());
+  // The distance traveled in this correction
   traceType distanceBeginPointIntersectingPoint =
-      Magnitude(intersectingPoint-i_point2D);
-
+      Magnitude(intersectingPoint - currentRobotPosition);
+  // calculate the correction distance and destination after correction
+  traceType jointPointDifference;
+  const Point2D* destinationPoint;
   if (distenceEndPointIntersectingPoint < distanceBeginPointIntersectingPoint) {
     /*if the distance needed in the next step is smaller then the distance we travel in this correction step
       Don't overshoot
     */
-    jointPointDifference = Magnitude(i_trace->getEndPoint()-i_point2D);
-    destinationPoint=&(i_trace->getEndPoint());
+    jointPointDifference = Magnitude(i_trace.getEndPoint()-currentRobotPosition);
+    destinationPoint=&(i_trace.getEndPoint());
   } else {
     /*
       Otherwise we assume that there is enough distance, 
@@ -150,41 +129,31 @@ bool LineTraceCalculator::correctRotation(const Trace* i_trace,
 
   LOG_INFO("Destination point is: " <<
            destinationPoint->x << ", " << destinationPoint->y);
-
-  int numberOfSteps = std::floor((jointPointDifference)/m_jointController->
-                                 resolveJoint(Translational)->getMovementPerStep());
+  // calculate the number of steps needed to correct
+  int numberOfSteps = std::floor((jointPointDifference) / m_robot->
+                                 getMovementPerStep(Translational));
 
   if (numberOfSteps>0) {
+    // calculate the direction and prepare them
     std::string translationDirection=
-        i_trace->getTranslationDirection(i_point2D, *destinationPoint);
-
-    m_jointController->resolveJoint(Translational)->
-        predictSteps(&i_point2D, translationDirection, numberOfSteps);
-
-    m_jointController->moveSteps(translationDirection,
-                                 numberOfSteps);
-
-    LOG_INFO("Number of correction steps: " <<
-             numberOfSteps << " in the " <<
+        i_trace.getTranslationDirection(currentRobotPosition, *destinationPoint);
+    m_robot->prepareSteps(translationDirection, numberOfSteps);
+    LOG_INFO("Number of correction steps: " << numberOfSteps << " in the " <<
              translationDirection << " direction");
     if (getWriteLog())
-      writeToStepLog(translationDirection, numberOfSteps, i_point2D);
+      writeToStepLog(translationDirection, numberOfSteps, m_robot->getVirtualPosition());
     return true;
-
   } else {
     return false;
   }
 }
 
-
-bool LineTraceCalculator::correctTranslation(const Trace* i_trace,
-                                             Point2D& i_point2D) const {
+bool LineTraceCalculator::correctTranslation(const Trace& i_trace) const {
   /* The distance to the enpoint after the correction is applied*/
-
   Point2D intersectingPoint;
-
+  Point2D currentRobotPosition = m_robot->getVirtualPosition();
   try {
-    intersectingPoint = i_trace->intersectingPoint(i_point2D);
+    intersectingPoint = i_trace.intersectingPoint(currentRobotPosition);
   }
   catch(std::runtime_error) {
     LOG_DEBUG("Found no intersection reverting the old position!");
@@ -194,9 +163,9 @@ bool LineTraceCalculator::correctTranslation(const Trace* i_trace,
   if (intersectingPoint == Point2D(0, 0))
     return false;
 
-  traceType currentRotation = i_point2D.getAlpha();
+  traceType currentRotation = currentRobotPosition.getAlpha();
   traceType intersectingAngle = intersectingPoint.getAlpha();
-  traceType endPointAngle = i_trace->getEndPoint().getAlpha();
+  traceType endPointAngle = i_trace.getEndPoint().getAlpha();
 
   LOG_INFO("Distination point: " << intersectingPoint.x <<
            ", " << intersectingPoint.y);
@@ -206,29 +175,21 @@ bool LineTraceCalculator::correctTranslation(const Trace* i_trace,
   /* The distance to the enpoint after the correction is applied*/
   traceType distenceEndPointIntersectingPoint =
       std::abs(endPointAngle-intersectingAngle);
-
   // The distance traveled in this correction
   traceType distanceBeginPointIntersectingPoint =
       std::abs(currentRotation-intersectingAngle);
-
-  // traceType distinationPointRotation=intersectingPoint.getAlpha();
-  // traceType jointAngleDifference=currentRotation-distinationPointRotation;
-
   LOG_INFO("Joint angle difference: " <<
            distanceBeginPointIntersectingPoint*(PI/180));
-
   // Anglular distance for the correction
   traceType jointPointDifference;
-
   // Position the joint is aiming for
   Point2D destinationPoint;
-
   if (distenceEndPointIntersectingPoint < distanceBeginPointIntersectingPoint) {
     /*if the distance needed in the next step is smaller then the distance we travel in this correction step
       Don't overshoot
     */
     jointPointDifference = distanceBeginPointIntersectingPoint;
-    destinationPoint = i_trace->getEndPoint();
+    destinationPoint = i_trace.getEndPoint();
   } else {
     /*
       Otherwise we assume that there is enough distance, 
@@ -239,33 +200,18 @@ bool LineTraceCalculator::correctTranslation(const Trace* i_trace,
     destinationPoint = intersectingPoint;
     jointPointDifference*=2.0;
   }
-
+  // calculate the number of steps needed to correct
   int numberOfSteps = std::floor(jointPointDifference/
-                               m_jointController->resolveJoint(Rotational)->
-                               getMovementPerStep()*(PI/180.0));
+                                 m_robot->getMovementPerStep(Rotational));
 
   if (numberOfSteps>0) {
-    std::string rotationDirection = i_trace->
-        getRotationDirection(i_point2D,
-                             destinationPoint);
-
-    m_jointController->
-      resolveJoint(Rotational)->predictSteps(&i_point2D,
-                                             rotationDirection,
-                                             numberOfSteps);
-
-    m_jointController->moveSteps(rotationDirection,
-                                 numberOfSteps);
-
+    // direction of correction
+    std::string rotationDirection =
+      i_trace. getRotationDirection(currentRobotPosition, destinationPoint);
+    m_robot->prepareSteps(rotationDirection, numberOfSteps);
     if (getWriteLog())
-      writeToStepLog(rotationDirection, numberOfSteps, i_point2D);
-
+      writeToStepLog(rotationDirection, numberOfSteps, m_robot->getVirtualPosition());
     return true;
   }
   return false;
 }
-
-bool LineTraceCalculator::hasStepped() {
-  return (m_hasTranslated or m_hasRotated);
-}
-

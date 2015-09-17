@@ -6,40 +6,31 @@
 
 class Point2D;
 class Trace;
-class JointController;
+class Robot;
 
 class LineTraceCalculator: public BaseTraceCalculator {
- protected:
-  // Calculation variables
-  bool m_hasRotated = true;
-  bool m_hasTranslated = true;
-  bool calculateStep(const Trace*,
-                     Point2D&) const;
-  void setRotationStep();
-  void setTranslationStep();
-  void prepareTranslation(const Trace*,
-                          Point2D&)const;
-  void prepareRotation(const Trace*,
-                       Point2D&)const;
-  bool correctRotation(const Trace*,
-                       Point2D&) const;
-  bool correctTranslation(const Trace*,
-                          Point2D&) const;
-  bool hasStepped();
-  void prepareNextStep();
-
  public:
   // Calculation method
-  virtual void calculateTrace(const Trace*,
-                              Point2D&);
+  virtual void calculateTrace(const Trace&);
+
   // Constructors
   LineTraceCalculator();
 
   explicit LineTraceCalculator
-    (const JointController::JointControllerPointer& i_jointControlerPointer);
+    (Robot* i_robotPointer);
 
-  LineTraceCalculator(const JointController::JointControllerPointer&,
+  LineTraceCalculator(Robot* i_robotPointer,
                       const traceType& i_tolerance);
+ protected:
+  // Calculation variables
+  bool calculateStep(const Trace&) const;
+  void setRotationStep();
+  void setTranslationStep();
+  void prepareTranslation(const Trace&) const;
+  void prepareRotation(const Trace&) const;
+  bool correctRotation(const Trace&) const;
+  bool correctTranslation(const Trace&) const;
+  void prepareNextStep();
 };
 
 #endif  // MATH_LINETRACECALCULATOR_H_

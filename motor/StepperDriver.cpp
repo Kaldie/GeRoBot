@@ -29,9 +29,7 @@ bool StepperDriver::setEnable(const bool& i_setEnable) {
     } else {
       newState = DEFAULT_STATE;
     }
-
     if (newState != pinState.getPinState(enablePin())) {
-      LOG_DEBUG("Change current pin state!");
       pinState.update(enablePin(), newState);
       setCurrentPinState(pinState);
       return true;
@@ -80,14 +78,7 @@ void StepperDriver::moveStep(
 
   PinStateVector pinStateVector;
   // Enable the driver!
-  bool changeDirectionOrEnable = false;
-  if (setEnable(true))
-    changeDirectionOrEnable = true;
-
-  if (setDirection(i_direction))
-    changeDirectionOrEnable = true;
-
-  if (changeDirectionOrEnable)
+  if (setEnable(true) | setDirection(i_direction))
     pinStateVector.push_back(getCurrentPinState());
 
   PinState pinState = getCurrentPinState();

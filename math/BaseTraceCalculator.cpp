@@ -10,17 +10,17 @@
 
 BaseTraceCalculator::BaseTraceCalculator()
     : m_tolerance(0.01),
-      m_jointController(nullptr),
+      m_robot(nullptr),
       m_translationTolerance(0.01),
       m_rotationTolerance(0.01),
       m_writeLog(false),
       m_logFileName("./stepLog.log")
 {}
 
-BaseTraceCalculator::BaseTraceCalculator(
- const JointController::JointControllerPointer& i_jointController)
+BaseTraceCalculator::BaseTraceCalculator
+(Robot* i_robotPointer)
     : m_tolerance(0.01),
-      m_jointController(i_jointController),
+      m_robot(i_robotPointer),
       m_translationTolerance(0.01),
       m_rotationTolerance(0.01),
       m_writeLog(false),
@@ -29,10 +29,10 @@ BaseTraceCalculator::BaseTraceCalculator(
 }
 
 BaseTraceCalculator::BaseTraceCalculator
- (const JointController::JointControllerPointer& i_jointController,
-  const traceType& i_tolerance)
+(Robot* i_robotPointer,
+ const traceType& i_tolerance)
     : m_tolerance(i_tolerance),
-      m_jointController(i_jointController),
+      m_robot(i_robotPointer),
       m_translationTolerance(0.01),
       m_rotationTolerance(0.01),
       m_writeLog(false),
@@ -41,56 +41,45 @@ BaseTraceCalculator::BaseTraceCalculator
 }
 
 
-bool BaseTraceCalculator::hasJointController() const {
-  if (m_jointController == nullptr)
+bool BaseTraceCalculator::hasRobot() const {
+  if (m_robot == nullptr)
     return false;
   else
     return true;
 }
 
 void BaseTraceCalculator::setTolerances() {
-  if (hasJointController()) {
-    try {
-      m_rotationTolerance = m_jointController
-          ->resolveJoint(Rotational)->getMovementPerStep();}
-    catch(int e) {
-      LOG_INFO("Could not find a rotaional joint" <<
-               "tolerance is left at default!");}
-
-    try {
-      m_translationTolerance = m_jointController->
-          resolveJoint(Translational)->getMovementPerStep();}
-    catch(int e) {
-      LOG_INFO("Could not find a translational joint," <<
-               "tolerance is left at default!");}
+  if (hasRobot()) {
+    m_rotationTolerance = m_robot->getMovementPerStep(Rotational) / 2.0;
+    m_translationTolerance = m_robot->getMovementPerStep(Translational) / 2.0;
   }
 }
 
 
-std::vector<int> BaseTraceCalculator::getNumberOfSteps(
-    const Trace* i_trace,
-    const Point2D& i_position) const {
-  if (!hasJointController())
+std::vector<int> BaseTraceCalculator::getNumberOfSteps
+(const Trace& i_trace,
+ const Point2D& i_position) const {
+  if (!hasRobot())
     LOG_ERROR("Does not have a joint controller!");
 
-  Point2D endPoint = i_trace->getEndPoint();
-  LOG_INFO("Translational movement per step: "<<
-           static_cast<traceType>(
-               m_jointController->resolveJoint(Translational)->
-               getMovementPerStep()));
+  Point2D endPoint = i_trace.getEndPoint();
+  LOG_INFO
+    ("Translational movement per step: "<<
+     m_robot->getMovementPerStep(Translational));
 
-  LOG_INFO("Rotationalal movement per step: "<<
-           m_jointController->resolveJoint(Rotational)->getMovementPerStep());
+  LOG_INFO
+    ("Rotationalal movement per step: "<<
+     m_robot->getMovementPerStep(Rotational));
 
   // Magnitude difference / movement per step of Translational joint
   int numberOfTranslationSteps =
       std::abs(Magnitude(i_position)-Magnitude(endPoint))/
-      (m_jointController->resolveJoint(Translational)->getMovementPerStep());
+      (m_robot->getMovementPerStep(Translational));
 
   // Rotational difference / movement per step of Rotational joint
   int numberOfRotationSteps =
-      (std::abs(i_position.getAlpha()-endPoint.getAlpha())*(180/PI))/
-      (m_jointController->resolveJoint(Rotational)->getMovementPerStep());
+    (std::abs(i_position.getAlpha()-endPoint.getAlpha())*(180/PI)) /
+    m_robot->getMovementPerStep(Rotational);
 
    return std::vector<int> {numberOfRotationSteps, numberOfTranslationSteps} ;
 }
@@ -105,25 +94,19 @@ void BaseTraceCalculator::writeToStepLog(const std::string& i_direction,
         i_newPos.x <<  ", " << i_newPos.y << std::endl;
 }
 
+
 bool BaseTraceCalculator::shouldTranslate(const Trace& i_trace,
                                           const Point2D &i_point2D) const {
   /*
     Translate if the magnitude differs between the current point and the endpoint.
-  */	
+  */
   traceType pointMagnitude = Magnitude(i_point2D);
   traceType endPointMagnitude = Magnitude(i_trace.getEndPoint());
   traceType difference = std::abs(pointMagnitude-endPointMagnitude);
   bool shouldTranslate;
-  
+
   if (difference>m_translationTolerance)
     shouldTranslate = true;
-
-  else if (difference >
-           (m_jointController->
-            resolveJoint(Translational)->
-            getMovementPerStep() / 2.0))
-    shouldTranslate = true;
-
   else
     shouldTranslate = false;
 
@@ -138,19 +121,15 @@ bool BaseTraceCalculator::shouldTranslate(const Trace& i_trace,
   return shouldTranslate;
 }
 
+
 bool BaseTraceCalculator::shouldRotate(const Trace& i_trace,
                                        const Point2D &i_point2D) const {
-  traceType pointAngle = i_point2D.getAlpha()*180/PI;
-  traceType endPointAngle = i_trace.getEndPoint().getAlpha()*180/PI;
-  traceType difference = std::abs(pointAngle-endPointAngle);
+  traceType difference = std::abs(i_point2D.getAlpha()-
+                                  i_trace.getEndPoint().getAlpha());
+  difference *= 180 / PI;
   bool shouldRotate;
 
-  if (difference>m_rotationTolerance)
-    shouldRotate = true;
-  else if (difference>
-           (getJointController()->
-            resolveJoint(Rotational)->
-            getMovementPerStep()/2.0))
+  if (difference > m_rotationTolerance)
     shouldRotate = true;
   else
     shouldRotate = false;
@@ -158,54 +137,37 @@ bool BaseTraceCalculator::shouldRotate(const Trace& i_trace,
 #ifdef DEBUG
   if (!shouldRotate) {
     LOG_INFO("Not rotating!!");
-    LOG_INFO("current angle: " << pointAngle << " ");
-    LOG_INFO("wanted angle: " << endPointAngle);
+    LOG_INFO("current angle: " << i_point2D.getAlpha() * 180 / PI << " ");
+    LOG_INFO("wanted angle: " << i_trace.getEndPoint().getAlpha() * 180 / PI);
     LOG_INFO("diff: " << difference);
   }
 #endif
   return shouldRotate;
 }
 
-void BaseTraceCalculator::calculateTrace(const Trace* i_trace,
-                                         Point2D& i_startPoint) {
-  if (!hasJointController()) {
+void BaseTraceCalculator::calculateTrace(const Trace& i_trace) {
+  if (!hasRobot()) {
     LOG_ERROR("Does not have a joint controller!");
   }
-  LOG_INFO("Current robot position: " <<
-           i_startPoint.x << ", " << i_startPoint.y);
-
-  LOG_INFO("Going to position: " <<
-           i_trace->getEndPoint().x << ", " << i_trace->getEndPoint().y);
-
-  std::string rotationDirection = i_trace->
-      getRotationDirectionToEndPoint(i_startPoint);
-
-  std::string translationDirection = i_trace->
-      getTranslationDirectionToEndPoint(i_startPoint);
-
-  std::vector<int> numberOfSteps = getNumberOfSteps(i_trace, i_startPoint);
-  LOG_INFO("\nNumber of rotation steps: " << numberOfSteps[0] << "\n"
-           "Number of translation steps: " << numberOfSteps[1]);
-
+  Point2D currentVirtualPosition = m_robot->getVirtualPosition();
+  LOG_INFO("Current robot position: " << currentVirtualPosition.x <<
+           ", " << currentVirtualPosition.y);
+  LOG_INFO("Going to position: " << i_trace.getEndPoint().x <<
+           ", " << i_trace.getEndPoint().y);
+  // Get rotation direction
+  std::string rotationDirection = i_trace.
+      getRotationDirectionToEndPoint(currentVirtualPosition);
+  // Get translation direction
+  std::string translationDirection = i_trace.
+      getTranslationDirectionToEndPoint(currentVirtualPosition);
+  // get number of steps
+  std::vector<int> numberOfSteps =
+    getNumberOfSteps(i_trace, currentVirtualPosition);
+  // set steps
   if (numberOfSteps[0] > 0) {
-    m_jointController->resolveJoint(Rotational)->predictSteps(
-        &i_startPoint,
-        rotationDirection,
-        numberOfSteps[0]);
-
-    m_jointController->moveSteps(
-        rotationDirection,
-        numberOfSteps[0]);
+    m_robot->prepareSteps(rotationDirection, numberOfSteps[0]);
   }
-
   if (numberOfSteps[1] > 0) {
-    m_jointController->resolveJoint(Translational)->
-        predictSteps(&i_startPoint,
-                     translationDirection,
-                     numberOfSteps[1]);
-
-    m_jointController->moveSteps(
-        translationDirection,
-        numberOfSteps[1]);
+    m_robot->prepareSteps(translationDirection, numberOfSteps[1]);
   }
-  }
+}

@@ -19,13 +19,16 @@ class Robot {
   // Speed of the robot during the movement
   GETSET(float, m_speed, Speed);
   // Position of the head of the robot
-  GETSET(Point2D, m_currentPosition, Position);
-
+  GETSET(Point2D, m_position, Position);
+  // Position after current actuations
+  GETSET(Point2D, m_virtualPosition, VirtualPosition);
+  // Positions which has been seen during stepping
+  GETSET(std::vector<Point2D>, m_traveledPoints, TraveledPoints);
  public:
   typedef std::shared_ptr<Robot> RobotPointer;
   bool hasValidConnection();
 
-  Point2D* getPositionPointer() {return &m_currentPosition;}
+  Point2D* getPositionPointer() {return &m_position;}
     // actuations
   void goToPosition(const Point2D&);
   void goTrace(const Trace&);
@@ -35,11 +38,6 @@ class Robot {
   /// Get the amount of movement per step given a direction
   traceType getMovementPerStep(const MovementType&) const ;
 
-  /// Given a point, predict the final position when steps have been set
-  Point2D predictSteps(const std::string& i_direction,
-                       const int& i_numberOfSteps,
-                       Point2D* i_position) const;
-
   /**
    * prepares to take steps with the given movement type, direction and number
    * This function pepares the joint controller to take steps when actuate is called
@@ -47,12 +45,12 @@ class Robot {
    * @param[in] i_direction direction which the step has to be taken, currently IN/OUT or CCW/CW
    * @param[in] i_numberOfSteps Number of steps that has to be taken
    */
-  void prepareStep(const MovementType& i_movementType,
-                   const std::string& i_direction,
+  void prepareSteps(const std::string& i_direction,
                    const int& i_numberOfSteps);
-
   /// easy to do
   Robot();
+  /// defines controlle
+  Robot(const JointController::JointControllerPointer& i_pointer);
   /// defines controller and speed
   Robot(const JointController::JointControllerPointer& i_pointer,
         const int& i_speed);
@@ -60,6 +58,9 @@ class Robot {
   Robot(const JointController::JointControllerPointer& i_pointer,
         const int& i_speed,
         const Point2D& i_point);
+ private:
+  int getNumberOfSequences(const JointController::JointControllerPointer&);
+  int getNumberOfSequences(const bool&);
 };
 
 #endif  // ROBOT_ROBOT_H_

@@ -65,12 +65,12 @@ class JointController {
    */
   BaseJoint::JointPointer resolveJoint(const MovementType& i_movementType);
 
- private:
+
   /**
    * returns the number of joints currently registed
    */
    int getNumberOfJoints() {return m_jointPointerVector.size();}
-
+ private:
    /**
    * returns if the joint is ready to be added to the robot
    */
@@ -87,7 +87,7 @@ class JointController {
   bool hasJoint(const BaseJoint::JointPointer&) const;
 
   /// Method to retrieve the joint of the type
-  BaseJoint::JointPointer& getJoint(const MovementType&);
+  BaseJoint::JointPointer getJoint(const MovementType&);
 };
 
 #endif  // MOTOR_JOINTCONTROLLER_H_

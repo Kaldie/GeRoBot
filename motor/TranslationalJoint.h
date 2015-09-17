@@ -7,20 +7,13 @@
 
 template <typename ActuatorType>
 class TranslationalJoint: public BaseJoint {
- private:
-    ActuatorType m_actuator;
-    virtual int getPositionModifier(const std::string&) const;
-
- protected:
-    virtual TranslationalJoint<ActuatorType>* cloneImpl() const;
-
  public:
     // Actual methods!
     virtual void predictSteps(Point2D*,
                               const std::string&,
                               const int&) const;
 
-    virtual ActuatorType* getMotor() {return &m_actuator;};
+    virtual ActuatorType* getMotor();
 
     std::shared_ptr<TranslationalJoint<ActuatorType>> clone() const {
       return std::shared_ptr
@@ -30,19 +23,26 @@ class TranslationalJoint: public BaseJoint {
     // Constructors
     TranslationalJoint();
 
-    TranslationalJoint(const double&,
-                       const double&);
+    TranslationalJoint(const double& i_currentPosition,
+                       const double& i_movementPerStep);
 
-    TranslationalJoint(const double&,
-                       const double&,
+    TranslationalJoint(const double& i_currentPosition,
+                       const double& i_movementPerStep,
                        const ActuatorType&);
 
-    TranslationalJoint(const double&,
-                       const double&,
+    TranslationalJoint(const double& i_currentPosition,
+                       const double& i_movementPerStep,
                        const DirectionConversionMap&,
                        const ActuatorType&);
 
-  virtual ~TranslationalJoint() {};
+  virtual ~TranslationalJoint(){};
+
+ protected:
+    virtual TranslationalJoint<ActuatorType>* cloneImpl() const;
+
+ private:
+    ActuatorType m_actuator;
+    virtual int getPositionModifier(const std::string&) const;
 };
 
 
@@ -91,6 +91,13 @@ TranslationalJoint<ActuatorType>::
 }
 
 // Actual methods
+template <class ActuatorType>
+ActuatorType* TranslationalJoint<ActuatorType>::
+getMotor() {
+  return &m_actuator;
+}
+
+
 template <class ActuatorType>
 int TranslationalJoint<ActuatorType>::
   getPositionModifier(const std::string& i_direction) const {

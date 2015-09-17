@@ -8,7 +8,8 @@
 #include <BaseMotor.h>
 
 JointController::JointController()
-    :m_actuator(ArduinoMotorDriver("/dev/ttyUSB*")) {
+  :m_jointPointerVector({}),
+   m_actuator(ArduinoMotorDriver("/dev/ttyUSB*")) {
   LOG_DEBUG("yay2");
 }
 
@@ -101,7 +102,7 @@ bool JointController::addJoint(const BaseJoint::JointPointer& i_joint) {
 }
 
 
-BaseJoint::JointPointer& JointController::getJoint(const MovementType &i_movementType) {
+BaseJoint::JointPointer JointController::getJoint(const MovementType &i_movementType) {
   if (m_jointPointerVector.size() == 0)
     LOG_ERROR("No joints defined yet");
 

@@ -16,18 +16,17 @@ class RotationTraceCalculator: public LineTraceCalculator {
    * @param[in] i_trace i_trace trace that needs to be evaluated
    * @param[in] i_currentPosition Position of the robot
    */
-  virtual void calculateTrace(const RotationTrace* i_trace,
-                              Point2D& i_currentPosition);
+  virtual void calculateTrace(const RotationTrace& i_trace);
   /// Default constructor
   RotationTraceCalculator();
 
   /// Constructor with defined joint controller pointer
   explicit RotationTraceCalculator
-    (const JointController::JointControllerPointer& i_jointController);
+    (Robot* i_robot);
 
   /// Constructor with tolerance and joint controller
   RotationTraceCalculator
-    (const JointController::JointControllerPointer& i_jointController,
+    (Robot* i_robot,
      const traceType& i_tolerance);
 };
 

@@ -2,17 +2,16 @@
 #ifndef MATH_BASETRACECALCULATOR_H_
 #define MATH_BASETRACECALCULATOR_H_
 
-#include <JointController.h>
+#include <Robot.h>
 
 class Point2D;
-class JointController;
 class Trace;
 
 class BaseTraceCalculator {
   // tolerance of the calculations
   GETSET(traceType, m_tolerance, Tolerance);
   // shared pointer to a controller
-  GETSETPROTECTED(JointController::JointControllerPointer, m_jointController, JointController);
+  GETSETPOINTER(Robot, m_robot, Robot);
   // translation tolerance
   GETSET(traceType, m_translationTolerance, TranslationTolerance);
   // rotation tolerance
@@ -30,7 +29,7 @@ class BaseTraceCalculator {
     many reallocations
     too much memory use
   */
-  virtual std::vector<int> getNumberOfSteps(const Trace*,
+  virtual std::vector<int> getNumberOfSteps(const Trace&,
                                             const Point2D&) const ;
 
   /*
@@ -38,7 +37,7 @@ class BaseTraceCalculator {
     The base trace calculate simply makes the robot go to the specific point,
     override this function when implementing new types of trace calculators
   */
-  virtual void calculateTrace(const Trace*, Point2D&);
+  virtual void calculateTrace(const Trace&);
   /*
      To re-create the steps taking during the calculation
      a file where all the steps are specified can be created.
@@ -52,21 +51,20 @@ class BaseTraceCalculator {
   // Constructors
   BaseTraceCalculator();
 
-  BaseTraceCalculator(const JointController::JointControllerPointer&);
+  BaseTraceCalculator(Robot* i_robotPointer);
 
-  BaseTraceCalculator(const JointController::JointControllerPointer&,
+  BaseTraceCalculator(Robot* i_robotPointer,
                       const traceType& i_tolerance);
   virtual ~BaseTraceCalculator() {};
 
  protected:
   // See if the joint controller pointer has been set
-  bool hasJointController() const;
+  bool hasRobot() const;
   bool shouldRotate(const Trace&,
                     const Point2D&) const;
   bool shouldTranslate(const Trace&,
                        const Point2D&) const;
   void setTolerances();
-
  };
 
 #endif  // MATH_BASETRACECALCULATOR_H_

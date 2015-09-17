@@ -11,36 +11,35 @@ RotationTraceCalculator::RotationTraceCalculator()
 
 
 RotationTraceCalculator::RotationTraceCalculator
-(const JointController::JointControllerPointer& i_jointControllerPointer)
-    : LineTraceCalculator(i_jointControllerPointer)
+( Robot* i_robotPointer)
+    : LineTraceCalculator(i_robotPointer)
 {}
 
 RotationTraceCalculator::RotationTraceCalculator
-(const JointController::JointControllerPointer& i_jointControllerPointer,
+(Robot* i_robotPointer,
  const traceType& i_tolerance)
-    : LineTraceCalculator(i_jointControllerPointer, i_tolerance)
+    : LineTraceCalculator(i_robotPointer, i_tolerance)
 {}
 
 void RotationTraceCalculator::calculateTrace
-(const RotationTrace* i_rotationTrace,
- Point2D& i_currentPosition) {
-  if (i_rotationTrace->getTraceType() != Trace::Curve)
+(const RotationTrace& i_rotationTrace) {
+  if (i_rotationTrace.getTraceType() != Trace::Curve)
     LOG_ERROR("Rotational trace calculator only works on rotational traces!"<<
-              "\nvalue: " << i_rotationTrace->getTraceType() <<
+              "\nvalue: " << i_rotationTrace.getTraceType() <<
               " curve value: " << Trace::Curve);
-  std::vector<RotationTrace> traces = i_rotationTrace->getNecessaryTraces();
+  std::vector<RotationTrace> traces = i_rotationTrace.getNecessaryTraces();
   LOG_DEBUG("Number of traces: " << traces.size());
 
   Point2D startPointOfThisTrace;
   for (std::vector<RotationTrace>::const_iterator itr = traces.begin();
       itr != traces.end();
       itr++) {
-    startPointOfThisTrace = i_currentPosition;
+    startPointOfThisTrace = m_robot->getVirtualPosition();
 
     LOG_DEBUG("Arc endPoint x, y: " << itr->getArc().getSecondPoint().x <<
               ", " << itr->getArc().getSecondPoint().y);
 
-    LineTraceCalculator::calculateTrace(&(*itr), i_currentPosition);
+    LineTraceCalculator::calculateTrace(*itr);
 
     if (std::next(itr) != traces.end()) {
       LOG_DEBUG("Setting another translation step!");
@@ -48,18 +47,14 @@ void RotationTraceCalculator::calculateTrace
           itr->getTranslationDirectionToEndPoint(startPointOfThisTrace);
 
       // Predict the step
-      getJointController()->resolveJoint(Translational)->
-        predictSteps(&i_currentPosition, direction ,1);
-
+      m_robot->prepareSteps(direction ,1);
       if (getWriteLog())
-        writeToStepLog(direction, 1, i_currentPosition);
-
+        writeToStepLog(direction, 1, m_robot->getVirtualPosition());
       LOG_INFO("Translating: " << direction);
       // Correct the rotation, if nessesary!
-      bool hasCorrectionSteps = correctTranslation(&(*std::next(itr)), i_currentPosition);
+      bool hasCorrectionSteps = correctTranslation(*std::next(itr));
       LOG_DEBUG("Has correction steps: " << std::boolalpha <<
                 hasCorrectionSteps);
-      getJointController()->moveSteps(direction, 1);
     }
   }
 }

@@ -6,8 +6,14 @@
 #include <Trace.h>
 
 Robot::Robot()
-  : Robot( nullptr, 0, Point2D(0, 50))
+  : Robot( nullptr, 30, Point2D(0, 50))
 {}
+
+
+Robot::Robot(const JointController::JointControllerPointer& i_pointer)
+  : Robot(i_pointer, 30, Point2D(0, 50))
+{}
+
 
 Robot::Robot(const JointController::JointControllerPointer& i_pointer,
              const int& i_speed)
@@ -20,21 +26,8 @@ Robot::Robot(const JointController::JointControllerPointer& i_pointer,
              const Point2D& i_currentPosition)
   : m_jointController(i_pointer),
     m_speed(i_speed),
-    m_currentPosition(i_currentPosition) {
-}
-
-
-void Robot::goToPosition(const Point2D &i_position) {
-  if (!m_jointController)
-    LOG_ERROR("JointController is not set yet!");
-  LOG_DEBUG("current position: " << m_currentPosition.x << m_currentPosition.y);
-  Trace thisTrace(m_currentPosition, i_position);
-  BaseTraceCalculator baseTraceCalculator(m_jointController);
-  baseTraceCalculator.calculateTrace(&thisTrace,
-                                     m_currentPosition);
-
-  LOG_DEBUG("new position: " << m_currentPosition.x << m_currentPosition.y);
-  m_jointController->actuate();
+    m_position(i_currentPosition),
+    m_virtualPosition(i_currentPosition) {
 }
 
 
@@ -51,11 +44,25 @@ traceType Robot::getMovementPerStep(const MovementType& i_movementType) const {
 }
 
 
-void Robot::predictSteps(const std::string& i_direction,
-                         const int& i_numberOfSteps,
-                         Point2D* i_position) const {
+void Robot::goToPosition(const Point2D &i_position) {
+  if (!m_jointController)
+    LOG_ERROR("JointController is not set yet!");
+  LOG_DEBUG("current position: " << m_position.x << m_position.y);
+  Trace thisTrace(m_position, i_position);
+  BaseTraceCalculator baseTraceCalculator(this);
+  baseTraceCalculator.calculateTrace(thisTrace);
+  LOG_DEBUG("new position: " << m_position.x << m_position.y);
+  m_jointController->actuate();
+}
+
+
+void Robot::prepareSteps(const std::string& i_direction,
+                         const int& i_numberOfSteps) {
+  // predict the next step
   m_jointController->resolveJoint(i_direction)->
-    predictSteps(i_position,
-                 i_direction,
-                 i_numberOfSteps);
+    predictSteps(&m_virtualPosition, i_direction, i_numberOfSteps);
+  // add the point to the traveled points
+  m_traveledPoints.push_back(m_virtualPosition);
+  // add the step to the sequence
+  m_jointController->moveSteps(i_direction, i_numberOfSteps);
 }

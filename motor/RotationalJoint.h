@@ -8,16 +8,9 @@
 
 template <class ActuatorType>
 class RotationalJoint: public BaseJoint {
- private:
-  ActuatorType m_actuator;
-  virtual int getPositionModifier(const std::string&) const;
-
- protected:
-  virtual RotationalJoint<ActuatorType>* cloneImpl() const;
-
  public:
   // Can also be used as a "setter (*joint.getMotor())=exampleMotor;
-  virtual ActuatorType* getMotor() {return &m_actuator;}
+  virtual ActuatorType* getMotor();
 
   // Actual methods!
   void predictSteps(Point2D*,
@@ -32,19 +25,26 @@ class RotationalJoint: public BaseJoint {
   // Constructors
   RotationalJoint();
 
-  RotationalJoint(const double& ,
-                  const double&);
+  RotationalJoint(const double& i_currentPosition,
+                  const double& i_movementPerStep);
 
   RotationalJoint(const double& i_currentPosition,
                   const double& i_movementPerStep,
                   ActuatorType& i_actuator);
 
-  RotationalJoint(const double&,
-                  const double&,
+  RotationalJoint(const double& i_currentPosition,
+                  const double& i_movementPerStep,
                   const DirectionConversionMap&,
                   ActuatorType&);
 
   ~RotationalJoint(){};
+
+ protected:
+  virtual RotationalJoint<ActuatorType>* cloneImpl() const;
+
+ private:
+  ActuatorType m_actuator;
+  virtual int getPositionModifier(const std::string&) const;
 };
 
 
@@ -91,6 +91,12 @@ RotationalJoint<ActuatorType>::RotationalJoint(const double& i_currentPosition,
 
 // Actual methods
 template <class ActuatorType>
+ActuatorType* RotationalJoint<ActuatorType>::getMotor() {
+  return &m_actuator;
+}
+
+
+template <class ActuatorType>
 int RotationalJoint<ActuatorType>::
 getPositionModifier(const std::string& i_direction) const {
 
@@ -111,9 +117,11 @@ void RotationalJoint<ActuatorType>::predictSteps(Point2D* o_position,
   int positionModifier = getPositionModifier(i_directionString);
   LOG_DEBUG("Position modifier is: "<< positionModifier);
   LOG_DEBUG("Movement per step is: " << getMovementPerStep());
+  LOG_DEBUG("Current position: " << o_position->x << " , " << o_position->y);
   o_position->rotate
     (getMovementPerStep() * (PI/180.0) *
      static_cast<double>(positionModifier) * i_numberOfSteps);
+  LOG_DEBUG("New position: " << o_position->x << " , " << o_position->y);
 }
 
 
