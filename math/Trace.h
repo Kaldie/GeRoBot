@@ -14,6 +14,7 @@ class Trace {
  public:
   // smart pointer definitions
   typedef std::shared_ptr<Trace> TracePointer;
+  typedef std::vector<TracePointer> TracePointerVector;
   typedef std::weak_ptr<Trace> WeakTracePointer;
 
   enum TraceType{Line,
@@ -47,7 +48,8 @@ class Trace {
    * Get direction which the robot needs to rotate to.
    * @param[in] i_currentPosition Point2D Current position of the robot
    */
-  std::string getRotationDirectionToEndPoint(const Point2D&) const;
+  std::string getRotationDirectionToEndPoint(const Point2D&
+                                             i_currentPosition) const;
 
   /**
    * Translation direction towards the end poin

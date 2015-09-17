@@ -9,7 +9,28 @@ Arc2D::Arc2D(const Point2D& i_startPoint,
              const Point2D& i_centrePoint):
     Circle2D(i_startPoint,
              i_endPoint,
-             i_centrePoint)
+             i_centrePoint) {
+  traceType startAngle = (m_firstPoint-m_centrePoint).getAlpha();
+  LOG_DEBUG("m_firstPoint: " << m_firstPoint.x << " , " << m_firstPoint.y);
+  LOG_DEBUG("Start angle: " << startAngle);
+  traceType stopAngle = (m_secondPoint-m_centrePoint).getAlpha();
+  LOG_DEBUG("Stop angle: " << stopAngle);
+  if (stopAngle >= startAngle) {
+    m_isClockwise = false;
+  } else {
+    m_isClockwise = true;
+  }
+}
+
+
+Arc2D::Arc2D(const Point2D& i_startPoint,
+             const Point2D& i_endPoint,
+             const Point2D& i_centrePoint,
+             const bool& i_isClockwise)
+  : Circle2D(i_startPoint,
+             i_endPoint,
+             i_centrePoint),
+    m_isClockwise(i_isClockwise)
 {}
 
 
@@ -20,64 +41,39 @@ Arc2D::Arc2D(const Point2D& i_startPoint,
     Circle2D(i_startPoint,
              i_endPoint,
              i_radius,
-             i_isClockwise)
+             i_isClockwise),
+    m_isClockwise(i_isClockwise)
 {}
 
 
-bool Arc2D::isClockwise() const {
-  /*
-    In doubt => yes it is clockwise!
-  */
-
-  validate();
-
+traceType Arc2D::spanAngle() const {
+  if (m_firstPoint == m_secondPoint) {
+    return 2 * PI;
+  }
   traceType startAngle=(m_firstPoint-m_centrePoint).getAlpha();
   traceType stopAngle=(m_secondPoint-m_centrePoint).getAlpha();
-  LOG_DEBUG("Start and stop angle is:  " <<
-            startAngle << ", " << stopAngle << " .");
-  LOG_DEBUG("startAngle <= PI: " << (startAngle <= (PI+0.000001)));
-  LOG_DEBUG("stopAngle>startAngle && stopAngle<(PI+startAngle): "
-            << (stopAngle>startAngle && stopAngle < (PI+startAngle)));
-
-  stopAngle-=startAngle;
-  if (stopAngle < 0)
-    stopAngle+=2*PI;
-
-  if (stopAngle < PI-0.000001)
-    return false;
-  else
-    return true;
-}
-
-
-traceType Arc2D::arcLength(const Point2D& i_startPoint,
-                        const Point2D& i_endPoint) const  {
-  validate();
-  isPointOnCircle(i_startPoint);
-  isPointOnCircle(i_endPoint);
-
-  traceType startAngle=(m_firstPoint-m_centrePoint).getAlpha();
-  traceType stopAngle=(m_secondPoint-m_centrePoint).getAlpha();
-
-  LOG_DEBUG("Startpoint x,y: " << i_startPoint.x << ", " << i_startPoint.y);
-  LOG_DEBUG("Endpoint x,y: " << i_endPoint.x << ", " << i_endPoint.y);
-  traceType angle = startAngle - stopAngle;
-  LOG_DEBUG("Anglular difference is: " << angle*(180/PI));
-  LOG_DEBUG("is clockwise : " << isClockwise());
-  LOG_DEBUG("Magnitude is: " << radius());
-
-  if (isClockwise()) {
+  LOG_DEBUG("Is clockwise: " << m_isClockwise);
+  if (m_isClockwise) {
     if (startAngle < stopAngle)
-      startAngle+=2*PI;
-    return (startAngle-stopAngle) * radius();
+      return 2 * PI - (stopAngle - startAngle);
+    return startAngle-stopAngle;
   } else {
-    if (startAngle > stopAngle)
-      stopAngle+=2*PI;
-    return (stopAngle-startAngle) * radius();
+    if (startAngle > stopAngle) {
+      LOG_DEBUG("taking the long route!");
+      return (2 * PI) - (startAngle - stopAngle);
+    }
+    LOG_DEBUG("taking the short route!");
+    return stopAngle-startAngle;
   }
 }
 
-
 traceType Arc2D::arcLength() const {
-  return arcLength(m_firstPoint, m_secondPoint);
+  validate();
+  LOG_DEBUG("Startpoint x,y: " << m_firstPoint.x << ", " << m_firstPoint.y);
+  LOG_DEBUG("Endpoint x,y: " << m_secondPoint.x << ", " << m_secondPoint.y);
+  LOG_DEBUG("is clockwise : " << m_isClockwise);
+  LOG_DEBUG("Magnitude is: " << radius());
+
+  traceType angle = spanAngle();
+  return angle * radius();
 }

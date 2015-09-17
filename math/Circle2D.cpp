@@ -44,19 +44,18 @@ Point2D Circle2D::getCentrePoint(const Point2D& i_firstPoint,
   Vector2D unitH = 1 / Magnitude(V) * Vector2D(V.y,-1*V.x);
 
   Point2D centrePoint=i_firstPoint + 0.5 * V + h * unitH;
+  traceType startAngle=(i_firstPoint-centrePoint).getAlpha();
+  traceType stopAngle=(i_secondPoint-centrePoint).getAlpha();
 
   LOG_DEBUG("Start point x,y "<<i_firstPoint.x<<", "<<i_firstPoint.y);
   LOG_DEBUG("End point x,y "<<i_secondPoint.x<<", "<<i_secondPoint.y);
   LOG_DEBUG("Vector V x,y "<<V.x<<", "<<V.y);
 
-  if(i_isClockwise==Arc2D(m_firstPoint,m_secondPoint,centrePoint).isClockwise())
+  if(i_isClockwise == (stopAngle <= startAngle)) {
     return centrePoint;
-	
-  centrePoint=i_firstPoint + 0.5 * V - h * unitH;
-			
-  if(i_isClockwise==Arc2D(m_firstPoint,m_secondPoint,centrePoint).isClockwise())
-    return centrePoint;
-
+  } else {
+    return i_firstPoint + 0.5 * V - h * unitH;
+  }
   if(i_isClockwise)
     LOG_ERROR("Could not find a centre point which define a arc were the direction is clockwise");
   else
@@ -81,7 +80,6 @@ bool Circle2D::isPointOnCircle(const Point2D& i_point) const {
     LOG_DEBUG("Point radius: " << pointRadius);
     LOG_DEBUG("Circle radius: " << circleRadius);
     LOG_DEBUG("radius from start point and end point are not equal!");
-							
     return false;
   }
 }

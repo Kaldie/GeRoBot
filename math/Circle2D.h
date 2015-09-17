@@ -22,7 +22,7 @@ class Circle2D {
    * http://math.stackexchange.com/questions/27535/how-to-find-center-of-an-arc-given-start-point-end-point-radius-and-arc-direc
    */
   Point2D getCentrePoint(const Point2D& i_firstPoint,
-                         const Point2D& i_secondPointy,
+                         const Point2D& i_secondPoint,
                          const traceType& i_radius,
                          const bool& i_isClockwise);
  protected:
@@ -31,7 +31,7 @@ class Circle2D {
  public:
   /**
    * Constructor using 3 Points2D
-   * @param[in] i_firsPoint Point2D that defines 1 point on the cirlce
+   * @param[in] i_firstPoint Point2D that defines 1 point on the cirlce
    * @param[in] i_secondPoint Point2D that defines the second point
    * @param[in] i_centrePoint Point2D that defines the centre of the circle
    */
@@ -41,10 +41,10 @@ class Circle2D {
 
   /**
    * Constructor using 2 Point2D, radius of the cirlce and if it is clockwise
-   * @param[in] i_firsPoint Point2D that defines 1 point on the cirlce
+   * @param[in] i_firstPoint Point2D that defines 1 point on the cirlce
    * @param[in] i_secondPoint Point2D that defines the second point
    * @param[in] i_radius radius of the circle
-   * @param[in] Is the circle clockwise?
+   * @param[in] i_isClockwise Is the circle clockwise?
    */
   Circle2D(const Point2D& i_firstPoint,
            const Point2D& i_secondPoint,

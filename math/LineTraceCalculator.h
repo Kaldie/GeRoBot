@@ -35,13 +35,11 @@ class LineTraceCalculator: public BaseTraceCalculator {
   // Constructors
   LineTraceCalculator();
 
-  explicit LineTraceCalculator(JointController* i_jointControlerPointer);
+  explicit LineTraceCalculator
+    (const JointController::JointControllerPointer& i_jointControlerPointer);
 
-  LineTraceCalculator(JointController*,
+  LineTraceCalculator(const JointController::JointControllerPointer&,
                       const traceType& i_tolerance);
-
-  // Copy constructor
-  LineTraceCalculator(const LineTraceCalculator& obj);
 };
 
 #endif  // MATH_LINETRACECALCULATOR_H_

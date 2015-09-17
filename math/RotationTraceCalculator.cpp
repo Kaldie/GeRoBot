@@ -10,20 +10,20 @@ RotationTraceCalculator::RotationTraceCalculator()
 {}
 
 
-RotationTraceCalculator::RotationTraceCalculator(
-    JointController* i_jointControllerPointer)
+RotationTraceCalculator::RotationTraceCalculator
+(const JointController::JointControllerPointer& i_jointControllerPointer)
     : LineTraceCalculator(i_jointControllerPointer)
 {}
 
-RotationTraceCalculator::RotationTraceCalculator(
-    JointController* i_jointControllerPointer,
-    const traceType& i_tolerance)
+RotationTraceCalculator::RotationTraceCalculator
+(const JointController::JointControllerPointer& i_jointControllerPointer,
+ const traceType& i_tolerance)
     : LineTraceCalculator(i_jointControllerPointer, i_tolerance)
 {}
 
-void RotationTraceCalculator::calculateTrace(
-    const RotationTrace* i_rotationTrace,
-    Point2D& i_currentPosition) {
+void RotationTraceCalculator::calculateTrace
+(const RotationTrace* i_rotationTrace,
+ Point2D& i_currentPosition) {
   if (i_rotationTrace->getTraceType() != Trace::Curve)
     LOG_ERROR("Rotational trace calculator only works on rotational traces!"<<
               "\nvalue: " << i_rotationTrace->getTraceType() <<
@@ -48,8 +48,8 @@ void RotationTraceCalculator::calculateTrace(
           itr->getTranslationDirectionToEndPoint(startPointOfThisTrace);
 
       // Predict the step
-      getJointController()->getJoint(Translational)->
-          predictStep(i_currentPosition, direction);
+      getJointController()->resolveJoint(Translational)->
+        predictSteps(&i_currentPosition, direction ,1);
 
       if (getWriteLog())
         writeToStepLog(direction, 1, i_currentPosition);
@@ -59,10 +59,7 @@ void RotationTraceCalculator::calculateTrace(
       bool hasCorrectionSteps = correctTranslation(&(*std::next(itr)), i_currentPosition);
       LOG_DEBUG("Has correction steps: " << std::boolalpha <<
                 hasCorrectionSteps);
-      getJointController()->moveStep(
-          getJointController()->getJoint(Translational),
-          direction,
-          hasCorrectionSteps);
+      getJointController()->moveSteps(direction, 1);
     }
   }
 }

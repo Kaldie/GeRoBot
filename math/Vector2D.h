@@ -1,13 +1,10 @@
 #ifndef Vector2D_h
 #define Vector2D_h
 
-#include <macroHeader.h>
-
 class Vector2D
 {
  public:
-
-  traceType   x;
+  traceType  x;
   traceType  y;
 
   Vector2D() {}
@@ -117,8 +114,8 @@ class Vector2D
     return ((x != v.x) || (y != v.y));
   }
 
-  Vector2D& normalize(void);
-
+  Vector2D normalize(void);
+  static traceType dotProduct(const Vector2D& v1, const Vector2D& v2){ return v1* v2;}
   Vector2D& rotate(traceType angle);
   traceType getAlpha() const;
 };

@@ -2,36 +2,29 @@
 #ifndef MATH_BASETRACECALCULATOR_H_
 #define MATH_BASETRACECALCULATOR_H_
 
+#include <JointController.h>
+
 class Point2D;
 class JointController;
 class Trace;
 
 class BaseTraceCalculator {
+  // tolerance of the calculations
   GETSET(traceType, m_tolerance, Tolerance);
-  GETSETPOINTER(JointController, m_jointController, JointController);
+  // shared pointer to a controller
+  GETSETPROTECTED(JointController::JointControllerPointer, m_jointController, JointController);
+  // translation tolerance
   GETSET(traceType, m_translationTolerance, TranslationTolerance);
+  // rotation tolerance
   GETSET(traceType, m_rotationTolerance, RotationTolerance);
+  // When step, write it in the log
   GETSET(bool, m_writeLog, WriteLog);
+  // Filename of the log
   GETSET(std::string, m_logFileName, LogFileName);
-
- private:
-  // assign operator
-  //  BaseTraceCalculator& operator=(const BaseTraceCalculator& obj);
-  // copy constructor
-  BaseTraceCalculator(const BaseTraceCalculator& obj);
- protected:
-  // See if the joint controller pointer has been set
-  bool hasJointController() const;
-  bool shouldRotate(const Trace&,
-                    const Point2D&) const;
-  bool shouldTranslate(const Trace&,
-                       const Point2D&) const;
-  void setTolerances();
-
  public:
   /*
     Get an estimate of the number of steps needed to create the specified trace.
-    Use this to update the PinStateVector of the joint controller to 
+    Use this to update the PinStateVector of the joint controller to
     reduce the number of reallocations use in this specific vector
     If the estimate is very inacurate this can lead to:
     many reallocations
@@ -44,11 +37,10 @@ class BaseTraceCalculator {
     Calculate the necessary steps to conduct the trace.
     The base trace calculate simply makes the robot go to the specific point,
     override this function when implementing new types of trace calculators
-  */			
+  */
   virtual void calculateTrace(const Trace*, Point2D&);
-		
-  /* 
-     To re-create the steps taking during the calculation 
+  /*
+     To re-create the steps taking during the calculation
      a file where all the steps are specified can be created.
      The location can be set with setFileLocation(const std::string&)
      The necessary switch is setWriteLog(true)
@@ -59,12 +51,22 @@ class BaseTraceCalculator {
 
   // Constructors
   BaseTraceCalculator();
-		
-  BaseTraceCalculator(JointController*);
-    
-  BaseTraceCalculator(JointController*,
+
+  BaseTraceCalculator(const JointController::JointControllerPointer&);
+
+  BaseTraceCalculator(const JointController::JointControllerPointer&,
                       const traceType& i_tolerance);
   virtual ~BaseTraceCalculator() {};
-};
+
+ protected:
+  // See if the joint controller pointer has been set
+  bool hasJointController() const;
+  bool shouldRotate(const Trace&,
+                    const Point2D&) const;
+  bool shouldTranslate(const Trace&,
+                       const Point2D&) const;
+  void setTolerances();
+
+ };
 
 #endif  // MATH_BASETRACECALCULATOR_H_

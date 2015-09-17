@@ -23,26 +23,15 @@
  */
 
 class RotationTrace:public Trace {
-  GETSET(Point2D, m_centrePoint, CentrePoint);
+    GETSETPROTECTED(Point2D, m_centrePoint, CentrePoint);
+    GETSET(bool, m_isClockwise, IsClockwise);
 
-  /// The calculation will be done in parts, each part is a trace
-  GETSET(std::vector<RotationTrace>, m_partialTraceVector, PartialTraceVector);
-
- private:
-    /// bockus function, all points are valid, if the trace can be constructed!
-    virtual bool isValidStartAndEndPosition(const Point2D&,
-                                            const Point2D&) {return true;}
-
-    bool shouldAddExtremePoint(traceType& i_startAngle,
-                               traceType& i_stopAngle,
-                               traceType& i_extremePoint) const;
-
-    Point2D* getCentralPointFromArc() const;
+    /// The calculation will be done in parts, each part is a trace
+    GETSET(std::vector<RotationTrace>, m_partialTraceVector, PartialTraceVector);
 
  public:
-    Arc2D getArc() const;
-
     typedef std::shared_ptr<RotationTrace> RotationTracePointer;
+    Arc2D getArc() const;
 
     /**
      * Get the point between the start and stop position.
@@ -83,7 +72,7 @@ class RotationTrace:public Trace {
      * constructor
      * @param[in] i_startPoint Start point
      * @param[in] i_endPoint end point
-     * @param[in] centrePoint Centre of the circle
+     * @param[in] i_centrePoint Centre of the circle
      */
     RotationTrace(const Point2D& i_startPoint,
                   const Point2D& i_endPoint,
@@ -100,8 +89,8 @@ class RotationTrace:public Trace {
      * The extremes are points on the arc
      * with the most extreme angle
      */
-    void getExtremePoints(Point2D& i_firstExtreme,
-                          Point2D& i_secondExtreme) const;
+    void getExtremePoints(Point2D* i_firstExtreme,
+                          Point2D* i_secondExtreme) const;
 
     /**
      * Split the trace to go from the first to the extremes to the end
@@ -114,5 +103,15 @@ class RotationTrace:public Trace {
 
     void getStartStopAngle(double* i_startAngle,
                            double* i_stopAngle) const;
+ private:
+    /// bockus function, all points are valid, if the trace can be constructed!
+    virtual bool isValidStartAndEndPosition(const Point2D&,
+                                            const Point2D&) {return true;}
+
+    bool shouldAddExtremePoint(const traceType& i_startAngle,
+                               const traceType& i_stopAngle,
+                               const traceType& i_extremePoint) const;
+
+    Point2D* getCentralPointFromArc() const;
 };
 #endif  // MATH_ROTATIONTRACE_H_

@@ -18,7 +18,7 @@ class RotationTraceCalculatorTest : public CxxTest::TestSuite {
   StepperDriver stepperDriver2;
   RotationalJoint<StepperDriver> rotationalJoint;
   TranslationalJoint<StepperDriver> translationalJoint;
-  JointController jointController;
+  JointController::JointControllerPointer jointControllerPointer;
 
   void setUp() {
     stepperDriver1.setPins({5, 6, 7});
@@ -26,8 +26,11 @@ class RotationTraceCalculatorTest : public CxxTest::TestSuite {
 
     (*rotationalJoint.getMotor()) = stepperDriver1;
     (*translationalJoint.getMotor()) = stepperDriver2;
+    JointController jointController;
     jointController.addJoint(rotationalJoint.clone());
     jointController.addJoint(translationalJoint.clone());
+    jointControllerPointer =
+      std::make_shared<JointController>(jointController);
   }
 
   void testRotationTraceCalculation() {
@@ -39,30 +42,30 @@ class RotationTraceCalculatorTest : public CxxTest::TestSuite {
                         endPoint,
                         centrePoint);
 
-    jointController.getJoint(Translational)->setMovementPerStep(0.01);
-    jointController.getJoint(Rotational)->setMovementPerStep(0.01);
+    jointControllerPointer->resolveJoint(Translational)->setMovementPerStep(0.01);
+    jointControllerPointer->resolveJoint(Rotational)->setMovementPerStep(0.01);
 
     trace.setRotationTolerance(
-        jointController.getJoint(Rotational)->getMovementPerStep()*1);
+        jointControllerPointer->resolveJoint(Rotational)->getMovementPerStep()*1);
 
     trace.setTranslationTolerance(
-        jointController.getJoint(Translational)->getMovementPerStep()*1);
+        jointControllerPointer->resolveJoint(Translational)->getMovementPerStep()*1);
 
-    jointController.getJoint(Translational)->getMotor()->setHoldMotor(true);
-    jointController.getJoint(Rotational)->getMotor()->setHoldMotor(true);
+    jointControllerPointer->resolveJoint(Translational)->getMotor()->setHoldMotor(true);
+    jointControllerPointer->resolveJoint(Rotational)->getMotor()->setHoldMotor(true);
 
-    RotationTraceCalculator rotationTraceCalculator(&jointController);
+    RotationTraceCalculator rotationTraceCalculator(jointControllerPointer);
     rotationTraceCalculator.setWriteLog(true);
     rotationTraceCalculator.calculateTrace(&trace, startPoint);
 
     /// Tests
-    TS_ASSERT_EQUALS(jointController.getSequenceVector().numberOfSequences(),
+    TS_ASSERT_EQUALS(jointControllerPointer->getSequenceVector().numberOfSequences(),
                      4904);
-    TS_ASSERT_EQUALS(jointController.getSequenceVector().numberOfSteps(),
+    TS_ASSERT_EQUALS(jointControllerPointer->getSequenceVector().numberOfSteps(),
                      21948);
 
-    SequenceVector sequenceVector = jointController.getSequenceVector();
-    
+    SequenceVector sequenceVector = jointControllerPointer->getSequenceVector();
+
     /// testing condensing on this big vector
     sequenceVector.normalise();
     long totalNumberOfReps = 0;
@@ -123,12 +126,10 @@ class RotationTraceCalculatorTest : public CxxTest::TestSuite {
     */
     try {
       LOG_DEBUG("here!!");
-      jointController.actuate();
+      jointControllerPointer->actuate();
     } catch(std::runtime_error) {
       LOG_INFO("Could not find sizzle");
     }
   }
 };
 #endif  // MATH_UNIT_TEST_ROTATIONTRACECALCULATORTEST_H_
-
-

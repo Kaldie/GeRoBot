@@ -16,36 +16,27 @@ LineTraceCalculator::LineTraceCalculator()
 {}
 
 
-LineTraceCalculator::LineTraceCalculator(JointController* i_jointController)
+LineTraceCalculator::LineTraceCalculator
+(const JointController::JointControllerPointer& i_jointController)
     : BaseTraceCalculator(i_jointController),
       m_hasRotated(true),
       m_hasTranslated(true)
 {}
 
 
-LineTraceCalculator::LineTraceCalculator(JointController* i_jointController,
-                                         const traceType& i_tolerance)
+LineTraceCalculator::LineTraceCalculator
+(const JointController::JointControllerPointer& i_jointController,
+ const traceType& i_tolerance)
     : BaseTraceCalculator(i_jointController,
                           i_tolerance),
       m_hasRotated(true),
       m_hasTranslated(true)
 {}
 
-// assign operator
-LineTraceCalculator::LineTraceCalculator(const LineTraceCalculator& rhs) {
-  LOG_INFO("Copy constructor");
-  this->setJointController(rhs.getJointController());
-  this->setTolerance(rhs.getTolerance());
-}
-
 
 void LineTraceCalculator::calculateTrace(const Trace* i_trace,
                                          Point2D& i_point) {
   // Setting the capacity of the vector to hold all the data
-  std::vector<int> numberOfSteps = getNumberOfSteps(i_trace, i_point);
-  std::vector<int>::iterator maximumNumberOfSteps =
-      std::max_element(numberOfSteps.begin(),
-                       numberOfSteps.end());
   int i = 0;
   bool hasStepped(true);
   do {
@@ -81,7 +72,7 @@ void LineTraceCalculator::prepareRotation(const Trace* i_trace,
   std::string direction = i_trace->getRotationDirectionToEndPoint(i_point2D);
 
   // See where we end up after rotation
-  getJointController()->getJoint(Rotational)->predictStep(i_point2D, direction);
+  m_jointController->resolveJoint(Rotational)->predictSteps(&i_point2D, direction, 1);
 
   if (getWriteLog())
     writeToStepLog(direction, 1, i_point2D);
@@ -90,12 +81,10 @@ void LineTraceCalculator::prepareRotation(const Trace* i_trace,
   LOG_INFO("Rotating: " << direction);
 
   // Correct the rotation
-  bool hasCorrectionSteps = correctRotation(i_trace,
-                                          i_point2D);
+  correctRotation(i_trace, i_point2D);
 
-  getJointController()->moveStep(getJointController()->getJoint(Rotational),
-                                 direction,
-                                 hasCorrectionSteps);
+  m_jointController->moveSteps(direction,
+                               1);
 }
 
 void LineTraceCalculator::prepareTranslation(const Trace* i_trace,
@@ -105,8 +94,8 @@ void LineTraceCalculator::prepareTranslation(const Trace* i_trace,
   std::string direction = i_trace->getTranslationDirectionToEndPoint(i_point2D);
 
   // Predict the step
-  getJointController()->getJoint(Translational)->
-      predictStep(i_point2D, direction);
+  m_jointController->resolveJoint(Translational)->
+    predictSteps(&i_point2D, direction ,1);
 
   if (getWriteLog())
     writeToStepLog(direction, 1, i_point2D);
@@ -114,11 +103,8 @@ void LineTraceCalculator::prepareTranslation(const Trace* i_trace,
   LOG_INFO("Translating: " << direction);
 
   // Correct the rotation, if nessesary!
-  bool hasCorrectionSteps = correctTranslation(i_trace, i_point2D);
-
-  getJointController()->moveStep(getJointController()->getJoint(Translational),
-                                 direction,
-                                 hasCorrectionSteps);
+  correctTranslation(i_trace, i_point2D);
+  m_jointController->moveSteps(direction, 1);
 }
 
 
@@ -165,20 +151,18 @@ bool LineTraceCalculator::correctRotation(const Trace* i_trace,
   LOG_INFO("Destination point is: " <<
            destinationPoint->x << ", " << destinationPoint->y);
 
-  int numberOfSteps = std::floor((jointPointDifference)/getJointController()->
-                               getJoint(Translational)->getMovementPerStep());
+  int numberOfSteps = std::floor((jointPointDifference)/m_jointController->
+                                 resolveJoint(Translational)->getMovementPerStep());
 
   if (numberOfSteps>0) {
     std::string translationDirection=
         i_trace->getTranslationDirection(i_point2D, *destinationPoint);
 
-    getJointController()->getJoint(Translational)->
-        predictSteps(i_point2D, translationDirection, numberOfSteps);
+    m_jointController->resolveJoint(Translational)->
+        predictSteps(&i_point2D, translationDirection, numberOfSteps);
 
-    getJointController()->moveSteps(getJointController()->
-                                    getJoint(Translational),
-                                    translationDirection,
-                                    numberOfSteps);
+    m_jointController->moveSteps(translationDirection,
+                                 numberOfSteps);
 
     LOG_INFO("Number of correction steps: " <<
              numberOfSteps << " in the " <<
@@ -257,7 +241,7 @@ bool LineTraceCalculator::correctTranslation(const Trace* i_trace,
   }
 
   int numberOfSteps = std::floor(jointPointDifference/
-                               getJointController()->getJoint(Rotational)->
+                               m_jointController->resolveJoint(Rotational)->
                                getMovementPerStep()*(PI/180.0));
 
   if (numberOfSteps>0) {
@@ -265,13 +249,13 @@ bool LineTraceCalculator::correctTranslation(const Trace* i_trace,
         getRotationDirection(i_point2D,
                              destinationPoint);
 
-    getJointController()->getJoint(Rotational)->predictSteps(i_point2D,
-                                                             rotationDirection,
-                                                             numberOfSteps);
+    m_jointController->
+      resolveJoint(Rotational)->predictSteps(&i_point2D,
+                                             rotationDirection,
+                                             numberOfSteps);
 
-    getJointController()->moveSteps(getJointController()->getJoint(Rotational),
-                                    rotationDirection,
-                                    numberOfSteps);
+    m_jointController->moveSteps(rotationDirection,
+                                 numberOfSteps);
 
     if (getWriteLog())
       writeToStepLog(rotationDirection, numberOfSteps, i_point2D);

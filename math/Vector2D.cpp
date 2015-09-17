@@ -34,6 +34,6 @@ traceType Vector2D::getAlpha() const {
   return angle;
 }
 
-Vector2D& Vector2D::normalize(void) {
+Vector2D Vector2D::normalize(void) {
   return (*this /= sqrt(x * x + y * y));
 }

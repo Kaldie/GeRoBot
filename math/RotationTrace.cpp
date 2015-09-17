@@ -9,35 +9,39 @@ RotationTrace::RotationTrace()
   : Trace(Point2D(-1, 0), Point2D(1,0), Curve) {
   Arc2D arc(m_startPoint, m_endPoint, Point2D(0,0));
   m_centrePoint = arc.getCentrePoint();
+  m_isClockwise = arc.getIsClockwise();
 }
 
 RotationTrace::RotationTrace(const Point2D& i_startPoint,
                              const Point2D& i_endPoint,
                              const Point2D& i_centrePoint)
-  : Trace(i_startPoint, i_endPoint, Curve), m_centrePoint(i_centrePoint)
-{}
+  : Trace(i_startPoint, i_endPoint, Curve), m_centrePoint(i_centrePoint) {
+  Arc2D arc(i_startPoint, i_endPoint, i_centrePoint);
+  m_isClockwise = arc.getIsClockwise();
+}
 
 
 RotationTrace::RotationTrace(const Point2D& i_startPoint,
                              const Point2D& i_endPoint,
                              const traceType& i_radius,
                              const bool& i_isClockwise /*=true*/)
-    : Trace(i_startPoint, i_endPoint, Curve)
-{
+  : Trace(i_startPoint, i_endPoint, Curve),
+    m_isClockwise(i_isClockwise) {
   Arc2D arc(i_startPoint, i_endPoint, i_radius, i_isClockwise);
-  m_centrePoint = arc.getCentrePoint();
  }
 
 
 RotationTrace::RotationTrace(const Arc2D& i_arc)
     : Trace(i_arc.getFirstPoint(), i_arc.getSecondPoint(), Curve) {
   m_centrePoint = i_arc.getCentrePoint();
+  m_isClockwise = i_arc.getIsClockwise();
 }
 
 Arc2D RotationTrace::getArc() const {
   return Arc2D(m_startPoint,
                m_endPoint,
-               m_centrePoint);
+               m_centrePoint,
+               m_isClockwise);
 }
 
 
@@ -92,8 +96,8 @@ Point2D RotationTrace::intersectingPoint(
 }
 
 
-void RotationTrace::getExtremePoints(Point2D& i_firstPoint,
-                                     Point2D& i_secondPoint) const {
+void RotationTrace::getExtremePoints(Point2D* i_firstPoint,
+                                     Point2D* i_secondPoint) const {
   /**
    * Given a circle 
    * gives the two points for which the angle to the origin is
@@ -101,28 +105,32 @@ void RotationTrace::getExtremePoints(Point2D& i_firstPoint,
    */
   traceType centreMagnitude = Magnitude(m_centrePoint);
   traceType radius = getArc().radius();
-  if (centreMagnitude != 0) {
+  if (centreMagnitude > radius) {
     traceType rotationAngle = asin(radius/centreMagnitude);
     LOG_DEBUG("Rotation angle: " << rotationAngle*180/PI);
 
-    i_firstPoint = m_centrePoint*cos(rotationAngle);
-    i_secondPoint = m_centrePoint*cos(rotationAngle);
+    *i_firstPoint = m_centrePoint*cos(rotationAngle);
+    *i_secondPoint = m_centrePoint*cos(rotationAngle);
 
-    i_secondPoint.rotate(rotationAngle);
-    i_firstPoint.rotate(-rotationAngle);
-
-    // i_secondPoint*=cos(rotationAngle);
-    // i_firstPoint*=cos(rotationAngle);
+    i_secondPoint->rotate(rotationAngle);
+    i_firstPoint->rotate(-rotationAngle);
   } else {
-    i_firstPoint = m_centrePoint+Point2D(radius, 0);
-    i_secondPoint = m_centrePoint-Point2D(radius, 0);
+    // er ligt ergens een kladje waar dit op staat uitgelegd
+    *i_secondPoint = (m_startPoint - m_centrePoint).rotate(PI) + m_centrePoint;
+    *i_firstPoint = (m_endPoint - m_centrePoint).rotate(PI) + m_centrePoint;
+    if (*i_firstPoint == m_startPoint) {
+      // zelfde geld hier
+      LOG_DEBUG("Same points, monster!");
+      *i_secondPoint = (m_startPoint - m_centrePoint).rotate(PI/2.0) + m_centrePoint;
+      *i_firstPoint = (m_endPoint - m_centrePoint).rotate(PI/2.0) + m_centrePoint;
+    }
   }
 }
 
 
 std::vector<RotationTrace> RotationTrace::getNecessaryTraces() const {
   Point2D firstExtreme, secondExtreme;
-  getExtremePoints(firstExtreme, secondExtreme);
+  getExtremePoints(&firstExtreme, &secondExtreme);
 
   traceType firstExtremeAngle=(firstExtreme - m_centrePoint).getAlpha();
   traceType secondExtremeAngle=(secondExtreme - m_centrePoint).getAlpha();
@@ -156,33 +164,29 @@ std::vector<RotationTrace> RotationTrace::getNecessaryTraces() const {
 }
 
 
-bool RotationTrace::shouldAddExtremePoint(traceType& i_startAngle,
-                                          traceType& i_stopAngle,
-                                          traceType& i_extremeAngle) const {
-
-  LOG_DEBUG("Start angle: " << i_startAngle*180/PI);
-  LOG_DEBUG("Stop angle: " << i_stopAngle*180/PI);
-  LOG_DEBUG("Extreme angle: " << i_extremeAngle*180/PI);
-
-  i_stopAngle-=i_startAngle;
-  if (i_stopAngle < 0)
-    i_stopAngle+=2*PI;
-
-  i_extremeAngle-=i_startAngle;
-  if (i_extremeAngle < 0)
-    i_extremeAngle+=2*PI;
-
-  if (getArc().isClockwise()) {
-    if (i_extremeAngle > i_stopAngle)
-      return true;
-    else
-      return false;
+bool RotationTrace::shouldAddExtremePoint(const traceType& i_startAngle,
+                                          const traceType& i_stopAngle,
+                                          const traceType& i_extremeAngle) const {
+  bool shouldAddPoint = false;
+  traceType span = getArc().spanAngle();
+  traceType angle;
+  if (m_isClockwise) {
+    angle = i_startAngle;
   } else {
-    if (i_extremeAngle < i_stopAngle)
-      return true;
-    else
-      return false;
+    angle = i_stopAngle;
   }
+
+  if (angle > i_extremeAngle && span > (angle - i_extremeAngle)) {
+    shouldAddPoint = true;
+  }
+
+  if (angle < span) {
+    // this means it goes through 0, the angle needs to be adjusted such that it will work
+    shouldAddPoint |= shouldAddExtremePoint(i_startAngle + 2 * PI,
+                                            i_stopAngle + 2 * PI,
+                                            i_extremeAngle);
+  }
+  return shouldAddPoint;
 }
 
 

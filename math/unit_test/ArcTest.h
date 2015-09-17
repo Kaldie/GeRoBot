@@ -17,17 +17,17 @@ class ArcTest : public CxxTest::TestSuite {
               Point2D(0, 0));
 
     TS_ASSERT_DELTA(arc.arcLength(), PI / 2.0, 0.0001);
-    TS_ASSERT(arc.isClockwise());
+    TS_ASSERT(arc.getIsClockwise());
 
     arc.setFirstPoint(Point2D(-2, 0));
     arc.setSecondPoint(Point2D(2, 0));
     arc.setCentrePoint(Point2D(0, 0));
 
     TS_ASSERT_DELTA(arc.arcLength(), 2*PI, 0.0001);
-    TS_ASSERT(arc.isClockwise());
+    TS_ASSERT(arc.getIsClockwise());
 
     arc.setCentrePoint(Point2D(0, 10));
-    TS_ASSERT(!arc.isClockwise());
+    TS_ASSERT(arc.getIsClockwise());
 
     TS_ASSERT_THROWS(Arc2D arc2(Point2D(0, 1),
                                 Point2D(2, 0),
@@ -38,7 +38,7 @@ class ArcTest : public CxxTest::TestSuite {
                Point2D(4.0, 0),
                4,
                true);
-    TS_ASSERT(arc3.isClockwise());
+    TS_ASSERT(arc3.getIsClockwise());
     TS_ASSERT_EQUALS(arc3.getCentrePoint(),
                      Point2D(0, 0));
 
@@ -47,7 +47,7 @@ class ArcTest : public CxxTest::TestSuite {
                4,
                false);
 
-    TS_ASSERT(!arc4.isClockwise());
+    TS_ASSERT(!arc4.getIsClockwise());
     TS_ASSERT_EQUALS(arc4.getCentrePoint(),
                      Point2D(4, 4));
   }

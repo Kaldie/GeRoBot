@@ -17,7 +17,8 @@ BaseTraceCalculator::BaseTraceCalculator()
       m_logFileName("./stepLog.log")
 {}
 
-BaseTraceCalculator::BaseTraceCalculator(JointController* i_jointController)
+BaseTraceCalculator::BaseTraceCalculator(
+ const JointController::JointControllerPointer& i_jointController)
     : m_tolerance(0.01),
       m_jointController(i_jointController),
       m_translationTolerance(0.01),
@@ -27,8 +28,9 @@ BaseTraceCalculator::BaseTraceCalculator(JointController* i_jointController)
   setTolerances();
 }
 
-BaseTraceCalculator::BaseTraceCalculator(JointController* i_jointController,
-                                         const traceType& i_tolerance)
+BaseTraceCalculator::BaseTraceCalculator
+ (const JointController::JointControllerPointer& i_jointController,
+  const traceType& i_tolerance)
     : m_tolerance(i_tolerance),
       m_jointController(i_jointController),
       m_translationTolerance(0.01),
@@ -36,17 +38,6 @@ BaseTraceCalculator::BaseTraceCalculator(JointController* i_jointController,
       m_writeLog(false),
       m_logFileName("./stepLog.log") {
   setTolerances();
-}
-
-// assign operator
-BaseTraceCalculator::BaseTraceCalculator(const BaseTraceCalculator& obj) {
-  LOG_INFO("Copy constructor");
-  m_jointController = obj.m_jointController;
-  m_tolerance = obj.m_tolerance;
-  m_writeLog = obj.m_writeLog;
-  m_logFileName = obj.m_logFileName;
-  m_rotationTolerance = obj.m_rotationTolerance;
-  m_translationTolerance = obj.m_translationTolerance;
 }
 
 
@@ -61,14 +52,14 @@ void BaseTraceCalculator::setTolerances() {
   if (hasJointController()) {
     try {
       m_rotationTolerance = m_jointController
-          ->getJoint(Rotational)->getMovementPerStep();}
+          ->resolveJoint(Rotational)->getMovementPerStep();}
     catch(int e) {
       LOG_INFO("Could not find a rotaional joint" <<
                "tolerance is left at default!");}
 
     try {
       m_translationTolerance = m_jointController->
-          getJoint(Translational)->getMovementPerStep();}
+          resolveJoint(Translational)->getMovementPerStep();}
     catch(int e) {
       LOG_INFO("Could not find a translational joint," <<
                "tolerance is left at default!");}
@@ -81,25 +72,25 @@ std::vector<int> BaseTraceCalculator::getNumberOfSteps(
     const Point2D& i_position) const {
   if (!hasJointController())
     LOG_ERROR("Does not have a joint controller!");
-  
+
   Point2D endPoint = i_trace->getEndPoint();
   LOG_INFO("Translational movement per step: "<<
            static_cast<traceType>(
-               m_jointController->getJoint(Translational)->
+               m_jointController->resolveJoint(Translational)->
                getMovementPerStep()));
 
   LOG_INFO("Rotationalal movement per step: "<<
-           m_jointController->getJoint(Rotational)->getMovementPerStep());
+           m_jointController->resolveJoint(Rotational)->getMovementPerStep());
 
   // Magnitude difference / movement per step of Translational joint
   int numberOfTranslationSteps =
       std::abs(Magnitude(i_position)-Magnitude(endPoint))/
-      (m_jointController->getJoint(Translational)->getMovementPerStep());
+      (m_jointController->resolveJoint(Translational)->getMovementPerStep());
 
   // Rotational difference / movement per step of Rotational joint
   int numberOfRotationSteps =
       (std::abs(i_position.getAlpha()-endPoint.getAlpha())*(180/PI))/
-      (m_jointController->getJoint(Rotational)->getMovementPerStep());
+      (m_jointController->resolveJoint(Rotational)->getMovementPerStep());
 
    return std::vector<int> {numberOfRotationSteps, numberOfTranslationSteps} ;
 }
@@ -128,8 +119,8 @@ bool BaseTraceCalculator::shouldTranslate(const Trace& i_trace,
     shouldTranslate = true;
 
   else if (difference >
-           (getJointController()->
-            getJoint(Translational)->
+           (m_jointController->
+            resolveJoint(Translational)->
             getMovementPerStep() / 2.0))
     shouldTranslate = true;
 
@@ -158,7 +149,7 @@ bool BaseTraceCalculator::shouldRotate(const Trace& i_trace,
     shouldRotate = true;
   else if (difference>
            (getJointController()->
-            getJoint(Rotational)->
+            resolveJoint(Rotational)->
             getMovementPerStep()/2.0))
     shouldRotate = true;
   else
@@ -197,28 +188,24 @@ void BaseTraceCalculator::calculateTrace(const Trace* i_trace,
            "Number of translation steps: " << numberOfSteps[1]);
 
   if (numberOfSteps[0] > 0) {
-    getJointController()->getJoint(Rotational)->predictSteps(
-        i_startPoint,
+    m_jointController->resolveJoint(Rotational)->predictSteps(
+        &i_startPoint,
         rotationDirection,
         numberOfSteps[0]);
 
-    getJointController()->moveSteps(
-        getJointController()->getJoint(Rotational),
+    m_jointController->moveSteps(
         rotationDirection,
-        numberOfSteps[0],
-        true);
+        numberOfSteps[0]);
   }
 
   if (numberOfSteps[1] > 0) {
-    getJointController()->getJoint(Translational)->
-        predictSteps(i_startPoint,
+    m_jointController->resolveJoint(Translational)->
+        predictSteps(&i_startPoint,
                      translationDirection,
                      numberOfSteps[1]);
 
-    getJointController()->moveSteps(
-        getJointController()->getJoint(Translational),
+    m_jointController->moveSteps(
         translationDirection,
-        numberOfSteps[1],
-        true);
+        numberOfSteps[1]);
   }
   }

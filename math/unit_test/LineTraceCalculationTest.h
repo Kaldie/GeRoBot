@@ -17,7 +17,7 @@ class LineTraceCalculationTest : public CxxTest::TestSuite {
   StepperDriver stepperDriver2;
   RotationalJoint<StepperDriver> rotationalJoint;
   TranslationalJoint<StepperDriver> translationalJoint;
-  JointController jointController;
+  JointController::JointControllerPointer jointControllerPointer;
 
   void setUp() {
     stepperDriver1.setPins({5, 6, 7});
@@ -25,8 +25,10 @@ class LineTraceCalculationTest : public CxxTest::TestSuite {
 
     (*rotationalJoint.getMotor()) = stepperDriver1;
     (*translationalJoint.getMotor()) = stepperDriver2;
+    JointController jointController;
     jointController.addJoint(rotationalJoint.clone());
     jointController.addJoint(translationalJoint.clone());
+    jointControllerPointer = std::make_shared<JointController>(jointController);
   }
 
   void testLineTraceCalculation() {
@@ -34,29 +36,29 @@ class LineTraceCalculationTest : public CxxTest::TestSuite {
     Point2D endPoint(-150, 50);
     Trace trace(startPoint, endPoint);
 
-    jointController.getJoint(Translational)->setMovementPerStep(0.01);
-    jointController.getJoint(Rotational)->setMovementPerStep(0.01);
+    jointControllerPointer->resolveJoint(Translational)->setMovementPerStep(0.01);
+    jointControllerPointer->resolveJoint(Rotational)->setMovementPerStep(0.01);
 
     trace.setRotationTolerance(
-        jointController.getJoint(Rotational)->getMovementPerStep()*1.5);
+        jointControllerPointer->resolveJoint(Rotational)->getMovementPerStep()*1.5);
 
     trace.setTranslationTolerance(
-        jointController.getJoint(Translational)->getMovementPerStep()*1.5);
+        jointControllerPointer->resolveJoint(Translational)->getMovementPerStep()*1.5);
 
-    jointController.getJoint(Translational)->getMotor()->setHoldMotor(true);
-    jointController.getJoint(Rotational)->getMotor()->setHoldMotor(true);
+    jointControllerPointer->resolveJoint(Translational)->getMotor()->setHoldMotor(true);
+    jointControllerPointer->resolveJoint(Rotational)->getMotor()->setHoldMotor(true);
 
-    LineTraceCalculator lineTraceCalculator(&jointController);
+    LineTraceCalculator lineTraceCalculator(jointControllerPointer);
     lineTraceCalculator.setWriteLog(true);
     lineTraceCalculator.calculateTrace(&trace, startPoint);
 
     /// Tests
-    TS_ASSERT_EQUALS(jointController.getSequenceVector().numberOfSequences(),
+    TS_ASSERT_EQUALS(jointControllerPointer->getSequenceVector().numberOfSequences(),
                      7411);
-    TS_ASSERT_EQUALS(jointController.getSequenceVector().numberOfSteps(),
+    TS_ASSERT_EQUALS(jointControllerPointer->getSequenceVector().numberOfSteps(),
                      26458);
 
-    SequenceVector sequenceVector = jointController.getSequenceVector();
+    SequenceVector sequenceVector = jointControllerPointer->getSequenceVector();
     
     /// testing condensing on this big vector
     sequenceVector.normalise();
@@ -130,7 +132,7 @@ class LineTraceCalculationTest : public CxxTest::TestSuite {
     */
     try {
       LOG_DEBUG("here!!");
-      jointController.actuate();
+      jointControllerPointer->actuate();
     } catch(std::runtime_error) {
       LOG_INFO("Could not find sizzle");
     }
