@@ -231,7 +231,7 @@ bool StateSequence::addToSequence(const StateSequence& i_sequence) {
     m_numberOfRepetitions += i_sequence.m_numberOfRepetitions;
     return true;
   }
-  
+
   if (hasMutualPins(i_sequence)) {
     LOG_DEBUG("Could not add sequence, has mutual pins");
     return false;
@@ -288,31 +288,34 @@ bool StateSequence::mergePinStateSequences(
     *io_secondSequence = StateSequence();
     return true;
   }
-
   // check if both sequence do not define the same pins
   if (io_firstSequence->hasMutualPins(*io_secondSequence)) {
     LOG_DEBUG("The first sequence has the same pins " <<
               "as the second therefor cannot be merged");
     return false;
   }
-
   // check if the first sequence has more repetitions then the second
-  if (io_firstSequence->getNumberOfRepetitions()<
+  if (io_firstSequence->getNumberOfRepetitions() <
       io_secondSequence->getNumberOfRepetitions()) {
       LOG_DEBUG("The second sequence has more repetitions then the first" <<
                 "Using recursive call to fix it");
       return StateSequence::mergePinStateSequences(io_secondSequence,
-                                                      io_firstSequence);
+                                                   io_firstSequence);
   }
-
   // Merge them!
   LOG_DEBUG("Now we are sure we can merge them!");
   int newFirstSequenceRepetitions =
       io_firstSequence->getNumberOfRepetitions() -
       io_secondSequence->getNumberOfRepetitions();
-
-  if (newFirstSequenceRepetitions <= 0)
-    LOG_ERROR("@ this point this could not happen!!");
+  if (newFirstSequenceRepetitions <= 0) {
+    LOG_DEBUG("first sequence reps: " << io_firstSequence->getNumberOfRepetitions());
+    LOG_DEBUG("second sequence reps: " << io_secondSequence->getNumberOfRepetitions());
+    LOG_DEBUG("First sequence");
+    io_firstSequence->displaySequence();
+    LOG_DEBUG("Second sequence");
+    io_secondSequence->displaySequence();
+    return false;
+  }
 
   io_firstSequence->setNumberOfRepetitions(
       io_secondSequence->getNumberOfRepetitions());
