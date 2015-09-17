@@ -8,16 +8,16 @@ const int ArduinoMotorDriver::ECHO_MODE_VERBOSE_VALUE = 150;
 const int ArduinoMotorDriver::ECHO_MODE_VALUE = 149;
 const int ArduinoMotorDriver::DELETE_FILE_MODE_VALUE = 140;
 const int ArduinoMotorDriver::UPLOAD_MODE_VALUE =
-    sizeof(ArduinoMotorDriver::HAND_SHAKE_VALUE);
+  sizeof(ArduinoMotorDriver::HAND_SHAKE_VALUE);
 
 
 ArduinoMotorDriver::ArduinoMotorDriver()
-    : m_serialRegularExpresion("lalal") {
+  : m_serialRegularExpresion("lalal") {
 }
 
 
 ArduinoMotorDriver::ArduinoMotorDriver(std::string i_serialRegularExpression)
-    : m_serialRegularExpresion(i_serialRegularExpression) {
+  : m_serialRegularExpresion(i_serialRegularExpression) {
 }
 
 
@@ -30,7 +30,7 @@ void ArduinoMotorDriver::initialiseArduinoConnection() {
   m_arduinoConnection.setMinimumBytePerMessage(1);
   m_arduinoConnection.setCloseHandleAfterMessage(false);
   if (!m_arduinoConnection.hasConnection()) {
-      m_arduinoConnection.openConnection();
+    m_arduinoConnection.openConnection();
   } else {
     m_arduinoConnection.resetConnection();
   }
@@ -41,61 +41,59 @@ void ArduinoMotorDriver::initialiseArduinoConnection() {
 bool ArduinoMotorDriver::handShake(ArduinoMotorDriver::DriverStatus i_status) {
   if (!m_arduinoConnection.hasConnection())
     initialiseArduinoConnection();
-
-  int receivedHandShake, receivedModeValue = 10000;
-  int attempts, modeValue = 0;
-
-  receivedHandShake = m_arduinoConnection.serialRead(1);
+  /// receive the handshake value from the arduino
+  int receivedHandShake = m_arduinoConnection.serialRead(1);
   LOG_DEBUG("Hand shake value: " << ArduinoMotorDriver::HAND_SHAKE_VALUE <<
             ", received value: " << receivedHandShake);
-
+  /// If it is not the known value, return
   if (ArduinoMotorDriver::HAND_SHAKE_VALUE != receivedHandShake) {
     return false;
   }
-
+  /// Send the handshake value to let it know we received it
   m_arduinoConnection.serialWrite(ArduinoMotorDriver::HAND_SHAKE_VALUE);
 
+  /// Determine the mode value
+  int modeValue;
   switch (i_status) {
-    case ArduinoMotorDriver::UPLOAD : {
-      modeValue = ArduinoMotorDriver::UPLOAD_MODE_VALUE;
-      break;
-    }
-    case ArduinoMotorDriver::ACTUATE : {
-      modeValue = ArduinoMotorDriver::ACTUATE_MODE_VALUE;
-      break;
-    }
-    case ArduinoMotorDriver::SERIAL_ECHO : {
-      modeValue = ArduinoMotorDriver::ECHO_MODE_VALUE;
-      break;
-    }
-    case ArduinoMotorDriver::SERIAL_ECHO_VERBOSE : {
-      modeValue = ArduinoMotorDriver::ECHO_MODE_VERBOSE_VALUE;
-      break;
-    }
-    case ArduinoMotorDriver::DELETE_FILE : {
-      modeValue = ArduinoMotorDriver::DELETE_FILE_MODE_VALUE;
-      break;
-    }
-    case ArduinoMotorDriver::ERROR : {
-      LOG_ERROR("An error has occured. Reset the driver!");
-      break;
-    }
-    default : {
-      LOG_ERROR("Mode is not set properly!");
-      break;
-    }
+  case ArduinoMotorDriver::UPLOAD : {
+    modeValue = ArduinoMotorDriver::UPLOAD_MODE_VALUE;
+    break;
   }
+  case ArduinoMotorDriver::ACTUATE : {
+    modeValue = ArduinoMotorDriver::ACTUATE_MODE_VALUE;
+    break;
+  }
+  case ArduinoMotorDriver::SERIAL_ECHO : {
+    modeValue = ArduinoMotorDriver::ECHO_MODE_VALUE;
+    break;
+  }
+  case ArduinoMotorDriver::SERIAL_ECHO_VERBOSE : {
+    modeValue = ArduinoMotorDriver::ECHO_MODE_VERBOSE_VALUE;
+    break;
+  }
+  case ArduinoMotorDriver::DELETE_FILE : {
+    modeValue = ArduinoMotorDriver::DELETE_FILE_MODE_VALUE;
+    break;
+  }
+  case ArduinoMotorDriver::ERROR : {
+    LOG_ERROR("An error has occured. Reset the driver!");
+    break;
+  }
+  default : {
+    LOG_ERROR("Mode is not set properly!");
+    break;
+  }}  // end switch case
 
+  /// Send the mode value to the arduino
   m_arduinoConnection.serialWrite(modeValue);
-  receivedModeValue = m_arduinoConnection.serialRead(1);
-  while (modeValue != receivedModeValue && attempts < 5) {
+  /// check if it is acknowledged
+  int receivedModeValue, attempts(0);
+  do {
     receivedModeValue = m_arduinoConnection.serialRead(1);
     attempts++;
-  }
-
+  } while (modeValue != receivedModeValue && attempts < 5);
   LOG_DEBUG("Selected mode value: " << modeValue <<
             " ,received mode value: " << receivedModeValue);
-
   if (receivedModeValue != modeValue) {
     return false;
   }
@@ -121,10 +119,9 @@ void ArduinoMotorDriver::upload(const std::vector<int> i_messageVector) {
   for (auto itr = i_messageVector.begin();
        itr != i_messageVector.end();
        itr++) {
-    m_arduinoConnection.serialWrite(
-        reinterpret_cast<const unsigned char*>(&(*itr)),
-        sizeof(*itr));
-
+    m_arduinoConnection.serialWrite
+      (reinterpret_cast<const unsigned char*>(&(*itr)),
+       sizeof(*itr));
     calculatedCRC += *itr;
   }
 
@@ -139,10 +136,10 @@ void ArduinoMotorDriver::upload(const std::vector<int> i_messageVector) {
 
 
 void ArduinoMotorDriver::actuate() {
-    if (!m_arduinoConnection.hasConnection()) {
-      initialiseArduinoConnection();
-    }
-    while (!handShake(ArduinoMotorDriver::ACTUATE)) {}
+  if (!m_arduinoConnection.hasConnection()) {
+    initialiseArduinoConnection();
+  }
+  while (!handShake(ArduinoMotorDriver::ACTUATE)) {}
 }
 
 bool ArduinoMotorDriver::sendTestBit() {
@@ -152,10 +149,10 @@ bool ArduinoMotorDriver::sendTestBit() {
   }
 
   unsigned char* position;
-  int testInt [] = {16,10000,100,0,4,0,8};
+  int testInt [] = {24,1,10,0,4,0,8};
   unsigned char crc = 0;
   for (int i = 0;
-       i < 5;
+       i < 7;
        i++) {
     position = reinterpret_cast<unsigned char*>(testInt+i);
     m_arduinoConnection.serialWrite(position, sizeof(testInt[0]));
@@ -176,24 +173,25 @@ bool ArduinoMotorDriver::sendTestBit() {
 
 
 void ArduinoMotorDriver::deleteFile() {
-     if (!m_arduinoConnection.hasConnection()) {
-      initialiseArduinoConnection();
-    }
-    while (!handShake(ArduinoMotorDriver::DELETE_FILE)) {}
+  if (!m_arduinoConnection.hasConnection()) {
+    initialiseArduinoConnection();
+  }
+  while (!handShake(ArduinoMotorDriver::DELETE_FILE)) {}
 }
 
-void ArduinoMotorDriver::echo() {
-     if (!m_arduinoConnection.hasConnection()) {
-      initialiseArduinoConnection();
-    }
 
-     while (!handShake(ArduinoMotorDriver::SERIAL_ECHO_VERBOSE)) {}
-    
-    std::string currentString;
-    do {
-      currentString = m_arduinoConnection.serialReadString();
-      LOG_INFO(currentString);
-    } while (currentString != "");
+void ArduinoMotorDriver::echo() {
+  // initialise the connection if necessary
+  if (!m_arduinoConnection.hasConnection()) {
+    initialiseArduinoConnection();
+  }
+  // handshake untill we get the proper response!
+  while (!handShake(ArduinoMotorDriver::SERIAL_ECHO_VERBOSE)) {}
+  std::string currentString;
+  do {
+    currentString = m_arduinoConnection.serialReadString();
+    LOG_INFO(currentString);
+  } while (currentString != "");
 }
 
 bool ArduinoMotorDriver::benchmarkSD(const int& i_numberOfMessages) {
@@ -223,7 +221,7 @@ bool ArduinoMotorDriver::benchmarkSD(const int& i_numberOfMessages) {
       LOG_DEBUG("Number of bytes send by arduino: " << numberOfBytes);
       //      LOG_ERROR("Number of send bytes is not what expected!");
     }
-    
+
     int value;
     for (int i = 0;
          i < numberOfBytes/2;
@@ -240,18 +238,20 @@ bool ArduinoMotorDriver::benchmarkSD(const int& i_numberOfMessages) {
   return true;
 }
 
-void ArduinoMotorDriver::createRandomMessages(const int& i_numberOfMessages,
-                                              std::vector< std::vector<int> >* i_totalMessagePointer) {
-  unsigned int seed = 10;
+
+void ArduinoMotorDriver::createRandomMessages
+(const int& i_numberOfMessages,
+ std::vector< std::vector<int> >* i_totalMessagePointer) {
+  srand(time(NULL));
   for (int i= 0;
        i < i_numberOfMessages;
        i++) {
     std::vector<int> messageVector;
-    int numberOfSteps = rand_r(&seed) % 3 + 1;
+    int numberOfSteps = rand() % 3 + 1;
     messageVector.push_back(sizeof(numberOfSteps) * 2 +
                             sizeof(numberOfSteps) * numberOfSteps);
-    messageVector.push_back(rand_r(&seed) % 10000);  // speed
-    messageVector.push_back(rand_r(&seed) % 50+1);  // number of repititions
+    messageVector.push_back(rand() % 2 + 1);  // speed
+    messageVector.push_back(rand() % 100+1);  // number of repititions
 
     LOG_DEBUG("Number of steps: " << numberOfSteps);
     LOG_DEBUG("Message size: " << messageVector[0]);
@@ -260,7 +260,7 @@ void ArduinoMotorDriver::createRandomMessages(const int& i_numberOfMessages,
     for (int j = 0;
          j < numberOfSteps;
          j++) {
-      messageVector.push_back(rand_r(&seed) % 125 + 3);
+      messageVector.push_back(rand() % 125 + 3);
     }
     i_totalMessagePointer->push_back(messageVector);
   }

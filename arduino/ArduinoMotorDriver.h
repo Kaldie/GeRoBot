@@ -35,11 +35,15 @@ public:
     bool resetConnection();
     bool sendTestBit();
     void deleteFile();
+
     void echo();
+    /// Benchmark the SD card on the system. Testing purpose often
     bool benchmarkSD(const int& i_numberOfMessages);
-    // Constructors
-    explicit ArduinoMotorDriver(std::string i_regExpression);
+    // Default constructors
     ArduinoMotorDriver();
+    /// Constructor with path to serial
+    explicit ArduinoMotorDriver(std::string i_regExpression);
+
 };
 
 #endif  // ARDUINO_ARDUINOMOTORDRIVER_H_
