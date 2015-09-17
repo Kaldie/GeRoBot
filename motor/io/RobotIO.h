@@ -17,7 +17,7 @@ class RobotIO: public XMLBuilder {
  private:
   RobotIO();
   JointController parseJointController(const pugi::xml_node&);
-  bool updateJointController(const JointController& i_jointController);
+  bool updateJointController(const JointController::JointControllerPointer& i_jointController);
 
  public:
   explicit RobotIO(const std::string&);

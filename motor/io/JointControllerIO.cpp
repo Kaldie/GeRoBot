@@ -37,7 +37,7 @@ void JointControllerIO::addJoints(){
 void JointControllerIO::parseJoint(const pugi::xml_node& i_jointNode) {
   JointIO jointIO(i_jointNode);
   jointIO.build();
-  getJointController().addJoint(jointIO.getJointPointer());
+  m_jointController.addJoint(jointIO.getJointPointer());
 }
 
 
@@ -70,47 +70,43 @@ bool JointControllerIO::updateActuatorNode() {
   pugi::xml_node actuatorNode = getNodeFromPath("./ACTUATOR");
 
   getNodeFromPath(actuatorNode, "./REGULAR_EXPRESSION").text().
-      set(getJointController().
-          getActuator().getSerialRegularExpresion().c_str());
-
-  //  getNodeFromPath(actuatorNode, "./REDUCED_SPEED").text().
-  //   set(getJointController().getActuator().getReducedSpeed());
+      set(m_jointController.getActuator().
+          getSerialRegularExpresion().c_str());
   return true;
 }
 
 
 bool JointControllerIO::updateJointNodes() {
   bool hasSucceeded(true);
-  JointController::JointPointerVector rotationalJointVector =
-      m_jointController.getJoints(Rotational);
-
-  JointController::JointPointerVector translationalJointVector =
-      m_jointController.getJoints(Translational);
+  JointController::JointPointerVector jointVector =
+    m_jointController.getJointPointerVector();
+  // current found joint pointer
   JointPointer jointPointer;
-
-  // remove all joints first
+  // current movement type
+  MovementType movementType;
+  std::string movementString;
   for (pugi::xml_node jointNode = getNodeFromPath("./JOINT");
       jointNode;
       jointNode = jointNode.next_sibling()) {
-    std::string movementType =
-        getNodeFromPath(jointNode, "./MOVEMENT_TYPE").text().as_string();
-
-    if (movementType == "ROTATIONAL") {
-      if (rotationalJointVector.size() < 1)
-        LOG_ERROR("Number of rotational joint in the previous" <<
-                  "version does not corrispond to the new number!");
-      jointPointer = rotationalJointVector.back();
-      rotationalJointVector.pop_back();
-    } else if (movementType == "TRANSLATIONAL") {
-      if (translationalJointVector.size() < 1)
-        LOG_ERROR("Number of translational joint in the" <<
-                  "previous version does not corrispond to the new number!");
-      jointPointer = translationalJointVector.back();
-      translationalJointVector.pop_back();
+    movementString = getNodeFromPath(jointNode, "./MOVEMENT_TYPE").text().as_string();
+    if (movementString.compare(std::string("Rotational")) != 0) {
+      movementType = Rotational;
+    } else if (movementString.compare("Translational") != 0) {
+      movementType = Translational;
     }
-
-
+    for (auto& jointPointer : jointVector) {
+      if (jointPointer->getMovementType() == movementType) {
+        jointVector.erase(std::remove(jointVector.begin(), jointVector.end(), jointPointer));
+        break;
+      }
+    }
+    // check if the proper joint is found!
+    if (jointPointer->getMovementType() != movementType) {
+      LOG_ERROR("Could not find a joint with the proper movement type!");
+    }
+    // create an IO instance
     JointIO jointIO(jointNode);
+    // try to update it
     hasSucceeded &= jointIO.update(jointPointer);
   }
   return hasSucceeded;

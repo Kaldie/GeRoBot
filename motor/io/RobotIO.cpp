@@ -15,8 +15,11 @@ void RobotIO::build() {
   // need to call the xml builder build function to load the root node of the document given by the file name.
   LOG_DEBUG("Building a robot from file name: " << getFileName());
   LOG_DEBUG("Root node is: " << getNode().name());
-  m_robotPointer->setJointController(
-      parseJointController(getNodeFromPath("./ROBOT/JOINTCONTROLLER")));
+  JointController controller = parseJointController(getNodeFromPath("./ROBOT/JOINTCONTROLLER"));
+  LOG_DEBUG("Set controller!");
+  LOG_DEBUG(m_robotPointer);
+  m_robotPointer->setJointController(std::make_shared<JointController>(controller));
+  LOG_DEBUG("Controler is set!");
 }
 
 
@@ -61,12 +64,11 @@ bool RobotIO::update(const Robot::RobotPointer& i_robotPointer) {
 }
 
 
-bool RobotIO::updateJointController(
-    const JointController& i_jointController) {
-    JointControllerIO jointControllerIO(
-      getNodeFromPath("./ROBOT/JOINTCONTROLLER"));
-
-  return jointControllerIO.update(m_robotPointer->getJointController());
+bool RobotIO::updateJointController
+(const JointController::JointControllerPointer& i_jointController) {
+  JointControllerIO jointControllerIO
+    (getNodeFromPath("./ROBOT/JOINTCONTROLLER"));
+  return jointControllerIO.update(*m_robotPointer->getJointController());
 }
 
 
