@@ -837,7 +837,9 @@ EXCLUDE_SYMLINKS       = YES
 
 EXCLUDE_PATTERNS       = ../.git/* \
                          */tests/* \
-                         ../pugixml/docs/*
+			 */unit_test/* \
+                         ../pugixml/docs/* \
+			 */output/*
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the
