@@ -11,7 +11,7 @@ TOROOT= $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 PUGISRC = ./pugixml/src
 SHAREDFOLDERS = ./math ./math/io ./arduino ./motor ./motor/io ./util/xml $(PUGISRC)
 UPLOADEDFOLDERS = ./arduinosketch
-MAIN = GeoRobot
+MAIN = GeRobot
 include Makefile.config
 
 OBJS := $(wildcard bin/objects/*.o)
