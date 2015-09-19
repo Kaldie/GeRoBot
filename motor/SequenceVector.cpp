@@ -156,6 +156,7 @@ void SequenceVector::clean() {
     return;
   }
   // Make sure that the last state represents all pins
+  LOG_DEBUG("Normalising");
   normalise();
 
   PinStateSequenceVector emptyPinStateSequenceVector;
