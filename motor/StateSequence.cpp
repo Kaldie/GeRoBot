@@ -317,8 +317,8 @@ bool StateSequence::mergePinStateSequences(
     return false;
   }
 
-    if (i_sequence.getPinStateVector().size() >
-      m_pinStateVector.size()) {
+    if (io_secondSequence->getPinStateVector().size() >
+      io_secondSequence->getPinStateVector().size()) {
     LOG_DEBUG("Cannot merge the two, " <<
               "the right hand side has more pin states then the left");
     return false;

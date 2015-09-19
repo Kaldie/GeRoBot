@@ -126,9 +126,9 @@ BaseJoint::JointPointer JointController::getJoint(const MovementType &i_movement
 void JointController::resetPinStateSequence() {
   StateSequence stateSequence;
   for (auto& joint : m_jointPointerVector) {
-    stateSequence.addState(joint->getCurrentPinState(), true);
+    stateSequence.addToSequence(joint->getMotor()->getCurrentPinState(), true);
   }
-  m_sequenceVector.appendSequence(stateSequence);
+  m_sequenceVector.appendStateSequence(stateSequence, false);
   m_sequenceVector.clean();
 }
 

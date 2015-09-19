@@ -53,6 +53,7 @@ void Robot::goToPosition(const Point2D &i_position) {
   baseTraceCalculator.calculateTrace(thisTrace);
   LOG_DEBUG("new position: " << m_position.x << m_position.y);
   m_jointController->actuate();
+  m_position = m_virtualPosition;
 }
 
 
@@ -65,4 +66,12 @@ void Robot::prepareSteps(const std::string& i_direction,
   m_traveledPoints.push_back(m_virtualPosition);
   // add the step to the sequence
   m_jointController->moveSteps(i_direction, i_numberOfSteps);
+}
+
+
+void Robot::actuate() {
+  m_jointController->actuate();
+  std::vector<Point2D> empty;
+  m_traveledPoints.swap(empty);
+  m_position = m_virtualPosition;
 }

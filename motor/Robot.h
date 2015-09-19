@@ -34,7 +34,7 @@ class Robot {
   void goTrace(const Trace&);
   void definePosition(Point2D&);
   void callibrate(Trace&);
-
+  void actuate();
   /// Get the amount of movement per step given a direction
   traceType getMovementPerStep(const MovementType&) const ;
 
