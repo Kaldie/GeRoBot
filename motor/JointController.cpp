@@ -96,7 +96,8 @@ bool JointController::addJoint(const BaseJoint::JointPointer& i_joint) {
     }
   }
   LOG_DEBUG("Resetting pin state sequence");
-  LOG_INFO("Current size: " << m_jointPointerVector.size());
+  LOG_DEBUG("Current size: " << m_jointPointerVector.size());
+
   resetPinStateSequence();
   return true;
 }
@@ -123,6 +124,11 @@ BaseJoint::JointPointer JointController::getJoint(const MovementType &i_movement
 
 
 void JointController::resetPinStateSequence() {
+  StateSequence stateSequence;
+  for (auto& joint : m_jointPointerVector) {
+    stateSequence.addState(joint->getCurrentPinState(), true);
+  }
+  m_sequenceVector.appendSequence(stateSequence);
   m_sequenceVector.clean();
 }
 
@@ -176,6 +182,7 @@ BaseJoint::JointPointer JointController::resolveJoint(const std::string& i_movem
   }
   LOG_ERROR("Could not resolve movement direction: " << i_movementDirection);
 }
+
 
 BaseJoint::JointPointer JointController::resolveJoint(const MovementType& i_movementType) {
   return getJoint(i_movementType);
