@@ -188,13 +188,14 @@ void readIntegerFromSerial(int& i_value,
 
   for (int i = 0;
        i < SIZE_OF_INT;
-       i++)
+       i++) {
     INTEGER_BUFFER[i] = Serial.read();
+  }
   i_value = *(reinterpret_cast<int*>(INTEGER_BUFFER));
 }
 
 
-bool sendHandShake(ReturnState* i_returnState) {
+void sendHandShake(ReturnState* i_returnState) {
   Serial.write(HAND_SHAKE_VALUE);
   *i_returnState = SUCCES;
 }
@@ -208,7 +209,6 @@ void handleModeSelect(ReturnState* i_returnState) {
 
   // read the int size of the controller
   byte buffer[1];
-  int intSize = 0;
   Serial.readBytes((char*)buffer, 1);
 
   if (*buffer < 10) {
@@ -294,7 +294,6 @@ void verifyResponse(const unsigned char& i_requiredResponse,
 
 void writeMotorMessageBufferToSD(MotorMessage* i_messagePointer) {
   bool isOwner;
-
   if (stepFile.isOpen()) {
     isOwner = false;
   } else {
@@ -304,14 +303,12 @@ void writeMotorMessageBufferToSD(MotorMessage* i_messagePointer) {
     stepFile.seekSet(CURRENT_WRITE_MESSAGE_ON_SD * sizeof(MotorMessage));
     isOwner = true;
   }
-
   if (i_messagePointer->numberOfRepetitions > 0) {
     CURRENT_WRITE_MESSAGE_ON_SD++;
     stepFile.write(
         reinterpret_cast<byte*>(i_messagePointer),
         sizeof(MotorMessage));
   }
-
   if (isOwner) {
     stepFile.close();
   }
@@ -348,13 +345,10 @@ bool readMotorMessagesFromSD() {
     if (CURRENT_WRITE_MESSAGE_ON_SD <= CURRENT_READ_MESSAGE_ON_SD) {
       break;
     }
-
     numberOfBytesRead += stepFile.read(
         reinterpret_cast<void*>(MOTOR_MESSAGE_BUFFER.getWritePointer()),
         sizeof(MotorMessage));
-
-    CURRENT_READ_MESSAGE_ON_SD++;
-
+    ++CURRENT_READ_MESSAGE_ON_SD;
     if (MOTOR_MESSAGE_BUFFER.getWritePointer()->numberOfRepetitions > 0) {
       MOTOR_MESSAGE_BUFFER.finishWritePointer();
     }
@@ -618,7 +612,6 @@ void handleStatus() {
     if ((MOTOR_MESSAGE_BUFFER.isEmpty() or !IS_MOTOR_RUNNING) and
         !MOTOR_MESSAGE_BUFFER.isFull()) {
       hasFoundMessageOnSD = readMotorMessagesFromSD();
-
       /*
         if there are now new message read from SD
         and the motor is not running
@@ -632,7 +625,7 @@ void handleStatus() {
       }
     }
 
-    if (!IS_MOTOR_RUNNING) {
+    if (!IS_MOTOR_RUNNING and !MOTOR_MESSAGE_BUFFER.isEmpty()) {
       if (MOTOR_MESSAGE_BUFFER.getReadPointer()->numberOfRepetitions > 0) {
         setTimer1Interupt(MOTOR_MESSAGE_BUFFER.getReadPointer()->speed);
       } else {
