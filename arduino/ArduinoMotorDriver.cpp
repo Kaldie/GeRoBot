@@ -39,8 +39,6 @@ void ArduinoMotorDriver::initialiseArduinoConnection() {
 
 
 bool ArduinoMotorDriver::handShake(ArduinoMotorDriver::DriverStatus i_status) {
-  if (!m_arduinoConnection.hasConnection())
-    initialiseArduinoConnection();
   /// receive the handshake value from the arduino
   int receivedHandShake = m_arduinoConnection.serialRead(1);
   LOG_DEBUG("Hand shake value: " << ArduinoMotorDriver::HAND_SHAKE_VALUE <<
@@ -104,6 +102,8 @@ bool ArduinoMotorDriver::handShake(ArduinoMotorDriver::DriverStatus i_status) {
 void ArduinoMotorDriver::upload(const std::vector<int> i_messageVector) {
   if (!m_arduinoConnection.hasConnection()) {
     initialiseArduinoConnection();
+  } else {
+    m_arduinoConnection.flushConnection();
   }
 
   unsigned char calculatedCRC(0);
@@ -138,11 +138,19 @@ void ArduinoMotorDriver::upload(const std::vector<int> i_messageVector) {
 void ArduinoMotorDriver::actuate() {
   if (!m_arduinoConnection.hasConnection()) {
     initialiseArduinoConnection();
+  } else {
+    m_arduinoConnection.flushConnection();
   }
   while (!handShake(ArduinoMotorDriver::ACTUATE)) {}
 }
 
 bool ArduinoMotorDriver::sendTestBit() {
+    if (!m_arduinoConnection.hasConnection()) {
+    initialiseArduinoConnection();
+  } else {
+      m_arduinoConnection.flushConnection();
+  }
+
   while (!handShake(ArduinoMotorDriver::UPLOAD)) {
     LOG_DEBUG("Hand shake went bad!");
     std::cout << 'x';
