@@ -55,10 +55,12 @@ bool MainWindow::initialise() {
           SIGNAL(expanded(const QModelIndex& /*modelIndex*/)),
           this,
           SLOT(resizeColumnsToContents(const QModelIndex& /*modelIndex*/)));
-
-  Robot::RobotPointer robotPointer =  m_modelPointer->getRobotPointer();
-  robotMovementTab->layout()->addWidget(
-    new RobotMovementWidget(robotPointer, this));
+  RobotMovementWidget* robotMovementWidget =
+    new RobotMovementWidget(m_modelPointer->getRobotPointer(), this);
+  robotMovementTab->layout()->addWidget(robotMovementWidget);
+  LOG_DEBUG("Connection centralWidget to robot movement!");
+  connect(tabWidget, SIGNAL(currentChanged(int)),
+	  robotMovementWidget, SLOT(updatePositionWidget()));
   traceDesignTab->layout()->addWidget(new TraceDesignWidget(this));
   return true;
 }
@@ -120,8 +122,9 @@ bool MainWindow::loadTraceDesign() {
 bool MainWindow::clearTraceDesign() {
  if (TraceDesignWidget* traceWidget = findChild<TraceDesignWidget*>()) {
    traceWidget->clearWidget();
+   return true;
   } else {
-    LOG_DEBUG(traceWidget);
-    return false;
+   LOG_DEBUG(traceWidget);
+   return false;
   }
 }
