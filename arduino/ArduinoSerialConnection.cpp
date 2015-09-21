@@ -79,6 +79,7 @@ void ArduinoSerialConnection::closeConnection() {
 }
 
 bool ArduinoSerialConnection::hasConnection()const {
+  LOG_DEBUG("fcntl: " << fcntl(m_fileHandle, F_GETFL));
   if (m_fileHandle != -1)
     return true;
   else
@@ -87,8 +88,8 @@ bool ArduinoSerialConnection::hasConnection()const {
 
 
 void ArduinoSerialConnection::resetConnection() {
-    closeConnection();
-    openConnection();
+  closeConnection();
+  openConnection();
 }
 
 
@@ -118,9 +119,9 @@ void ArduinoSerialConnection::openConnection() {
   cfsetispeed(&tio, m_baudRate);  // 115200 baud
 
   if (m_blockThread)
-    m_fileHandle = open(getPortName().c_str(), O_RDWR | O_NOCTTY);
+    m_fileHandle = open(getPortName().c_str(), O_RDWR | O_NOCTTY | O_CLOEXEC);
   else
-    m_fileHandle = open(getPortName().c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
+    m_fileHandle = open(getPortName().c_str(), O_RDWR | O_NOCTTY | O_NDELAY | O_CLOEXEC);
 
   LOG_INFO("Opening file to port: '" << getPortName() << "'");
 
@@ -205,8 +206,6 @@ std::string ArduinoSerialConnection::serialReadString() {
 
   //  m_blockThread = false;
   //  m_closeHandleAfterMessage = false;
-  
-  //  openConnection();
   int arrayLength(2);
   char* result = new char[arrayLength];
   std::stringstream stringStream;
@@ -230,7 +229,6 @@ std::string ArduinoSerialConnection::serialReadString() {
       }
     }
   } while (result[numberOfBytes-1] != 10);
-  
   delete[] result;
   return stringStream.str();
 }
