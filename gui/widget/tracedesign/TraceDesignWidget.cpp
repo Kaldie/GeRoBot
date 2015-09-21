@@ -145,6 +145,7 @@ void TraceDesignWidget::removeTrace(Trace::TracePointer i_pointer) {
                                   m_vector.end(),
                                   i_pointer);
   if (vectorIterator == m_vector.end()) {
+    LOG_DEBUG("Could not find the trace!!");
     return;
   }
   if (i_pointer->getTraceType()==Trace::Curve)
@@ -259,8 +260,11 @@ void TraceDesignWidget::setupReplacementPointer(Trace::TracePointer i_replacemen
 
 
 void TraceDesignWidget::clearWidget() {
-  for (const auto& trace : m_vector) {
-    removeTrace(trace);
+  // use this while statement, we will be removing elements from the vector
+  // Using something related to an iterator will complicate things significantly
+  while (m_vector.size() != 0) {
+    LOG_DEBUG("Removed a trace");
+    removeTrace(*m_vector.begin());
   }
 }
 
