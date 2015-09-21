@@ -85,6 +85,7 @@
  MONITOR_PORT = /dev/ttyUSB*
 #
  include /usr/share/arduino/Arduino.mk
+EXTRA_FLAGS := $(EXTRA_FLAGS) -fno-strict-aliasing
 #
 # Hopefully these will be self-explanatory but in case they're not:
 #
