@@ -202,8 +202,16 @@ bool TraceGraphPoint::correctTracePosition(Trace::TracePointer trace,
   case TraceGraphPoint::EndPoint : {
     LOG_DEBUG("Fixing the end or start point");
     LOG_DEBUG("Point: " << i_newPoint->x << " , " << i_newPoint->y);
-    *i_newPoint = rotationTrace->intersectingPoint(*i_newPoint);
-    LOG_DEBUG("New point: " << i_newPoint->x << " , " << i_newPoint->y);
+    try {
+      *i_newPoint = rotationTrace->intersectingPoint(*i_newPoint);
+    } catch (std::runtime_error) {
+      LOG_DEBUG("Could not find intersecting point!");
+      if (m_positionOnTrace == TraceGraphPoint::EndPoint) {
+       *i_newPoint = rotationTrace->getEndPoint();
+      } else if (m_positionOnTrace == TraceGraphPoint::StartPoint) {
+        *i_newPoint = rotationTrace->getStartPoint();
+      }
+    }
     break;
   }
   default : {
@@ -214,39 +222,39 @@ bool TraceGraphPoint::correctTracePosition(Trace::TracePointer trace,
 }
 
 
-bool TraceGraphPoint::curveNeedsCorrection(
-  const RotationTrace::RotationTracePointer& i_rotationTrace,
-  const Point2D& i_newPoint) const {
+bool TraceGraphPoint::curveNeedsCorrection
+(const RotationTrace::RotationTracePointer& i_rotationTrace,
+ const Point2D& i_newPoint) const {
   switch (m_positionOnTrace) {
   case TraceGraphPoint::CenterPoint : {
-  try {
-    Circle2D(i_rotationTrace->getStartPoint(),
-             i_rotationTrace->getEndPoint(),
-             i_newPoint);
-    return false;
-  } catch (std::runtime_error) {}
-  return true;
-  break;
+    try {
+      Circle2D(i_rotationTrace->getStartPoint(),
+               i_rotationTrace->getEndPoint(),
+               i_newPoint);
+      return false;
+    } catch (std::runtime_error) {}
+    return true;
+    break;
   }
   case TraceGraphPoint::StartPoint : {
-  try {
-    Circle2D(i_newPoint,
-             i_rotationTrace->getEndPoint(),
-             i_rotationTrace->getCentrePoint());
-    return false;
-  } catch (std::runtime_error) {}
-  return true;
-  break;
+    try {
+      Circle2D(i_newPoint,
+               i_rotationTrace->getEndPoint(),
+               i_rotationTrace->getCentrePoint());
+      return false;
+    } catch (std::runtime_error) {}
+    return true;
+    break;
   }
   case TraceGraphPoint::EndPoint : {
-  try {
-    Circle2D(i_rotationTrace->getStartPoint(),
-             i_newPoint,
-             i_rotationTrace->getCentrePoint());
-    return false;
-  } catch (std::runtime_error) {}
-  return true;
-  break;
+    try {
+      Circle2D(i_rotationTrace->getStartPoint(),
+               i_newPoint,
+               i_rotationTrace->getCentrePoint());
+      return false;
+    } catch (std::runtime_error) {}
+    return true;
+    break;
   }}
   return true;
 }
