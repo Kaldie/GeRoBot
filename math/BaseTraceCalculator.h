@@ -60,8 +60,23 @@ class BaseTraceCalculator {
  protected:
   // See if the joint controller pointer has been set
   bool hasRobot() const;
-  bool shouldRotate(const Trace&,
-                    const Point2D&) const;
+
+  /**
+   * Determine of the given point is within the set
+   * translation tolerances of the endpoin of the trace
+   * @param[in] i_trace EndPoint of this trace will be
+   * used to determine if it is within tolerance
+   * @param[in] i_position Current position
+   */
+  bool shouldRotate(const Trace& i_trace,
+                    const Point2D& i_position) const;
+  /**
+   * Determine of the given point is within the set
+   * rotation tolerances of the endpoin of the trace
+   * @param[in] i_trace EndPoint of this trace will be
+   * used to determine if it is within tolerance
+   * @param[in] i_position Current position
+   */
   bool shouldTranslate(const Trace&,
                        const Point2D&) const;
   void setTolerances();
