@@ -86,7 +86,7 @@ Point2D RotationTrace::intersectingPoint(
     // We will have 2 so
     traceType t1 = (-b - discriminant)/(2*a);
     traceType t2 = (-b + discriminant)/(2*a);
-    LOG_DEBUG("T1 : " << t1 << ", T2: " << t2);
+    LOG_DEBUG("T1 : " << t1 <<  ", T2: " << t2);
 
     if (std::abs(1-t1) < std::abs(1-t2))
       return t1*i_currentPosition;
@@ -131,16 +131,15 @@ void RotationTrace::getExtremePoints(Point2D* i_firstPoint,
 std::vector<RotationTrace> RotationTrace::getNecessaryTraces() const {
   Point2D firstExtreme, secondExtreme;
   getExtremePoints(&firstExtreme, &secondExtreme);
-
   traceType firstExtremeAngle=(firstExtreme - m_centrePoint).getAlpha();
   traceType secondExtremeAngle=(secondExtreme - m_centrePoint).getAlpha();
   traceType startAngle=(m_startPoint - m_centrePoint).getAlpha();
-  traceType endPoint=(m_endPoint - m_centrePoint).getAlpha();
+  traceType endAngle=(m_endPoint - m_centrePoint).getAlpha();
 
-  Point2D startPoint = getStartPoint();
+  Point2D startPoint = m_startPoint;
 
   std::vector<RotationTrace> itermediateTraces;
-  if (shouldAddExtremePoint(startAngle, endPoint, firstExtremeAngle)) {
+  if (shouldAddExtremePoint(startAngle, endAngle, firstExtremeAngle)) {
     itermediateTraces.push_back(
         RotationTrace(startPoint,
                       firstExtreme,
@@ -148,7 +147,7 @@ std::vector<RotationTrace> RotationTrace::getNecessaryTraces() const {
 
     startPoint = firstExtreme;
   }
-  if (shouldAddExtremePoint(startAngle, endPoint, secondExtremeAngle)) {
+  if (shouldAddExtremePoint(startAngle, endAngle, secondExtremeAngle)) {
     itermediateTraces.push_back(
         RotationTrace(startPoint,
                       secondExtreme,
