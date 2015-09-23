@@ -10,33 +10,23 @@
 
 RobotMovementWidget::RobotMovementWidget(Robot::RobotPointer i_robotPointer,
                                          QWidget* parent/*=0*/)
-    : QWidget(parent) {
-  m_robotPointer = i_robotPointer;
-  m_point2DPointer= m_robotPointer->getPositionPointer();
+  : QWidget(parent),
+    m_robotPointer(i_robotPointer) {
   initialise();
 }
 
 
 RobotMovementWidget::RobotMovementWidget(QWidget* parent /* =0 */)
     : QWidget(parent) {
-  m_point2DPointer = new Point2D(0, 50);
   initialise();
 }
 
 
-RobotMovementWidget::~RobotMovementWidget() {
-  if (!m_robotPointer)
-    delete m_point2DPointer;
-}
-
-
 void RobotMovementWidget::setRobotPointer(Robot::RobotPointer i_robotPointer) {
-  if (i_robotPointer.get() == 0)
+  if (i_robotPointer)
     return;
-
-  delete m_point2DPointer;
-
   m_robotPointer = i_robotPointer;
+
 }
 
 
@@ -47,37 +37,29 @@ void RobotMovementWidget::initialise() {
      is linked to update position widget
   */
   connect(this, SIGNAL(hasNewPosition()), this, SLOT(updatePositionWidget()));
-
   connect(toolModeRadioButton,
           SIGNAL(toggled(bool)),
           this,
           SLOT(updateMovementType(bool)));
-
   connect(axisModeRadioButton,
           SIGNAL(toggled(bool)),
           this,
           SLOT(updateMovementType(bool)));
-
   connect(moveLeftButton, SIGNAL(clicked()), this, SLOT(movementLeft()));
+  connect(moveLeftButton, SIGNAL(clicked()), this, SLOT(movementCounterClockWise()));
   connect(moveRightButton, SIGNAL(clicked()), this, SLOT(movementRight()));
+  connect(moveRightButton, SIGNAL(clicked()), this, SLOT(movementClockWise()));
   connect(moveUpButton, SIGNAL(clicked()), this, SLOT(movementUp()));
-  connect(moveDownButton, SIGNAL(clicked()), this, SLOT(movementDown()));
+  connect(moveUpButton, SIGNAL(clicked()), this, SLOT(movementExtent()));
+  connect(moveDownButton, SIGNAL(clicked()), this, SLOT(movementRetract()));
 
-  if (m_point2DPointer) {
-    // adding Robot Position widget
-    robotCanvas->layout()->
-        addWidget(new RobotPositionWidget(m_point2DPointer, this));
+  robotCanvas->layout()->addWidget(new RobotPositionWidget(m_robotPointer, this));
+  if (m_robotPointer) {
     updateMovementType(true);
-  } else {
-    LOG_DEBUG("m_point2DPointer is not a valid pointer!");
-  }
-  
-  if (m_robotPointer.get()) {
     connect(simulateRadioButton,
             SIGNAL(toggled(bool)),
             this,
             SLOT(updateSimulateRadioButtons()));
-    
     connect(actuateRadioButton,
             SIGNAL(toggled(bool)),
             this,
@@ -100,21 +82,22 @@ void RobotMovementWidget::updatePositionWidget() {
     robotPositionWidget->update();
   else
     LOG_ERROR("could not find robot position widget!");
-
+  LOG_DEBUG("Update RobotPosition!");
+  Point2D robotPosition = m_robotPointer->getPosition();
   // update x position line edit
-  textualRepresentation.setNum(m_point2DPointer->x);
+  textualRepresentation.setNum(robotPosition.x);
   xPositionLineEdit->setText(textualRepresentation);
 
   // update y position line edit
-  textualRepresentation.setNum(m_point2DPointer->y);
+  textualRepresentation.setNum(robotPosition.y);
   yPositionLineEdit->setText(textualRepresentation);
 
   // update extension line edit
-  textualRepresentation.setNum(Magnitude(*m_point2DPointer));
+  textualRepresentation.setNum(Magnitude(robotPosition));
   extensionLineEdit->setText(textualRepresentation);
 
   // update angle line edit
-  textualRepresentation.setNum(m_point2DPointer->getAlpha() * 180 / PI);
+  textualRepresentation.setNum(robotPosition.getAlpha() * 180 / PI);
   angleLineEdit->setText(textualRepresentation);
 }
 
@@ -123,7 +106,7 @@ void RobotMovementWidget::updateMovementType(bool i_isChecked) {
   //  update line edits
   if (!m_robotPointer && !i_isChecked)
     return;
-	
+
   // store movement mode in dialog
   if (toolModeRadioButton->isChecked())
     m_mode = ToolMode;
@@ -134,13 +117,11 @@ void RobotMovementWidget::updateMovementType(bool i_isChecked) {
 
   if (m_mode == ToolMode) {
     // set icons of movement button to tool mode which is straight pointers
-    moveLeftButton->setIcon(QIcon(":/icons/StraightLeft.png"));
-    moveRightButton->setIcon(QIcon(":/icons/StraightRight.png"));
-
-  } else if (m_mode == AxisMode) {
     moveLeftButton->setIcon(QIcon(":/icons/CCW.png"));
     moveRightButton->setIcon(QIcon(":/icons/CW.png"));
-
+  } else if (m_mode == AxisMode) {
+    moveLeftButton->setIcon(QIcon(":/icons/StraightLeft.png"));
+    moveRightButton->setIcon(QIcon(":/icons/StraightRight.png"));
   } else {
     LOG_ERROR("Mode is not resolved correctly!");
   }
@@ -169,7 +150,7 @@ bool RobotMovementWidget::hasValidRobot() {
   bool hasRobotPointer(false);
   bool hasArduinoConnection(false);
 
-  if (m_robotPointer.get()) {
+  if (m_robotPointer) {
     hasRobotPointer = true;
     LOG_DEBUG("Found robot pointer!");
   }
@@ -180,6 +161,7 @@ bool RobotMovementWidget::hasValidRobot() {
         LOG_DEBUG("Found a connection!!!");
         hasArduinoConnection = true;
       } else {
+        LOG_DEBUG("Has a robot pointer but no connection!!!");
         hasArduinoConnection = false;
       }
     } catch(std::runtime_error) {
@@ -202,66 +184,138 @@ void RobotMovementWidget::updateSimulateRadioButtons() {
 
 
 void RobotMovementWidget::movementUp() {
+  if (m_mode != AxisMode)
+    return;
+
+  Point2D newPosition = m_robotPointer->getPosition();
+  newPosition.y += stepSizeLineEdit->text().toDouble();
   if (hasValidRobot() && actuateRadioButton->isChecked()) {
-    LOG_DEBUG("Current position x,y "
-              << m_point2DPointer->x  <<", "<< m_point2DPointer->y);
-
-    Point2D newPosition = *m_point2DPointer;
-    newPosition.y += stepSizeLineEdit->text().toDouble();
-
-    LOG_DEBUG("New position x,y "
-              << newPosition.x  <<", "<< newPosition.y);
-
     m_robotPointer->goToPosition(newPosition);
   } else {
-    m_point2DPointer->y += stepSizeLineEdit->text().toDouble();
+    m_robotPointer->setPosition(newPosition);
   }
-    emit hasNewPosition();
+  emit hasNewPosition();
 }
 
 
 void RobotMovementWidget::movementDown() {
-  if (hasValidRobot()) {
-    Point2D newPosition = *m_point2DPointer;
-    newPosition.y -= stepSizeLineEdit->text().toDouble();
+  if (m_mode != AxisMode)
+    return;
 
-    LOG_DEBUG("New position x,y "
-              << newPosition.x  <<", "<< newPosition.y);
-
+  Point2D newPosition = m_robotPointer->getPosition();
+  newPosition.y -= stepSizeLineEdit->text().toDouble();
+  if (hasValidRobot() && actuateRadioButton->isChecked()) {
     m_robotPointer->goToPosition(newPosition);
   } else {
-    m_point2DPointer->y -= stepSizeLineEdit->text().toDouble();
+    m_robotPointer->setPosition(newPosition);
   }
   emit hasNewPosition();
 }
 
 
 void RobotMovementWidget::movementLeft() {
-  if (hasValidRobot()) {
-    Point2D newPosition = *m_point2DPointer;
-    newPosition.x -= stepSizeLineEdit->text().toDouble();
-
-    LOG_DEBUG("New position x,y "
-              << newPosition.x  <<", "<< newPosition.y);
-
+  if (m_mode != AxisMode)
+    return;
+  Point2D newPosition = m_robotPointer->getPosition();
+  newPosition.x -= stepSizeLineEdit->text().toDouble();
+  if (hasValidRobot() && actuateRadioButton->isChecked()) {
     m_robotPointer->goToPosition(newPosition);
   } else {
-    m_point2DPointer->x -= stepSizeLineEdit->text().toDouble();
+    m_robotPointer->setPosition(newPosition);
   }
   emit hasNewPosition();
 }
 
 void RobotMovementWidget::movementRight() {
-  if (hasValidRobot()) {
-        Point2D newPosition = *m_point2DPointer;
-    newPosition.x += stepSizeLineEdit->text().toDouble();
+  if (m_mode != AxisMode)
+    return;
 
-    LOG_DEBUG("New position x,y "
-              << newPosition.x  <<", "<< newPosition.y);
-
+  Point2D newPosition = m_robotPointer->getPosition();
+  newPosition.x += stepSizeLineEdit->text().toDouble();
+  if (hasValidRobot() && actuateRadioButton->isChecked()) {
     m_robotPointer->goToPosition(newPosition);
   } else {
-    m_point2DPointer->x += stepSizeLineEdit->text().toDouble();
+    m_robotPointer->setPosition(newPosition);
+  }
+  emit hasNewPosition();
+}
+
+
+void RobotMovementWidget::movementExtent() {
+  if (m_mode != ToolMode)
+    return;
+  double stepSize = stepSizeLineEdit->text().toDouble();
+  double robotStepSize = m_robotPointer->getMovementPerStep(Translational);
+  int numberOfSteps = stepSize / robotStepSize;
+  if (numberOfSteps == 0) {
+    numberOfSteps = 1;
+  }
+  // Calculate the new position and prepare to actual take the steps
+  m_robotPointer->prepareSteps("OUT",numberOfSteps);
+  if (hasValidRobot() && actuateRadioButton->isChecked()) {
+    m_robotPointer->actuate();
+  } else {
+    m_robotPointer->setPosition(m_robotPointer->getVirtualPosition());
+  }
+  emit hasNewPosition();
+}
+
+
+void RobotMovementWidget::movementRetract() {
+  if (m_mode != ToolMode)
+    return;
+  double stepSize = stepSizeLineEdit->text().toDouble();
+  double robotStepSize = m_robotPointer->getMovementPerStep(Translational);
+  int numberOfSteps = stepSize / robotStepSize;
+  if (numberOfSteps == 0) {
+    numberOfSteps = 1;
+  }
+  // Calculate the new position and prepare to actual take the steps
+  m_robotPointer->prepareSteps("IN",numberOfSteps);
+  if (hasValidRobot() && actuateRadioButton->isChecked()) {
+    m_robotPointer->actuate();
+  } else {
+    m_robotPointer->setPosition(m_robotPointer->getVirtualPosition());
+  }
+  emit hasNewPosition();
+}
+
+
+void RobotMovementWidget::movementClockWise() {
+  if (m_mode != ToolMode)
+    return;
+  double stepSize = stepSizeLineEdit->text().toDouble();
+  double robotStepSize = m_robotPointer->getMovementPerStep(Rotational);
+  int numberOfSteps = stepSize / robotStepSize;
+  if (numberOfSteps == 0) {
+    numberOfSteps = 1;
+  }
+  // Calculate the new position and prepare to actual take the steps
+  m_robotPointer->prepareSteps("CW",numberOfSteps);
+  if (hasValidRobot() && actuateRadioButton->isChecked()) {
+    m_robotPointer->actuate();
+  } else {
+    m_robotPointer->setPosition(m_robotPointer->getVirtualPosition());
+  }
+  emit hasNewPosition();
+}
+
+
+void RobotMovementWidget::movementCounterClockWise() {
+  if (m_mode != ToolMode)
+    return;
+  double stepSize = stepSizeLineEdit->text().toDouble();
+  double robotStepSize = m_robotPointer->getMovementPerStep(Rotational);
+  int numberOfSteps = stepSize / robotStepSize;
+  if (numberOfSteps == 0) {
+    numberOfSteps = 1;
+  }
+  // Calculate the new position and prepare to actual take the steps
+  m_robotPointer->prepareSteps("CCW",numberOfSteps);
+  if (hasValidRobot() && actuateRadioButton->isChecked()) {
+    m_robotPointer->actuate();
+  } else {
+    m_robotPointer->setPosition(m_robotPointer->getVirtualPosition());
   }
   emit hasNewPosition();
 }
