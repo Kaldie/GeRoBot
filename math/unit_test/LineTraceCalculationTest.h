@@ -35,12 +35,6 @@ class LineTraceCalculationTest : public CxxTest::TestSuite {
     Point2D endPoint(-150, 50);
     Trace trace(startPoint, endPoint);
 
-    trace.setRotationTolerance(
-        robot.getJointController()->resolveJoint(Rotational)->getMovementPerStep()*1.5);
-
-    trace.setTranslationTolerance(
-        robot.getJointController()->resolveJoint(Translational)->getMovementPerStep()*1.5);
-
     LineTraceCalculator lineTraceCalculator(&robot);
     lineTraceCalculator.setWriteLog(true);
     lineTraceCalculator.calculateTrace(trace);
