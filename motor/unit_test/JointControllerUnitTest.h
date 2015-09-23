@@ -69,14 +69,14 @@ class JointControllerTestSuite : public CxxTest::TestSuite {
   void testResetPinStateSequence() {
     SequenceVector pinStateVector =
         jointController.getSequenceVector();
-    TS_ASSERT_EQUALS(pinStateVector.numberOfSequences(), 0);
+    TS_ASSERT_EQUALS(pinStateVector.numberOfSequences(), 1);
     LOG_INFO("JointControlerUnitTest::test resetPinState");
     jointController.moveSteps("CW", 1);
     pinStateVector =
         jointController.getSequenceVector();
 
     TS_ASSERT_DIFFERS(pinStateVector.numberOfSequences(), 0);
-    TS_ASSERT_EQUALS(pinStateVector.numberOfSequences(), 1);
+    TS_ASSERT_EQUALS(pinStateVector.numberOfSequences(), 2);
 
     jointController.resetPinStateSequence();
     pinStateVector =
@@ -86,8 +86,9 @@ class JointControllerTestSuite : public CxxTest::TestSuite {
     StateSequence stateSequence = *pinStateVector.begin();
     TS_ASSERT_EQUALS(stateSequence.getPinStateVector().size(), 1);
     TS_ASSERT_EQUALS(stateSequence.getNumberOfRepetitions(), 0);
+    (*pinStateVector.begin()).displaySequence();
     TS_ASSERT_EQUALS((*pinStateVector.begin()).getIntegerSequence(),
-                     std::vector<int> {224});
+                     std::vector<int> {252});
   }
 
   void testMoveStep() {
@@ -154,6 +155,10 @@ class JointControllerTestSuite : public CxxTest::TestSuite {
 
     SequenceVector sequenceVector = jointController.getSequenceVector();
     sequenceVector.normalise();
+    LOG_DEBUG("Display normalised sequence!");
+    for (auto& i : sequenceVector) {
+      i.displaySequence();
+    }
     TS_ASSERT(sequenceVector.isNormilized());
 
     try {
