@@ -98,7 +98,7 @@ bool LineTraceCalculator::correctRotation(const Trace& i_trace) const {
     LOG_DEBUG("Found no intersection reverting the old position!");
     return false;
   }
-  LOG_DEBUG("point: " << currentRobotPosition.x
+  LOG_DEBUG("Current position: " << currentRobotPosition.x
             << " , "<< currentRobotPosition.y);
   LOG_DEBUG("Intersecting point: " << intersectingPoint.x << " , "<< intersectingPoint.y);
   // The distance to the enpoint after the correction is applied*/
@@ -115,7 +115,7 @@ bool LineTraceCalculator::correctRotation(const Trace& i_trace) const {
       Don't overshoot
     */
     jointPointDifference = Magnitude(i_trace.getEndPoint()-currentRobotPosition);
-    destinationPoint=&(i_trace.getEndPoint());
+    destinationPoint=&i_trace.getEndPoint();
   } else {
     /*
       Otherwise we assume that there is enough distance, 
@@ -137,9 +137,9 @@ bool LineTraceCalculator::correctRotation(const Trace& i_trace) const {
     // calculate the direction and prepare them
     std::string translationDirection=
         i_trace.getTranslationDirection(currentRobotPosition, *destinationPoint);
-    m_robot->prepareSteps(translationDirection, numberOfSteps);
     LOG_INFO("Number of correction steps: " << numberOfSteps << " in the " <<
              translationDirection << " direction");
+    m_robot->prepareSteps(translationDirection, numberOfSteps);
     if (getWriteLog())
       writeToStepLog(translationDirection, numberOfSteps, m_robot->getVirtualPosition());
     return true;
