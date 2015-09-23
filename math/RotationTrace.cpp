@@ -26,9 +26,7 @@ RotationTrace::RotationTrace(const Point2D& i_startPoint,
                              const traceType& i_radius,
                              const bool& i_isClockwise /*=true*/)
   : Trace(i_startPoint, i_endPoint, Curve),
-    m_isClockwise(i_isClockwise) {
-  Arc2D arc(i_startPoint, i_endPoint, i_radius, i_isClockwise);
- }
+    m_isClockwise(i_isClockwise) {}
 
 
 RotationTrace::RotationTrace(const Arc2D& i_arc)

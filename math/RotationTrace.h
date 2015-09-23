@@ -22,7 +22,7 @@
  * http://www.analyzemath.com/CircleEq/circle_line_intersection.html
  */
 
-class RotationTrace:public Trace {
+class RotationTrace: public Trace {
     GETSETPROTECTED(Point2D, m_centrePoint, CentrePoint);
     GETSET(bool, m_isClockwise, IsClockwise);
 
