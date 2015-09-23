@@ -32,29 +32,49 @@ void RotationTraceCalculator::calculateTrace
 
   Point2D startPointOfThisTrace;
   for (std::vector<RotationTrace>::const_iterator itr = traces.begin();
-      itr != traces.end();
-      itr++) {
+       itr != traces.end();
+       itr++) {
     startPointOfThisTrace = m_robot->getVirtualPosition();
 
     LOG_DEBUG("Arc endPoint x, y: " << itr->getArc().getSecondPoint().x <<
               ", " << itr->getArc().getSecondPoint().y);
 
     LineTraceCalculator::calculateTrace(*itr);
-
+    // if there will be a next one
     if (std::next(itr) != traces.end()) {
-      LOG_DEBUG("Setting another translation step!");
-      std::string direction =
-          itr->getTranslationDirectionToEndPoint(startPointOfThisTrace);
+      auto nextTrace = std::next(itr);
+      // what is the current translation direction
+      std::string translationDirection =
+        itr->getTranslationDirectionToEndPoint(startPointOfThisTrace);
+      LOG_DEBUG("Current Translation direction " << translationDirection);
 
-      // Predict the step
-      m_robot->prepareSteps(direction ,1);
+      // what will be the current rotation direction
+      std::string rotationDirection =
+        nextTrace->getRotationDirectionToEndPoint(m_robot->getVirtualPosition());
+      LOG_DEBUG("Current Rotation direction " << rotationDirection);
+      /// Set one rotation step
       if (getWriteLog())
-        writeToStepLog(direction, 1, m_robot->getVirtualPosition());
-      LOG_INFO("Translating: " << direction);
-      // Correct the rotation, if nessesary!
-      bool hasCorrectionSteps = correctTranslation(*std::next(itr));
-      LOG_DEBUG("Has correction steps: " << std::boolalpha <<
-                hasCorrectionSteps);
+        writeToStepLog(rotationDirection, 1, m_robot->getVirtualPosition());
+      m_robot->prepareSteps(rotationDirection, 1);
+
+      // do set translation step untill the correction will be the same as the direcion we are stepping now
+      std::string currentCorrectionTranslationDirection;
+      Point2D intersectingPoint;
+      do {
+        LOG_DEBUG("Setting another translation step!");
+        // Prepare a set
+        m_robot->prepareSteps(translationDirection ,1);
+        if (getWriteLog())
+          writeToStepLog(translationDirection, 1, m_robot->getVirtualPosition());
+        LOG_INFO("Translating: " << translationDirection);
+        // get current intersecting point
+        intersectingPoint = nextTrace->intersectingPoint(m_robot->getVirtualPosition());
+        // determine the translation direction to that intersecting point
+        currentCorrectionTranslationDirection = nextTrace->getTranslationDirection
+          (m_robot->getVirtualPosition(), intersectingPoint);
+        LOG_DEBUG("Current correction direction :" << currentCorrectionTranslationDirection);
+        // if that is the same, stop
+      } while (currentCorrectionTranslationDirection != translationDirection);
     }
   }
 }
