@@ -13,11 +13,8 @@ class QWidget;
 
 class RobotMovementWidget: public QWidget, private Ui::RobotMovementWidget {
     Q_OBJECT
-
     GET(Robot::RobotPointer, m_robotPointer, RobotPointer)
-    GETSETPOINTER(Point2D, m_point2DPointer, Point)
     GETSET(GUIMovementMode, m_mode, MovementMode)
-
  public:
     // Constructor
     explicit RobotMovementWidget(QWidget* parent = 0);
@@ -26,8 +23,6 @@ class RobotMovementWidget: public QWidget, private Ui::RobotMovementWidget {
                         QWidget *parent = 0);
 
     void setRobotPointer(Robot::RobotPointer i_robotPointer);
-
-    ~RobotMovementWidget();
 
  private:
     void initialise();
@@ -38,9 +33,13 @@ class RobotMovementWidget: public QWidget, private Ui::RobotMovementWidget {
       void updateMovementType(bool i_isSet);
       void updatePositionWidget();
       void movementUp();
+      void movementExtent();
       void movementDown();
+      void movementRetract();
       void movementLeft();
+      void movementCounterClockWise();
       void movementRight();
+      void movementClockWise();
 
  signals:
      void hasNewPosition();
