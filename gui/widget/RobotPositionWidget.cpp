@@ -5,14 +5,14 @@
 #include "./RobotPositionWidget.h"
 
 RobotPositionWidget::RobotPositionWidget(QWidget *parent)
-    : QWidget(parent)
+  : QWidget(parent)
 {}
 
 
-RobotPositionWidget::RobotPositionWidget(Point2D* i_point,
-                                         QWidget* parent /*= 0 */):
-    QWidget(parent),
-    m_point(i_point)
+RobotPositionWidget::RobotPositionWidget(const Robot::RobotPointer& i_robot,
+                                         QWidget* parent /*= 0 */)
+  : QWidget(parent),
+    m_robot(i_robot)
 {}
 
 
@@ -20,17 +20,19 @@ QSize RobotPositionWidget::minimumSizeHint() const {
   return QSize(100, 100);
 }
 
+
 QSize RobotPositionWidget::sizeHint() const {
   return QSize(300, 300);
 }
 
+
 void RobotPositionWidget::paintEvent(QPaintEvent * /* event */) {
-  if (!m_point) {
+  if (!m_robot.lock()) {
     LOG_DEBUG("Point2D pointer is void");
     return;
   }
 
-  QPoint points[2] = {QPoint(0, 0), QPoint(m_point->x, -1 * m_point->y)};
+  QPointF points[2] = {QPointF(0, 0), QPointF(m_robot.lock()->getPosition())};
   float scaleFactor = qMin(width(), height())/100.0;
 
   QPainter painter(this);
@@ -64,7 +66,7 @@ void RobotPositionWidget::paintEvent(QPaintEvent * /* event */) {
   QFont font;
   font.setPixelSize(3);
   painter.setFont(font);
-  
+
   for (int xPosition = startPoint.x()-(startPoint.x()%10);
        xPosition < endPoint.x();
        xPosition += 10) {

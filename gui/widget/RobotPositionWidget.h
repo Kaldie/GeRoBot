@@ -4,17 +4,18 @@
 
 #include <macroHeader.h>
 #include <QWidget>
-#include <Point2D.h>
+#include <Robot.h>
 
 class RobotPositionWidget : public QWidget {
   Q_OBJECT
-
-  GETSETPOINTER(Point2D, m_point, Point);
+ private:
+  typedef std::weak_ptr<Robot> WeakRobotPointer;
+  GETSET(WeakRobotPointer, m_robot, RobotPointer);
 
  public:
   explicit RobotPositionWidget(QWidget *parent = 0);
 
-  RobotPositionWidget(Point2D* i_point,
+  RobotPositionWidget(const Robot::RobotPointer& i_robot,
                       QWidget *parent = 0);
 
   QSize minimumSizeHint() const;
