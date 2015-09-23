@@ -5,9 +5,7 @@
 #include "./PinState.h"
 
 StateSequence::StateSequence()
-    : StateSequence(3000,
-                       0,
-                       {})
+    : StateSequence(50, 0, {})
 {}
 
 
@@ -129,13 +127,13 @@ bool StateSequence::hasMutualPins(const PinState& i_pinState) const {
 
 bool StateSequence::appendSequence(const StateSequence i_sequence) {
   // checking parameters!
-  if (m_numberOfRepetitions != i_sequence.getNumberOfRepetitions()) {
-    LOG_DEBUG("Number of repetitions is not equal!");
+  if (m_numberOfRepetitions > 1) {
+    LOG_DEBUG("Coud not append them, number of repetitions is not 1!");
     return false;
   }
 
-  if (m_numberOfRepetitions > 1) {
-    LOG_DEBUG("Coud not append them, number of repetitions is not 1!");
+  if (m_numberOfRepetitions != i_sequence.getNumberOfRepetitions()) {
+    LOG_DEBUG("Number of repetitions is not equal!");
     return false;
   }
 
@@ -158,9 +156,10 @@ bool StateSequence::addToSequence(
     LOG_DEBUG("Number of repetitions is more then 1 thus this will not fly");
     return false;
   }
+
   bool hasMutualPin = hasMutualPins(i_pinState);
   LOG_DEBUG("Has mutual pins: " << hasMutualPin);
-  if (hasMutualPin && !i_forceAdd) {
+  if (hasMutualPin && !i_forceAdd ) {
     LOG_DEBUG("The added pin states has mutual " <<
               "pins to the allready defined ones!");
     return false;
@@ -244,10 +243,6 @@ bool StateSequence::addToSequence(const StateSequence& i_sequence) {
     return false;
   }
 
-  LOG_DEBUG("Size of input sequence: " <<
-            i_sequence.getPinStateVector().size());
-  LOG_DEBUG("Size of current sequence: " << m_pinStateVector.size());
-
   if (i_sequence.getPinStateVector().size() >
       m_pinStateVector.size()) {
     LOG_DEBUG("Cannot merge the two, " <<
@@ -262,9 +257,6 @@ bool StateSequence::addToSequence(const StateSequence& i_sequence) {
        ltsItr != m_pinStateVector.end() &&
        rhsItr != i_sequence.getPinStateVector().end();
        ltsItr++, rhsItr++) {
-    ltsItr->displayPinState();
-    rhsItr->displayPinState();
-    LOG_DEBUG("Updateing the pin state vector");
     ltsItr->update(*rhsItr);
   }
   return true;

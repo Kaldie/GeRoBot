@@ -11,8 +11,47 @@ class StateSequence {
   GETSET(int, m_speed, Speed);
   GETSET(int, m_numberOfRepetitions, NumberOfRepetitions);
   GETSET(PinStateVector, m_pinStateVector, PinStateVector);
+ public:
+  /// default constructor
+  StateSequence();
+  /// fully defined constructor
+  StateSequence(const int& i_speed,
+                const int& i_numberOfRepetitions,
+                const PinStateVector& i_pinStateVector);
+  /// returns if the StateSequence is empty
+  bool isEmpty()const;
+  /// Append StateSequence to this sequence
+  bool appendSequence(const StateSequence i_sequence);
+  /**
+   * Add the PinState to the last element of the sequence if possible.
+   * @param[in] i_pinState PinState that will be added to the sequence
+   * @param[in] i_forceAdd Tries to update the last element of the sequence, if Fails add a new element
+   */
+  bool addToSequence(const PinState& i_pinState,
+                     const bool& i_forceAdd = false);
+  /// Add several pin states to this StateSequence
+  bool addToSequence(const PinStateVector& i_pinStateVector);
+  /// add the other sequence to this one
+  bool addToSequence(const StateSequence& i_otherSequence);
+  /**
+   * Set this PinState for all the states in the vector
+   * @param[in] i_extent will extent the StateSequence without overriding it
+   * @param[in] i_overrideSequence will override all entries even if they were previously defind
+   */
+  bool setStateForSequence(const PinState& i_pinState,
+                           const bool& i_extent = false,
+                           const bool& overrideSequence = false);
 
- private:
+  std::vector<int> getIntegerSequence() const;
+  static bool mergePinStateSequences(StateSequence* io_firstSequence,
+                                     StateSequence* io_secondSequence);
+
+  bool mergePinStateSequence(StateSequence* io_sequence);
+  bool condenseSequence();
+  void displaySequence() const;
+
+  std::vector<int> createArduinoBuffer() const;
+   private:
   bool hasEqualSequence(const StateSequence& i_sequence) const;
   void validate() const;
   void validate(const PinStateVector& i_pinStateVector) const;
@@ -27,35 +66,5 @@ class StateSequence {
                             const PinState& i_secondState);
 
   size_t getSizeOfMessage() const;
-
- public:
-  StateSequence();
-
-  StateSequence(const int& i_speed,
-                const int& i_numberOfRepetitions,
-                const PinStateVector& i_pinStateVector);
-
-  bool isEmpty()const;
-
-  bool appendSequence(const StateSequence i_sequence);
-
-  bool addToSequence(const PinState& i_pinState,
-                     const bool& i_forceAdd = false);
-  bool addToSequence(const PinStateVector& i_pinStateVector);
-  bool addToSequence(const StateSequence& i_otherSequence);
-
-  bool setStateForSequence(const PinState& i_pinState,
-                           const bool& i_extent = false,
-                           const bool& overrideSequence = false);
-
-  std::vector<int> getIntegerSequence() const;
-  static bool mergePinStateSequences(StateSequence* io_firstSequence,
-                                     StateSequence* io_secondSequence);
-
-  bool mergePinStateSequence(StateSequence* io_sequence);
-  bool condenseSequence();
-  void displaySequence() const;
-
-  std::vector<int> createArduinoBuffer() const;
 };
 #endif  // MOTOR_PINSTATESEQUENCE_H_
