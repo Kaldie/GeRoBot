@@ -23,8 +23,13 @@ class SequenceVector {
 
   void normalise(const bool i_condenseVector = false);
   bool isNormilized() const;
-  void appendStateSequence(const StateSequence&,
-                           const bool&);
+  /**
+   * add state to the sequence vector
+   * @param[in] i_stateSequence New sequence which will be added to the vector
+   * @param[in] i_merge Merge this new sequence with the old if possible
+   */
+  void appendStateSequence(const StateSequence& i_stateSequence,
+                           const bool& i_merge);
 
   std::vector<StateSequence>::const_iterator begin()
       const { return m_sequenceVector.begin();};
