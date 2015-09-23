@@ -31,10 +31,9 @@ class Robot {
   Point2D* getPositionPointer() {return &m_position;}
     // actuations
   void goToPosition(const Point2D&);
-  void goTrace(const Trace&);
-  void definePosition(Point2D&);
-  void callibrate(Trace&);
   void actuate();
+  /// set a step and set the hold motor function to the boolean value
+  void setIdle(const bool& i_setIdle);
   /// Get the amount of movement per step given a direction
   traceType getMovementPerStep(const MovementType&) const ;
 

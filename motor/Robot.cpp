@@ -2,6 +2,7 @@
 #include <macroHeader.h>
 #include "Robot.h"
 #include <BaseTraceCalculator.h>
+#include <BaseMotor.h>
 #include <PinState.h>
 #include <Trace.h>
 
@@ -32,10 +33,13 @@ Robot::Robot(const JointController::JointControllerPointer& i_pointer,
 
 
 bool Robot::hasValidConnection() {
-  if (m_jointController)
-    return m_jointController->getActuatorPointer()->
-      getArduinoConnection().hasConnection();
-  return false;
+  if (m_jointController) {
+    if (m_jointController->getActuatorPointer()->
+        getArduinoConnection().hasConnection()) {
+      return true;
+    }
+  }
+  return true;
 }
 
 
@@ -48,12 +52,11 @@ void Robot::goToPosition(const Point2D &i_position) {
   if (!m_jointController)
     LOG_ERROR("JointController is not set yet!");
   LOG_DEBUG("current position: " << m_position.x << m_position.y);
-  Trace thisTrace(m_position, i_position);
   BaseTraceCalculator baseTraceCalculator(this);
+  Trace thisTrace(m_position, i_position);
   baseTraceCalculator.calculateTrace(thisTrace);
   LOG_DEBUG("new position: " << m_position.x << m_position.y);
-  m_jointController->actuate();
-  m_position = m_virtualPosition;
+  actuate();
 }
 
 
@@ -70,8 +73,30 @@ void Robot::prepareSteps(const std::string& i_direction,
 
 
 void Robot::actuate() {
+  // upload the current sequence
+  m_jointController->uploadSequence(false);
+  // Send the command to actuate the sequence
   m_jointController->actuate();
+  // reset the traveledPoints vector
   std::vector<Point2D> empty;
   m_traveledPoints.swap(empty);
+  // After the actuation, the virtual position is the actual position
   m_position = m_virtualPosition;
+}
+
+
+void Robot::setIdle(const bool& i_setIdle) {
+  // update the actuators of the joints
+  // so that the hold motor is set the proper value
+  StateSequence newState;
+  for (auto& joint : m_jointController->getJointPointerVector()) {
+    joint->getMotor()->setHoldMotor(i_setIdle);
+    newState.addToSequence(joint->getMotor()->getCurrentPinState());
+  }
+  SequenceVector newVector;
+  newVector.appendStateSequence(newState, false);
+  // Replace the StateSequenceVector
+  m_jointController->setSequenceVector(newVector);
+  // upload and actuate
+  actuate();
 }
