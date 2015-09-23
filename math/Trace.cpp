@@ -14,9 +14,7 @@ Trace::Trace(const Point2D& i_startPoint,
              const Point2D& i_endPoint):
     m_traceType(Line),
     m_startPoint(i_startPoint),
-    m_endPoint(i_endPoint),
-    m_rotationTolerance(0.1),
-    m_translationTolerance(0.1) {
+    m_endPoint(i_endPoint) {
 }
 
 
@@ -25,9 +23,7 @@ Trace::Trace(const Point2D& i_startPoint,
              const Trace::TraceType& i_traceType):
     m_traceType(i_traceType),
     m_startPoint(i_startPoint),
-    m_endPoint(i_endPoint),
-    m_rotationTolerance(0.1),
-    m_translationTolerance(0.1) {
+    m_endPoint(i_endPoint) {
 }
 
 
@@ -118,10 +114,13 @@ std::string Trace::
 
   if (currentPointMagnitude < desiredPointMagnitude)
     return "OUT";
-  else if (currentPointMagnitude>desiredPointMagnitude)
+  else if (currentPointMagnitude > desiredPointMagnitude)
     return "IN";
-  else
+  else {
+    LOG_DEBUG("Current magnitude: " << currentPointMagnitude);
+    LOG_DEBUG("Desired point magnitude: " << desiredPointMagnitude);
     return "STABLE";
+  }
 }
 
 

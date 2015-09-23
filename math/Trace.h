@@ -9,8 +9,6 @@ class Trace {
   GETSET(traceType, m_traceType, TraceType);
   GETSETPROTECTED(Point2D, m_startPoint, StartPoint);
   GETSETPROTECTED(Point2D, m_endPoint, EndPoint);
-  GETSET(double, m_rotationTolerance, RotationTolerance);
-  GETSET(double, m_translationTolerance, TranslationTolerance);
  public:
   // smart pointer definitions
   typedef std::shared_ptr<Trace> TracePointer;
