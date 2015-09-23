@@ -16,7 +16,7 @@ class JointController {
   /// The actuator
   GETSET(ArduinoMotorDriver, m_actuator, Actuator);
   /// Vector where all the sequences will be stored in!
-  GET(SequenceVector, m_sequenceVector, SequenceVector);
+  GETSET(SequenceVector, m_sequenceVector, SequenceVector);
  public:
   JointController();
   ~JointController();
@@ -38,8 +38,11 @@ class JointController {
   /// Method to the Arduino actuator pointer
   ArduinoMotorDriver* getActuatorPointer() {return &m_actuator;}
 
-  /// Method which uploads the current sequence to the actuator
-  void uploadSequence();
+  /**
+   * Method which uploads the current sequence to the actuator
+   * @param[in] i_condenseSequence Should condense the vector before upload
+   */
+  void uploadSequence(const bool& i_condenseSequence);
 
   /// function which will make the robot move!
   void actuate();

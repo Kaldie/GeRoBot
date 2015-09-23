@@ -153,21 +153,22 @@ void JointController::moveSteps(const std::string& i_directionString,
 
 //  Brief: Actuate the robot from the given pin state sequence
 void JointController::actuate() {
-  uploadSequence();
   m_actuator.actuate();
   resetPinStateSequence();
 }
 
 
-void JointController::uploadSequence() {
+void JointController::uploadSequence(const bool& i_condense) {
   m_sequenceVector.normalise();
-  for (PinStateSequenceVector::const_iterator pinStateSequenceIterator
-         = m_sequenceVector.begin();
-       pinStateSequenceIterator != m_sequenceVector.end();
-       pinStateSequenceIterator++) {
+  if (i_condense) {
+    m_sequenceVector.condenseVector();
+  }
+  LOG_DEBUG("Size of vector: " << m_sequenceVector.getSequenceVector().size());
+  for (const auto& stateSequence : m_sequenceVector) {
     /// Get the integer sequence of this pin state
-    if (pinStateSequenceIterator->getNumberOfRepetitions() > 0) {
-      m_actuator.upload(pinStateSequenceIterator->createArduinoBuffer());
+    if (stateSequence.getNumberOfRepetitions() > 0) {
+      stateSequence.displaySequence();
+      m_actuator.upload(stateSequence.createArduinoBuffer());
     }
   }
 }
