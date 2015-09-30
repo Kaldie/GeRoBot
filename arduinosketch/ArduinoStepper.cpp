@@ -61,7 +61,7 @@ int SIZE_OF_INT = 4;
 unsigned char INTEGER_BUFFER[4];
 
 // buffer for motor messages
-ByteBuffer<MotorMessage> MOTOR_MESSAGE_BUFFER(25);
+ByteBuffer<MotorMessage> MOTOR_MESSAGE_BUFFER(20);
 
 // return state of the handle functions
 ReturnState RETURN_STATE;
@@ -157,22 +157,34 @@ void setPins(byte i_byte) {
 
 
 ISR(TIMER1_COMPA_vect) {
+  // get the read pointer
   MotorMessage* message = MOTOR_MESSAGE_BUFFER.getReadPointer();
+  /// put the current step on the pins
   setPins((byte)(
       message->stepArray[message->currentStep]));
-
+  // advance the current step for the next iteration
   message->currentStep++;
-
+  // if this step exeeds the number if steps in this message
   if (message->currentStep >=
       message->numberOfSteps) {
+    // reduce the number of reps and set current step to 0
     message->numberOfRepetitions--;
     message->currentStep = 0;
   }
-
+  // if the number of reps is 0 or less
   if (message->numberOfRepetitions <= 0) {
+    // disable the heart beat
     disableHeartBeat();
+    // tell the buffer we're done with this message
     MOTOR_MESSAGE_BUFFER.finishReadPointer();
-    IS_MOTOR_RUNNING = false;
+    // if the buffer is not empty
+    if (!MOTOR_MESSAGE_BUFFER.isEmpty()) {
+      // start with the next one
+      setTimer1Interupt(MOTOR_MESSAGE_BUFFER.getReadPointer()->speed);
+    } else {
+      // else let it be known that we are not running anymore
+      IS_MOTOR_RUNNING = false;
+    }
   }
 }
 
@@ -293,23 +305,23 @@ void verifyResponse(const unsigned char& i_requiredResponse,
 
 
 void writeMotorMessageBufferToSD(MotorMessage* i_messagePointer) {
-  bool isOwner;
-  if (stepFile.isOpen()) {
-    isOwner = false;
-  } else {
+  bool isAllreadyOpen = stepFile.isOpen();
+  if (!isAllreadyOpen) {
+    // if it not yet opened open it
     if (!stepFile.open(STEP_FILE_NAME, O_WRITE | O_CREAT)) {
       SD.errorHalt("opening file for write failed");
     }
+    // and set the position correct so we don't overwrite important stuff
     stepFile.seekSet(CURRENT_WRITE_MESSAGE_ON_SD * sizeof(MotorMessage));
-    isOwner = true;
   }
-  if (i_messagePointer->numberOfRepetitions > 0) {
-    CURRENT_WRITE_MESSAGE_ON_SD++;
-    stepFile.write(
-        reinterpret_cast<byte*>(i_messagePointer),
-        sizeof(MotorMessage));
-  }
-  if (isOwner) {
+  // notify we have 1 more message written on the SD card
+  CURRENT_WRITE_MESSAGE_ON_SD++;
+  // Write it
+  stepFile.write(reinterpret_cast<byte*>(i_messagePointer),
+                 sizeof(MotorMessage));
+  // if it was not yet opened
+  if (!isAllreadyOpen) {
+    // close it
     stepFile.close();
   }
 }
@@ -333,29 +345,43 @@ void writeMotorMessageBufferToSD() {
 
 
 bool readMotorMessagesFromSD() {
-  unsigned int numberOfBytesRead = 0;
-  if (!stepFile.open(STEP_FILE_NAME, O_READ)) {
-    SD.errorHalt("opening file for read failed");
+  bool isOpen = stepFile.isOpen();
+  int numberOfBytesRead = 0;
+  int numberOfMessageToRead = MOTOR_MESSAGE_BUFFER.inlineElements();
+  if ((CURRENT_WRITE_MESSAGE_ON_SD - CURRENT_READ_MESSAGE_ON_SD) <
+      numberOfMessageToRead) {
+    numberOfMessageToRead =
+      CURRENT_WRITE_MESSAGE_ON_SD - CURRENT_READ_MESSAGE_ON_SD;
   }
-
+  /// check if there are messages to read
+  if (numberOfMessageToRead == 0) {
+    return false;
+  }
+  /// Open the file
+  if (!isOpen) {
+    if (!stepFile.open(STEP_FILE_NAME, O_READ)) {
+      SD.errorHalt("opening file for read failed");
+    }
+  }
+  /// set the position to the "the read" message
   stepFile.seekSet(CURRENT_READ_MESSAGE_ON_SD * sizeof(MotorMessage));
-
-  while ((!MOTOR_MESSAGE_BUFFER.isFull()) &&
-         stepFile.available()) {
-    if (CURRENT_WRITE_MESSAGE_ON_SD <= CURRENT_READ_MESSAGE_ON_SD) {
-      break;
-    }
-    numberOfBytesRead += stepFile.read(
-        reinterpret_cast<void*>(MOTOR_MESSAGE_BUFFER.getWritePointer()),
-        sizeof(MotorMessage));
-    ++CURRENT_READ_MESSAGE_ON_SD;
-    if (MOTOR_MESSAGE_BUFFER.getWritePointer()->numberOfRepetitions > 0) {
-      MOTOR_MESSAGE_BUFFER.finishWritePointer();
-    }
+  /// read the bytes and store them at the buffer
+  numberOfBytesRead = stepFile.read
+    ((void*)MOTOR_MESSAGE_BUFFER.getWritePointer(),
+     sizeof(MotorMessage) * numberOfMessageToRead);
+  /// notify the buffer that messages are written and finished
+  MOTOR_MESSAGE_BUFFER.finishWritePointers(numberOfBytesRead / sizeof(MotorMessage));
+  /// Notify that there are messages read from the SD
+  CURRENT_READ_MESSAGE_ON_SD += numberOfBytesRead / sizeof(MotorMessage);
+  // if the file was previously not open close it now
+  if (!isOpen) {
+    // close the file
+    stepFile.close();
   }
-  stepFile.close();
-  return numberOfBytesRead;
+  /// return if something is read
+  return numberOfBytesRead > 0;
 }
+
 
 const int getNumberOfMessagesOnSD() {
   long totalNumberOfBytesRead;
@@ -363,7 +389,7 @@ const int getNumberOfMessagesOnSD() {
   if (!stepFile.isOpen()) {
     if (!stepFile.open(STEP_FILE_NAME, O_READ)) {
       SD.errorHalt("opening file for read failed");
-    }
+   }
   }
   // get the size of the file
   totalNumberOfBytesRead = stepFile.fileSize();
@@ -489,10 +515,8 @@ void handleStatus() {
     if (RETURN_STATE == SUCCES) {
       currentMessage->stepArray
         [currentMessage->currentStep] = step;
-
       currentMessage->currentCRC +=
         currentMessage->stepArray[currentMessage->currentStep];
-
       currentMessage->currentStep++;
     }
 
@@ -567,7 +591,6 @@ void handleStatus() {
   }
 
   case ECHO_MODE: {
-    MotorMessage* currentMessage;
     writeMotorMessageBufferToSD();
 
     // clean the read buffer before starts
@@ -582,8 +605,7 @@ void handleStatus() {
     // continue spamming until it breaks
     while (readMotorMessagesFromSD()) {
       while (!MOTOR_MESSAGE_BUFFER.isEmpty()) {
-        currentMessage = MOTOR_MESSAGE_BUFFER.getReadPointer();
-        printMessageToSerial(currentMessage,
+        printMessageToSerial(MOTOR_MESSAGE_BUFFER.getReadPointer(),
                              false);
         MOTOR_MESSAGE_BUFFER.finishReadPointer();
       }
@@ -603,15 +625,18 @@ void handleStatus() {
         (CURRENT_WRITE_MESSAGE_ON_SD == 0)) {
       CURRENT_WRITE_MESSAGE_ON_SD = getNumberOfMessagesOnSD();
     }
+    // open the step file
+      if (!stepFile.open(STEP_FILE_NAME, O_READ)) {
+      SD.errorHalt("opening file for read failed");
+    }
+    // Tell the arduino we are actuating
     ARDUINO_STATUS = ACTUATE_MODE;
     break;
   }
 
   case ACTUATE_MODE : {
-    bool hasFoundMessageOnSD = false;
-    if ((MOTOR_MESSAGE_BUFFER.isEmpty() or !IS_MOTOR_RUNNING) and
-        !MOTOR_MESSAGE_BUFFER.isFull()) {
-      hasFoundMessageOnSD = readMotorMessagesFromSD();
+    if (MOTOR_MESSAGE_BUFFER.emptyElements() >= 5) {
+      bool hasFoundMessageOnSD = readMotorMessagesFromSD();
       /*
         if there are now new message read from SD
         and the motor is not running
@@ -626,22 +651,21 @@ void handleStatus() {
     }
 
     if (!IS_MOTOR_RUNNING and !MOTOR_MESSAGE_BUFFER.isEmpty()) {
-      if (MOTOR_MESSAGE_BUFFER.getReadPointer()->numberOfRepetitions > 0) {
-        setTimer1Interupt(MOTOR_MESSAGE_BUFFER.getReadPointer()->speed);
-      } else {
-        MOTOR_MESSAGE_BUFFER.finishReadPointer();
-      }
+      setTimer1Interupt(MOTOR_MESSAGE_BUFFER.getReadPointer()->speed);
     }
     break;
   }
   case ACTUATE_POST_MODE : {
+    // "Reset" the SD card
     CURRENT_WRITE_MESSAGE_ON_SD = 0;
     CURRENT_READ_MESSAGE_ON_SD = 0;
+    // the stepFile is still opened, close it
+    stepFile.close();
+    // Reset the state machine
     ARDUINO_STATUS = SEND_HAND_SHAKE;
     break;
   }
   default: {
-    // sendSOSLed();
     break;
   }
   }  // end switch
@@ -654,27 +678,9 @@ void setup() {
   // Open the serial connections
   Serial.setTimeout(10);
   Serial.begin(BAUD_RATE);
-
   // see if the card is present and can be initialized:
   if (!SD.begin(CHIP_SELECT, SPI_FULL_SPEED)) {
     SD.initErrorHalt("Could not open the SD card!");
-  } else {
-    /*
-    // define a serial output stream
-    ArduinoOutStream cout(Serial);
-    SdFile file;
-    // open next file in root.  The volume working directory, vwd, is root
-    while (file.openNext(SD.vwd(), O_READ)) {
-      file.printName(&Serial);
-      cout << ' ';
-      file.printModifyDateTime(&Serial);
-      cout << ' ';
-      cout << file.fileSize();
-      cout << endl;
-      file.close();
-    }
-    cout << "\nDone!" << endl;
-    */
   }
 }
 
