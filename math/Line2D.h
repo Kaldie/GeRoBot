@@ -18,12 +18,12 @@ class Line2D {
          Point2D i_endPoint);
 
   /// Get the intersection of the two lines
-  Point2D getIntersectingPoint(const Line2D&) const;
+  bool intersects(const Line2D& i_line) const;
 
   /// get the intersection of the line and the point
   /// Where the point defines a line through origin
   Point2D getIntersectingPoint(const Point2D&) const;
-
+  Point2D getIntersectingPoint(const Line2D &i_line2D) const;
   /// Get the length of the line defined by the two points
   traceType getLength();
 };
