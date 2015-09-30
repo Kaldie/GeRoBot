@@ -50,8 +50,8 @@ bool BaseTraceCalculator::hasRobot() const {
 
 void BaseTraceCalculator::setTolerances() {
   if (hasRobot()) {
-    m_rotationTolerance = m_robot->getMovementPerStep(Rotational) / 2.0;
-    m_translationTolerance = m_robot->getMovementPerStep(Translational) / 2.0;
+    m_rotationTolerance = m_robot->getMovementPerStep(Rotational) / 1.5;
+    m_translationTolerance = m_robot->getMovementPerStep(Translational) / 1.5;
   }
 }
 
