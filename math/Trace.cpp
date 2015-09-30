@@ -37,35 +37,6 @@ Line2D Trace::getTraceLine() const {
   }
 }
 
-bool Trace::isWithinRange(const traceType &i_reference,
-                          const traceType &i_verification) const {
-  if (i_verification+TOLERANCE < i_reference)
-    return false;
-  else if (i_verification-TOLERANCE>i_reference)
-    return false;
-  else
-    return true;
-}
-
-
-bool Trace::isWithinRange(const Point2D &i_referencePoint,
-                          const Point2D &i_verificationPoint) const {
-  if (isWithinRange(i_referencePoint.x, i_verificationPoint.x) and
-      isWithinRange(i_referencePoint.y, i_verificationPoint.y))
-    return true;
-  else
-    return false;
-}
-
-
-bool Trace::isWithinEndRange(const Point2D &i_point2D) const {
-  return isWithinRange(m_endPoint, i_point2D);
-}
-
-bool Trace::isWithinBeginRange(const Point2D &i_point2D) const {
-  return isWithinRange(m_startPoint, i_point2D);
-}
-
 
 std::string Trace::
   getRotationDirectionToEndPoint(Point2D const &i_point2D) const {

@@ -30,10 +30,6 @@ class Trace {
 
   // Actual methods
   Line2D getTraceLine() const;
-
-  bool isWithinEndRange(const Point2D&) const;
-  bool isWithinBeginRange(const Point2D&) const;
-
   /**
    * Given a point, determine the point on the
    * trace which will be intersected by the position and the base
@@ -64,13 +60,8 @@ class Trace {
   std::string getTranslationDirection(const Point2D& i_currentPosition,
                                       const Point2D& i_desiredPosition) const;
 
-  virtual std::vector<Point2D*> getPointPointers();
-
   std::string getRotationDirection(const Point2D&, const Point2D&) const;
 
- private:
-  bool isWithinRange(const Point2D&, const Point2D&) const;
-  bool isWithinRange(const traceType&, const traceType&) const;
-
+  virtual std::vector<Point2D*> getPointPointers();
 };
 #endif  // MATH_TRACE_H_
