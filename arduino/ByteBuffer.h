@@ -4,15 +4,6 @@
 /*
   Simple circular templated buffer
 */
-
-
-/*#if defined(ARDUINO) && ARDUINO < 100
-#include "WProgram.h"
-#else
-//#include "Arduino.h"
-#endif //arduino header include
-*/
-
 template <typename T>
 class ByteBuffer {
  private:
@@ -31,15 +22,34 @@ class ByteBuffer {
 
   // Deconstructor
   ~ByteBuffer();
-
+  /// Get the element that is currently available to be read
   T* getReadPointer();
+  /// Let the buffer known that the current read element is ready to be re-written
   bool finishReadPointer();
-
+  /**
+   * Let the buffer know that several elements are ready to be written
+   * @param[in] i_finishes Number of elements that are ready to be written
+   */
+  bool finishReadPointers(const int& i_finishes);
+  /// Get the element that is currently available to be written
   T* getWritePointer();
+  /// Let the buffer know that the current written element is ready to be read
   bool finishWritePointer();
-
-  const bool isFull();
-  const bool isEmpty();
+  /**
+   * Let the buffer know that several elements are ready to be read
+   * @param[in] i_finishes Number of elements that are ready
+   */
+  bool finishWritePointers(const int& i_finishes);
+  /// returns true if no elements are currently ready to be written
+  bool isFull();
+  /// returns true if no elements are currently ready to be read
+  bool isEmpty();
+  /// return the number of elements that are empty
+  int emptyElements();
+  /// return the number of elements that could be written continiusly
+  int inlineWriteElements();
+  /// return the number of elements that could be read continiusly
+  int inlineReadElements();
 };
 
 // Constructors
@@ -67,16 +77,43 @@ void ByteBuffer<T>::incrementPosition(T*& i_position) {
 }
 
 
-// Actual methods
 template <typename T>
-const bool ByteBuffer<T>::isFull() {
+bool ByteBuffer<T>::isFull() {
   return (m_endOfBuffer - m_buffer) <= m_itemCount;
 }
 
 
 template <typename T>
-const bool ByteBuffer<T>::isEmpty() {
+bool ByteBuffer<T>::isEmpty() {
   return m_itemCount == 0;
+}
+
+
+template <typename T>
+int ByteBuffer<T>::emptyElements() {
+  return (m_endOfBuffer - m_buffer) - m_itemCount;
+}
+
+
+template <typename T>
+int ByteBuffer<T>::inlineWriteElements() {
+  if (isFull()) {
+    return 0;
+  }
+  return m_endOfBuffer - m_writePosition;
+}
+
+
+template <typename T>
+int ByteBuffer<T>::inlineReadElements() {
+  if (isEmpty()) {
+    return 0;
+  }
+
+  if (m_writePosition <= m_readPosition)
+    return m_endOfBuffer - m_readPosition;
+  else
+    return m_writePosition - m_readPosition;
 }
 
 
@@ -99,6 +136,18 @@ bool ByteBuffer<T>::finishReadPointer() {
 
 
 template<typename T>
+bool  ByteBuffer<T>::finishReadPointers(const int& i_finishes) {
+  bool result = true;
+  for (int i = 0;
+       i < i_finishes && result;
+       ++i) {
+    result &= finishReadPointer();
+  }
+  return result;
+}
+
+
+template<typename T>
 T* ByteBuffer<T>::getWritePointer() {
   return m_writePosition;
 }
@@ -109,11 +158,21 @@ bool ByteBuffer<T>::finishWritePointer() {
   if (isFull()) {
     return false;
   } else {
-    m_itemCount++;
+    ++m_itemCount;
     incrementPosition(m_writePosition);
     return true;
   }
 }
 
-#endif  // ARDUINOSKETCH_BYTEBUFFER_H_
 
+template<typename T>
+bool  ByteBuffer<T>::finishWritePointers(const int& i_finishes) {
+  bool result = true;
+  for (int i = 0;
+       i < i_finishes && result;
+       ++i) {
+    result &= finishWritePointer();
+  }
+  return result;
+}
+#endif  // ARDUINOSKETCH_BYTEBUFFER_H_
