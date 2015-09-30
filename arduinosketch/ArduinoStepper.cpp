@@ -304,7 +304,7 @@ void verifyResponse(const unsigned char& i_requiredResponse,
 }
 
 
-void writeMotorMessageBufferToSD(MotorMessage* i_messagePointer) {
+bool writeMotorMessageBufferToSD() {
   bool isAllreadyOpen = stepFile.isOpen();
   if (!isAllreadyOpen) {
     // if it not yet opened open it
@@ -314,40 +314,34 @@ void writeMotorMessageBufferToSD(MotorMessage* i_messagePointer) {
     // and set the position correct so we don't overwrite important stuff
     stepFile.seekSet(CURRENT_WRITE_MESSAGE_ON_SD * sizeof(MotorMessage));
   }
-  // notify we have 1 more message written on the SD card
-  CURRENT_WRITE_MESSAGE_ON_SD++;
+  /// Get the number of message which are in continues memory
+  int numberOfMessageToRead = MOTOR_MESSAGE_BUFFER.inlineReadElements();
+  /// if there are none, stop
+  if (numberOfMessageToRead == 0) {
+    return false;
+  }
   // Write it
-  stepFile.write(reinterpret_cast<byte*>(i_messagePointer),
-                 sizeof(MotorMessage));
+  stepFile.write((void*)MOTOR_MESSAGE_BUFFER.getReadPointer(),
+                 sizeof(MotorMessage) * numberOfMessageToRead);
+  // notify we have 1 more message written on the SD card
+  CURRENT_WRITE_MESSAGE_ON_SD += numberOfMessageToRead;
+  MOTOR_MESSAGE_BUFFER.finishReadPointers(numberOfMessageToRead);
   // if it was not yet opened
   if (!isAllreadyOpen) {
     // close it
     stepFile.close();
   }
-}
-
-
-void writeMotorMessageBufferToSD() {
-  // opening file
-  if (!stepFile.open(STEP_FILE_NAME, O_WRITE | O_CREAT)) {
-    SD.errorHalt("opening file for write failed");
+  if (!MOTOR_MESSAGE_BUFFER.isEmpty()) {
+    writeMotorMessageBufferToSD();
   }
-  // set the file at the correct writing position
-  stepFile.seekSet(CURRENT_WRITE_MESSAGE_ON_SD * sizeof(MotorMessage));
-  // dump message on sd untill buffer is empty
-  while (!MOTOR_MESSAGE_BUFFER.isEmpty()) {
-    writeMotorMessageBufferToSD(MOTOR_MESSAGE_BUFFER.getReadPointer());
-    MOTOR_MESSAGE_BUFFER.finishReadPointer();
-  }
-  // clos the sd card to ensure the messages are written
-  stepFile.close();
+  return true;
 }
 
 
 bool readMotorMessagesFromSD() {
   bool isOpen = stepFile.isOpen();
   int numberOfBytesRead = 0;
-  int numberOfMessageToRead = MOTOR_MESSAGE_BUFFER.inlineElements();
+  int numberOfMessageToRead = MOTOR_MESSAGE_BUFFER.inlineWriteElements();
   if ((CURRENT_WRITE_MESSAGE_ON_SD - CURRENT_READ_MESSAGE_ON_SD) <
       numberOfMessageToRead) {
     numberOfMessageToRead =
