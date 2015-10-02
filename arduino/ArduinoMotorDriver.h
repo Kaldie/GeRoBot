@@ -30,12 +30,15 @@ class ArduinoMotorDriver {
                               std::vector< std::vector<int> > *i_totalVector);
 
 public:
+    /// Upload the message to the arduino
     void upload(const std::vector<int> i_messageVector);
+    /// Send an actuate command to the arduino
     void actuate();
-    bool resetConnection();
+    /// Send a test message to the arduino
     bool sendTestBit();
+    /// Command the arduino to delete the step file
     void deleteFile();
-
+    /// Request that the arduino display its information of messages
     void echo();
     /// Benchmark the SD card on the system. Testing purpose often
     bool benchmarkSD(const int& i_numberOfMessages);
