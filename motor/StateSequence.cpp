@@ -5,7 +5,7 @@
 #include "./PinState.h"
 
 StateSequence::StateSequence()
-    : StateSequence(50, 0, {})
+    : StateSequence(100, 0, {})
 {}
 
 

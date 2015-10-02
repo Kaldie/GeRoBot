@@ -35,12 +35,13 @@ class StateSequence {
   bool addToSequence(const StateSequence& i_otherSequence);
   /**
    * Set this PinState for all the states in the vector
+   * @param[in] i_pinState State which will be used to override stuff
    * @param[in] i_extent will extent the StateSequence without overriding it
    * @param[in] i_overrideSequence will override all entries even if they were previously defind
    */
   bool setStateForSequence(const PinState& i_pinState,
                            const bool& i_extent = false,
-                           const bool& overrideSequence = false);
+                           const bool& i_overrideSequence = false);
 
   std::vector<int> getIntegerSequence() const;
   static bool mergePinStateSequences(StateSequence* io_firstSequence,
