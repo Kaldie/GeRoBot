@@ -54,7 +54,7 @@ class XMLBuilder {
   std::vector<bool> getBoolList(const pugi::xml_node& i_node,
                                 const std::string& i_xmlPath,
                                 const int& i_numberOfEntries) const;
-		
+
   pugi::xml_node loadXMLFile();
 
   pugi::xml_node getNodeFromPath(const pugi::xml_node&,
