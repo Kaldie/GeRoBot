@@ -108,6 +108,7 @@
      <string>TraceDesign</string>
     </property>
     <addaction name="clearTraceAction"/>
+    <addaction name="actionAppend_Trace"/>
     <addaction name="loadTraceAction"/>
     <addaction name="saveTraceAction"/>
     <addaction name="separator"/>
@@ -172,6 +173,11 @@
   <action name="clearTraceAction">
    <property name="text">
     <string>Clear</string>
+   </property>
+  </action>
+  <action name="actionAppend_Trace">
+   <property name="text">
+    <string>Append Trace</string>
    </property>
   </action>
  </widget>
