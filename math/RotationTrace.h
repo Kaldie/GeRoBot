@@ -85,14 +85,6 @@ class RotationTrace: public Trace {
     RotationTrace(const Arc2D& i_arc);
 
     /**
-     * Get the extremes of of the cirlce.
-     * The extremes are points on the arc
-     * with the most extreme angle
-     */
-    void getExtremePoints(Point2D* i_firstExtreme,
-                          Point2D* i_secondExtreme) const;
-
-    /**
      * Split the trace to go from the first to the extremes to the end
      * If the there are one or more extreme points found. Create multiple traces
      * which can be calculated one after each other to get proper arc
@@ -103,6 +95,10 @@ class RotationTrace: public Trace {
 
     void getStartStopAngle(double* i_startAngle,
                            double* i_stopAngle) const;
+    void getExtremePoints(std::vector<Point2D>* i_list,
+                          const double* i_angle = nullptr) const;
+    /// Estimate the trace with a std::vector<Point2D> with size of i_numberOfPoints
+    std::vector<Point2D> estimateTrace(const int& i_numberOfPoints) const;
  private:
     /// bockus function, all points are valid, if the trace can be constructed!
     virtual bool isValidStartAndEndPosition(const Point2D&,
@@ -113,5 +109,16 @@ class RotationTrace: public Trace {
                                const traceType& i_extremePoint) const;
 
     Point2D* getCentralPointFromArc() const;
+
+   /**
+     * The arguments will contain points which intersects the trace at extreme angles
+     * Calculates and returns points which intesect the trace at the maximum and minimum angle
+     * The angle is defined as the angle a line intersecting the
+     * circle and the origin of the coordinate system.
+     * @param[out] i_firstExtreme First extreme point
+     * @param[out] i_secondExtreme Second extreme point
+     */
+    void getPointAtExtremeAngle(Point2D* i_firstExtreme,
+                                Point2D* i_secondExtreme) const;
 };
 #endif  // MATH_ROTATIONTRACE_H_
