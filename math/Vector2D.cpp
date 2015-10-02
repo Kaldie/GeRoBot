@@ -6,13 +6,11 @@ Vector2D& Vector2D::rotate(traceType angle)
 {
     traceType s = sinf(angle);
     traceType c = cosf(angle);
-    
+    // we need these temp variables
     traceType nx = c * x - s * y;
     traceType ny = s * x + c * y;
-    
     x = nx;
     y = ny;
-    
     return (*this);
 }
 
