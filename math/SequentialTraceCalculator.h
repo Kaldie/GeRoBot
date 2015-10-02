@@ -6,7 +6,7 @@
 #include <Robot.h>
 #include <Trace.h>
 
-class QPolygonF;
+class Polygon2D;
 class TraceSections;  // forward declared because it is a private type def.
 /**
  * Class which is responsible for dispatching calculation calls
@@ -38,7 +38,7 @@ class SequentialTraceCalculator {
 
   /**
    * Returns the number of closed sections and add these to the i_closedSections TraceSections
-   * @param[in] i_closedsections Groups which are closed
+   * @param[in] i_closedSections Groups which are closed
    */
   int getClosedSections(TraceSections* i_closedSections) const;
  private:
@@ -78,7 +78,7 @@ class SequentialTraceCalculator {
    * @param[in] i_polygon The Polygon that will be made
    */
   void createPolygon(const Trace::TracePointerVector& i_vector,
-                     QPolygonF* i_polygon) const;
+                     Polygon2D* i_polygon) const;
 
   bool isInside(const Trace::TracePointerVector& i_larger,
                 const Trace::TracePointerVector& i_smaller) const;

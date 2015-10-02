@@ -124,7 +124,7 @@ bool LineTraceCalculator::correctRotation(const Trace& i_trace) const {
     */
     jointPointDifference = distanceBeginPointIntersectingPoint;
     destinationPoint=&intersectingPoint;
-    jointPointDifference*=2.0;
+    jointPointDifference*=1.0;
   }
 
   LOG_INFO("Destination point is: " <<

@@ -41,7 +41,7 @@ class SequentialTraceCalculatorTest : public CxxTest::TestSuite {
     TS_ASSERT(calc.isPartOfClosedSection(vector[0]));
     SequentialTraceCalculator::TraceSections sections;
     TS_ASSERT_EQUALS(1, calc.getClosedSections(&sections));
-    TS_ASSERT_EQUALS(sections.size(), 4);
+    TS_ASSERT_EQUALS(sections.size(), 1);
   }
 
   void testDriehoek() {
@@ -60,7 +60,7 @@ class SequentialTraceCalculatorTest : public CxxTest::TestSuite {
     TS_ASSERT(calc.isPartOfClosedSection(vector[0]));
     SequentialTraceCalculator::TraceSections sections;
     TS_ASSERT_EQUALS(1, calc.getClosedSections(&sections));
-    TS_ASSERT_EQUALS(sections.size(), 3);
+    TS_ASSERT_EQUALS(sections.size(), 1);
   }
 
   void testRoundedSquare() {
@@ -87,7 +87,6 @@ class SequentialTraceCalculatorTest : public CxxTest::TestSuite {
                     Point2D(28, 10),
                     Point2D(28, 12));  // rechts onder straal 2
 
-
     Trace::TracePointerVector vector;
     vector.push_back(std::make_shared<Trace>(a));
     vector.push_back(std::make_shared<Trace>(b));
@@ -101,7 +100,8 @@ class SequentialTraceCalculatorTest : public CxxTest::TestSuite {
     TS_ASSERT(calc.isPartOfClosedSection(vector[0]));
     SequentialTraceCalculator::TraceSections sections;
     TS_ASSERT_EQUALS(1, calc.getClosedSections(&sections));
-    TS_ASSERT_EQUALS(sections.size(), 3);
+    TS_ASSERT_EQUALS(sections.size(), 1);
+    TS_ASSERT_EQUALS(sections[0].size(), 8);
   }
 
 };

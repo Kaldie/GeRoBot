@@ -27,7 +27,21 @@ class Line2DTest : public CxxTest::TestSuite {
                 endPoint);
   }
 
-  
+  void testIsEqual() {
+    Line2D line(startPoint,
+                endPoint);
+    Line2D line2(startPoint,
+                 endPoint);
+    Line2D line3(startPoint + Point2D(1, 1),
+                 endPoint + Point2D(1, 1));
+    Line2D line4(startPoint + Point2D(1, 1),
+                 endPoint);
+    TS_ASSERT_EQUALS(line, line2);
+    TS_ASSERT_DIFFERS(line, line3);
+    TS_ASSERT_DIFFERS(line, line4);
+  }
+
+
   void testLength() {
     Line2D line(startPoint,
                 endPoint);

@@ -20,6 +20,9 @@
 #include <vector>
 #include <iomanip>
 #include <cassert>
+#include <QtCore/QPointF>
+#include <pugixml.hpp>
+
 #define PIN_HIGH 1
 #define PIN_LOW 0
 
@@ -29,7 +32,7 @@
 #define HAS_RPI false
 
 #define PI 3.1415926535897932384626433
-#define TOLERANCE 0.1
+#define TOLERANCE 0.0001
 
 #define DEBUG
 // #define DEBUG_FILE

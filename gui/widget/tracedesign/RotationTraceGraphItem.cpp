@@ -19,27 +19,22 @@ QRectF RotationTraceGraphItem::boundingRect() const {
    if (!rotationTrace) {
       return QRectF();
    }
-   QPointF minPoint, maxPoint;
-   QList<QPointF> points;
-   QPointF start(0,0);
-   QPointF end(Point2D(rotationTrace->getEndPoint() -
-                       rotationTrace->getStartPoint()));
-   Point2D centerPoint = Point2D(rotationTrace->getCentrePoint() -
-                                 rotationTrace->getStartPoint());
-   points.append(start);
-   points.append(end);
-   points.append(centerPoint);
+   std::vector<Point2D> points;
+   points.push_back(rotationTrace->getStartPoint());
+   points.push_back(rotationTrace->getEndPoint());
+   points.push_back(rotationTrace->getCentrePoint());
 
    // get the extreme points, points which lay on the curve at 90, 180, 270 and 0
-   getExtremePoints(nullptr, rotationTrace, &points);
-
-   minPoint = points[0];
-   maxPoint = points[1];
+   rotationTrace->getExtremePoints(&points);
    double x(0.0);
    double y(0.0);
-   for (const auto& point : points) {
-      x = point.x();
-      y = point.y();
+   QPointF minPoint, maxPoint;
+   minPoint = points[0];
+   maxPoint = points[1];
+   for (const Point2D& point : points) {
+      QPointF qPoint = Point2D(point - rotationTrace->getCentrePoint());
+      x = qPoint.x();
+      y = qPoint.y();
       LOG_DEBUG("x : " << x << " y: " << y);
       if (minPoint.x() > x) {
          minPoint.setX(x);
@@ -56,8 +51,9 @@ QRectF RotationTraceGraphItem::boundingRect() const {
    }
 
    QPointF adjust(3,3);
-   return QRectF(minPoint - adjust,
-                 maxPoint + adjust);
+   minPoint -= adjust;
+   maxPoint += adjust;
+   return QRectF(minPoint, maxPoint);
 }
 
 
@@ -176,5 +172,4 @@ void RotationTraceGraphItem::getExtremePoints(const double* i_angle,
       LOG_DEBUG("add 270 deg point");
       i_list->append(QPointF(centerPoint.x, -centerPoint.y + radius));
    }
-
 }

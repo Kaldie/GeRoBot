@@ -3,7 +3,8 @@
 #include <Robot.h>
 #include <Trace.h>
 #include <Point2D.h>
-#include <QtGui/QPolygonF>
+#include "./RotationTrace.h"
+#include "./Polygon2D.h"
 #include "./SequentialTraceCalculator.h"
 
 /// easy constructor
@@ -151,20 +152,25 @@ isPartOfClosedSection(const Trace::TracePointer& i_trace) const {
 
 void SequentialTraceCalculator::
 createPolygon(const Trace::TracePointerVector& i_vector,
-              QPolygonF* i_polygon) const {
+              Polygon2D* i_polygon) const {
   if (!i_polygon) {
     return;
   }
   if (!i_polygon->isEmpty()) {
     LOG_WARNING("Cleaning out the non-empty polygon!!");
-    QPolygonF emptyPoly;
-    i_polygon->swap(emptyPoly);
+    Polygon2D emptyPoly;
+    *i_polygon = emptyPoly;
   }
+  // for each trace
   for (const auto& trace : i_vector) {
-    *i_polygon << QPointF(trace->getStartPoint());
-    *i_polygon << QPointF(trace->getEndPoint());
+    std::vector<Point2D> points = trace->estimateTrace(100);
+    // add all points to the polygon
+    for (const auto& point : points) {
+      i_polygon->addPoint2D(point);
+    }
   }
 }
+
 
 
 bool SequentialTraceCalculator::
@@ -183,18 +189,29 @@ isInside(const Trace::TracePointerVector& i_larger,
 bool SequentialTraceCalculator::
 isInside(const Trace::TracePointerVector& i_vector,
          const Trace::TracePointer& i_trace) const {
-  QPolygonF polygon;
+  Polygon2D polygon;
   createPolygon(i_vector, &polygon);
-  if (!polygon.containsPoint(i_trace->getStartPoint(), Qt::OddEvenFill))
+  if (!polygon.isInside(i_trace->getStartPoint()))
     return false;
-  if (!polygon.containsPoint(i_trace->getEndPoint(), Qt::OddEvenFill))
+  if (!polygon.isInside(i_trace->getEndPoint()))
     return false;
+
+  if (RotationTrace::RotationTracePointer rotationTrace =
+      std::dynamic_pointer_cast<RotationTrace>(i_trace)) {
+    std::vector<Point2D> points = rotationTrace->estimateTrace(100);
+    auto pointItr = points.begin();
+    while (points.end() != pointItr) {
+      if (!polygon.isInside(*pointItr))
+        return false;
+      ++pointItr;
+    }
+  }
   return true;
 }
 
-
 int SequentialTraceCalculator::
 getClosedSections(SequentialTraceCalculator::TraceSections* i_closedSections) const {
+  LOG_DEBUG("getClosedSections");
   Trace::TracePointerVector traces = m_traceVector;
   Trace::TracePointer currentTrace;
   int sections(0);
@@ -209,7 +226,13 @@ getClosedSections(SequentialTraceCalculator::TraceSections* i_closedSections) co
       ++sections;
       // remove all connected traces from the traces vector
       for (const auto& connectedTrace : connected) {
-	traces.erase(std::remove(traces.begin(), traces.end(), connectedTrace));
+        LOG_DEBUG("Size of traces before: " << traces.size());
+        if (std::find(traces.begin(), traces.end(), connectedTrace) == traces.end()) {
+          LOG_DEBUG("could not find trace!");
+          continue;
+        }
+        traces.erase(std::remove(traces.begin(), traces.end(), connectedTrace));
+        LOG_DEBUG("Size of traces after: " << traces.size());
       }
       // Add the connectedTraces to the closedSections vector
       i_closedSections->push_back(connected);

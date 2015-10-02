@@ -11,6 +11,7 @@
 #include <JointController.h>
 #include <RotationTrace.h>
 #include <RotationTraceCalculator.h>
+#include <RobotIO.h>
 
 class RotationTraceCalculatorTest : public CxxTest::TestSuite {
  public:
@@ -29,16 +30,14 @@ class RotationTraceCalculatorTest : public CxxTest::TestSuite {
   }
 
   void testRotationTraceCalculation() {
-
-    Point2D startPoint(-10, 30);
-    Point2D endPoint(-10, 30);;
-    Point2D centrePoint(-30, 30);
-    RotationTrace trace(startPoint,
-                        endPoint,
-                        centrePoint);
+    Point2D startPoint(-0, 255);
+    Point2D endPoint(-0, 255);
+    Point2D centrePoint(-0, 345);
+    RotationTrace trace(startPoint, endPoint, centrePoint);
     robot.setVirtualPosition(startPoint);
     robot.setPosition(startPoint);
-    robot.getJointController()->resolveJoint(Translational)->setMovementPerStep(0.01);
+    /*
+      robot.getJointController()->resolveJoint(Translational)->setMovementPerStep(0.01);
     robot.getJointController()->resolveJoint(Rotational)->setMovementPerStep(0.01);
 
     trace.setRotationTolerance(
@@ -49,10 +48,28 @@ class RotationTraceCalculatorTest : public CxxTest::TestSuite {
     trace.setIsClockwise(true);
     robot.getJointController()->resolveJoint(Translational)->getMotor()->setHoldMotor(true);
     robot.getJointController()->resolveJoint(Rotational)->getMotor()->setHoldMotor(true);
+    */
+    RobotIO robotBuilder("/home/ruud/project/gerobot/gui/defaultRobot.xml");
+    robotBuilder.build();
+    //    robotBuilder.getRobotPointer();
+    Robot robot = *robotBuilder.getRobotPointer();
+    robot.setVirtualPosition(startPoint);
+    robot.setPosition(startPoint);
 
     RotationTraceCalculator rotationTraceCalculator(&robot);
     rotationTraceCalculator.setWriteLog(true);
     rotationTraceCalculator.calculateTrace(trace);
+    SequenceVector vector = robot.getJointController()->getSequenceVector();
+    LOG_DEBUG("Number of steps before condense: " << vector.numberOfSteps());
+    //    vector.condenseVector();
+    LOG_DEBUG("Number of steps after condense: " << vector.numberOfSteps());
+    try {
+        LOG_DEBUG("here!!");
+        robot.actuate();
+    } catch(std::runtime_error) {
+        LOG_INFO("Could not find sizzle");
+    }
+    return;
 
     /// Tests
     TS_ASSERT_EQUALS(robot.getJointController()->getSequenceVector().numberOfSequences(),
@@ -85,10 +102,10 @@ class RotationTraceCalculatorTest : public CxxTest::TestSuite {
         numberOfEmptySequences += 1;
       totalNumberOfReps += sequence.getNumberOfRepetitions();
     }
-    
+
     TS_ASSERT_EQUALS(numberOfEmptySequences, 3436);
     TS_ASSERT_EQUALS(sequenceVector.numberOfSequences(), 6198);
-    
+
     double optimisedAverageRep = static_cast<float>(totalNumberOfReps)/
         (sequenceVector.numberOfSequences() - numberOfEmptySequences);
     /// check if the condensing improves information densitity
@@ -122,7 +139,7 @@ class RotationTraceCalculatorTest : public CxxTest::TestSuite {
     */
     try {
       LOG_DEBUG("here!!");
-      robot.getJointController()->actuate();
+      robot.actuate();
     } catch(std::runtime_error) {
       LOG_INFO("Could not find sizzle");
     }

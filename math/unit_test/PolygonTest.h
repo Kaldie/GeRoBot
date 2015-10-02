@@ -90,6 +90,7 @@ class PolygonTest : public CxxTest::TestSuite {
     TS_ASSERT(a.isInside(Point2D(5,5)));
     TS_ASSERT(a.isInside(Point2D(5,0)));
     TS_ASSERT(a.isInside(Point2D(10,0)));
+    TS_ASSERT(a.isInside(Point2D(9,6)));
     TS_ASSERT(a.isInside(Point2D(-10,0)));
     TS_ASSERT(!a.isInside(Point2D(-10 - 0.01 ,0)));
     TS_ASSERT(!a.isInside(Point2D(-10,0 - 0.01)));

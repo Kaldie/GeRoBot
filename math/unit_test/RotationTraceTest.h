@@ -42,12 +42,7 @@ class RotationTraceTest : public CxxTest::TestSuite {
 			Point2D(10, 100));
     // check if the calculation of the spanned angle still works
     TS_ASSERT_DELTA(trace.getArc().spanAngle(), PI, 0.001);
-    // check the calculation of the extreme points
-    Point2D first, second;
-    trace.getExtremePoints(&first, &second);
-    TS_ASSERT_EQUALS(first, Point2D(19.802 ,98.0198));
-    TS_ASSERT_EQUALS(second, Point2D(0, 100));
-    // check if the necessary traces are derived in the clockwise fashion
+      // check if the necessary traces are derived in the clockwise fashion
     std::vector<RotationTrace> vector = trace.getNecessaryTraces();
     TS_ASSERT_EQUALS(2, vector.size());
     TS_ASSERT_EQUALS(vector[0].getEndPoint() , Point2D(0,100));
@@ -99,6 +94,47 @@ class RotationTraceTest : public CxxTest::TestSuite {
     TS_ASSERT_EQUALS(vector.size(), 2);
     TS_ASSERT_EQUALS(vector[0].getEndPoint(), Point2D(4, 0));
   };
+
+  void testEstimateTrace() {
+    RotationTrace trace(Point2D(0, 4),
+                        Point2D(0, 4),
+                        Point2D(0, 0));
+    std::vector<Point2D> points =  trace.estimateTrace(5);
+    TS_ASSERT_EQUALS(points.size(), 5);
+    std::vector<Point2D> knownPoints(
+               {Point2D(0, 4),
+                Point2D(-4, 0),
+                Point2D(0, -4),
+                Point2D(4, 0),
+                Point2D(0, 4)});
+
+    auto knownItr = knownPoints.begin();
+    for (const auto& X : points) {
+        TS_ASSERT_EQUALS(X, *knownItr);
+        ++knownItr;
+    }
+  }
+
+
+  void testEstimateTrace2() {
+    RotationTrace trace(Point2D(0, 4),
+                        Point2D(0, -4),
+                        Point2D(0, 0));
+    trace.setIsClockwise(true);
+    std::vector<Point2D> points =  trace.estimateTrace(3);
+    TS_ASSERT_EQUALS(points.size(), 3);
+    std::vector<Point2D> knownPoints(
+               {Point2D(0, 4),
+                Point2D(4, 0),
+                Point2D(0, -4)});
+
+    auto knownItr = knownPoints.begin();
+    for (const auto& X : points) {
+        TS_ASSERT_EQUALS(X, *knownItr);
+        LOG_DEBUG("Point: " << X.x << " , " << X.y);
+        ++knownItr;
+    }
+  }
 
 };
 #endif  // MATH_UNIT_TEST_ROTATIONTRACETEST_H_

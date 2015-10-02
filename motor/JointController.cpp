@@ -159,6 +159,8 @@ void JointController::actuate() {
 
 
 void JointController::uploadSequence(const bool& i_condense) {
+  LOG_DEBUG("Sending: " << m_sequenceVector.numberOfSequences() << " sequences!");
+  LOG_DEBUG("Sending: " << m_sequenceVector.numberOfSteps() << " steps!");
   m_sequenceVector.normalise();
   if (i_condense) {
     m_sequenceVector.condenseVector();

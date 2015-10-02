@@ -51,7 +51,7 @@ class Trace (object) :
 
        "Position settings"
        #position of the head in x,y viewed from back of robot, where robot is (0,0)
-       self.__currentPosition = numpy.array([-00.00 ,50.00])
+       self.__currentPosition = numpy.array([-10.00 ,30.00])
 
        #rotation in degree where 0 is perpendicular to the work piece minus angle ccw and positive cw
        self.__currentRotation = numpy.arctan2(self.__currentPosition[1],
@@ -223,14 +223,14 @@ class Trace (object) :
         from matplotlib.pyplot import plot,show,figure,Circle
 	myFigure=figure()
 	myAxes=myFigure.add_subplot(111)
-        circle1=Circle((-30.,30.),20.,color='r')
+        circle1=Circle((-0, 415),50.,color='r')
 	myAxes.plot(zip(*self.__trace)[0], zip(*self.__trace)[1], 'g.-')
-	myAxes.plot(zip(*self.__newTrace)[0], zip(*self.__newTrace)[1], 'b.-')
-        
+        myAxes.plot(zip(*self.__newTrace)[0], zip(*self.__newTrace)[1], 'b.-')
+
 	myAxes.plot([0,-44.1369],[0,15.8587])
 	myAxes.plot([0,-15.8587],[0,44.1369])
-        myAxes.set_ylim([-100,100])
-        myAxes.set_xlim([-100,100])
+        #myAxes.set_ylim([-100,100])
+        #myAxes.set_xlim([-100,100])
         myAxes.add_artist(circle1)
         show()
 

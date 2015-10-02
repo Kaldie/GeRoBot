@@ -10,6 +10,7 @@
 #include <JointController.h>
 #include <Trace.h>
 #include <LineTraceCalculator.h>
+#include <RobotIO.h>
 
 class LineTraceCalculationTest : public CxxTest::TestSuite {
  public:
@@ -31,13 +32,29 @@ class LineTraceCalculationTest : public CxxTest::TestSuite {
   }
 
   void testLineTraceCalculation() {
-    Point2D startPoint(0, 50);
-    Point2D endPoint(-150, 50);
+    RobotIO robotBuilder("/home/ruud/project/gerobot/gui/defaultRobot.xml");
+    robotBuilder.build();
+    //    robotBuilder.getRobotPointer();
+    Robot robot = *robotBuilder.getRobotPointer();
+    LOG_DEBUG("Robot build finished!");
+
+    Point2D startPoint(0, 375);
+    Point2D endPoint(-300, 375);
     Trace trace(startPoint, endPoint);
+    robot.setVirtualPosition(startPoint);
+    robot.setPosition(startPoint);
 
     LineTraceCalculator lineTraceCalculator(&robot);
     lineTraceCalculator.setWriteLog(true);
     lineTraceCalculator.calculateTrace(trace);
+        try {
+        LOG_DEBUG("here!!");
+        robot.actuate();
+    } catch(std::runtime_error) {
+        LOG_INFO("Could not find sizzle");
+    }
+    return;
+
 
     /// Tests
     TS_ASSERT_EQUALS(robot.getJointController()->getSequenceVector().numberOfSequences(),
