@@ -14,7 +14,6 @@ class RotationTraceCalculator: public LineTraceCalculator {
   /**
    * Calculate the trace
    * @param[in] i_trace i_trace trace that needs to be evaluated
-   * @param[in] i_currentPosition Position of the robot
    */
   virtual void calculateTrace(const RotationTrace& i_trace);
   /// Default constructor
