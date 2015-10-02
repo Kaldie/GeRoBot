@@ -6,7 +6,7 @@
 #include <Line2D.h>
 
 class Trace {
-  GETSET(traceType, m_traceType, TraceType);
+  GETSETPROTECTED(traceType, m_traceType, TraceType);
   GETSETPROTECTED(Point2D, m_startPoint, StartPoint);
   GETSETPROTECTED(Point2D, m_endPoint, EndPoint);
  public:
@@ -23,10 +23,6 @@ class Trace {
 
   Trace(const Point2D& i_startPoint,
         const Point2D& i_endPoint);
-
-  Trace(const Point2D& i_startPoint,
-        const Point2D& i_endPoint,
-        const TraceType&);
 
   // Actual methods
   Line2D getTraceLine() const;
@@ -63,5 +59,12 @@ class Trace {
   std::string getRotationDirection(const Point2D&, const Point2D&) const;
 
   virtual std::vector<Point2D*> getPointPointers();
+  /**
+   * give a vector with points that estimate the trace.
+   * If the number of points correlate with the number of steps
+   * then it gets a first order impression of the actual movement of the robot.
+   * @param[in] i_numberOfPoints Number of points on the trace that will be returned
+   */
+  virtual std::vector<Point2D> estimateTrace(const int& i_numberOfPoints) const;
 };
 #endif  // MATH_TRACE_H_

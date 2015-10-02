@@ -18,15 +18,6 @@ Trace::Trace(const Point2D& i_startPoint,
 }
 
 
-Trace::Trace(const Point2D& i_startPoint,
-             const Point2D& i_endPoint,
-             const Trace::TraceType& i_traceType):
-    m_traceType(i_traceType),
-    m_startPoint(i_startPoint),
-    m_endPoint(i_endPoint) {
-}
-
-
 Line2D Trace::getTraceLine() const {
   if (m_traceType == Line) {
     LOG_INFO("Start position is: " << m_startPoint.x << "," << m_startPoint.y);
@@ -103,5 +94,24 @@ std::vector<Point2D*> Trace::getPointPointers() {
   std::vector<Point2D*> points;
   points.push_back(&m_startPoint);
   points.push_back(&m_endPoint);
+  return points;
+}
+
+
+std::vector<Point2D> Trace::estimateTrace
+(const int& i_numberOfPoints) const {
+  // a vector in the direction of the trace with length with
+  // which will be increasing the point with each step
+  Vector2D normalisedLine =
+    (m_endPoint - m_startPoint).normalize() *
+    getTraceLine().getLength() / (i_numberOfPoints -1);
+  Point2D currentPoint = m_startPoint;
+  std::vector<Point2D> points;
+  for (int i = 0;
+       i < i_numberOfPoints;
+       ++i) {
+    points.push_back(currentPoint);
+    currentPoint += normalisedLine;
+  }
   return points;
 }
