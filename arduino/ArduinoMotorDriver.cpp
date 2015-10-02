@@ -39,6 +39,12 @@ void ArduinoMotorDriver::initialiseArduinoConnection() {
 
 
 bool ArduinoMotorDriver::handShake(ArduinoMotorDriver::DriverStatus i_status) {
+  if (!m_arduinoConnection.hasConnection()) {
+    initialiseArduinoConnection();
+  } else {
+    m_arduinoConnection.flushConnection();
+  }
+
   /// receive the handshake value from the arduino
   int receivedHandShake = m_arduinoConnection.serialRead(1);
   LOG_DEBUG("Hand shake value: " << ArduinoMotorDriver::HAND_SHAKE_VALUE <<
@@ -100,12 +106,6 @@ bool ArduinoMotorDriver::handShake(ArduinoMotorDriver::DriverStatus i_status) {
 
 
 void ArduinoMotorDriver::upload(const std::vector<int> i_messageVector) {
-  if (!m_arduinoConnection.hasConnection()) {
-    initialiseArduinoConnection();
-  } else {
-    m_arduinoConnection.flushConnection();
-  }
-
   unsigned char calculatedCRC(0);
   unsigned char receivedCRC;
 
@@ -116,15 +116,13 @@ void ArduinoMotorDriver::upload(const std::vector<int> i_messageVector) {
   // Shake it like a polaroid picture, at least untill it works
   while (!handShake(ArduinoMotorDriver::UPLOAD)) {}
 
-  for (auto itr = i_messageVector.begin();
-       itr != i_messageVector.end();
-       itr++) {
-    m_arduinoConnection.serialWrite
-      (reinterpret_cast<const unsigned char*>(&(*itr)),
-       sizeof(*itr));
-    calculatedCRC += *itr;
-  }
-
+  calculatedCRC = std::accumulate(i_messageVector.begin(),
+                  i_messageVector.end(),
+                  0);
+  const int* firstElement = &(*i_messageVector.begin());
+  m_arduinoConnection.serialWrite
+    (reinterpret_cast<const unsigned char*>(firstElement),
+       sizeof(int) * i_messageVector.size());
   receivedCRC = m_arduinoConnection.serialRead(1);
   m_arduinoConnection.serialWrite(calculatedCRC);
   LOG_INFO("read: " << static_cast<int>(receivedCRC)
@@ -258,7 +256,7 @@ void ArduinoMotorDriver::createRandomMessages
     int numberOfSteps = rand() % 3 + 1;
     messageVector.push_back(sizeof(numberOfSteps) * 2 +
                             sizeof(numberOfSteps) * numberOfSteps);
-    messageVector.push_back(rand() % 2 + 1);  // speed
+    messageVector.push_back(rand() % 10 + 100);  // speed
     messageVector.push_back(rand() % 100+1);  // number of repititions
 
     LOG_DEBUG("Number of steps: " << numberOfSteps);
