@@ -55,12 +55,10 @@ traceType Line2D::getLength() {
 
 
 bool Line2D::operator==(const Line2D& i_rhs) const {
-  if (this->getStartPoint() != i_rhs.getStartPoint())
+  if (m_startPoint != i_rhs.m_startPoint)
     return false;
-
-  if (this->getEndPoint() != i_rhs.getEndPoint())
+  if (m_endPoint != i_rhs.m_endPoint)
     return false;
-
   return true;
 }
 
