@@ -20,6 +20,8 @@ class PolygonTest : public CxxTest::TestSuite {
 	    Point2D(0,0)});
     Polygon2D a(x);
     Polygon2D b(x);
+    // This test is a bit off because it is a square itself
+    TS_ASSERT_DELTA(200.0, a.getSurface(), 0.001);
     TS_ASSERT(a == b);
     int numberOfPoints = b.getNumberOfPoints();
     TS_ASSERT_EQUALS(a.getNumberOfPoints(), numberOfPoints);
@@ -104,41 +106,14 @@ class PolygonTest : public CxxTest::TestSuite {
     */
   }
 
-  void testAngleBetweenPoints() {
-    /*
-    TS_ASSERT_DELTA(Point2D(11, 12).getAngleBetweenPoints(Point2D(11, 12)),
-                    0, 0.0001);
-    TS_ASSERT_DELTA(Point2D(10, 0).getAngleBetweenPoints(Point2D(0, 10)),
-                    PI/-2, 0.0001);
-    TS_ASSERT_DELTA(Point2D(-10, 0).getAngleBetweenPoints(Point2D(0, 10)),
-                    PI/2, 0.0001);
-    TS_ASSERT_DELTA(Point2D(10, 0).getAngleBetweenPoints(Point2D(0, -10)),
-                    -PI*1.5, 0.0001);
-    TS_ASSERT_DELTA(Point2D(-10, 0).getAngleBetweenPoints(Point2D(0, 10)),
-                    PI * 0.5, 0.0001);
-    */
-  }
-
-  void testQPointFCast() {
-    /*
-    Point2D point(10.0,-10.0);
-    QPointF qPoint = point;
-    TS_ASSERT_EQUALS(QPointF(10.0,10.0),
-                     qPoint);
-    TS_ASSERT_DIFFERS(QPointF(10.0,-10.0),
-                     qPoint);
-    */
-  }
-
-  void testConstrucionFromQPointF() {
-    /*
-    QPointF qPoint(-10,25);
-    Point2D point(qPoint);
-    TS_ASSERT_EQUALS(Point2D(-10.0, -25.0),
-                     point);
-    TS_ASSERT_DIFFERS(Point2D(10.0, 25.0),
-                     point);
-    */
+  void testSurfaceTriangle() {
+    std::vector<Point2D> x({Point2D(0,0),
+                            Point2D(10,0),
+                            Point2D(10,10),
+                            Point2D(0,0)
+                            });
+    Polygon2D a(x);
+    TS_ASSERT_DELTA(a.getSurface(), 50, 0.0001);
   }
 };
 

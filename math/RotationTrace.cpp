@@ -286,3 +286,9 @@ std::vector<Point2D> RotationTrace::estimateTrace(const int& i_numberOfPoints) c
   }
   return points;
 }
+
+
+void RotationTrace::reverse() {
+  Trace::reverse();
+  m_isClockwise = !m_isClockwise;
+}

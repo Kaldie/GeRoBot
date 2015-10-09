@@ -24,6 +24,10 @@ class Trace {
   Trace(const Point2D& i_startPoint,
         const Point2D& i_endPoint);
 
+  // isEqual operator
+  bool operator==(const Trace& rhs) const;
+  bool operator!=(const Trace& rhs) const {return !operator==(rhs);}
+
   // Actual methods
   Line2D getTraceLine() const;
   /**
@@ -66,5 +70,10 @@ class Trace {
    * @param[in] i_numberOfPoints Number of points on the trace that will be returned
    */
   virtual std::vector<Point2D> estimateTrace(const int& i_numberOfPoints) const;
+
+  /// Reverses the trace: endpoint become beginning and startpoint becomes end
+  virtual void reverse();
+  /// Returns if the given trace is connected with this trace
+  bool isAbutting(const Trace& i_trace) const;
 };
 #endif  // MATH_TRACE_H_

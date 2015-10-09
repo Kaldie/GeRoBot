@@ -57,6 +57,17 @@ bool Polygon2D::isInside(const Point2D i_point) const {
 }
 
 
+/// Determines if a Polygon2D is within the Polygon2D
+bool Polygon2D::isInside(const Polygon2D& i_polygon) const {
+  for (const Point2D& point : i_polygon.m_pointVector) {
+    if (!isInside(point)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+
 /// Determines if the Polygon2D is closed
 bool Polygon2D::isClosed() const {
   if(m_pointVector.front() == m_pointVector.back())
@@ -120,6 +131,19 @@ void Polygon2D::getXBounds(traceType* i_lowerBound,
 }
 
 
+void Polygon2D::getYBounds(traceType* i_lowerBound,
+                           traceType* i_upperBound) const {
+  for (const auto& point : m_pointVector) {
+    if (*i_lowerBound > point.y) {
+      *i_lowerBound = point.y;
+    }
+    if (*i_upperBound < point.y) {
+      *i_upperBound = point.y;
+    }
+  }
+}
+
+
 bool Polygon2D::operator==(const Polygon2D& i_polygon) const {
   // if the size is not equal, they are not equal
   if (i_polygon.m_pointVector.size() !=
@@ -139,4 +163,27 @@ bool Polygon2D::operator==(const Polygon2D& i_polygon) const {
   }
   // if all is equal, they are equal
   return true;
+}
+
+
+traceType Polygon2D::getSurface() const {
+  if (!isClosed()) {
+    LOG_ERROR("Polygon should be closed");
+  }
+  /// Yes this code is gotten from a website
+  /// http://geomalgorithms.com/a01-_area.html
+  /// Works like a charm!
+  /// if a polygon has 3 points then there is no surface
+  if (getNumberOfPoints() < 3)
+    return 0;
+  traceType area = 0;
+  int  i, j, k;   // indices
+  int numberOfPoints = getNumberOfPoints();
+  for (i = 1, j = 2, k = 0;
+       i < numberOfPoints;
+       i++, j++, k++) {
+    area += m_pointVector[i].x * (m_pointVector[j].y - m_pointVector[k].y);
+  }
+  area += m_pointVector[numberOfPoints].x * (m_pointVector[1].y - m_pointVector[numberOfPoints-1].y);  // wrap-around term
+  return area / 2.0;
 }

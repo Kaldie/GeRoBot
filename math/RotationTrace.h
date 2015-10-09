@@ -98,7 +98,9 @@ class RotationTrace: public Trace {
     void getExtremePoints(std::vector<Point2D>* i_list,
                           const double* i_angle = nullptr) const;
     /// Estimate the trace with a std::vector<Point2D> with size of i_numberOfPoints
-    std::vector<Point2D> estimateTrace(const int& i_numberOfPoints) const;
+    virtual std::vector<Point2D> estimateTrace(const int& i_numberOfPoints) const;
+    ///  Reverses the trace: endpoint become beginning and startpoint becomes end
+    virtual void reverse();
  private:
     /// bockus function, all points are valid, if the trace can be constructed!
     virtual bool isValidStartAndEndPosition(const Point2D&,

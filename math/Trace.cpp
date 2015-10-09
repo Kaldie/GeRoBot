@@ -29,6 +29,14 @@ Line2D Trace::getTraceLine() const {
 }
 
 
+bool Trace::operator==(const Trace& rhs) const{
+  if (m_startPoint != rhs.m_startPoint)
+    return false;
+  if (m_endPoint != rhs.m_endPoint)
+    return false;
+  return true;
+}
+
 std::string Trace::
   getRotationDirectionToEndPoint(Point2D const &i_point2D) const {
 #ifdef DEBUG
@@ -114,4 +122,36 @@ std::vector<Point2D> Trace::estimateTrace
     currentPoint += normalisedLine;
   }
   return points;
+}
+
+
+void Trace::reverse() {
+  Point2D newEndPoint = m_startPoint;
+  m_startPoint = m_endPoint;
+  m_endPoint = newEndPoint;
+}
+
+
+bool Trace::isAbutting(const Trace& i_trace) const {
+  // if the trace is equal check if the start and end are at the same spot
+  // then they are abutting otherwise nope
+  if (*this == i_trace) {
+    if (m_startPoint == m_endPoint) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  // if they are not the same, check if the end or start points are the same
+  if (m_startPoint == i_trace.m_startPoint) {
+    return true;
+  } else  if (m_startPoint == i_trace.m_endPoint) {
+    return true;
+  } else if (m_endPoint == i_trace.m_startPoint) {
+    return true;
+  } else if (m_endPoint == i_trace.m_endPoint) {
+    return true;
+  } else {
+    return false;
+  }
 }
