@@ -6,7 +6,7 @@
 #include <Robot.h>
 #include <Trace.h>
 #include "./Polygon2D.h"
-#include "./TraceSections.h"
+#include "./TSA.h"  // the tsa
 
 /**
  * Class which is responsible for dispatching calculation calls
@@ -26,7 +26,7 @@ class SequentialTraceCalculator {
    * Based on the employed algorithm the traces will be reordered
    */
   void orderVector(const Point2D& i_currentPosition,
-              const bool& i_useHeuristics) const;
+                   const bool& i_useHeuristics) const;
  private:
   /**
    * Given TraceSections create an order for which:
@@ -36,8 +36,17 @@ class SequentialTraceCalculator {
    * - the first includes at least all others
    * - all sections except the last are closed sections
    */
-  void orderSections
-    (TraceSections::TraceSections* i_sections, Trace::TracePointerVector* i_vector) const;
+  void orderSections (tsa::TraceSections* i_sections,
+                      Trace::TracePointerVector* i_vector) const;
+
+  /// Order the given section, based on
+  void appendSection(Trace::TracePointerVector i_section,
+                     Point2D* i_virtualPosition,
+                     Trace::TracePointerVector* i_orderedTracePointerVector) const;
+
+  void handleIndependendSections(tsa::TraceSections i_independedSections,
+                                 Trace::TracePointerVector* i_orderedTracePointerVector,
+                                 Point2D* i_virtualPosition) const;
 };
 
 #endif  // MATH_SEQUENTRIALTRACECALCULATOR_H_

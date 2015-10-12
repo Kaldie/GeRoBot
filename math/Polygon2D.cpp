@@ -81,7 +81,7 @@ bool Polygon2D::isClosed() const {
 std::vector<Line2D> Polygon2D::getLines() const {
   Polygon2D newPoly(*this);
   newPoly.closePolygon();
-  int numberOfLines = newPoly.getNumberOfPoints() - 2;
+  int numberOfLines = newPoly.getNumberOfPoints() - 1;
   std::vector<Line2D> lines;
   Point2DVector vector(newPoly.getPointVector());
   for (int i = 0;
@@ -108,8 +108,8 @@ bool Polygon2D::closePolygon() {
 Line2D Polygon2D::getOutsideLine(Point2D i_point) const {
   traceType min,max;
   getXBounds(&min, &max);
-  Line2D minLine(i_point, Point2D(min - 10 * TOLERANCE, i_point.y));
-  Line2D maxLine(i_point, Point2D(max + 10 * TOLERANCE, i_point.y));
+  Line2D minLine(i_point, Point2D(min - 100 * TOLERANCE, i_point.y));
+  Line2D maxLine(i_point, Point2D(max + 100 * TOLERANCE, i_point.y));
   if (minLine.getLength() < maxLine.getLength()) {
     return minLine;
   } else {
@@ -176,14 +176,29 @@ traceType Polygon2D::getSurface() const {
   /// if a polygon has 3 points then there is no surface
   if (getNumberOfPoints() < 3)
     return 0;
-  traceType area = 0;
-  int  i, j, k;   // indices
+  traceType area = 0.0;
+  //  int  i, j, k;   // indices
   int numberOfPoints = getNumberOfPoints();
-  for (i = 1, j = 2, k = 0;
+  /*
+    for (i = 1, j = 2, k = 0;
        i < numberOfPoints;
        i++, j++, k++) {
     area += m_pointVector[i].x * (m_pointVector[j].y - m_pointVector[k].y);
   }
-  area += m_pointVector[numberOfPoints].x * (m_pointVector[1].y - m_pointVector[numberOfPoints-1].y);  // wrap-around term
-  return area / 2.0;
+  */
+  for (int i = 0;
+       i < numberOfPoints -1;
+       i++) {
+    area += m_pointVector[i].x * m_pointVector[i+1].y - m_pointVector[i+1].x * m_pointVector[i].y;
+  }
+  return std::abs(area / 2.0);
+}
+
+
+void Polygon2D::exportToFile() {
+  std::ofstream stepLogFile("PolyGon.pol", std::ios::app);
+  if (!stepLogFile.good())
+    LOG_ERROR("eror!");
+  for (const auto& point : m_pointVector)
+    stepLogFile << point.x <<  "," << point.y << std::endl;
 }

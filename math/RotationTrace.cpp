@@ -174,11 +174,8 @@ Point2D RotationTrace::getPointBetweenStartAndStopPosition() const {
 
 Point2D RotationTrace::suggestCentralPoint(const Point2D& i_startPoint,
                                            const Point2D& i_endPoint) {
-  LOG_DEBUG("start point: " << i_startPoint.x << ", " << i_startPoint.y);
-  LOG_DEBUG("end point: " << i_endPoint.x << ", " << i_endPoint.y);
-  Point2D xnew = i_endPoint + (i_startPoint - i_endPoint) * 0.5;
-  LOG_DEBUG("new point: " << xnew.x << ", " << xnew.y);
-  return xnew;
+  Point2D centralPoint = i_endPoint + (i_startPoint - i_endPoint) * 0.5;
+  return centralPoint;
 }
 
 
@@ -264,6 +261,7 @@ void RotationTrace::getPointAtExtremeAngle
 
 
 std::vector<Point2D> RotationTrace::estimateTrace(const int& i_numberOfPoints) const {
+  LOG_DEBUG("RotationTrace::estimateTrace()");
   // if the trace is clockwise reverse it
   if (m_isClockwise) {
     RotationTrace reverseTrace = *this;
@@ -276,6 +274,7 @@ std::vector<Point2D> RotationTrace::estimateTrace(const int& i_numberOfPoints) c
   }
 
   traceType angle = getArc().spanAngle();
+  LOG_DEBUG("Span angle: " << angle);
   std::vector<Point2D> points;
   for (traceType currentAngle = 0;
        currentAngle <= angle;
@@ -283,6 +282,7 @@ std::vector<Point2D> RotationTrace::estimateTrace(const int& i_numberOfPoints) c
     Point2D normalisedStartPoint = m_startPoint - m_centrePoint;
     points.push_back
       (normalisedStartPoint.rotate(currentAngle) + m_centrePoint);
+    normalisedStartPoint += m_centrePoint;
   }
   return points;
 }

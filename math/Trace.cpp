@@ -108,6 +108,7 @@ std::vector<Point2D*> Trace::getPointPointers() {
 
 std::vector<Point2D> Trace::estimateTrace
 (const int& i_numberOfPoints) const {
+  LOG_DEBUG("Trace::estimateTrace()");
   // a vector in the direction of the trace with length with
   // which will be increasing the point with each step
   Vector2D normalisedLine =

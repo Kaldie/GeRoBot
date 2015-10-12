@@ -35,6 +35,8 @@ class Polygon2D {
    * The algorithm is described in: http://geomalgorithms.com/a01-_area.html
    */
   traceType getSurface() const;
+  // Write the points to file
+  void exportToFile();
   bool operator==(const Polygon2D& i_polygon) const;
   bool operator!=(const Polygon2D& i_polygon) const {return !operator==(i_polygon);}
  private:
