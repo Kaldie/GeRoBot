@@ -61,7 +61,7 @@ int SIZE_OF_INT = 4;
 unsigned char INTEGER_BUFFER[4];
 
 // buffer for motor messages
-ByteBuffer<MotorMessage> MOTOR_MESSAGE_BUFFER(17);
+ByteBuffer<MotorMessage> MOTOR_MESSAGE_BUFFER(25);
 
 // return state of the handle functions
 ReturnState RETURN_STATE;
@@ -587,12 +587,18 @@ void handleStatus() {
       CURRENT_WRITE_MESSAGE_ON_SD = getNumberOfMessagesOnSD();
     }
     // continue spamming until it breaks
-    while (readMotorMessagesFromSD()) {
-      while (!MOTOR_MESSAGE_BUFFER.isEmpty()) {
+    int i = 0;
+    bool xx = true;
+    while (readMotorMessagesFromSD() || xx) {
+      xx = false;
+      while (!MOTOR_MESSAGE_BUFFER.isEmpty() && i < 8) {
+        xx = true;
         printMessageToSerial(MOTOR_MESSAGE_BUFFER.getReadPointer(),
                              false);
         MOTOR_MESSAGE_BUFFER.finishReadPointer();
+        ++i;
       }
+      i = 0;
     }
     CURRENT_READ_MESSAGE_ON_SD = 0;
     CURRENT_WRITE_MESSAGE_ON_SD = 0;
@@ -619,7 +625,7 @@ void handleStatus() {
   }
 
   case ACTUATE_MODE : {
-    if (MOTOR_MESSAGE_BUFFER.emptyElements() >= 5) {
+    if (MOTOR_MESSAGE_BUFFER.emptyElements() >= 15) {
       bool hasFoundMessageOnSD = readMotorMessagesFromSD();
       /*
         if there are now new message read from SD
@@ -633,6 +639,13 @@ void handleStatus() {
         ARDUINO_STATUS = ACTUATE_POST_MODE;
       }
     }
+    /* DEBUG STATEMENTS TO FIGURE OUT IF SOMETHING IS WRONG HERE!
+      while (!MOTOR_MESSAGE_BUFFER.isEmpty()) {
+        printMessageToSerial(MOTOR_MESSAGE_BUFFER.getReadPointer(),
+                             false);
+        MOTOR_MESSAGE_BUFFER.finishReadPointer();
+       }
+    */
 
     if (!IS_MOTOR_RUNNING and !MOTOR_MESSAGE_BUFFER.isEmpty()) {
       setTimer1Interupt(MOTOR_MESSAGE_BUFFER.getReadPointer()->speed);
