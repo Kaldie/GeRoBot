@@ -165,12 +165,17 @@ void JointController::uploadSequence(const bool& i_condense) {
   if (i_condense) {
     m_sequenceVector.condenseVector();
   }
-  LOG_DEBUG("Size of vector: " << m_sequenceVector.getSequenceVector().size());
+  unsigned long sendCount = 0;
+#ifdef DEBUG
+  unsigned long totalSize = m_sequenceVector.getSequenceVector().size();
+#endif
   for (const auto& stateSequence : m_sequenceVector) {
     /// Get the integer sequence of this pin state
     if (stateSequence.getNumberOfRepetitions() > 0) {
-      stateSequence.displaySequence();
       m_actuator.upload(stateSequence.createArduinoBuffer());
+      ++sendCount;
+      LOG_DEBUG("Percentage send: " <<
+                static_cast<float>(sendCount) / totalSize * 100 << "%.");
     }
   }
 }
