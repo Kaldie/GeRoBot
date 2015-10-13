@@ -100,7 +100,11 @@ int ByteBuffer<T>::inlineWriteElements() {
   if (isFull()) {
     return 0;
   }
-  return m_endOfBuffer - m_writePosition;
+  if (m_writePosition < m_readPosition) {
+    return m_readPosition - m_writePosition;
+  } else {
+    return m_endOfBuffer - m_writePosition;
+  }
 }
 
 
@@ -139,7 +143,7 @@ template<typename T>
 bool  ByteBuffer<T>::finishReadPointers(const int& i_finishes) {
   bool result = true;
   for (int i = 0;
-       i < i_finishes && result;
+       i < i_finishes;
        ++i) {
     result &= finishReadPointer();
   }
@@ -169,7 +173,7 @@ template<typename T>
 bool  ByteBuffer<T>::finishWritePointers(const int& i_finishes) {
   bool result = true;
   for (int i = 0;
-       i < i_finishes && result;
+       i < i_finishes;
        ++i) {
     result &= finishWritePointer();
   }
