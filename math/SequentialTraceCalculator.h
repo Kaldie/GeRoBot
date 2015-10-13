@@ -14,6 +14,7 @@
  */
 class SequentialTraceCalculator {
   GETSET(Trace::TracePointerVector, m_traceVector, TracePointerVector);
+  GETSET(Robot::RobotPointer, m_robot, Robot);
 
  public:
   /// easy constructor
@@ -25,8 +26,7 @@ class SequentialTraceCalculator {
    * Returns a vector in which the traces are orderd
    * Based on the employed algorithm the traces will be reordered
    */
-  void orderVector(const Point2D& i_currentPosition,
-                   const bool& i_useHeuristics) const;
+  void orderVector(const bool& i_useHeuristics) const;
  private:
   /**
    * Given TraceSections create an order for which:
@@ -43,6 +43,28 @@ class SequentialTraceCalculator {
   void appendSection(Trace::TracePointerVector i_section,
                      Point2D* i_virtualPosition,
                      Trace::TracePointerVector* i_orderedTracePointerVector) const;
+
+  /**
+   * Given TraceSections add the largest section and its included sections
+   * @param[in/out] o_sections Sections from which the largest is
+   * found and other sections which are inside this section
+   * @param[in/out] o_position This position is used to order the sections and indicates the new position
+   * @param[in/out] o_ordedVector The resulting vector in which all traces are nicely orded
+   */
+  tsa::TraceSection handleDependendSections(tsa::TraceSections* o_sections,
+                                            Point2D* o_position,
+                                            tsa::TraceSection* o_ordedVector);
+  /**
+   * Append the appropiate traces to the orded vector.
+   * @param[in/out] o_section tsa::TraceSection all isolated traces inside this section will be added
+   * @param[in/out] o_position Position which determines the order of the isolated traces
+   * @param[in/out] o_isolatedTraces A group of individual traces from which appropiate traces will be added
+   * @param[in/out] o_orderedvector The resulting vector in which all traces are nicely orded
+   */
+  void handleIsolatedTraces(tsa::TraceSection* o_section,
+                            Point2D* o_position,
+                            tsa::TraceSection* o_isolatedTraces,
+                            tsa::TraceSection* o_ordedVector);
 
   void handleIndependendSections(tsa::TraceSections i_independedSections,
                                  Trace::TracePointerVector* i_orderedTracePointerVector,

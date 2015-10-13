@@ -7,131 +7,143 @@
 #include "./Polygon2D.h"
 #include "./SequentialTraceCalculator.h"
 
+
 /// easy constructor
 SequentialTraceCalculator::SequentialTraceCalculator()
-  : SequentialTraceCalculator(Trace::TracePointerVector()){
+  : SequentialTraceCalculator(tsa::TraceSection()){
 }
 
 
 /// fully fledged constructor
 SequentialTraceCalculator::
-SequentialTraceCalculator(const Trace::TracePointerVector& i_vector)
+SequentialTraceCalculator(const tsa::TraceSection& i_vector)
   : m_traceVector(i_vector){
 }
 
 
 void
-SequentialTraceCalculator::orderVector(const Point2D& i_currentPosition,
-                                       const bool& i_useHeuristics) const {
-  using namespace TraceSections;
+SequentialTraceCalculator::orderVector(const bool& i_useHeuristics) {
   if (!i_useHeuristics) {
     // hope someone was paying attention
     return;
   }
   // the final ordered trace pointer vector
-  Trace::TracePointerVector orderedTracePointerVector;
+  tsa::TraceSection orderedTracePointerVector;
   // Start position of the calculations
-  Point2D virtualPosition = i_currentPosition;
-      // get all closed sections
-    TraceSections sections = getSections(m_traceVector);
-    // Sort them based on the surface
-    std::sort(sections.begin(), sections.end(), isBigger);
-    // get remaining/ isolated traces
-    TraceSection remainingTraces = getRemainingTraces(m_traceVector,
-                                                      sections);
-    // while we have closed sections
-    while (sections.size() > 0) {
-      // get the current biggest one
-      TraceSection largeSection = sections.back();
-      sections.pop_back();
-      // find all sections and traces inside that larget section
-      TraceSections insideSections = getInsideSections(sections,
-                                                       largeSection);
-      // Add the biggest section of them all
-      insideSections.insert(insideSections.begin(), largeSection);
-      // Find the isolated traces that are within the largeSection
-      TraceSection isolatedTraces = getInsideSection(remainingTraces,
-                                                      largeSection);
-      /// the smallest sections shall be done first
-      std::reverse(insideSections.begin(), insideSections.end());
-      TraceSections::iterator startIndependedSection = insideSections.begin();
-      TraceSections::iterator endIndependedSection;
-      do {
-        endIndependedSection = getIndependendSections(startIndependedSection,
-                                                      insideSections.end());
-        // add the isolated sections
-        appendSection(isolatedTraces
-                                 &orderedTracePointerVector,
-                                 &virtualPosition);
-
-        handleIndependendSections(&independedSections,
-                                  &orderedTracePointerVector,
-                                  &virtualPosition);
-        startIndependedSection = endIndependedSection;
-      } while (endIndependedSection != insideSections.end());
-      // remove the isolated traces from the
-      insideSections.pop_front();
-      for (const auto& section : insideSections) {
-        sections.erase(std::remove(sections.begin(), sections.end(), section));
-      }
-
+  Point2D virtualPosition = m_robot->getPosition();
+  // get all closed sections
+  tsa::TraceSections sections = tsa::getSections(m_traceVector);
+  // Sort them based on the surface
+  std::sort(sections.begin(), sections.end(), tsa::sortBigToSmall);
+  // get remaining/ isolated traces
+  tsa::TraceSection remainingTraces =
+    tsa::getRemainingTraces(m_traceVector, sections);
+  // while we have closed sections
+  while (sections.size() > 0) {
+    // Handle one large section and its inner sections
+    tsa::TraceSection largeSection =
+      handleDependendSections(&sections, &virtualPosition, &orderedTracePointerVector);
+    // Find the isolated traces that are within the largeSection
+    tsa::TraceSection isolatedTraces =
+      tsa::getInsideTraces(remainingTraces, largeSection);
+    // add the isolated sections
+    appendSection(isolatedTraces, &virtualPosition, &orderedTracePointerVector);
+    for (const auto& aTrace : isolatedTraces) {
+      remainingTraces.erase(std::remove(remainingTraces.begin(),
+                                        remainingTraces.end(),
+                                        aTrace));
     }
-    LOG_ERROR("Not implemented yet");
+  }
+  LOG_ERROR("Not implemented yet");
+}
+
+
+tsa::TraceSection SequentialTraceCalculator::
+handleDependendSections(tsa::TraceSections* o_sections,
+                        Point2D* o_position,
+                        tsa::TraceSection* o_ordedVector) {
+  tsa::TraceSection largeSection = o_sections->front();
+  tsa::TraceSections insideSections =
+    tsa::getInsideSections(largeSection, *o_sections);
+  /// the smallest sections shall be done first
+  std::reverse(insideSections.begin(), insideSections.end());
+  tsa::TraceSections::iterator startIndependedSection = insideSections.begin();
+  tsa::TraceSections::iterator endIndependedSection = startIndependedSection;
+  while (endIndependedSection != insideSections.end()) {
+    endIndependedSection =
+      tsa::getIndependendSections(startIndependedSection, insideSections.end());
+
+    handleIndependendSections(tsa::TraceSections(startIndependedSection,
+                                                 endIndependedSection),
+                              o_ordedVector,
+                              o_position);
+    startIndependedSection = endIndependedSection;
+  }
+  // remove the sections from the overall sections
+  for (const auto& section : insideSections) {
+    o_sections->erase(std::remove(sections->begin(), sections->end(), section));
+  }
+  return largeSection;
+}
+
+
+void SequentialTraceCalculator::
+handleIsolatedTraces(tsa::TraceSection* o_section,
+                     Point2D* o_position,
+                     tsa::TraceSection* o_isolatedTraces,
+                     tsa::TraceSection* o_ordedVector) {
+    tsa::TraceSection isolatedTraces =
+      tsa::getInsideTraces(*o_isolatedTraces, *o_section);
+    // add the isolated sections
+    appendSection(isolatedTraces, o_position, o_ordedVector);
+    for (const auto& aTrace : isolatedTraces) {
+      o_section->erase(std::remove(o_section->begin(),
+                                   o_section->end(),
+                                   aTrace));
+    }
+}
+
+
+void SequentialTraceCalculator::
+handleIndependendSections(tsa::TraceSections i_sections,
+                          Trace::TracePointerVector* o_orderedVector,
+                          Point2D* i_position) const {
+  tsa::TraceSection currentSection;
+  while (i_sections.size() > 0) {
+    // get the section which is closed
+    currentSection =  tsa::getExtremeSection(*i_position,
+                                             true,
+                                             i_sections);
+    // append it the the ordered vector
+    appendSection(currentSection, i_position, o_orderedVector);
+    // Then throw it out
+    i_sections.erase
+      (std::remove(i_sections.begin(), i_sections.end(), currentSection));
   }
 }
 
 
-void SequentialTraceCalculator::handleIndependendSections
-(TraceSections* i_independedSections,
- Trace::TracePointerVector* i_orderedTracePointerVector,
- Point2D* i_virtualPosition) const {
-  appendSection(i_independedSections,
-                i_virtualPosition,
-                i_orderedTracePointerVector,
-                true);
-  while (i_independedSections->size() > 0) {
-    appendSection(i_independedSections,
-                  i_virtualPosition,
-                  i_orderedTracePointerVector,
-                  false);
-  }
-}
-
-
-void SequentialTraceCalculator::appendSection
-(const Trace::TracePointerVector i_section,
- Point2D* i_virtualPosition,
- Trace::TracePointerVector* i_orderedTracePointerVector,
- const bool& i_isNearest) const {
-  Trace::TracePointerVector sequence;
-  Trace::TracePointer trace;
-  bool fromStartPoint(true);
-  if (i_isNearest) {
-  // get nearest sequence
-    sequence = getNearestSequence(*i_virtualPosition,
-                                  *i_independedSections,
-                                  &fromStartPoint);
-    trace = getNearestTrace(*i_virtualPosition, sequence, nullptr);
-  } else {
-    // or furthest
-    sequence = getFurthestSequence(*i_virtualPosition,
-                                   *i_independedSections,
-                                   &fromStartPoint);
-    trace = getFurthestTrace(*i_virtualPosition, sequence, nullptr);
-  }
-  // if necessary reverse the trace
-  if (!fromStartPoint) {
-    for (auto& tracePointer : sequence) {
-      tracePointer->reverse();
+void SequentialTraceCalculator::appendSection(Trace::TracePointerVector i_section,
+                                              Point2D* i_virtualPosition,
+                                              Trace::TracePointerVector* i_vector) const {
+  bool isClosed = tsa::isClosedSection(i_section);
+  traceType currentDistance;
+  while (i_section.size() > 0) {
+    // get the trace which is at the most suitable position
+    Trace::TracePointer currentTrace = tsa::getExtremeTrace(*i_virtualPosition,
+                                                            isClosed,
+                                                            i_section,
+                                                            &currentDistance);
+    // reverse it if necessary
+    if (currentDistance <
+        Magnitude(*i_virtualPosition - currentTrace->getStartPoint())) {
+      currentTrace->reverse();
     }
+    // push it in the ordered vector
+    i_vector->push_back(currentTrace);
+    // update the position
+    *i_virtualPosition = currentTrace->getEndPoint();
+    // throw it out
+    i_section.erase(std::remove(i_section.begin(), i_section.end(), currentTrace));
   }
-  // And finaly append the trace to the orded trace pointer vector!
-  i_orderedTracePointerVector->insert(i_orderedTracePointerVector->end(),
-                                      sequence.begin(),
-                                      sequence.end());
-  *i_virtualPosition = sequence.front()->getEndPoint();
-  // remove it frmo the independedsections
-  i_independedSections->erase(std::remove(i_independedSections->begin(),
-                                          i_independedSections->end(),
-                                          sequence));
 }
