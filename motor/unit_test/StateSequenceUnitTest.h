@@ -10,7 +10,7 @@
 #include <vector>
 
 
-class PinStateSequenceTestSuite : public CxxTest::TestSuite {
+class StateSequenceUnitTest : public CxxTest::TestSuite {
  public:
   void testDefaultCreation(void) {
     LOG_INFO("PinStateSequenceTestSuite::testDefaultCreation");
@@ -210,7 +210,9 @@ class PinStateSequenceTestSuite : public CxxTest::TestSuite {
               "equal pin state sequence" <<
               "none equal number of repititions");
     TS_ASSERT(pinStateSequence1.mergePinStateSequence(&pinStateSequence2));
-              }
+    TS_ASSERT_EQUALS(pinStateSequence1.getNumberOfRepetitions(), 17);
+    TS_ASSERT(pinStateSequence2.isEmpty());
+  }
 
 
   void testMergeOfNoneEqualSequence() {
@@ -256,18 +258,18 @@ class PinStateSequenceTestSuite : public CxxTest::TestSuite {
       Testing if merging 2 sequence with:
         none mutual pins and
         equal number of repetitions works
-    */ 
+    */
     TS_ASSERT(pinStateSequence1.mergePinStateSequence(&pinStateSequence3));
     std::vector<int> sequenceAfterMerge1 = pinStateSequence1.getIntegerSequence();
 
     TS_ASSERT_EQUALS(sequenceBeforeMerge1.size(),
                      sequenceAfterMerge1.size());
-    
+
     auto i = sequenceBeforeMerge1.begin();
     auto j = sequenceAfterMerge1.begin();
     for (;
          i!= sequenceBeforeMerge1.end();
-         i++, j++) 
+         i++, j++)
       if (*i != 0 && *j !=0)
         TS_ASSERT_DIFFERS(*i, *j);
 
@@ -279,7 +281,7 @@ class PinStateSequenceTestSuite : public CxxTest::TestSuite {
       Testing if merging 2 sequence with:
         none mutual pins and
         none equal number of repetitions works
-    */ 
+    */
     std::vector<int> beforeMerge2 = pinStateSequence2.getIntegerSequence();
     std::vector<int> beforeMerge4 = pinStateSequence4.getIntegerSequence();
 
