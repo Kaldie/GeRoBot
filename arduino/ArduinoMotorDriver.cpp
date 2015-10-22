@@ -200,6 +200,7 @@ void ArduinoMotorDriver::echo() {
   } while (currentString != "");
 }
 
+
 bool ArduinoMotorDriver::benchmarkSD(const int& i_numberOfMessages) {
   std::vector<std::vector<int>> totalVector;
   std::vector<int> thisMessage;
@@ -270,4 +271,47 @@ void ArduinoMotorDriver::createRandomMessages
     }
     i_totalMessagePointer->push_back(messageVector);
   }
+}
+
+
+bool ArduinoMotorDriver::benchmarkCurrentRobot(const SequenceVector& i_sequenceVector) {
+  std::vector<std::vector<int>> messageVector;
+  for (const auto& stateSequence : i_sequenceVector) {
+    messageVector.push_back(stateSequence.createArduinoBuffer());
+    upload(stateSequence.createArduinoBuffer());
+  }
+
+  while (!handShake(ArduinoMotorDriver::SERIAL_ECHO));
+  //  return true;
+
+  int i = 0;
+  int numberOfBytes;
+  std::vector<int> thisMessage;
+  for (auto message = messageVector.begin();
+       message != messageVector.end();
+       message++) {
+    LOG_DEBUG("Verifying message: " << i);
+    thisMessage = *message;
+    int expectedSize = (thisMessage.size()-1) * 2;
+    numberOfBytes = m_arduinoConnection.serialRead(1);
+    if (numberOfBytes !=  expectedSize) {
+      LOG_DEBUG("Expected number of bytes: " << expectedSize);
+      LOG_DEBUG("Number of bytes send by arduino: " << numberOfBytes);
+      //      LOG_ERROR("Number of send bytes is not what expected!");
+    }
+
+    int value;
+    for (int i = 0;
+         i < numberOfBytes/2;
+         i++) {
+      value = m_arduinoConnection.serialRead(2);
+      if (thisMessage[i+1] != value) {
+        LOG_DEBUG("Requested: " << thisMessage[i+1]);
+        LOG_DEBUG("Given: " << value);
+        //        LOG_ERROR("Failed benchmark!");
+      }
+    }
+    i++;
+  }
+  return true;
 }
