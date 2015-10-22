@@ -13,6 +13,7 @@
 #define DELETE_FILE_MODE_VALUE 140
 #define ERROR_MODE 244
 #define CHIP_SELECT 10
+#define TOOL_PIN 14
 
 // States for the machine
 enum Status {
@@ -146,29 +147,35 @@ void setPinOutputs() {
   pinMode(CHIP_SELECT, OUTPUT);
   // Always hook up the 2 t/m 7 inputs!
   DDRD = DDRD | B11111100;
+  // Tools go on A0 t/m A5
+  DDRC = DDRC | B00000111;
 }
 
 
-void setPins(byte i_byte) {
+void setPinsD(byte i_byte) {
   // no1 touches the 1st and 2nd pin;
   i_byte &= B11111100;
   PORTD = i_byte;
 }
 
 
+void setPinsC(byte i_byte) {
+  PORTC = i_byte;
+}
+
 ISR(TIMER1_COMPA_vect) {
   // get the read pointer
   MotorMessage* message = MOTOR_MESSAGE_BUFFER.getReadPointer();
   /// put the current step on the pins
-  setPins((byte)(
-      message->stepArray[message->currentStep]));
+  int stepValue = message->stepArray[message->currentStep];
+  setPinsD((byte)(stepValue));
+  setPinsC((byte)(stepValue >> 8));
   // advance the current step for the next iteration
   message->currentStep++;
   // if this step exeeds the number if steps in this message
-  if (message->currentStep >=
-      message->numberOfSteps) {
+  if (message->currentStep >= message->numberOfSteps) {
     // reduce the number of reps and set current step to 0
-    message->numberOfRepetitions--;
+    --message->numberOfRepetitions;
     message->currentStep = 0;
   }
   // if the number of reps is 0 or less
@@ -234,45 +241,40 @@ void handleModeSelect(ReturnState* i_returnState) {
     *i_returnState = SUCCES;
 
     // Will be receiving message over serial now!
-     ARDUINO_STATUS = RECEIVING_MESSAGE_SIZE;
+    ARDUINO_STATUS = RECEIVING_MESSAGE_SIZE;
   } else {
     // Something else is intended
     switch (*buffer) {
-      case  ACTUATE_MODE_VALUE : {
-        Serial.write(*buffer);
-        *i_returnState = SUCCES;
-        ARDUINO_STATUS = ACTUATE_PRE_MODE;
-        break;
-      }
-      case DELETE_FILE_MODE_VALUE : {
-        Serial.write(*buffer);
-        *i_returnState = SUCCES;
-        ARDUINO_STATUS = DELETE_FILE_MODE;
-        break;
-      }
-      case ECHO_MODE_VERBOSE_VALUE : {
-        Serial.write(*buffer);
-        *i_returnState = SUCCES;
-        ARDUINO_STATUS = ECHO_MODE_VERBOSE;
-        break;
-      }
-      case ECHO_MODE_VALUE : {
-        Serial.write(*buffer);
-        *i_returnState = SUCCES;
-        ARDUINO_STATUS = ECHO_MODE;
-        break;
-      }
-      case ERROR_MODE : {
-        *buffer = 0;
-        Serial.write(*buffer);
-        *i_returnState = FAIL;
-        break;
-      }
-      default : {
-        ARDUINO_STATUS = SEND_HAND_SHAKE;
-        break;
-      }
+    case  ACTUATE_MODE_VALUE : {
+      ARDUINO_STATUS = ACTUATE_PRE_MODE;
+      break;
+    }
+    case DELETE_FILE_MODE_VALUE : {
+      *i_returnState = SUCCES;
+      ARDUINO_STATUS = DELETE_FILE_MODE;
+      break;
+    }
+    case ECHO_MODE_VERBOSE_VALUE : {
+      *i_returnState = SUCCES;
+      ARDUINO_STATUS = ECHO_MODE_VERBOSE;
+      break;
+    }
+    case ECHO_MODE_VALUE : {
+      *i_returnState = SUCCES;
+      ARDUINO_STATUS = ECHO_MODE;
+      break;
+    }
+    case ERROR_MODE : {
+      *buffer = 0;
+      *i_returnState = FAIL;
+      break;
+    }
+    default : {
+      ARDUINO_STATUS = SEND_HAND_SHAKE;
+      break;
+    }
     }  // end switch case
+    Serial.write(*buffer);
   }  // end if statement
 }
 
@@ -544,13 +546,11 @@ void handleStatus() {
     ARDUINO_STATUS = SEND_HAND_SHAKE;
     break;
   }
-
   case DELETE_FILE_MODE : {
     SD.remove(STEP_FILE_NAME);
     ARDUINO_STATUS = SEND_HAND_SHAKE;
     break;
   }
-
   case ECHO_MODE_VERBOSE: {
     MotorMessage* currentMessage;
     Serial.println("Echoing messages on sd card!");
