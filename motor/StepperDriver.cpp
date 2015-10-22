@@ -115,14 +115,16 @@ void StepperDriver::moveSteps(
 
   for (int i = 0;
        i< i_numberOfSteps;
-       i++) {
+       ++i) {
     LOG_DEBUG("Setting step: " << i);
     StateSequence stateSequence;
     moveStep(i_direction, &stateSequence);
     LOG_DEBUG("done setting step: " << i);
-    if (!o_sequenceVector->addToSequence(stateSequence))
+    if (!o_sequenceVector->addToSequence(stateSequence)){
+      LOG_DEBUG("Could not add newly created sequence to o_sequencevector");
       o_sequenceVector->appendStateSequence(stateSequence,
-                                           true);
+                                           false);
+    }
   }
 
   setHoldMotor(holdMotorAfterSteps);
