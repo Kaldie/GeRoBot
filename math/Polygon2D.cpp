@@ -4,7 +4,7 @@
 #include "./Point2D.h"
 
 /// easy constructor
-Polygon2D::Polygon2D() {}
+Polygon2D::Polygon2D() : m_pointVector() {}
 
 
 /// Constructor with vector
@@ -37,18 +37,27 @@ int Polygon2D::getNumberOfPoints() const {
 
 /// Determines if a point is within the Polygon2D
 bool Polygon2D::isInside(const Point2D i_point) const {
-  LOG_DEBUG("Point: " << i_point.x << " , " << i_point.y);
+  //  LOG_DEBUG("Point: " << i_point.x << " , " << i_point.y);
   Line2D toOutSideLine = getOutsideLine(i_point);
-  LOG_DEBUG("Outside line: start " << toOutSideLine.getStartPoint().x << " , " << toOutSideLine.getStartPoint().y <<
-            " stop " << toOutSideLine.getEndPoint().x << " , " << toOutSideLine.getEndPoint().y);
+  LOG_DEBUG("Outside line: start " << toOutSideLine.getStartPoint().x << ", " << toOutSideLine.getStartPoint().y <<
+           " stop " << toOutSideLine.getEndPoint().x << ", " << toOutSideLine.getEndPoint().y);
 
   int interSections = 0;
   for (const auto& line : getLines()) {
+    // exclude horizontal lines
+    if (line.getStartPoint().y == line.getEndPoint().y) {
+      continue;
+    }
+
     if (line.intersects(toOutSideLine)) {
       ++interSections;
-      LOG_DEBUG("Found intersection!");
+      //      LOG_DEBUG("Found intersection with line: " <<
+      //        line.getStartPoint().x << " , " << line.getStartPoint().y <<
+      //        " to: " << line.getEndPoint().x << " , " << line.getEndPoint().y );
     }
   }
+  LOG_DEBUG("Number of intersections: " << interSections);
+  LOG_DEBUG("interSections % 2: " << interSections % 2);
   if (interSections % 2) {
     return true;
   } else {
@@ -85,7 +94,7 @@ std::vector<Line2D> Polygon2D::getLines() const {
   std::vector<Line2D> lines;
   Point2DVector vector(newPoly.getPointVector());
   for (int i = 0;
-       i != numberOfLines;
+       i < numberOfLines;
        ++i) {
     lines.push_back(Line2D(vector[i],
 			   vector[i+1]));
@@ -106,15 +115,10 @@ bool Polygon2D::closePolygon() {
 
 /// Get a Points which lays outside the Polygon2D
 Line2D Polygon2D::getOutsideLine(Point2D i_point) const {
-  traceType min,max;
+  traceType min(std::numeric_limits<traceType>::max());
+  traceType max(0.0);
   getXBounds(&min, &max);
-  Line2D minLine(i_point, Point2D(min - 100 * TOLERANCE, i_point.y));
-  Line2D maxLine(i_point, Point2D(max + 100 * TOLERANCE, i_point.y));
-  if (minLine.getLength() < maxLine.getLength()) {
-    return minLine;
-  } else {
-    return maxLine;
-  }
+  return Line2D(i_point, Point2D(min - 0.1, i_point.y));
 }
 
 
@@ -168,7 +172,7 @@ bool Polygon2D::operator==(const Polygon2D& i_polygon) const {
 
 traceType Polygon2D::getSurface() const {
   if (!isClosed()) {
-    LOG_ERROR("Polygon should be closed");
+    return 0;
   }
   /// Yes this code is gotten from a website
   /// http://geomalgorithms.com/a01-_area.html

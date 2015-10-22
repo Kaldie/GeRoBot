@@ -3,7 +3,6 @@
 #ifndef MATH_TSA_H_
 #define MATH_TSA_H_
 
-#include <Robot.h>
 #include "./Polygon2D.h"
 #include "./Trace.h"
 

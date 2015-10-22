@@ -50,6 +50,9 @@ namespace tsa {
 	abuttingVector.push_back(trace);
       }
     }
+    if (abuttingVector.size() == 0) {
+      abuttingVector.push_back(i_trace);
+    }
     return abuttingVector;
   }
 
@@ -90,6 +93,9 @@ namespace tsa {
       LOG_ERROR("o_connectedTraces does not point to anything!");
     LOG_DEBUG("getAllConnected()");
     // get ALL the abutting traces
+    LOG_DEBUG("Trace: " << i_trace->getStartPoint().x << " , " <<
+	      i_trace->getStartPoint().y << " | " << i_trace->getEndPoint().x
+	      << " , " << i_trace->getEndPoint().y);
     for (const auto& trace : getAbuttingTraces(i_trace,
 					       i_vector)) {
       // if the trace is NOT in the i_connectedTraces
@@ -139,12 +145,18 @@ namespace tsa {
     for (auto& trace : i_section) {
       currentDistance =
 	Magnitude(trace->getStartPoint() - i_position) * mutiplier;
+      LOG_DEBUG("Current distance: " << currentDistance);
+      LOG_DEBUG("Current Selected distance: " << *o_distance);
+      LOG_DEBUG("Multiplier: " << mutiplier);
       if (*o_distance > currentDistance) {
 	*o_distance = currentDistance;
 	extreme = trace;
       }
       currentDistance =
 	Magnitude(trace->getEndPoint() - i_position) * mutiplier;
+            LOG_DEBUG("Current distance: " << currentDistance);
+      LOG_DEBUG("Current Selected distance: " << *o_distance);
+      LOG_DEBUG("Multiplier: " << mutiplier);
       if (*o_distance > currentDistance) {
 	*o_distance = currentDistance;
 	extreme = trace;
