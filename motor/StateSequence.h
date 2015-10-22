@@ -7,7 +7,7 @@
 typedef std::vector<PinState> PinStateVector;
 
 class StateSequence {
-  // speed is defined in hecto Hertz (so 50 is 5k hertz)
+  // speed is defined in deco Hertz (so 50 is 500 hertz)
   GETSET(int, m_speed, Speed);
   GETSET(int, m_numberOfRepetitions, NumberOfRepetitions);
   GETSET(PinStateVector, m_pinStateVector, PinStateVector);
@@ -21,7 +21,7 @@ class StateSequence {
   /// returns if the StateSequence is empty
   bool isEmpty()const;
   /// Append StateSequence to this sequence
-  bool appendSequence(const StateSequence i_sequence);
+  bool appendSequence(const StateSequence& i_sequence);
   /**
    * Add the PinState to the last element of the sequence if possible.
    * @param[in] i_pinState PinState that will be added to the sequence
@@ -50,7 +50,7 @@ class StateSequence {
   bool mergePinStateSequence(StateSequence* io_sequence);
   bool condenseSequence();
   void displaySequence() const;
-
+  void exportValue() const;
   std::vector<int> createArduinoBuffer() const;
    private:
   bool hasEqualSequence(const StateSequence& i_sequence) const;
@@ -58,10 +58,7 @@ class StateSequence {
   void validate(const PinStateVector& i_pinStateVector) const;
 
   bool hasMutualPins(const PinState& i_pinState) const;
-  bool hasMutualPins(const StateSequence& i_otherSequence) const;
-
-  std::vector<int> getIntegerSequence(
-      const PinStateVector& i_pinStateVector) const;
+  bool hasMutualPins(const StateSequence& i_stateSequence) const;
 
   static bool areEqualState(const PinState& i_firstState,
                             const PinState& i_secondState);

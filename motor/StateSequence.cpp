@@ -58,15 +58,9 @@ void StateSequence::validate(
 
 
 std::vector<int> StateSequence::getIntegerSequence() const {
-  return getIntegerSequence(m_pinStateVector);
-}
-
-
-std::vector<int> StateSequence::getIntegerSequence(
-    const PinStateVector& i_pinStateVector) const  {
   std::vector<int> integerSequence;
-  for (PinStateVector::const_iterator itr = i_pinStateVector.begin();
-      itr != i_pinStateVector.end();
+  for (PinStateVector::const_iterator itr = m_pinStateVector.begin();
+      itr != m_pinStateVector.end();
       itr++) {
     integerSequence.push_back(itr->getNumericValue());
   }
@@ -95,13 +89,14 @@ bool StateSequence::isEmpty() const {
 
 bool StateSequence::hasMutualPins(
     const StateSequence& i_pinStateSequence) const {
-  bool hasMutualPin = false;
   for (auto itr = i_pinStateSequence.getPinStateVector().begin();
        itr!= i_pinStateSequence.getPinStateVector().end();
        itr++) {
-    hasMutualPin |= hasMutualPins(*itr);
+    if (hasMutualPins(*itr)) {
+      return true;
+    }
   }
-  return hasMutualPin;
+  return false;
 }
 
 
@@ -109,23 +104,22 @@ bool StateSequence::hasMutualPins(const PinState& i_pinState) const {
   // If the pin state vector is not yet set, then always no mutual pins!
   if (m_pinStateVector.size() == 0)
       return false;
-  
-  auto start = m_pinStateVector.back().getPinVector().begin();
-  auto end = m_pinStateVector.back().getPinVector().end();
 
-  PinVector firstPinVector = i_pinState.getPinVector();
-
-  for (auto itr = firstPinVector.begin();
-       itr != firstPinVector.end();
-       itr++) {
-    if (std::find(start, end, *itr) != end)
-      return true;
+  PinVector fornPinVector = i_pinState.getPinVector();
+  auto start = fornPinVector.begin();
+  auto end = fornPinVector.end();
+  for (const auto& pinState : m_pinStateVector) {
+    for (const auto& pinNumber : pinState.getPinVector()) {
+      if (std::find(start, end, pinNumber) != end) {
+        return true;
+      }
+    }
   }
   return false;
 }
 
 
-bool StateSequence::appendSequence(const StateSequence i_sequence) {
+bool StateSequence::appendSequence(const StateSequence& i_sequence) {
   // checking parameters!
   if (m_numberOfRepetitions > 1) {
     LOG_DEBUG("Coud not append them, number of repetitions is not 1!");
@@ -191,7 +185,7 @@ bool StateSequence::addToSequence(
     m_pinStateVector.insert(m_pinStateVector.end(),
                             i_pinStateVector.begin(),
                             i_pinStateVector.end());
-    m_numberOfRepetitions = 1;
+     m_numberOfRepetitions = 1;
     return true;
   }
 
@@ -200,8 +194,12 @@ bool StateSequence::addToSequence(
     return false;
   }
 
-  if (getIntegerSequence(m_pinStateVector) ==
-      getIntegerSequence(i_pinStateVector)) {
+  std::vector<int> sequence;
+  for (const auto& pinState : i_pinStateVector) {
+    sequence.push_back(pinState.getNumericValue());
+  }
+
+  if (getIntegerSequence() == sequence) {
     m_numberOfRepetitions += 1;
     LOG_DEBUG("integer sequence corrispond to this," <<
               "add it, one more repitition");
@@ -227,11 +225,17 @@ bool StateSequence::addToSequence(const StateSequence& i_sequence) {
 
   if (hasEqualSequence(i_sequence)) {
     LOG_DEBUG("Has an equal sequence and will be repeated  more times.");
+    LOG_DEBUG("Current number of reps: " << m_numberOfRepetitions);
+    LOG_DEBUG("Added number of reps: " << i_sequence.m_numberOfRepetitions);
     m_numberOfRepetitions += i_sequence.m_numberOfRepetitions;
     return true;
   }
 
   if (hasMutualPins(i_sequence)) {
+    //    LOG_DEBUG("Forn sequence: ");
+    //    i_sequence.displaySequence();
+    //    LOG_DEBUG("This sequence: ");
+    //    displaySequence();
     LOG_DEBUG("Could not add sequence, has mutual pins");
     return false;
   }
@@ -257,6 +261,7 @@ bool StateSequence::addToSequence(const StateSequence& i_sequence) {
        ltsItr != m_pinStateVector.end() &&
        rhsItr != i_sequence.getPinStateVector().end();
        ltsItr++, rhsItr++) {
+    LOG_DEBUG("Doing the update!");
     ltsItr->update(*rhsItr);
   }
   return true;
@@ -300,12 +305,14 @@ bool StateSequence::mergePinStateSequences(
       io_firstSequence->getNumberOfRepetitions() -
       io_secondSequence->getNumberOfRepetitions();
   if (newFirstSequenceRepetitions <= 0) {
-    LOG_DEBUG("first sequence reps: " << io_firstSequence->getNumberOfRepetitions());
+    /*
+      LOG_DEBUG("first sequence reps: " << io_firstSequence->getNumberOfRepetitions());
     LOG_DEBUG("second sequence reps: " << io_secondSequence->getNumberOfRepetitions());
     LOG_DEBUG("First sequence");
     io_firstSequence->displaySequence();
     LOG_DEBUG("Second sequence");
     io_secondSequence->displaySequence();
+    */
     return false;
   }
 
@@ -470,3 +477,20 @@ bool StateSequence::areEqualState(const PinState& i_firstState,
   return i_firstState.getNumericValue() == i_secondState.getNumericValue();
 }
 
+void StateSequence::exportValue() const{
+  std::ofstream sequenceVectorLog("SequenceLog.log", std::ios::app);
+  if (!sequenceVectorLog.good()) {
+    return;
+  }
+  sequenceVectorLog << m_numberOfRepetitions << " , ";
+  sequenceVectorLog << m_speed << " ; ";
+  for (const auto& pinState : m_pinStateVector) {
+    sequenceVectorLog << pinState.getNumericValue();
+    for (const auto& pin : pinState.getPinVector()) {
+      if (pinState.getPinState(pin))
+        sequenceVectorLog << " , " << pin;
+    }
+    sequenceVectorLog << " ; ";
+  }
+  sequenceVectorLog << std::endl;
+}
