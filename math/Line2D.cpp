@@ -64,14 +64,26 @@ bool Line2D::operator==(const Line2D& i_rhs) const {
 
 
 bool Line2D::intersects(const Line2D& i_line) const {
+  // check for horizontality
+  if (m_startPoint.y == m_endPoint.y) {
+    // of the other is also horizontal, no intersection possible
+    if (i_line.getStartPoint().y == i_line.getEndPoint().y) {
+      return false;
+    } else {
+      // change order and try again
+      return i_line.intersects(*this);
+    }
+  }
+
   Point2D intersectingPoint;
   try {
     intersectingPoint = getIntersectingPoint(i_line);
   } catch (std::runtime_error) {
-    LOG_DEBUG("They run in parrelal");
-    // try go paralel
+    // they run parallel
     return false;
   }
+  LOG_DEBUG("Intersecting point: " << intersectingPoint.x << " , " << intersectingPoint.y);
+
   bool liesOnFirst = false;
   if (std::min(m_startPoint.x, m_endPoint.x) - TOLERANCE <= intersectingPoint.x &&
       std::max(m_startPoint.x, m_endPoint.x) + TOLERANCE >= intersectingPoint.x &&
@@ -79,16 +91,45 @@ bool Line2D::intersects(const Line2D& i_line) const {
       std::max(m_startPoint.y, m_endPoint.y) + TOLERANCE >= intersectingPoint.y) {
     liesOnFirst = true;
   }
+
   // if it doesnt lie on the first
   Point2D startPoint = i_line.getStartPoint();
   Point2D endPoint = i_line.getEndPoint();
   bool liesOnSecond = false;
   if (std::min(startPoint.x, endPoint.x) - TOLERANCE <= intersectingPoint.x &&
-      std::max(startPoint.x, endPoint.x) + TOLERANCE >= intersectingPoint.x &&
-      std::min(startPoint.y, endPoint.y) - TOLERANCE <= intersectingPoint.y &&
-      std::max(startPoint.y, endPoint.y) + TOLERANCE >= intersectingPoint.y) {
+      std::max(startPoint.x, endPoint.x) + TOLERANCE >= intersectingPoint.x) {
     liesOnSecond = true;
   }
 
-  return liesOnFirst && liesOnSecond;
+  // it the intersection is not on both lines
+  if (!liesOnFirst || !liesOnSecond) {
+    return false;
+  }
+
+  if (intersectingPoint == m_startPoint ||
+      intersectingPoint == m_endPoint) {
+    LOG_DEBUG("Intersects at a end point.");
+    // Upward edge excludes its end point
+    if (m_startPoint.y < m_endPoint.y) {
+      LOG_DEBUG("This line is an upward line.");
+      if (m_endPoint == intersectingPoint) {
+        LOG_DEBUG("Does not intersect," <<
+                  "is upward and interesects at endpoint.");
+        return false;
+      }
+    } else if (m_startPoint.y > m_endPoint.y){
+      LOG_DEBUG("Is an downward line");
+      // Downward edge exclude its start point
+      if (m_startPoint == intersectingPoint) {
+        LOG_DEBUG("Does not intersect, " <<
+                  "is an downward line and intersects at startpoint");
+        return false;
+      }
+    } else {
+      LOG_DEBUG("Line is horizontal. Both ends are included");
+    }
+    // In all other cases where the intersecting point lays on
+    // the start or the stop point of the line it is ok
+  }
+  return true;
 }
