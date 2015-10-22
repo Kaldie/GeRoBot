@@ -2,7 +2,9 @@
 #ifndef ARDUINO_ARDUINOMOTORDRIVER_H_
 #define ARDUINO_ARDUINOMOTORDRIVER_H_
 
+#include <SequenceVector.h>
 #include "./ArduinoSerialConnection.h"
+
 
 class ArduinoMotorDriver {
     GETSET(ArduinoSerialConnection, m_arduinoConnection, ArduinoConnection);
@@ -42,11 +44,11 @@ public:
     void echo();
     /// Benchmark the SD card on the system. Testing purpose often
     bool benchmarkSD(const int& i_numberOfMessages);
+    bool benchmarkCurrentRobot(const SequenceVector& i_sequenceVector);
     // Default constructors
     ArduinoMotorDriver();
     /// Constructor with path to serial
     explicit ArduinoMotorDriver(std::string i_regExpression);
-
 };
 
 #endif  // ARDUINO_ARDUINOMOTORDRIVER_H_
