@@ -30,7 +30,10 @@ void PinState::setPins(const PinVector& i_pins) {
   for (auto itr = i_pins.begin();
        itr != i_pins.end();
        itr++) {
-    m_pinVector.push_back(*itr);
+    if (std::find(m_pinVector.begin(), m_pinVector.end(), *itr) ==
+        m_pinVector.end()) {
+      m_pinVector.push_back(*itr);
+    }
     LOG_INFO("Setting: " << (*itr) << " to: " << DEFAULT_STATE);
     if (DEFAULT_STATE)
       m_numericValue += getNumericPinValue(*itr);    
@@ -38,8 +41,7 @@ void PinState::setPins(const PinVector& i_pins) {
 }
 
 void PinState::setPinsToDefault() {
-  const PinVector pinVector(m_pinVector);
-  setPins(pinVector);
+  setPins(m_pinVector);
 }
 
 

@@ -174,8 +174,10 @@ void JointController::uploadSequence(const bool& i_condense) {
     if (stateSequence.getNumberOfRepetitions() > 0) {
       m_actuator.upload(stateSequence.createArduinoBuffer());
       ++sendCount;
+#ifdef DEBUG
       LOG_DEBUG("Percentage send: " <<
                 static_cast<float>(sendCount) / totalSize * 100 << "%.");
+#endif
     }
   }
 }

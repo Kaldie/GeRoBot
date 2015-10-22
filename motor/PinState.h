@@ -6,14 +6,17 @@
 typedef std::vector<int> PinVector;
 
 class PinState {
+  // Vector of pins included
   GETSET(PinVector, m_pinVector, PinVector);
+  // Numeric value of this state
   GETSET(int, m_numericValue, NumericValue);
 
  private:
-  // represents the integer value of the pins
+  // represents the integer value of a pin
   int getNumericPinValue(const int&) const;
 
  public:
+  /// Set
   void setPins(const PinVector&);
   void setPinsToDefault();
 

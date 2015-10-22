@@ -26,11 +26,18 @@ class Robot {
   GETSET(std::vector<Point2D>, m_traveledPoints, TraveledPoints);
  public:
   typedef std::shared_ptr<Robot> RobotPointer;
+  /// Returns if there is a valid arduino connenction
   bool hasValidConnection();
-
+  /// returns a pointer to the actual position
   Point2D* getPositionPointer() {return &m_position;}
-    // actuations
+
+  /*---------------Tool--------------------- */
+  /// Creates a state which will switch the tool to a active or inactive state
+  void switchTool(const bool& i_shouldBeActive){}; // no yet implemented!
+  /*---------------actuations---------------- */
+  /// move to a position, no f*cks given how
   void goToPosition(const Point2D&);
+  /// Given the pre-calculated steps, prefrom them
   void actuate();
   /// set a step and set the hold motor function to the boolean value
   void setIdle(const bool& i_setIdle);
