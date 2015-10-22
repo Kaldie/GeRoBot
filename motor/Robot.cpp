@@ -6,6 +6,8 @@
 #include <PinState.h>
 #include <Trace.h>
 
+int stepsMissed = 0;
+
 Robot::Robot()
   : Robot( nullptr, 30, Point2D(0, 50))
 {}
@@ -63,16 +65,25 @@ void Robot::goToPosition(const Point2D &i_position) {
 void Robot::prepareSteps(const std::string& i_direction,
                          const int& i_numberOfSteps) {
   // predict the next step
+  //  int preNumberOfSteps = m_jointController->getSequenceVector().numberOfSteps();
   m_jointController->resolveJoint(i_direction)->
     predictSteps(&m_virtualPosition, i_direction, i_numberOfSteps);
   // add the point to the traveled points
   m_traveledPoints.push_back(m_virtualPosition);
   // add the step to the sequence
   m_jointController->moveSteps(i_direction, i_numberOfSteps);
+  //if (preNumberOfSteps >
+  //  m_jointController->getSequenceVector().numberOfSteps() - (2 * i_numberOfSteps)) {
+  //LOG_DEBUG("Step is wanted, however not set!" << std::endl <<
+  //          "Current steps: " << preNumberOfSteps << ", new steps: " <<
+  //          m_jointController->getSequenceVector().numberOfSteps());
+  //++stepsMissed;
+  //LOG_DEBUG("Current steps missed: " << stepsMissed);
 }
 
 
 void Robot::actuate() {
+  LOG_DEBUG("Steps missed: " << stepsMissed);
   // upload the current sequence
   m_jointController->uploadSequence(false);
   // Send the command to actuate the sequence
