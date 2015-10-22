@@ -57,6 +57,7 @@ class SequenceVector {
     return getLastSequence()->addToSequence(i_otherSequence);};
 
   void clean();
+  void exportValue() const;
 };
 
 #endif  // MOTOR_SEQUENCEVECTOR_H_

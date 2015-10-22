@@ -41,14 +41,12 @@ void SequenceVector::normalise(const bool i_condenseVector /* = false*/) {
     if (currentSequence->getPinStateVector().size() > 0) {
       thisPinState = currentSequence->getPinStateVector().back();
     }
-    
     if (currentSequence != m_sequenceVector.end()) {
       thisPinState = *currentSequence->getPinStateVector().begin();
     } else {
       break;
     }
   }
-
   if (i_condenseVector)
     condenseVector();
 }
@@ -177,8 +175,10 @@ void SequenceVector::clean() {
 void SequenceVector::appendStateSequence(
     const StateSequence& i_newStateSequence,
     const bool& i_merge) {
-  if (i_newStateSequence.isEmpty())
+  if (i_newStateSequence.isEmpty()) {
+    LOG_DEBUG("Return from append due to emtpy new state sequence");
     return;
+  }
 
   if (m_sequenceVector.size() == 0) {
     LOG_DEBUG("First pin sequence");
@@ -186,13 +186,23 @@ void SequenceVector::appendStateSequence(
     return;
   }
 
+  //  for (const auto& stateSequence : m_sequenceVector) {
+  //    stateSequence.displaySequence();
+  //  }
   if (m_sequenceVector.back().addToSequence(i_newStateSequence)) {
-    LOG_DEBUG("Adding the new state sequence to the previous one!");
+    //LOG_DEBUG("New sequence: ");
+    ///    i_newStateSequence.displaySequence();
+    // LOG_DEBUG("Adding the new state sequence to the previous one!");
+    //    for (const auto& stateSequence : m_sequenceVector) {
+    //      stateSequence.displaySequence();
+    //x    }
+
     return;
   }
 
   LOG_DEBUG("Added new state sequence to vector");
   if (i_merge) {
+    LOG_DEBUG("merge couple states!");
     StateSequence stateSequence = i_newStateSequence;
     StateSequence::
         mergePinStateSequences(&m_sequenceVector.back(),
@@ -201,6 +211,7 @@ void SequenceVector::appendStateSequence(
     return;
   }
   m_sequenceVector.push_back(i_newStateSequence);
+  return;
 }
 
 
@@ -209,4 +220,11 @@ StateSequence* SequenceVector::getLastSequence() {
     m_sequenceVector.push_back(StateSequence());
   }
   return &(*(m_sequenceVector.end()-1));
+}
+
+
+void SequenceVector::exportValue() const {
+  for (const auto& sequence : m_sequenceVector) {
+    sequence.exportValue();
+  }
 }
