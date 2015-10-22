@@ -38,8 +38,8 @@ class LineTraceCalculationTest : public CxxTest::TestSuite {
     Robot robot = *robotBuilder.getRobotPointer();
     LOG_DEBUG("Robot build finished!");
 
-    Point2D startPoint(0, 375);
-    Point2D endPoint(-300, 375);
+    Point2D startPoint(0, 255);
+    Point2D endPoint(-100, 255);
     Trace trace(startPoint, endPoint);
     robot.setVirtualPosition(startPoint);
     robot.setPosition(startPoint);
@@ -47,6 +47,9 @@ class LineTraceCalculationTest : public CxxTest::TestSuite {
     LineTraceCalculator lineTraceCalculator(&robot);
     lineTraceCalculator.setWriteLog(true);
     lineTraceCalculator.calculateTrace(trace);
+    SequenceVector sequenceVector = robot.getJointController()->getSequenceVector();
+    sequenceVector.condenseVector();
+    sequenceVector.exportValue();
         try {
         LOG_DEBUG("here!!");
         robot.actuate();
@@ -62,10 +65,10 @@ class LineTraceCalculationTest : public CxxTest::TestSuite {
     TS_ASSERT_EQUALS(robot.getJointController()->getSequenceVector().numberOfSteps(),
                      26458);
 
-    SequenceVector sequenceVector = robot.getJointController()->getSequenceVector();
+    SequenceVector sequenceVector1 = robot.getJointController()->getSequenceVector();
     
     /// testing condensing on this big vector
-    sequenceVector.normalise();
+    sequenceVector1.normalise();
     long totalNumberOfReps = 0;
     for (auto& sequence : sequenceVector.getSequenceVector()) {
       totalNumberOfReps += sequence.getNumberOfRepetitions();

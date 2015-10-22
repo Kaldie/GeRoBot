@@ -86,17 +86,26 @@ class PolygonTest : public CxxTest::TestSuite {
                             Point2D(10,0),
                             Point2D(10,10),
                             Point2D(-10,10),
-                            Point2D(-10,0)
-                            });
+                            Point2D(-10,0),
+                            Point2D(0,0)});
     Polygon2D a(x);
+    a.exportToFile();
     TS_ASSERT(a.isInside(Point2D(5,5)));
     TS_ASSERT(a.isInside(Point2D(5,0)));
-    TS_ASSERT(a.isInside(Point2D(10,0)));
     TS_ASSERT(a.isInside(Point2D(9,6)));
-    TS_ASSERT(a.isInside(Point2D(-10,0)));
-    TS_ASSERT(!a.isInside(Point2D(-10 - 0.01 ,0)));
-    TS_ASSERT(!a.isInside(Point2D(-10,0 - 0.01)));
-    TS_ASSERT(!a.isInside(Point2D(10 + 0.01 ,0)));
+    TS_ASSERT(a.isInside(Point2D(-10, 0)));
+    // just over the border, downside
+    TS_ASSERT(!a.isInside(Point2D(-10, -10 - 1.01)));
+    // just over the border left side
+    TS_ASSERT(!a.isInside(Point2D(-10 - 0.1, 0)));
+    // just on the border right side
+    TS_ASSERT(!a.isInside(Point2D(10 ,0)));
+
+    // is at the right border, not inside
+    TS_ASSERT(!a.isInside(Point2D(10,0)));
+
+
+
     /*
       TS_ASSERT_EQUALS(Point2D(100, 0).getAngleToOrigin(), 0);
     TS_ASSERT_DELTA(Point2D(100, 100).getAngleToOrigin(), PI/4, 0.0001);

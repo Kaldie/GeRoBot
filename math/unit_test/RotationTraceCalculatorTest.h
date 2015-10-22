@@ -13,6 +13,7 @@
 #include <RotationTraceCalculator.h>
 #include <RobotIO.h>
 
+
 class RotationTraceCalculatorTest : public CxxTest::TestSuite {
  public:
   Robot robot;
@@ -32,7 +33,7 @@ class RotationTraceCalculatorTest : public CxxTest::TestSuite {
   void testRotationTraceCalculation() {
     Point2D startPoint(-0, 255);
     Point2D endPoint(-0, 255);
-    Point2D centrePoint(-0, 345);
+    Point2D centrePoint(-0, 385);
     RotationTrace trace(startPoint, endPoint, centrePoint);
     robot.setVirtualPosition(startPoint);
     robot.setPosition(startPoint);
@@ -58,11 +59,28 @@ class RotationTraceCalculatorTest : public CxxTest::TestSuite {
 
     RotationTraceCalculator rotationTraceCalculator(&robot);
     rotationTraceCalculator.setWriteLog(true);
+    LOG_DEBUG("Bitch please!");
     rotationTraceCalculator.calculateTrace(trace);
+
+    SequenceVector sequenceVector = robot.getJointController()->getSequenceVector();
+    /*
+      robot.getJointController()->moveSteps("OUT",2);
+    sequenceVector.getSequenceVector()[2].displaySequence();
+    StateSequence stateSequence = sequenceVector.getSequenceVector()[2];
+    for (int i = 0;
+         i < 79998;
+         ++i) {
+        sequenceVector.appendStateSequence(stateSequence, false);
+    }
+    //LOG_DEBUG("yaya" << sequenceVector.getSequenceVector().size());
+    robot.getJointController()->setSequenceVector(sequenceVector);
+    //    robot.getJointController()->setSequenceVector(sequenceVector);
+    */
+    robot.getJointController()->getSequenceVector().exportValue();
     SequenceVector vector = robot.getJointController()->getSequenceVector();
     LOG_DEBUG("Number of steps before condense: " << vector.numberOfSteps());
     //    vector.condenseVector();
-    LOG_DEBUG("Number of steps after condense: " << vector.numberOfSteps());
+    //    LOG_DEBUG("Number of steps after condense: " << vector.numberOfSteps());
     try {
         LOG_DEBUG("here!!");
         robot.actuate();
@@ -76,8 +94,6 @@ class RotationTraceCalculatorTest : public CxxTest::TestSuite {
                      4904);
     TS_ASSERT_EQUALS(robot.getJointController()->getSequenceVector().numberOfSteps(),
                      21948);
-
-    SequenceVector sequenceVector = robot.getJointController()->getSequenceVector();
 
     /// testing condensing on this big vector
     sequenceVector.normalise();

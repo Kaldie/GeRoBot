@@ -71,39 +71,67 @@ class Line2DTest : public CxxTest::TestSuite {
   }
 
   void testIntesects() {
-    Line2D line(startPoint,
-		endPoint);
+    Line2D line(startPoint,    // Point2D(0, 10);
+                endPoint);     // Point2D(10, 10);
     Line2D line2(startPoint,
 		 endPoint);
     // they run in parellel, so no intersection
     TS_ASSERT(!line.intersects(line2));
+    // clean intersection
     Line2D line3(Point2D(0,4),
 		 Point2D(8,11));
-    // clean intersection
     TS_ASSERT(line.intersects(line3));
+    // too short
     Line2D line4(Point2D(0,4),
 		 Point2D(8,9));
-    // too short
     TS_ASSERT(!line.intersects(line4));
-        Line2D line5(Point2D(10.5,4),
-		     Point2D(20,9));
     // too far
+    Line2D line5(Point2D(10.5,4),
+		     Point2D(20,9));
     TS_ASSERT(!line.intersects(line5));
 
-    Line2D line6(Point2D(0, 0 ),
-		 Point2D(0,11));
     // intersects on point
+    Line2D line6(Point2D(0, 0 ),
+                 Point2D(0,11));
     TS_ASSERT(line.intersects(line6));
 
-    Line2D line8(Point2D(5, 0 ),
-		 Point2D(5,15));
-    // intersects on point
+    // intersects on point end point of line8, which is a downward line, therefor does interesects
+    Line2D line8(Point2D(0, 20 ),
+                 Point2D(0, 10));
     TS_ASSERT(line.intersects(line8));
 
+    // intersects on point start point of line8, which is a upward line, therefor does interesects
+    Line2D line10(Point2D(0, 10 ),
+                 Point2D(0, 20));
+    TS_ASSERT(line.intersects(line10));
+
+    // intersects on the end point of line7, line is upward, therefor does not intersect
     Line2D line7(Point2D(0, 0 ),
 		 Point2D(0,10));
-    // intersects on point exectly
-    TS_ASSERT(line.intersects(line7));
+    TS_ASSERT(!line.intersects(line7));
+
+    // intersects on the end point of line7, line is upward, therefor does not intersect
+    Line2D line11(Point2D(0, 10 ),
+                 Point2D(0, 0));
+    TS_ASSERT(!line.intersects(line11));
+  }
+
+  void testIntersectCornerCase() {
+    /*
+     Given a vertical line
+     we define an intersection
+     if the line is intersected at from the startpoint
+     until (not included) the end point
+    */
+    Line2D firstLine(Point2D(5, 2), Point2D(5, 10));
+    Line2D secondLine(Point2D(0, 2), Point2D(6, 2)); // should intersect
+    Line2D thirdLine(Point2D(0, 10), Point2D(6, 10)); // shouldn't intersect
+    // test if when the line cuts at the start point it intersects
+    TS_ASSERT_EQUALS(firstLine.getStartPoint(), firstLine.getIntersectingPoint(secondLine));
+    TS_ASSERT(firstLine.intersects(secondLine));
+    // test when the line cuts at the end point it does not intersect
+    TS_ASSERT_EQUALS(firstLine.getEndPoint(), firstLine.getIntersectingPoint(thirdLine));
+    TS_ASSERT(!firstLine.intersects(thirdLine));
   }
 };
 
