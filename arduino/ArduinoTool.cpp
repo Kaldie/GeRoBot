@@ -1,8 +1,13 @@
+// Copyright [2015] Ruud Cools
+
+#include <macroHeader.h>
+#include "./ArduinoTool.h"
+#include <Robot.h>
 
 
 /// Empty constructor
-ArduinoPlasmaTool::ArduinoTool() :
-  ArduinoTool(nullptr, 0, 0 , 0 , 0, LOW) {
+ArduinoTool::ArduinoTool() :
+  ArduinoTool(nullptr, 0, 0 , 0 , 0, false) {
 }
 
 
@@ -22,14 +27,14 @@ ArduinoTool::ArduinoTool(const Robot::RobotPointer& i_robot,
 				     const int& i_coolDownTime,
 				     const int& i_pinNumber,
 				     const bool& i_offState)
-  : m_robotPointer(i_robot), m_switchOnTime(i_switchOnTime),
+  : m_robot(i_robot), m_switchOnTime(i_switchOnTime),
     m_switchOffTime(i_switchOffTime), m_coolDownTime(i_coolDownTime),
-    m_pinNumber(i_pinNumber), m_offState(i_offState) {
+    m_pin(i_pinNumber), m_offState(i_offState) {
 }
 
 
 void ArduinoTool::changeState(const bool& i_state) {
-  if (m_pinState > 3) {
+  if (m_pin > 3) {
     LOG_ERROR("Pin number cannot be higher then 3!");
   }
   bool pinState;
@@ -39,10 +44,11 @@ void ArduinoTool::changeState(const bool& i_state) {
     pinState = m_offState;
   }
   PinState primaryState;
-  primaryState.update(m_pinNumber << 8, pinState);
+  primaryState.update(8 + m_pin, pinState);
   // get the sequence vector which will set the tool to the state and
   // make sure arduino waits long enough
-  SequenceVector sequenceVector = createStates(primaryState, getDelay(i_state));
+  StateSequence stateSequence = createStateSequence(primaryState, getDelay(i_state));
+  m_robot->addToSequence(stateSequence);
 }
 
 
@@ -58,39 +64,67 @@ int ArduinoTool::getDelay(const bool& i_state) const {
   if (!i_state) {
       return m_switchOffTime;
   }
-
-  // if the tool is switched on, and the there is a cool down time we need to calculate if the tool is cold\
+  // if the tool is switched on, and the there is a
+  // cool down time we need to calculate if the tool is cold
   // If yes, we need cooldown time,
   // If no, we dont need it.
-  int offTime = calculateOffTime
-    (m_robot->getJointController()->getSequenceVector());
-  //
-  if (offTime < m_coolDownTime) {
+  if (calculateOffTime() < m_coolDownTime) {
     return 0;
-  } else {
-    return m_switchOnTime;
   }
+  return m_switchOnTime;
 }
 
 
-SequenceVector ArduinoTool::createDelayStates(const PinState& i_state,
-					      const int& i_delay) {
-  int frequency = 100; // equals 2000 hertz
-  frequency /= (i_delay / (1 << 15)) + 1; //
-
-  int steps = 1, reps = 1;
-  int maxSteps = 10, maxReps = 1 << 15;
-  int thisDelay;
+StateSequence ArduinoTool::createStateSequence(const PinState& i_state,
+                                               const int& i_delay) {
+  int numberOfSteps = 0;
+  int frequency, estimateNumberOfReps;
+  float delay = static_cast<float>(i_delay);
   do {
+    // this loop estimates the number of steps
+    frequency = 190;  // 2K frequency to start with
+    numberOfSteps += 1;
+    do {
+      // estimates the frequency
+      frequency -= 10;
+      estimateNumberOfReps = delay * (frequency / 100) / numberOfSteps - 0.5;
+      estimateNumberOfReps += 1;
+    } while (estimateNumberOfReps > (1 << 15) && frequency > 10);
+  } while (estimateNumberOfReps > (1 << 15) && numberOfSteps <= 10);
+  // check if the delay can be made
+  if (numberOfSteps > 10) {
+    LOG_ERROR("Was not possible to create a Sequence to ensure delay");
+  }
+  //Make delay
+  StateSequence stateSequence;
+  for (int i = 0;
+       i < numberOfSteps;
+       ++i) {
+    stateSequence.addToSequence(i_state, true);
+  }
+  stateSequence.setNumberOfRepetitions(estimateNumberOfReps);
+  stateSequence.setSpeed(frequency);
+  return stateSequence;
+}
 
-    thisDelay = steps * reps / frequency;
-  } while (thisDelay < i_delay)
-    StateSequence stateSequence =
-  SequenceVector vector;
-  msPerStep = i_delay / 100;
-  if (
 
-  StateSequence stateSequence(
-
-
+int ArduinoTool::calculateOffTime() const {
+  SequenceVector sequenceVector(m_robot->getJointController()->getSequenceVector());
+  float currentTime = 0.0;
+  PinStateVector pinStateVector;
+  const auto rend = sequenceVector.getSequenceVector().rend();
+  for (auto stateSequence = sequenceVector.getSequenceVector().rbegin();
+       stateSequence != rend;
+       ++stateSequence) {
+    currentTime += stateSequence->getIntegerSequence().size() *
+      stateSequence->getNumberOfRepetitions() / (stateSequence->getSpeed() * 10);
+    // Search for the tool pin on
+    for (const auto& pinState : stateSequence->getPinStateVector()) {
+      if (pinState.hasPin(8 + m_pin)) {
+        if (pinState.getPinState(8 + m_pin) != m_offState)
+          return static_cast<int>(currentTime);
+      }
+    }
+  }
+  return static_cast<int>(currentTime);
 }
