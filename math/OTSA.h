@@ -11,10 +11,6 @@
  */
 namespace tsa {
     namespace otsa {
-        struct PositionAndOutput {
-            Point2D* CurrentPosition;
-            TraceSection* OutPutSection;
-        };
         /**
          * Given TraceSections create an order for which:
          * Each sections which is inside another is ordered earlier then the including section
