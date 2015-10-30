@@ -5,7 +5,7 @@
 #include "./PinState.h"
 
 StateSequence::StateSequence()
-    : StateSequence(100, 0, {})
+    : StateSequence(250, 0, {})
 {}
 
 
@@ -347,7 +347,7 @@ bool StateSequence::
   if (i_extend and i_overrideSequence)
     LOG_ERROR("Cannot extend and override at the same time!");
 
-  PinState latestPinState = i_pinState;
+  PinState latestPinState(i_pinState);
   bool overrideSequence = i_overrideSequence;
   bool extendSequence = i_extend;
   // if none are set, ensure that there are no mutal pins
@@ -376,12 +376,11 @@ bool StateSequence::
       for (auto pinIterator = latestPinState.getPinVector().begin();
            pinIterator != latestPinState.getPinVector().end();
            pinIterator++) {
-        try {
-          int pinValue = pinStateIterator->getPinState(*pinIterator);
+        if (pinStateIterator->hasPin(*pinIterator)) {
           LOG_DEBUG("Found: "<< *pinIterator);
-          latestPinState.update(*pinIterator, pinValue);
-        }
-        catch(std::runtime_error) {
+          latestPinState.update(*pinIterator,
+                                pinStateIterator->getPinState(*pinIterator));
+      } else {
           LOG_DEBUG("Not Found: "<< *pinIterator <<
                     "Set: " << latestPinState.getPinState(*pinIterator));
           pinStateIterator->update(*pinIterator,

@@ -52,7 +52,7 @@ class StateSequence {
   void displaySequence() const;
   void exportValue() const;
   std::vector<int> createArduinoBuffer() const;
-   private:
+ private:
   bool hasEqualSequence(const StateSequence& i_sequence) const;
   void validate() const;
   void validate(const PinStateVector& i_pinStateVector) const;
