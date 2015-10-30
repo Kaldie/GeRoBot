@@ -50,9 +50,10 @@ bool BaseTraceCalculator::hasRobot() const {
 
 void BaseTraceCalculator::setTolerances() {
   if (hasRobot()) {
-    m_rotationTolerance = m_robot->getMovementPerStep(Rotational) / 1.5;
-    m_translationTolerance = m_robot->getMovementPerStep(Translational) / 1.5;
+   m_rotationTolerance = m_robot->getMovementPerStep(Rotational) / 1.0;
+   m_translationTolerance = m_robot->getMovementPerStep(Translational) / 1.0;
   }
+  m_tolerance = std::min(m_rotationTolerance, m_translationTolerance);
 }
 
 
@@ -80,8 +81,9 @@ std::vector<int> BaseTraceCalculator::getNumberOfSteps
   int numberOfRotationSteps =
     (std::abs(i_position.getAlpha()-endPoint.getAlpha())*(180/PI)) /
     m_robot->getMovementPerStep(Rotational);
-
-   return std::vector<int> {numberOfRotationSteps, numberOfTranslationSteps} ;
+  LOG_DEBUG("Number of translation steps: " << numberOfTranslationSteps);
+  LOG_DEBUG("Number of rotation steps: " << numberOfRotationSteps);
+  return std::vector<int> {numberOfRotationSteps, numberOfTranslationSteps} ;
 }
 
 
@@ -100,9 +102,11 @@ bool BaseTraceCalculator::shouldTranslate(const Trace& i_trace,
   /*
     Translate if the magnitude differs between the current point and the endpoint.
   */
+#ifdef DEBUG
   traceType pointMagnitude = Magnitude(i_point2D);
   traceType endPointMagnitude = Magnitude(i_trace.getEndPoint());
-  traceType difference = std::abs(pointMagnitude-endPointMagnitude);
+#endif
+  traceType difference = Magnitude(i_point2D - i_trace.getEndPoint());
   bool shouldTranslate;
 
   if (difference>m_translationTolerance)
@@ -144,6 +148,7 @@ bool BaseTraceCalculator::shouldRotate(const Trace& i_trace,
 #endif
   return shouldRotate;
 }
+
 
 void BaseTraceCalculator::calculateTrace(const Trace& i_trace) {
   if (!hasRobot()) {
