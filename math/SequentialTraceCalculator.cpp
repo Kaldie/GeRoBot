@@ -1,149 +1,66 @@
-// Copyright Ruud Cools [2015]
+// Copyright [2015] Ruud Cools
 #include <macroHeader.h>
 #include <Robot.h>
-#include <Trace.h>
-#include <Point2D.h>
-#include "./RotationTrace.h"
-#include "./Polygon2D.h"
+#include "./BaseTraceCalculator.h"
+#include "./RotationTraceCalculator.h"
+#include "./LineTraceCalculator.h"
+#include "./OTSA.h"
+#include <RotationTrace.h>
+//#include <ArduinoRobotTool.h> // will be necessary when we need to switch on the tool
 #include "./SequentialTraceCalculator.h"
 
 
-/// easy constructor
 SequentialTraceCalculator::SequentialTraceCalculator()
-  : SequentialTraceCalculator(tsa::TraceSection()){
+  : SequentialTraceCalculator(nullptr, tsa::TraceSection()) {
 }
 
 
-/// fully fledged constructor
-SequentialTraceCalculator::
-SequentialTraceCalculator(const tsa::TraceSection& i_vector)
-  : m_traceVector(i_vector){
+SequentialTraceCalculator::SequentialTraceCalculator(const Robot::RobotPointer& i_robot)
+  : SequentialTraceCalculator(i_robot, tsa::TraceSection()) {
 }
 
 
-void
-SequentialTraceCalculator::orderVector(const bool& i_useHeuristics) {
-  if (!i_useHeuristics) {
-    // hope someone was paying attention
+/// Full Fledged Constructor
+SequentialTraceCalculator::SequentialTraceCalculator(const Robot::RobotPointer& i_robot,
+                                                     const tsa::TraceSection& i_section)
+  : m_robot(i_robot), m_traceSection(i_section) {
+}
+
+
+/// Calculated Traces
+void SequentialTraceCalculator::calculatedTraces() {
+  // check if robot is alive
+  if (!m_robot) {
+    LOG_ERROR("Robot is not set yet!");
+  }
+  // check if there are sections
+  if (m_traceSection.size() == 0) {
     return;
   }
-  // the final ordered trace pointer vector
-  tsa::TraceSection orderedTracePointerVector;
-  // Start position of the calculations
-  Point2D virtualPosition = m_robot->getPosition();
-  // get all closed sections
-  tsa::TraceSections sections = tsa::getSections(m_traceVector);
-  // Sort them based on the surface
-  std::sort(sections.begin(), sections.end(), tsa::sortBigToSmall);
-  // get remaining/ isolated traces
-  tsa::TraceSection remainingTraces =
-    tsa::getRemainingTraces(m_traceVector, sections);
-  // while we have closed sections
-  while (sections.size() > 0) {
-    // Handle one large section and its inner sections
-    tsa::TraceSection largeSection =
-      handleDependendSections(&sections, &virtualPosition, &orderedTracePointerVector);
-    // Find the isolated traces that are within the largeSection
-    tsa::TraceSection isolatedTraces =
-      tsa::getInsideTraces(remainingTraces, largeSection);
-    // add the isolated sections
-    appendSection(isolatedTraces, &virtualPosition, &orderedTracePointerVector);
-    for (const auto& aTrace : isolatedTraces) {
-      remainingTraces.erase(std::remove(remainingTraces.begin(),
-                                        remainingTraces.end(),
-                                        aTrace));
+
+  BaseTraceCalculator baseTraceCalculator(m_robot.get());
+  RotationTraceCalculator rotationTraceCalculator(m_robot.get());
+  LineTraceCalculator lineTraceCalculator(m_robot.get());
+
+  tsa::otsa::orderVector(&m_traceSection,
+			 m_robot->getVirtualPosition());
+  for (const auto& trace : m_traceSection) {
+    traceType distance  =
+      Magnitude(trace->getStartPoint() - m_robot->getVirtualPosition());
+    if (distance > baseTraceCalculator.getTolerance()) {
+      Trace movementTrace(m_robot->getVirtualPosition(),
+                          trace->getStartPoint());
+      m_robot->switchTool(false);
+      baseTraceCalculator.calculateTrace(movementTrace);
+      m_robot->switchTool(true);
     }
-  }
-  LOG_ERROR("Not implemented yet");
-}
 
-
-tsa::TraceSection SequentialTraceCalculator::
-handleDependendSections(tsa::TraceSections* o_sections,
-                        Point2D* o_position,
-                        tsa::TraceSection* o_ordedVector) {
-  tsa::TraceSection largeSection = o_sections->front();
-  tsa::TraceSections insideSections =
-    tsa::getInsideSections(largeSection, *o_sections);
-  /// the smallest sections shall be done first
-  std::reverse(insideSections.begin(), insideSections.end());
-  tsa::TraceSections::iterator startIndependedSection = insideSections.begin();
-  tsa::TraceSections::iterator endIndependedSection = startIndependedSection;
-  while (endIndependedSection != insideSections.end()) {
-    endIndependedSection =
-      tsa::getIndependendSections(startIndependedSection, insideSections.end());
-
-    handleIndependendSections(tsa::TraceSections(startIndependedSection,
-                                                 endIndependedSection),
-                              o_ordedVector,
-                              o_position);
-    startIndependedSection = endIndependedSection;
-  }
-  // remove the sections from the overall sections
-  for (const auto& section : insideSections) {
-    o_sections->erase(std::remove(sections->begin(), sections->end(), section));
-  }
-  return largeSection;
-}
-
-
-void SequentialTraceCalculator::
-handleIsolatedTraces(tsa::TraceSection* o_section,
-                     Point2D* o_position,
-                     tsa::TraceSection* o_isolatedTraces,
-                     tsa::TraceSection* o_ordedVector) {
-    tsa::TraceSection isolatedTraces =
-      tsa::getInsideTraces(*o_isolatedTraces, *o_section);
-    // add the isolated sections
-    appendSection(isolatedTraces, o_position, o_ordedVector);
-    for (const auto& aTrace : isolatedTraces) {
-      o_section->erase(std::remove(o_section->begin(),
-                                   o_section->end(),
-                                   aTrace));
+    if (trace->getTraceType() == Trace::Line) {
+      lineTraceCalculator.calculateTrace(*trace);
+    } else if (trace->getTraceType() == Trace::Curve) {
+      RotationTrace::RotationTracePointer rotationTrace =
+        std::static_pointer_cast<RotationTrace>(trace);
+      rotationTraceCalculator.calculateTrace(*rotationTrace);
     }
-}
-
-
-void SequentialTraceCalculator::
-handleIndependendSections(tsa::TraceSections i_sections,
-                          Trace::TracePointerVector* o_orderedVector,
-                          Point2D* i_position) const {
-  tsa::TraceSection currentSection;
-  while (i_sections.size() > 0) {
-    // get the section which is closed
-    currentSection =  tsa::getExtremeSection(*i_position,
-                                             true,
-                                             i_sections);
-    // append it the the ordered vector
-    appendSection(currentSection, i_position, o_orderedVector);
-    // Then throw it out
-    i_sections.erase
-      (std::remove(i_sections.begin(), i_sections.end(), currentSection));
-  }
-}
-
-
-void SequentialTraceCalculator::appendSection(Trace::TracePointerVector i_section,
-                                              Point2D* i_virtualPosition,
-                                              Trace::TracePointerVector* i_vector) const {
-  bool isClosed = tsa::isClosedSection(i_section);
-  traceType currentDistance;
-  while (i_section.size() > 0) {
-    // get the trace which is at the most suitable position
-    Trace::TracePointer currentTrace = tsa::getExtremeTrace(*i_virtualPosition,
-                                                            isClosed,
-                                                            i_section,
-                                                            &currentDistance);
-    // reverse it if necessary
-    if (currentDistance <
-        Magnitude(*i_virtualPosition - currentTrace->getStartPoint())) {
-      currentTrace->reverse();
-    }
-    // push it in the ordered vector
-    i_vector->push_back(currentTrace);
-    // update the position
-    *i_virtualPosition = currentTrace->getEndPoint();
-    // throw it out
-    i_section.erase(std::remove(i_section.begin(), i_section.end(), currentTrace));
   }
 }
