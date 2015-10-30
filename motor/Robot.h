@@ -35,7 +35,7 @@ class Robot {
   /// Creates a state which will switch the tool to a active or inactive state
   void switchTool(const bool& i_shouldBeActive){}; // no yet implemented!
   /*---------------actuations---------------- */
-  /// move to a position, no f*cks given how
+  /// move to a position, independend on maner
   void goToPosition(const Point2D&);
   /// Given the pre-calculated steps, prefrom them
   void actuate();
@@ -53,6 +53,8 @@ class Robot {
    */
   void prepareSteps(const std::string& i_direction,
                    const int& i_numberOfSteps);
+  /// Add an StateSequence to the vector. Use this for instance when a wait is required
+  void addToSequence(const StateSequence& i_sequence);
   /// easy to do
   Robot();
   /// defines controlle

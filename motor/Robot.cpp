@@ -111,3 +111,10 @@ void Robot::setIdle(const bool& i_setIdle) {
   // upload and actuate
   actuate();
 }
+
+
+void Robot::addToSequence(const StateSequence& i_sequence) {
+  SequenceVector* sequenceVector = m_jointController->getSequenceVectorPointer();
+  if (!sequenceVector->addToSequence(i_sequence))
+    sequenceVector->appendStateSequence(i_sequence, false);
+}
