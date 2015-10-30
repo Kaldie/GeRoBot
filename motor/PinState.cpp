@@ -92,6 +92,15 @@ int PinState::getPinState(const int& i_pinNumber) const {
 }
 
 
+bool PinState::hasPin(const int& i_number) const {
+  if (std::find(m_pinVector.begin(),
+                m_pinVector.end(),
+                i_number) != m_pinVector.end()) {
+    return true;
+  }
+  return false;
+}
+
 void PinState::displayPinState() const {
   LOG_DEBUG("Display Pin State: ");
   for (auto itr = m_pinVector.begin();

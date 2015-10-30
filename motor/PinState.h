@@ -24,6 +24,9 @@ class PinState {
               const int& i_pinValue);
   void update(const PinState&);
 
+  /// Return if a pin is defined in this state
+  bool hasPin(const int& i_number) const;
+
   // get the set of a specific pin
   int getPinState(const int&) const;
 
