@@ -38,6 +38,9 @@ class JointController {
   /// Method to the Arduino actuator pointer
   ArduinoMotorDriver* getActuatorPointer() {return &m_actuator;}
 
+  /// Method to retrieve the sequence vector pointer
+  SequenceVector* getSequenceVectorPointer() {return &m_sequenceVector;}
+
   /**
    * Method which uploads the current sequence to the actuator
    * @param[in] i_condenseSequence Should condense the vector before upload
@@ -68,12 +71,12 @@ class JointController {
    */
   BaseJoint::JointPointer resolveJoint(const MovementType& i_movementType);
 
-
   /**
    * returns the number of joints currently registed
    */
    int getNumberOfJoints() {return m_jointPointerVector.size();}
  private:
+
    /**
    * returns if the joint is ready to be added to the robot
    */
