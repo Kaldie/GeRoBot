@@ -16,5 +16,5 @@ DEPENDENCY = $(filter-out $(DSRCS), $(notdir $(wildcard $(TOROOT)/$(OBJECTFOLDER
 MAIN = ArduinoInterface
 DEBUG = debug
 
-include ../Makefile.config
+include $(TOROOT)/Makefile.config
 DEPENDENCY := $(filter-out $(DOBJS), $(DEPENDENCY))

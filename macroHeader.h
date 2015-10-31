@@ -20,7 +20,9 @@
 #include <vector>
 #include <iomanip>
 #include <cassert>
+#ifdef QT
 #include <QtCore/QPointF>
+#endif
 #include <pugixml.hpp>
 
 #define PIN_HIGH 1
