@@ -32,10 +32,10 @@
 #define HAS_RPI false
 
 #define PI 3.1415926535897932384626433
-#define TOLERANCE 0.0001
+#define TOLERANCE 0.00001
 
 #define DEBUG
-// #define DEBUG_FILE
+//#define DEBUG_FILE
 
 // Create getter and setter for properties of a class
 #define GETSET(type, varName, property)                                 \
@@ -105,10 +105,9 @@ const type& get##property() const {                                     \
 // Create debug messages
 #if defined(DEBUG)
 #define DEBUG_MSG(message) do {std::cout << message << std::endl;} while (false)
-
 #elif defined(DEBUG_FILE)
 #define DEBUG_MSG(message) do {                                         \
-    std::ofstream thisStream;                                \
+    std::ofstream thisStream;                                           \
     thisStream.open("Debug.save", std::ios_base::app);                  \
     thisStream << message << std::endl;                                 \
     thisStream.close();                                                 \
