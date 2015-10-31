@@ -8,14 +8,13 @@
 TOROOT= ..
 
 # define the C source files
-SRCS=ArduinoMotorDriver.cpp
-SRCS:= $(SRCS) ArduinoSerialConnection.cpp
 DSRCS= debug2.cpp
+SRCS := $(filter-out $(DSRCS), $(wildcard *.cpp))
 #dependencies of other modules
 DEPENDENCY = $(filter-out $(DSRCS), $(notdir $(wildcard $(TOROOT)/$(OBJECTFOLDER)/*.o)))
 # define the executable file 
 MAIN = ArduinoInterface
 DEBUG = debug
 
-include ../Makefile.config
+include $(TOROOT)/Makefile.config
 DEPENDENCY := $(filter-out $(DOBJS), $(DEPENDENCY))
