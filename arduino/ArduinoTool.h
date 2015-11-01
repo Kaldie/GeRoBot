@@ -20,7 +20,7 @@ class ArduinoTool {
   /// Enforced delay after switching off
   GETSET(int, m_switchOffTime, SwitchOffTime);
   /// Time it takes to "Reset" the tool
-  GETSET(int, m_coolDownTime, coolDownTime);
+  GETSET(int, m_coolDownTime, CoolDownTime);
   /// The pin number (A0 to A3) from which the tool is controled
   GETSET(int, m_pin, Pin);
   /// the state of the pin to get it to OFF

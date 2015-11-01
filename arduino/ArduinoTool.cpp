@@ -34,6 +34,9 @@ ArduinoTool::ArduinoTool(const Robot::RobotPointer& i_robot,
 
 
 void ArduinoTool::changeState(const bool& i_state) {
+  if (!m_robot)
+    return;
+
   if (m_pin > 3) {
     LOG_ERROR("Pin number cannot be higher then 3!");
   }
@@ -82,13 +85,17 @@ StateSequence ArduinoTool::createStateSequence(const PinState& i_state,
   float delay = static_cast<float>(i_delay);
   do {
     // this loop estimates the number of steps
-    frequency = 190;  // 2K frequency to start with
+    frequency = 210;  // 2K frequency to start with
     numberOfSteps += 1;
     do {
       // estimates the frequency
       frequency -= 10;
-      estimateNumberOfReps = delay * (frequency / 100) / numberOfSteps - 0.5;
+      estimateNumberOfReps = delay * (frequency / 100.0) / numberOfSteps - 0.5;
       estimateNumberOfReps += 1;
+      LOG_DEBUG("Delay: " << delay);
+      LOG_DEBUG("Current freq: " << frequency);
+      LOG_DEBUG("Estimate number of reps: " << estimateNumberOfReps);
+      LOG_DEBUG("Number of steps: " << numberOfSteps);
     } while (estimateNumberOfReps > (1 << 15) && frequency > 10);
   } while (estimateNumberOfReps > (1 << 15) && numberOfSteps <= 10);
   // check if the delay can be made
@@ -109,6 +116,7 @@ StateSequence ArduinoTool::createStateSequence(const PinState& i_state,
 
 
 int ArduinoTool::calculateOffTime() const {
+  LOG_DEBUG("Calculating cool down time!");
   SequenceVector sequenceVector(m_robot->getJointController()->getSequenceVector());
   float currentTime = 0.0;
   PinStateVector pinStateVector;
@@ -117,7 +125,10 @@ int ArduinoTool::calculateOffTime() const {
        stateSequence != rend;
        ++stateSequence) {
     currentTime += stateSequence->getIntegerSequence().size() *
-      stateSequence->getNumberOfRepetitions() / (stateSequence->getSpeed() * 10);
+      stateSequence->getNumberOfRepetitions() / stateSequence->getSpeed() * 100.0;
+    LOG_DEBUG("Current time: " << currentTime);
+    stateSequence->displaySequence();
+    LOG_DEBUG("-----------");
     // Search for the tool pin on
     for (const auto& pinState : stateSequence->getPinStateVector()) {
       if (pinState.hasPin(8 + m_pin)) {
@@ -126,5 +137,5 @@ int ArduinoTool::calculateOffTime() const {
       }
     }
   }
-  return static_cast<int>(currentTime);
+  return std::numeric_limits<int>::max();
 }
