@@ -21,8 +21,9 @@ class LineTraceCalculator: public BaseTraceCalculator {
 
   LineTraceCalculator(Robot* i_robotPointer,
                       const traceType& i_tolerance);
+
  protected:
-  // Calculation variables
+  /// Calculation variables
   bool calculateStep(const Trace&) const;
   void setRotationStep();
   void setTranslationStep();

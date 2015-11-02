@@ -2,16 +2,14 @@
 
 #include <macroHeader.h>
 #include <Point2D.h>
+#include <Line2D.h>
 #include <Arc2D.h>
 #include "Circle2D.h"
 
 
 Circle2D::Circle2D(const Point2D& i_firstPoint,
-                   const Point2D& i_secondPoint,
-                   const Point2D& i_centrePoint):
-    m_firstPoint(i_firstPoint),
-    m_secondPoint(i_secondPoint),
-    m_centrePoint(i_centrePoint) {
+                   const Point2D& i_centrePoint)
+  : m_firstPoint(i_firstPoint), m_centrePoint(i_centrePoint) {
   validate();
 }
 
@@ -19,9 +17,8 @@ Circle2D::Circle2D(const Point2D& i_firstPoint,
 Circle2D::Circle2D(const Point2D& i_firstPoint,
                    const Point2D& i_secondPoint,
                    const traceType& i_radius,
-                   const bool& i_isClockwise /*=true*/):
-    m_firstPoint(i_firstPoint),
-    m_secondPoint(i_secondPoint) {
+                   const bool& i_isClockwise /*=true*/)
+  : m_firstPoint(i_firstPoint) {
   m_centrePoint= this->getCentrePoint(i_firstPoint,
                                       i_secondPoint,
                                       i_radius,
@@ -65,7 +62,7 @@ Point2D Circle2D::getCentrePoint(const Point2D& i_firstPoint,
 }
 
 
-traceType Circle2D::radius()const {
+traceType Circle2D::radius() const {
   return Magnitude(m_firstPoint-m_centrePoint);
 }
 
@@ -87,14 +84,59 @@ bool Circle2D::isPointOnCircle(const Point2D& i_point) const {
 std::vector<Point2D*> Circle2D::getPointPointers() {
   std::vector<Point2D*> points;
   points.push_back(&m_firstPoint);
-  points.push_back(&m_secondPoint);
   points.push_back(&m_centrePoint);
   return points;
 }
 
 
 void Circle2D::validate() const {
-  if (!isPointOnCircle(m_firstPoint) ||
-      !isPointOnCircle(m_secondPoint))
+  if (!isPointOnCircle(m_firstPoint))
     LOG_ERROR("Radius defined by first and second point are not equal!");
+}
+
+
+Point2D Circle2D::nearestIntersection(const Line2D& i_line) const {
+  /* calculating the nearest
+     intersecting points leads to solving a quardatic equition, vector style
+     where a,b and c are results based on vector shit
+     check out:
+     http://stackoverflow.com/questions/1073336/circle-line-collision-detection
+  */
+  Vector2D d = i_line.getEndPoint() - i_line.getStartPoint();
+  Vector2D f = i_line.getStartPoint() - m_centrePoint;
+  traceType thisRadius = radius();
+
+  traceType a = Vector2D::dotProduct(d, d);
+  traceType b = 2 * Vector2D::dotProduct(f, d);
+  traceType c = Vector2D::dotProduct(f, f) - thisRadius * thisRadius;
+  traceType discriminant = b * b - 4 * a * c;
+  if (discriminant < 0) {
+    LOG_ERROR("No intersection, discriminant is 0");
+  /*
+    Line=startPoint+t*(endPoint-(0,0))
+    if t > 1 there is an insection only it lies a bit furthur
+    if 0<=t<=t it lies within the line piece
+    if t<0 it lies backward on the of the line piece
+    We simply want the point nearest to the robot position
+  */
+  }
+  if (discriminant == 0) {
+    // only 1 solution
+    traceType t = (-b - discriminant)/(2*a);
+    return t * i_line.getStartPoint();
+  } else {
+    discriminant = sqrt(discriminant);
+    // We will have 2 so
+    traceType t1 = (-b - discriminant)/(2*a);
+    traceType t2 = (-b + discriminant)/(2*a);
+    LOG_DEBUG("T1 : " << t1 <<  ", T2: " << t2);
+    if (std::abs(1 - t1) < std::abs(1 - t2)) {
+      LOG_DEBUG("Adjustment vector: " << static_cast<Point2D>(t1 * d));
+      return t1 * d + i_line.getStartPoint();
+    } else {
+      LOG_DEBUG("Adjustment vector: " << static_cast<Point2D>(t2 * d));
+      return t2 * d + i_line.getStartPoint();
+    }
+  }
+
 }

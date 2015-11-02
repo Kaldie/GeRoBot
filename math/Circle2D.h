@@ -6,9 +6,10 @@
 #include <Point2D.h>
 #include <macroHeader.h>
 
+class Line2D;  // used as reference
+
 class Circle2D {
   GETSETPROTECTED(Point2D, m_firstPoint, FirstPoint);
-  GETSETPROTECTED(Point2D, m_secondPoint, SecondPoint);
   GETSETPROTECTED(Point2D, m_centrePoint, CentrePoint);
 
  private:
@@ -36,7 +37,6 @@ class Circle2D {
    * @param[in] i_centrePoint Point2D that defines the centre of the circle
    */
   Circle2D(const Point2D& i_firstPoint,
-           const Point2D& i_secondPoint,
            const Point2D& i_centrePoint);
 
   /**
@@ -58,6 +58,8 @@ class Circle2D {
   bool isPointOnCircle(const Point2D& i_point) const;
 
   std::vector<Point2D*> getPointPointers();
+
+  Point2D nearestIntersection(const Line2D& i_line) const;
 };
 
 #endif  // MATH_CIRCLE2D_H_

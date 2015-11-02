@@ -40,16 +40,19 @@ void LineTraceCalculator::calculateTrace(const Trace& i_trace) {
 
 
 bool LineTraceCalculator::calculateStep(const Trace& i_trace) const {
+  LOG_DEBUG("Calculate step");
   // keeping track if the robot is orded to translate or rotated
   bool hasStepped = false;
   // should rotate?
   if (shouldRotate(i_trace,
                    m_robot->getVirtualPosition())) {
+    LOG_DEBUG("Needs to rotate");
     // add rotation to the delay list and correct translations
     prepareRotation(i_trace);
     hasStepped = true;
   } else if (shouldTranslate(i_trace,
                              m_robot->getVirtualPosition())) {
+    LOG_DEBUG("Needs to translate.");
     prepareTranslation(i_trace);
     hasStepped = true;
   }
@@ -123,8 +126,16 @@ bool LineTraceCalculator::correctRotation(const Trace& i_trace) const {
       This is done by spreading out the error over both the positive as negative side of the line
     */
     jointPointDifference = distanceBeginPointIntersectingPoint;
+    traceType perpendicularDistance;
+    try {
+      perpendicularDistance = i_trace.getPerpendicularDistance(currentRobotPosition);
+    } catch (std::runtime_error) {
+      perpendicularDistance = 100;
+    }
+    if (perpendicularDistance > jointPointDifference * 2) {
+      jointPointDifference*=2.0;
+    }
     destinationPoint=&intersectingPoint;
-    jointPointDifference*=1.0;
   }
 
   LOG_INFO("Destination point is: " <<
@@ -198,7 +209,16 @@ bool LineTraceCalculator::correctTranslation(const Trace& i_trace) const {
     */
     jointPointDifference = distanceBeginPointIntersectingPoint;
     destinationPoint = intersectingPoint;
-    jointPointDifference*=2.0;
+    traceType perpendicularDistance;
+    try {
+      perpendicularDistance = i_trace.getPerpendicularDistance
+        (currentRobotPosition);
+    } catch (std::runtime_error) {
+      perpendicularDistance = 100;
+    }
+    if (perpendicularDistance > jointPointDifference * 2) {
+      jointPointDifference*=2.0;
+    }
   }
   // calculate the number of steps needed to correct
   int numberOfSteps = std::floor(jointPointDifference/

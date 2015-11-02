@@ -6,10 +6,8 @@
 
 Arc2D::Arc2D(const Point2D& i_startPoint,
              const Point2D& i_endPoint,
-             const Point2D& i_centrePoint):
-    Circle2D(i_startPoint,
-             i_endPoint,
-             i_centrePoint) {
+             const Point2D& i_centrePoint)
+  : Circle2D(i_startPoint, i_centrePoint), m_secondPoint(i_endPoint) {
   traceType startAngle = (m_firstPoint-m_centrePoint).getAlpha();
   LOG_DEBUG("m_firstPoint: " << m_firstPoint.x << " , " << m_firstPoint.y);
   LOG_DEBUG("Start angle: " << startAngle);
@@ -27,9 +25,8 @@ Arc2D::Arc2D(const Point2D& i_startPoint,
              const Point2D& i_endPoint,
              const Point2D& i_centrePoint,
              const bool& i_isClockwise)
-  : Circle2D(i_startPoint,
-             i_endPoint,
-             i_centrePoint),
+  : Circle2D(i_startPoint, i_centrePoint),
+    m_secondPoint(i_endPoint),
     m_isClockwise(i_isClockwise)
 {}
 
@@ -37,11 +34,9 @@ Arc2D::Arc2D(const Point2D& i_startPoint,
 Arc2D::Arc2D(const Point2D& i_startPoint,
              const Point2D& i_endPoint,
              const traceType& i_radius,
-             const bool& i_isClockwise):
-    Circle2D(i_startPoint,
-             i_endPoint,
-             i_radius,
-             i_isClockwise),
+             const bool& i_isClockwise)
+  : Circle2D(i_startPoint, i_endPoint, i_radius, i_isClockwise),
+    m_secondPoint(i_endPoint),
     m_isClockwise(i_isClockwise)
 {}
 

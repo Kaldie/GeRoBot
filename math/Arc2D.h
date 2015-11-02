@@ -7,6 +7,7 @@
 class Point2D;
 
 class Arc2D :public Circle2D {
+  GETSETPROTECTED(Point2D, m_secondPoint, SecondPoint);
   GETSET(bool, m_isClockwise, IsClockwise);
  public:
   Arc2D(const Point2D& i_firstPoint,
@@ -27,8 +28,6 @@ class Arc2D :public Circle2D {
   traceType arcLength() const;
  private:
   Arc2D();
-
-
 };
 
 #endif  // MATH_ARC2D_H_

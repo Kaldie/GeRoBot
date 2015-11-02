@@ -51,7 +51,7 @@ bool BaseTraceCalculator::hasRobot() const {
 void BaseTraceCalculator::setTolerances() {
   if (hasRobot()) {
    m_rotationTolerance = m_robot->getMovementPerStep(Rotational) / 1.0;
-   m_translationTolerance = m_robot->getMovementPerStep(Translational) / 1.0;
+   m_translationTolerance = m_robot->getMovementPerStep(Translational) / 2.0;
   }
   m_tolerance = std::min(m_rotationTolerance, m_translationTolerance);
 }
@@ -106,21 +106,19 @@ bool BaseTraceCalculator::shouldTranslate(const Trace& i_trace,
   traceType pointMagnitude = Magnitude(i_point2D);
   traceType endPointMagnitude = Magnitude(i_trace.getEndPoint());
 #endif
-  traceType difference = Magnitude(i_point2D - i_trace.getEndPoint());
+  traceType difference = std::abs(Magnitude(i_point2D) -
+                                  Magnitude(i_trace.getEndPoint()));
   bool shouldTranslate;
-
-  if (difference>m_translationTolerance)
+  if (difference > m_translationTolerance)
     shouldTranslate = true;
   else
     shouldTranslate = false;
-
 #ifdef DEBUG
-  if (!shouldTranslate) {
     LOG_INFO("Not translating!! ");
     LOG_INFO("Current magnitude: " << pointMagnitude << ". ");
     LOG_INFO("Wanted magnitude: " << endPointMagnitude);
-    LOG_INFO("diff: " << pointMagnitude-endPointMagnitude);
-  }
+    LOG_INFO("diff: " << difference);
+    LOG_INFO("translation tolerance: " << m_translationTolerance);
 #endif
   return shouldTranslate;
 }
