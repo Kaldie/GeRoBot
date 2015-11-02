@@ -48,3 +48,9 @@ traceType Point2D::getAngleToOrigin() {
 traceType Point2D::getAngleBetweenPoints(const Point2D &i_point2D) const {
   return this->getAlpha()-i_point2D.getAlpha();
 }
+
+
+std::ostream& operator<<(std::ostream& os, const Point2D& i_point) {
+  os << i_point.x << " , " << i_point.y;
+  return os;
+}

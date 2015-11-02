@@ -71,18 +71,20 @@ class Point2D:public Vector2D {
     return (Point2D(x * f, y * f));
   };
 
+#ifdef QT
   /**
    * Cast the Point2D to a QT point.
    * Due to changes in coordinate system we need to flip the y-axis
    */
-#ifdef QT
   operator QPointF() const {return QPointF(x,-y);};
 #endif
+
   bool operator ==(const Point2D& i_other) const ;
   traceType getAngleBetweenPoints(const Point2D&) const;
   traceType getAngleToOrigin();
 };
 
+std::ostream& operator<<(std::ostream& os, const Point2D& i_point);
 
 traceType Magnitude(const Vector2D& v);
 
