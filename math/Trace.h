@@ -24,12 +24,14 @@ class Trace {
   Trace(const Point2D& i_startPoint,
         const Point2D& i_endPoint);
 
-  // isEqual operator
+  /// isEqual operator
   bool operator==(const Trace& rhs) const;
+  /// inverse equal operator
   bool operator!=(const Trace& rhs) const {return !operator==(rhs);}
 
-  // Actual methods
+  /// return a Line2D that is this trace
   Line2D getTraceLine() const;
+
   /**
    * Given a point, determine the point on the
    * trace which will be intersected by the position and the base
@@ -37,6 +39,12 @@ class Trace {
    * used to get nearer to the end point.
    */
   virtual Point2D intersectingPoint(const Point2D& i_currentPosition) const;
+
+  /**
+   * Given a line going through the origin and i_position,
+   * determine the distance to the trace given a perpendicular line from i_position
+   */
+  virtual traceType getPerpendicularDistance(const Point2D& i_position) const;
 
   /**
    * Get direction which the robot needs to rotate to.
@@ -60,9 +68,11 @@ class Trace {
   std::string getTranslationDirection(const Point2D& i_currentPosition,
                                       const Point2D& i_desiredPosition) const;
 
+  /// return the direction to which need to be rotated to reach the end position
   std::string getRotationDirection(const Point2D&, const Point2D&) const;
 
   virtual std::vector<Point2D*> getPointPointers();
+
   /**
    * give a vector with points that estimate the trace.
    * If the number of points correlate with the number of steps
@@ -73,6 +83,7 @@ class Trace {
 
   /// Reverses the trace: endpoint become beginning and startpoint becomes end
   virtual void reverse();
+
   /// Returns if the given trace is connected with this trace
   bool isAbutting(const Trace& i_trace) const;
 };

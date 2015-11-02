@@ -156,3 +156,11 @@ bool Trace::isAbutting(const Trace& i_trace) const {
     return false;
   }
 }
+
+
+traceType Trace::getPerpendicularDistance(const Point2D& i_position) const {
+  /// Determine gradient of the line
+  Vector2D gradient(i_position.y, -1 * i_position.x);
+  Line2D gradientLine(i_position, i_position + gradient);
+  return Magnitude(i_position - getTraceLine().getIntersectingPoint(gradientLine));
+}
