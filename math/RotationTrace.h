@@ -34,12 +34,6 @@ class RotationTrace: public Trace {
     Arc2D getArc() const;
 
     /**
-     * Get the point between the start and stop position.
-     * this point corrispond to the point which is used a suggestion
-     * in suggestCentralPoint()
-     */
-    Point2D getPointBetweenStartAndStopPosition() const;
-    /**
      * Sugestion of its central point based on 2 Point2Ds
      * This method suggest a point that can be validly used as a central point based on 2 other points
      * This method can be used if, for instance, a LineTrace needs to be
@@ -48,7 +42,47 @@ class RotationTrace: public Trace {
     static Point2D suggestCentralPoint(const Point2D& i_startPoint,
                                        const Point2D& i_endPoint);
 
+    /**
+     * Given a point, determine the point on the
+     * trace which will be intersected by the position and the base
+     * This position is used to "correct" rotations or translation
+     * used to get nearer to the end point.
+     */
     virtual Point2D intersectingPoint(const Point2D& i_currentPosition) const;
+
+    /**
+     * Get the point between the start and stop position.
+     * this point corrispond to the point which is used a suggestion
+     * in suggestCentralPoint()
+     */
+    Point2D getPointBetweenStartAndStopPosition() const;
+
+    /**
+     * Split the trace to go from the first to the extremes to the end
+     * If the there are one or more extreme points found. Create multiple traces
+     * which can be calculated one after each other to get proper arc
+     */
+    std::vector<RotationTrace> getNecessaryTraces() const;
+
+    std::vector<Point2D*> getPointPointers();
+
+    void getStartStopAngle(double* i_startAngle,
+                           double* i_stopAngle) const;
+
+    void getExtremePoints(std::vector<Point2D>* i_list,
+                          const double* i_angle = nullptr) const;
+
+    /// Estimate the trace with a std::vector<Point2D> with size of i_numberOfPoints
+    virtual std::vector<Point2D> estimateTrace(const int& i_numberOfPoints) const;
+
+    /**
+     * Given a line going through the origin and i_position,
+     * determine the distance to the trace given a perpendicular line from i_position
+     */
+    virtual traceType getPerpendicularDistance(const Point2D& i_position) const;
+
+    ///  Reverses the trace: endpoint become beginning and startpoint becomes end
+    virtual void reverse();
 
     /**
      * constructor
@@ -67,7 +101,6 @@ class RotationTrace: public Trace {
      */
     RotationTrace();
 
-
     /**
      * constructor
      * @param[in] i_startPoint Start point
@@ -84,23 +117,6 @@ class RotationTrace: public Trace {
      */
     RotationTrace(const Arc2D& i_arc);
 
-    /**
-     * Split the trace to go from the first to the extremes to the end
-     * If the there are one or more extreme points found. Create multiple traces
-     * which can be calculated one after each other to get proper arc
-     */
-    std::vector<RotationTrace> getNecessaryTraces() const;
-
-    std::vector<Point2D*> getPointPointers();
-
-    void getStartStopAngle(double* i_startAngle,
-                           double* i_stopAngle) const;
-    void getExtremePoints(std::vector<Point2D>* i_list,
-                          const double* i_angle = nullptr) const;
-    /// Estimate the trace with a std::vector<Point2D> with size of i_numberOfPoints
-    virtual std::vector<Point2D> estimateTrace(const int& i_numberOfPoints) const;
-    ///  Reverses the trace: endpoint become beginning and startpoint becomes end
-    virtual void reverse();
  private:
     /// bockus function, all points are valid, if the trace can be constructed!
     virtual bool isValidStartAndEndPosition(const Point2D&,
@@ -112,7 +128,7 @@ class RotationTrace: public Trace {
 
     Point2D* getCentralPointFromArc() const;
 
-   /**
+    /**
      * The arguments will contain points which intersects the trace at extreme angles
      * Calculates and returns points which intesect the trace at the maximum and minimum angle
      * The angle is defined as the angle a line intersecting the

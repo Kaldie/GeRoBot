@@ -51,52 +51,8 @@ Arc2D RotationTrace::getArc() const {
 
 Point2D RotationTrace::intersectingPoint(
     const Point2D& i_currentPosition) const {
-  /* calculating the intersecting points leads to solving a quardatic equition, vector style
-     where a,b and c are results based on vector shit
-     check out:
-     http://stackoverflow.com/questions/1073336/circle-line-collision-detection
-  */
-
-  Vector2D f = (-1 * m_centrePoint);
-  Point2D d = Vector2D(i_currentPosition.x,
-                       i_currentPosition.y);
-
-  traceType a = Vector2D::dotProduct(d, d);
-  traceType b = 2*(Vector2D::dotProduct(f, d));
-
-  traceType radius = getArc().radius();
-  traceType c =
-      Vector2D::dotProduct(f, f) - radius * radius;
-
-  traceType discriminant = b * b - 4 * a * c;  // squared
-
-  if (discriminant < 0) {
-    LOG_ERROR("No intersection, discriminant is 0");
-  /*
-    Line=startPoint+t*(endPoint-(0,0))
-    if t > 1 there is an insection only it lies a bit furthur
-    if 0<=t<=t it lies within the line piece
-    if t<0 it lies backward on the of the line piece		
-    We simply want the point nearest to the robot position 
-  */
-  }
-
-  discriminant = sqrt(discriminant);
-  if (discriminant == 0) {
-    // only 1 solution
-    traceType t = (-b - discriminant)/(2*a);
-    return t*i_currentPosition;
-  } else {
-    // We will have 2 so
-    traceType t1 = (-b - discriminant)/(2*a);
-    traceType t2 = (-b + discriminant)/(2*a);
-    LOG_DEBUG("T1 : " << t1 <<  ", T2: " << t2);
-
-    if (std::abs(1-t1) < std::abs(1-t2))
-      return t1*i_currentPosition;
-    else
-      return t2*i_currentPosition;
-  }
+  return getArc().
+    nearestIntersection(Line2D(Point2D(0, 0), i_currentPosition));
 }
 
 
@@ -291,4 +247,12 @@ std::vector<Point2D> RotationTrace::estimateTrace(const int& i_numberOfPoints) c
 void RotationTrace::reverse() {
   Trace::reverse();
   m_isClockwise = !m_isClockwise;
+}
+
+
+traceType RotationTrace::getPerpendicularDistance
+(const Point2D& i_position) const {
+  Vector2D gradient(i_position.y, -1 * i_position.x);
+  Line2D gradientLine(i_position, i_position + gradient);
+  return Magnitude(getArc().nearestIntersection(gradientLine) - i_position);
 }
