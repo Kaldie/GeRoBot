@@ -82,6 +82,21 @@ class TraceTest : public CxxTest::TestSuite {
       TS_ASSERT_EQUALS(points[i], Point2D(i*-2,10));
     }
   }
+
+  void testPerpendicularDistance() {
+    Trace trace(Point2D(1, 0), Point2D(1, 25));
+    TS_ASSERT_DELTA(Trace(Point2D(1, 0), Point2D(1, 25)).
+		    getPerpendicularDistance(Point2D(0, 10)), 1, 0.0001);
+    TS_ASSERT_DELTA(Trace(Point2D(10, 0), Point2D(10, 25)).
+		    getPerpendicularDistance(Point2D(0, 10)), 10, 0.0001);
+    TS_ASSERT_DELTA(Trace(Point2D(1, 0), Point2D(26, 25)).
+		    getPerpendicularDistance(Point2D(25, 25)), 0.7071, 0.0001);
+    TS_ASSERT_DELTA(Trace(Point2D(-1, 0), Point2D(24, 25)).
+		    getPerpendicularDistance(Point2D(25, 25)), 0.7071, 0.0001);
+    TS_ASSERT_DELTA(Trace(Point2D(-10, 0), Point2D(15, 25)).
+		    getPerpendicularDistance(Point2D(25, 25)), 0.7071*10, 0.0001);
+
+  }
 };
 
 #endif  // MATH_UNIT_TEST_TRACETEST_H_

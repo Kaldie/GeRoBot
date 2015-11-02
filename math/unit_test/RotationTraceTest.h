@@ -95,6 +95,7 @@ class RotationTraceTest : public CxxTest::TestSuite {
     TS_ASSERT_EQUALS(vector[0].getEndPoint(), Point2D(4, 0));
   };
 
+
   void testEstimateTrace() {
     RotationTrace trace(Point2D(0, 4),
                         Point2D(0, 4),
@@ -136,5 +137,12 @@ class RotationTraceTest : public CxxTest::TestSuite {
     }
   }
 
+
+  void testPerpendicularDistance() {
+      TS_ASSERT_DELTA(RotationTrace(Point2D(10, 1), Point2D(10, 1), Point2D(0, 1)).
+                    getPerpendicularDistance(Point2D(0, 1)), 10, 0.0001);
+      TS_ASSERT_DELTA(RotationTrace(Point2D(13,5), Point2D(13, 5), Point2D(3, 5)).
+                 getPerpendicularDistance(Point2D(3, 5)), 10, 0.0001);
+  }
 };
 #endif  // MATH_UNIT_TEST_ROTATIONTRACETEST_H_
