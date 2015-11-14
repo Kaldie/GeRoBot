@@ -5,19 +5,19 @@
 void StepperDriverIO::build() {
   LOG_DEBUG("Buildiing a stepperdriver!");
   std::string actuatorType = getNode().first_child().text().as_string();
-  if (actuatorType != "STEPPERDRIVER")
+  if (actuatorType != "STEPPERDRIVER") {
     LOG_ERROR("Actuator type is only stepper driver!!!!");
-
-  std::vector<int> pinVector = getIntList(getNode(),
-                                          "./PINS",
-                                          3);
-
+  }
+  std::vector<int> pinVector = getIntList(getNode(), "./PINS", 3);
   StepperDriver stepperDriver(pinVector);
   stepperDriver.setDefaultDirection(
       getNodeFromPath("./DEFAULT_DIRECTION").text().as_string());
   LOG_DEBUG("Default direction is: " << stepperDriver.getDefaultDirection());
   stepperDriver.setHoldMotor(getNodeFromPath("./HOLD_MOTOR").text().as_bool());
   LOG_DEBUG("Hold motor: " << stepperDriver.getHoldMotor());
+  stepperDriver.setMaxSpeed(getNodeFromPath("./MAX_SPEED").text().as_int());
+  stepperDriver.setPullIn(getNodeFromPath("./PULL_IN").text().as_int());
+  stepperDriver.setPullOut(getNodeFromPath("./PULL_OUT").text().as_int());
   setStepperDriver(stepperDriver);
 }
 

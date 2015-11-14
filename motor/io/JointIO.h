@@ -5,20 +5,20 @@
 #include <BaseJoint.h>
 #include <StepperDriver.h>
 
-typedef std::shared_ptr<BaseJoint> JointPointer;
-
 class JointIO: public XMLBuilder {
-  GETSET(JointPointer, m_jointPointer, JointPointer);
+  GETSET(BaseJoint::JointPointer, m_jointPointer, JointPointer);
+
+ public:
+  virtual void build();
+  explicit JointIO(const pugi::xml_node&);
+  bool update(const BaseJoint::JointPointer& i_jointPointer);
 
  private:
   // No default contructor!!
   JointIO();
   StepperDriver parseStepperDriver(const pugi::xml_node&);
-
- public:
-  virtual void build();
-  explicit JointIO(const pugi::xml_node&);
-  bool update(const JointPointer& i_jointPointer);
+  void makeSharedJoint();
+  void handleConversionMap();
 };
 
 #endif // JointControllerBUilder
