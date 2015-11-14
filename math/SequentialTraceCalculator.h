@@ -8,8 +8,12 @@
 class SequentialTraceCalculator {
   /// Robot which will be operated on
   GETSET(Robot::RobotPointer, m_robot, Robot);
+
   /// Trace section which will be calculated
   GETSET(tsa::TraceSection, m_traceSection, TraceSection);
+
+  /// Let the robot come to an halt after each section
+  GETSET(bool, m_stopAfterSection, StopAfterSection);
  public:
   /// Easy Constructor
   SequentialTraceCalculator();

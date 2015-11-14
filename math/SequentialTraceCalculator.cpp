@@ -23,7 +23,7 @@ SequentialTraceCalculator::SequentialTraceCalculator(const Robot::RobotPointer& 
 /// Full Fledged Constructor
 SequentialTraceCalculator::SequentialTraceCalculator(const Robot::RobotPointer& i_robot,
                                                      const tsa::TraceSection& i_section)
-  : m_robot(i_robot), m_traceSection(i_section) {
+  : m_robot(i_robot), m_traceSection(i_section), m_stopAfterSection(true) {
 }
 
 
