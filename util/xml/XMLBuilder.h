@@ -10,7 +10,7 @@ class XMLBuilder {
  private:
   GETSET(std::string, m_fileName, FileName);
   GETSET(bool, m_hasLoaded, HasLoaded);
-  GETSET(pugi::xml_node, m_node, Node);
+  GETSETPROTECTED(pugi::xml_node, m_node, Node);
 
   std::shared_ptr<pugi::xml_document> m_documentPointer;
 
