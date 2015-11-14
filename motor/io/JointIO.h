@@ -19,6 +19,7 @@ class JointIO: public XMLBuilder {
   StepperDriver parseStepperDriver(const pugi::xml_node&);
   void makeSharedJoint();
   void handleConversionMap();
+  bool isValidNode(const pugi::xml_node&) const;
 };
 
 #endif // JointControllerBUilder

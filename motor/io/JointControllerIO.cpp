@@ -6,38 +6,41 @@ void JointControllerIO::build() {
   LOG_DEBUG("Building a Joint controller!");
   LOG_DEBUG("Joint controller node: " <<
             std::string(getNode().name()));
-
   addJoints();
   m_jointController.setActuator(parseActuator(getNodeFromPath("./ACTUATOR")));
-
   LOG_DEBUG("Joint controller node: " <<
             std::string(getNode().name()));
 }
 
 
 void JointControllerIO::addJoints(){
-  // Adding all the joints that
   LOG_DEBUG("Adding Joints");
-
-  BaseJoint::JointPointer pointer;
+  typedef std::tuple<pugi::xml_node, BaseJoint::JointPointer, std::string> JointTupple;
+  std::vector<JointTupple> jointTupleVector;
+  BaseJoint::JointPointer jointPointer;
+  std::string identificationString;
   for (pugi::xml_node jointNode = getNodeFromPath("./JOINT");
       jointNode;
       jointNode = jointNode.next_sibling()) {
     LOG_DEBUG(jointNode.name());
-
-    // if the sibling is named Joint, we are in bissnuss
+    // if the sibling is named Joint
     if(std::string(jointNode.name()) == "JOINT") {
       LOG_DEBUG("adding a joint!!");
-      parseJoint(jointNode);
+      jointPointer = parseJoint(jointNode);
+      identificationString = 
+	getNodeFromPath(jointNode, "IDENTIFICATIONSTRING").text().as_string();
+      jointTupleVector.push_back
+	(std::make_tuple(jointNode, jointPointer, identificationString));
+
     }
   }
 }
 
 
-void JointControllerIO::parseJoint(const pugi::xml_node& i_jointNode) {
+BaseJoint::JointPointer JointControllerIO::parseJoint(const pugi::xml_node& i_jointNode) {
   JointIO jointIO(i_jointNode);
   jointIO.build();
-  m_jointController.addJoint(jointIO.getJointPointer());
+  return jointIO.getJointPointer();
 }
 
 
@@ -83,16 +86,16 @@ bool JointControllerIO::updateJointNodes() {
   // current found joint pointer
   BaseJoint::JointPointer jointPointer;
   // current movement type
-  MovementType movementType;
+  BaseJoint::MovementType movementType;
   std::string movementString;
   for (pugi::xml_node jointNode = getNodeFromPath("./JOINT");
       jointNode;
       jointNode = jointNode.next_sibling()) {
     movementString = getNodeFromPath(jointNode, "./MOVEMENT_TYPE").text().as_string();
     if (movementString.compare(std::string("Rotational")) != 0) {
-      movementType = Rotational;
+      movementType = BaseJoint::Rotational;
     } else if (movementString.compare("Translational") != 0) {
-      movementType = Translational;
+      movementType = BaseJoint::Translational;
     }
     for (auto& jointPointer : jointVector) {
       if (jointPointer->getMovementType() == movementType) {

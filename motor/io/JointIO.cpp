@@ -9,13 +9,13 @@
 
 void JointIO::build() {
   LOG_DEBUG("Building a joint");
-  if (!isValidNode(m_node)) {
+  if (!isValidNode(m_node) ) {
     LOG_ERROR("Not a valid joint node!");
   }
   makeSharedJoint();
   //Movement per step
   m_jointPointer->setMovementPerStep
-    (getNodeFromPath(jointNode, "./MOVEMENT_PER_STEP").text().as_double());
+    (getNodeFromPath(m_node, "./MOVEMENT_PER_STEP").text().as_double());
   //Position
   m_jointPointer->setPosition
     (getNodeFromPath(m_node, "./DEFAULT_POSITION").text().as_double());
@@ -25,7 +25,7 @@ void JointIO::build() {
     parseStepperDriver(getNodeFromPath(m_node, "./ACTUATOR"));
   //Range
   m_jointPointer->setRange(getDoubleList(m_node, "./RANGE", 2));
-  handleDirectionMap();
+  handleConversionMap();
   LOG_DEBUG("Construction of the pointer is finished!");
   LOG_DEBUG("Joint Build is finshed!");
 }
@@ -44,9 +44,9 @@ JointIO::JointIO(const pugi::xml_node& i_node) {
 
 
 bool JointIO::update(const BaseJoint::JointPointer& i_jointPointer) {
-  if (i_jointPointer->getMovementType() == Rotational)
+  if (i_jointPointer->getMovementType() == BaseJoint::Rotational)
     getNodeFromPath("./MOVEMENT_TYPE").text().set("ROTATIONAL");
-  else if (i_jointPointer->getMovementType() == Translational)
+  else if (i_jointPointer->getMovementType() == BaseJoint::Translational)
     getNodeFromPath("./MOVEMENT_TYPE").text().set("TRANSLATIONAL");
   else
     LOG_ERROR("Unknown movement type!");
@@ -99,7 +99,7 @@ bool JointIO::isValidNode(const pugi::xml_node& i_node) const {
 
 void JointIO::makeSharedJoint() {
   std::string movementType =
-    getNodeFromPath(jointNode, "./MOVEMENT_TYPE").text().as_string();
+    getNodeFromPath(m_node, "./MOVEMENT_TYPE").text().as_string();
   if (movementType == "ROTATIONAL") {
     LOG_DEBUG("Building a rotational joint!");
     m_jointPointer = std::make_shared<RotationalJoint<StepperDriver>>();

@@ -2,6 +2,7 @@
 #define JointControllerIO_H
 
 #include <JointController.h>
+#include <BaseJoint.h>
 #include <XMLBuilder.h>
 
 class JointControllerIO: public XMLBuilder {
@@ -13,7 +14,7 @@ class JointControllerIO: public XMLBuilder {
   // no default contructor!
   JointControllerIO();
   void addJoints();
-  void parseJoint(const pugi::xml_node&);
+  BaseJoint::JointPointer parseJoint(const pugi::xml_node&);
   ArduinoMotorDriver parseActuator(const pugi::xml_node&);
   bool updateActuatorNode();
   bool updateJointNodes();
@@ -24,5 +25,4 @@ class JointControllerIO: public XMLBuilder {
   virtual void build();
   bool update(const JointController& i_newJointController);
 };
-
 #endif // JointControllerIO
