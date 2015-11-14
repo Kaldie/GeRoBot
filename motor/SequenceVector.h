@@ -12,11 +12,6 @@ class SequenceVector {
          m_sequenceVector,
          SequenceVector);
 
- private:
-  StateSequence* getLastSequence();
-  bool mergeCondense(const bool& i_removeFromVector);
-  bool internalCondense();
-  bool recompileCondense();
  public:
   int numberOfSteps() const;
   int numberOfSequences() const;
@@ -31,8 +26,10 @@ class SequenceVector {
   void appendStateSequence(const StateSequence& i_stateSequence,
                            const bool& i_merge);
 
+  /// shortcut the the first sequence
   std::vector<StateSequence>::const_iterator begin()
       const { return m_sequenceVector.begin();};
+  /// Shortcut to the one after the last sequences
   std::vector<StateSequence>::const_iterator end()
       const { return m_sequenceVector.end();};
 
@@ -50,14 +47,25 @@ class SequenceVector {
     return getLastSequence()->addToSequence(i_pinState,
                                             i_forceAdd);};
 
+  /// try to add a pin state vector to the last StateSequence
   bool addToSequence(const PinStateVector& i_pinStateVector) {
     return getLastSequence()->addToSequence(i_pinStateVector);};
 
+  /// Try to add a StateSequence to the last one
   bool addToSequence(const StateSequence& i_otherSequence) {
     return getLastSequence()->addToSequence(i_otherSequence);};
 
+  /// Remove all the sequences from the vector
   void clean();
+  /// create a file where all states are stated
   void exportValue() const;
+
+ private:
+  StateSequence* getLastSequence();
+  bool mergeCondense(const bool& i_removeFromVector);
+  bool internalCondense();
+  bool recompileCondense();
+
 };
 
 #endif  // MOTOR_SEQUENCEVECTOR_H_

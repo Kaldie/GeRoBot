@@ -19,7 +19,7 @@ void JointControllerIO::addJoints(){
   // Adding all the joints that
   LOG_DEBUG("Adding Joints");
 
-  JointPointer pointer;
+  BaseJoint::JointPointer pointer;
   for (pugi::xml_node jointNode = getNodeFromPath("./JOINT");
       jointNode;
       jointNode = jointNode.next_sibling()) {
@@ -81,7 +81,7 @@ bool JointControllerIO::updateJointNodes() {
   JointController::JointPointerVector jointVector =
     m_jointController.getJointPointerVector();
   // current found joint pointer
-  JointPointer jointPointer;
+  BaseJoint::JointPointer jointPointer;
   // current movement type
   MovementType movementType;
   std::string movementString;

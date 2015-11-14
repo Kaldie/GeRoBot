@@ -32,7 +32,8 @@ BaseMotor::BaseMotor(const PinVector& i_pins,
                      const std::string& i_defaultDirection,
                      const bool i_holdMotor)
     : m_defaultDirection(i_defaultDirection),
-      m_holdMotor(i_holdMotor) {
+      m_holdMotor(i_holdMotor),
+      m_speed(0) {
   setPins(i_pins);
 }
 

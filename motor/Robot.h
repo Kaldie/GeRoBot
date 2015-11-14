@@ -2,6 +2,7 @@
 #ifndef ROBOT_ROBOT_H_
 #define ROBOT_ROBOT_H_
 
+#include <BaseJoint.h>
 #include <JointController.h>
 #include <Point2D.h>
 class Trace;
@@ -16,33 +17,43 @@ class Trace;
 class Robot {
   // Handles the joints and can update the position after a step
   GETSET(JointController::JointControllerPointer, m_jointController, JointController);
+
   // Speed of the robot during the movement
   GETSET(float, m_speed, Speed);
+
   // Position of the head of the robot
   GETSET(Point2D, m_position, Position);
+
   // Position after current actuations
   GETSET(Point2D, m_virtualPosition, VirtualPosition);
+
   // Positions which has been seen during stepping
   GETSET(std::vector<Point2D>, m_traveledPoints, TraveledPoints);
+
  public:
   typedef std::shared_ptr<Robot> RobotPointer;
+
   /// Returns if there is a valid arduino connenction
   bool hasValidConnection();
+
   /// returns a pointer to the actual position
   Point2D* getPositionPointer() {return &m_position;}
 
-  /*---------------Tool--------------------- */
+
   /// Creates a state which will switch the tool to a active or inactive state
   void switchTool(const bool& i_shouldBeActive){}; // no yet implemented!
-  /*---------------actuations---------------- */
+
   /// move to a position, independend on maner
   void goToPosition(const Point2D&);
+
   /// Given the pre-calculated steps, prefrom them
   void actuate();
+
   /// set a step and set the hold motor function to the boolean value
   void setIdle(const bool& i_setIdle);
+
   /// Get the amount of movement per step given a direction
-  traceType getMovementPerStep(const MovementType&) const ;
+  traceType getMovementPerStep(const BaseJoint::MovementType&) const ;
 
   /**
    * prepares to take steps with the given movement type, direction and number
@@ -53,15 +64,20 @@ class Robot {
    */
   void prepareSteps(const std::string& i_direction,
                    const int& i_numberOfSteps);
+
   /// Add an StateSequence to the vector. Use this for instance when a wait is required
   void addToSequence(const StateSequence& i_sequence);
+
   /// easy to do
   Robot();
+
   /// defines controlle
   Robot(const JointController::JointControllerPointer& i_pointer);
+
   /// defines controller and speed
   Robot(const JointController::JointControllerPointer& i_pointer,
         const int& i_speed);
+
   /// fully fledged constructor
   Robot(const JointController::JointControllerPointer& i_pointer,
         const int& i_speed,

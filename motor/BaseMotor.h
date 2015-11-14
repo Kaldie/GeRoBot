@@ -10,18 +10,22 @@ class SequenceVector;
 class StateSequence;
 
 class BaseMotor {
-  // State in which the pins currently resides
-  GETSET(PinState, m_currentPinState, CurrentPinState);
+  /// State in which the pins currently resides
+  GETSETPROTECTED(PinState, m_currentPinState, CurrentPinState);
 
-  // Direction which the motor goes when all pins are in default mode
+  /// Direction which the motor goes when all pins are in default mode
   GETSET(std::string, m_defaultDirection, DefaultDirection);
 
-  // After setting the step, hold the motor or release the current
+  /// After setting the step, hold the motor or release the current
   GETSET(bool, m_holdMotor, HoldMotor);
 
+  /// Current speed of the motor
+  GETSETPROTECTED(int, m_speed, Speed);
  public:
   PinState* getPinStatePointer() {return &m_currentPinState;}
+
   virtual void setPins(const PinVector&);
+
   virtual PinVector getPins() const {return m_currentPinState.getPinVector();}
 
   // Move steps
@@ -32,7 +36,15 @@ class BaseMotor {
                          const int& i_numberOfSteps,
                          SequenceVector* i_vector) =0;
 
-  virtual int numberOfStatesPerStep() const =0;
+  virtual int numberOfStatesPerStep() const = 0;
+
+  /// return the maximum speed the motor could achive right now
+  /// including acceleration etc.
+  virtual int getMaximumSpeed() const = 0;
+
+  /// return the minimum speed the motor could achive right now
+  /// including breaking etc.
+  virtual int getMinimumSpeed() const = 0;
 
   // Print pin states
   virtual void displayPinState() const;

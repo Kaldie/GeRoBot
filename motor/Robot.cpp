@@ -45,7 +45,7 @@ bool Robot::hasValidConnection() {
 }
 
 
-traceType Robot::getMovementPerStep(const MovementType& i_movementType) const {
+traceType Robot::getMovementPerStep(const BaseJoint::MovementType& i_movementType) const {
   return m_jointController->resolveJoint(i_movementType)->getMovementPerStep();
 }
 

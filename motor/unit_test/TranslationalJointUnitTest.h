@@ -13,60 +13,46 @@
 
 class TranslationalJointUnitTest : public CxxTest::TestSuite {
  public:
-  void testCreation(void) {
-    TranslationalJoint<StepperDriver> translationalJoint1;
+  TranslationalJoint<StepperDriver> translationalJoint;
 
-    TranslationalJoint<StepperDriver> translationalJoint2(10.1,
-                                                    0.3);
-
-    StepperDriver driver;
-    TranslationalJoint<StepperDriver> translationalJoint3(10.1,
-                                                    0.3,
-                                                    driver);
-
-    TranslationalJoint<StepperDriver> translationalJoint4(0.0,
-                                                    1.0,
-                                                    DirectionConversionMap {
-                                                      {"CCW","IN"},
-                                                      {"CW","OUT"}
-                                                    },
-                                                    driver);
+  void setUp() {
+    translationalJoint.setPosition(50);
+    translationalJoint.setMovementPerStep(1);
   }
 
+
   void testPredictStep() {
-    TranslationalJoint<StepperDriver> translationalJoint(50, 1);
     translationalJoint.setRange(std::vector<traceType>{50, 180});
-    Point2D point(0, 50);
+    Point2D point(50, 0);
     for (int i = 0;
          i < 45;
          i++) {
       translationalJoint.predictSteps(&point, "OUT", 1);
     }
-    TS_ASSERT_EQUALS(point, Point2D(0, 95));
+    TS_ASSERT_EQUALS(point, Point2D(95, 0));
   }
 
 
   void testPredictSteps() {
-    TranslationalJoint<StepperDriver> translationalJoint(50, 1);
-    translationalJoint.setRange(std::vector<traceType>{50, 180});
-    Point2D point(0, 50);
+      translationalJoint.setRange(std::vector<traceType>{50, 180});
+    Point2D point(50, 0);
 
     std::string direction("OUT");
     std::string contraDirection("IN");
     translationalJoint.predictSteps(&point, direction, 90);
     LOG_DEBUG(point.x << ", "<< point.y);
-    TS_ASSERT_EQUALS(point, Point2D(0, 140));
+    TS_ASSERT_EQUALS(point, Point2D(140, 0));
     translationalJoint.predictSteps(&point, contraDirection, 90);
-    TS_ASSERT_EQUALS(point, Point2D(0, 50));
+    TS_ASSERT_EQUALS(point, Point2D(50, 0));
   }
 
   void testClone() {
     StepperDriver stepperDriver({5,7,4});
-    TranslationalJoint<StepperDriver> translationalJoint(90, 1, stepperDriver);
-    PinVector pinVector = translationalJoint.getMotor()->getPins();
+    *translationalJoint.getMotor() = stepperDriver;
     std::vector<traceType> rangeVector {0, 180};
-    int currentPosition = translationalJoint.getPosition();
     translationalJoint.setRange(rangeVector);
+    int currentPosition = translationalJoint.getPosition();
+    PinVector pinVector = translationalJoint.getMotor()->getPins();
 
     std::shared_ptr<BaseJoint> cloned = translationalJoint.clone();
 

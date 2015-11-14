@@ -13,23 +13,40 @@
 #include <string>
 
 
-class JointControllerTestSuite : public CxxTest::TestSuite {
+class JointControllerUnitTest : public CxxTest::TestSuite {
  public:
   StepperDriver stepperDriver1;
   StepperDriver stepperDriver2;
-  RotationalJoint<StepperDriver> rotationalJoint;
-  TranslationalJoint<StepperDriver> translationalJoint;
+  BaseJoint::JointPointer rotationalJoint;
+  BaseJoint::JointPointer translationalJoint;
   JointController jointController;
 
   void setUp() {
+    LOG_DEBUG("lalaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
     stepperDriver1.setPins({5, 6, 7});
     stepperDriver2.setPins({2, 3, 4});
+    // Create rotational joint
+    rotationalJoint = std::make_shared<RotationalJoint<StepperDriver>>();
+    rotationalJoint->setMovementPerStep(1);
+    rotationalJoint->setPosition(90);
+    rotationalJoint->setRange(std::vector<traceType>({0, 2* PI}));
+    rotationalJoint->setDirectionConversionMap({{"CCW", "CCW"}, {"CW","CW"}});
 
-    (*rotationalJoint.getMotor()) = stepperDriver1;
-    (*translationalJoint.getMotor()) = stepperDriver2;
-    JointController jointController;
-    jointController.addJoint(rotationalJoint.clone());
-    jointController.addJoint(translationalJoint.clone());
+    translationalJoint = std::make_shared<TranslationalJoint<StepperDriver>>();
+    translationalJoint->setMovementPerStep(1);
+    translationalJoint->setPosition(50);
+    translationalJoint->setRange(std::vector<traceType>({50, 1000}));
+    translationalJoint->setDirectionConversionMap({{"IN", "CCW"}, {"OUT","CW"}});
+
+    *rotationalJoint->getMotor() = stepperDriver1;
+    rotationalJoint->setChild(translationalJoint);
+
+    *translationalJoint->getMotor() = stepperDriver2;
+    translationalJoint->setParent(rotationalJoint);
+
+    jointController = JointController();
+    jointController.addJoint(rotationalJoint);
+    jointController.addJoint(translationalJoint);
   }
 
   void tearDown(){
@@ -50,18 +67,24 @@ class JointControllerTestSuite : public CxxTest::TestSuite {
     LOG_INFO("JointControlerUnitTest::test AddJoint");
     StepperDriver stepperDriver3({5, 6, 7});
     StepperDriver stepperDriver4({2, 3, 4});
-    RotationalJoint<StepperDriver> rotationalJoint2(50, 1, stepperDriver3);
-    TranslationalJoint<StepperDriver>
-        translationalJoint2(50, 1, stepperDriver4);
-
+    BaseJoint::JointPointer rotationalJoint2 =
+      std::make_shared<RotationalJoint<StepperDriver>>();
+    rotationalJoint2->setPosition(50);
+    rotationalJoint2->setMovementPerStep(1);
+    *rotationalJoint2->getMotor() =  stepperDriver3;
+    BaseJoint::JointPointer translationalJoint2 =
+      std::make_shared<TranslationalJoint<StepperDriver>>();
+    translationalJoint2->setPosition(50);
+    translationalJoint2->setMovementPerStep(1);
+    *translationalJoint2->getMotor() = stepperDriver4;
     JointController jointController2;
-
-    TS_ASSERT(jointController.addJoint(rotationalJoint2.clone()));
-    TS_ASSERT_THROWS(jointController.addJoint(rotationalJoint2.clone()),
+    jointController.setJointPointerVector({});
+    TS_ASSERT(jointController.addJoint(rotationalJoint2));
+    TS_ASSERT_THROWS(jointController.addJoint(rotationalJoint2->clone()),
                      std::runtime_error);
 
-    TS_ASSERT(jointController.addJoint(translationalJoint2.clone()));
-    TS_ASSERT_THROWS(jointController.addJoint(translationalJoint2.clone()),
+    TS_ASSERT(jointController.addJoint(translationalJoint2));
+    TS_ASSERT_THROWS(jointController.addJoint(translationalJoint2->clone()),
                      std::runtime_error);
   }
 
@@ -112,16 +135,17 @@ class JointControllerTestSuite : public CxxTest::TestSuite {
 
     integerSequence = (*(jointController.getSequenceVector().
                           end()-1)).getIntegerSequence();
+    (jointController.getSequenceVector().end()-1)->displaySequence();
     TS_ASSERT_EQUALS(
         integerSequence,
-        (std::vector<int> {152, 8, 152, 188}));
+        (std::vector<int> {152, 8, 152, 160, 28}));
   }
 
   void testMoveSteps() {
     LOG_INFO("JointControlerUnitTest:: test move steps");
-    BaseJoint::JointPointer rotationalJointPointer = jointController.resolveJoint(Rotational);
+    BaseJoint::JointPointer rotationalJointPointer = jointController.resolveJoint(BaseJoint::Rotational);
     BaseJoint::JointPointer translationJointPointer =
-        jointController.resolveJoint(Translational);
+      jointController.resolveJoint(BaseJoint::Translational);
 
     jointController.moveSteps("CW", 5);
     TS_ASSERT_EQUALS(
@@ -132,7 +156,7 @@ class JointControllerTestSuite : public CxxTest::TestSuite {
     }
 
     std::vector<int> numberOfRepetitionsOfVector {0, 1, 4, 1};
-    std::vector<std::vector<int>> integerSequence{{188},
+    std::vector<std::vector<int>> integerSequence{{252},
                                                   {192, 64, 192},
                                                   {64, 192}, {224}};
 
@@ -144,9 +168,9 @@ class JointControllerTestSuite : public CxxTest::TestSuite {
     for (;
          sequenceIterator != jointController.getSequenceVector().end();
          sequenceIterator++, repetitionIter++, integerSequenceIter++) {
+      sequenceIterator->displaySequence();
       TS_ASSERT_EQUALS(sequenceIterator->getNumberOfRepetitions(),
                        *repetitionIter);
-
       TS_ASSERT_EQUALS(sequenceIterator->getIntegerSequence(),
                        *integerSequenceIter);
     }

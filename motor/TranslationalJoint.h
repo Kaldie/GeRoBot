@@ -11,9 +11,11 @@ class TranslationalJoint: public BaseJoint {
     // Actual methods!
     virtual void predictSteps(Point2D*,
                               const std::string&,
-                              const int&) const;
+                              const int&);
 
     virtual ActuatorType* getMotor();
+
+    virtual traceType distancePerStep() const;
 
     std::shared_ptr<TranslationalJoint<ActuatorType>> clone() const {
       return std::shared_ptr
@@ -23,26 +25,19 @@ class TranslationalJoint: public BaseJoint {
     // Constructors
     TranslationalJoint();
 
-    TranslationalJoint(const double& i_currentPosition,
-                       const double& i_movementPerStep);
-
-    TranslationalJoint(const double& i_currentPosition,
-                       const double& i_movementPerStep,
-                       const ActuatorType&);
-
-    TranslationalJoint(const double& i_currentPosition,
-                       const double& i_movementPerStep,
-                       const DirectionConversionMap&,
-                       const ActuatorType&);
-
   virtual ~TranslationalJoint(){};
 
  protected:
-    virtual TranslationalJoint<ActuatorType>* cloneImpl() const;
+  virtual TranslationalJoint<ActuatorType>* cloneImpl() const;
+  /// return length of the Joint
+  virtual traceType getLength() const;
+
+  /// return the angle of the Joint
+  virtual traceType getAngle() const;
 
  private:
-    ActuatorType m_actuator;
-    virtual int getPositionModifier(const std::string&) const;
+  ActuatorType m_actuator;
+  virtual int getPositionModifier(const std::string&) const;
 };
 
 
@@ -55,40 +50,6 @@ TranslationalJoint()
 }
 
 
-template <class ActuatorType>TranslationalJoint<ActuatorType>::
-TranslationalJoint(const double& i_currentPosition,
-                   const double& i_movementPerStep)
-: BaseJoint(i_currentPosition,
-            i_movementPerStep,
-            {{"IN", "CCW"}, {"OUT", "CW"}}) {
-  setMovementType(Translational);
-}
-
-
-template <class ActuatorType>
-TranslationalJoint<ActuatorType>::
-  TranslationalJoint(const double& i_currentPosition,
-                     const double& i_movementPerStep,
-                     const ActuatorType& i_actuator)
-: BaseJoint(i_currentPosition,
-            i_movementPerStep,
-            {{"IN", "CCW"}, {"OUT", "CW"}}),
-  m_actuator(i_actuator) {
-  setMovementType(Translational);
-}
-
-template <class ActuatorType>
-TranslationalJoint<ActuatorType>::
-  TranslationalJoint(const double& i_currentPosition,
-                     const double& i_movementPerStep,
-                     const DirectionConversionMap& i_directionConversionMap,
-                     const ActuatorType& i_actuator)
-: BaseJoint(i_currentPosition,
-            i_movementPerStep,
-            i_directionConversionMap),
-  m_actuator(i_actuator) {
-  setMovementType(Translational);
-}
 
 // Actual methods
 template <class ActuatorType>
@@ -96,6 +57,18 @@ ActuatorType* TranslationalJoint<ActuatorType>::
 getMotor() {
   return &m_actuator;
 }
+
+template <class ActuatorType>
+traceType TranslationalJoint<ActuatorType>::getLength() const {
+  return m_currentPosition;
+}
+
+
+template <class ActuatorType>
+traceType TranslationalJoint<ActuatorType>::getAngle() const {
+  return 0;
+}
+
 
 
 template <class ActuatorType>
@@ -111,17 +84,38 @@ int TranslationalJoint<ActuatorType>::
 
 
 template <class ActuatorType>
-void TranslationalJoint<ActuatorType>::predictSteps
-(Point2D* o_position,
- const std::string& i_directionString,
- const int& i_numberOfSteps) const {
-  double currentAngle = o_position->getAlpha();
-  double newLength = Magnitude(*o_position)+getMovementPerStep() *
-      getPositionModifier(i_directionString) * i_numberOfSteps;
-  o_position->x = cos(currentAngle)*newLength;
-  o_position->y = sin(currentAngle)*newLength;
-  LOG_INFO("Position after translation is: "
-           <<o_position->x << ", " << o_position->y);
+void TranslationalJoint<ActuatorType>::
+predictSteps(Point2D* o_robotPosition,
+             const std::string& i_directionString,
+             const int& i_numberOfSteps) {
+  //initialise variable
+  Point2D relativeRobotPosition(0, 0), jointPosition;
+  traceType angle(0.0);
+  // calculate the relative robot position from this joint
+  childPosition(&relativeRobotPosition, &angle);
+  // get the absolute joint position from this
+  jointPosition = *o_robotPosition - relativeRobotPosition;
+  // Show debug info
+  LOG_DEBUG("Current Robot position: " << *o_robotPosition);
+  LOG_DEBUG("Relative Robot position: " << relativeRobotPosition);
+  LOG_DEBUG("Joint position: " << jointPosition);
+  // how much will this joint shift
+  traceType addedExtension = getMovementPerStep() *
+    getPositionModifier(i_directionString) * i_numberOfSteps;
+  // Determine the new relative length of the robot
+  double newLength = Magnitude(relativeRobotPosition) + addedExtension;
+  // Update the current position of the joint
+  m_currentPosition += addedExtension;
+  // Update the current end position of the robot
+  o_robotPosition->x = cos(angle) * newLength + jointPosition.x;
+  o_robotPosition->y = sin(angle) * newLength + jointPosition.y;
+  LOG_INFO("Position after translation is: " <<*o_robotPosition);
+}
+
+
+template <class ActuatorType>
+traceType TranslationalJoint<ActuatorType>::distancePerStep() const {
+  return m_movementPerStep;
 }
 
 
@@ -137,10 +131,8 @@ TranslationalJoint<ActuatorType>* TranslationalJoint<ActuatorType>::
   joint->setRange(this->getRange());
   joint->setMovementType(this->getMovementType());
   joint->m_actuator = this->m_actuator;
-
-  LOG_INFO("movement per step 1: " << joint->getMovementPerStep());
-  LOG_INFO("movement per step 1: " << this->getMovementPerStep());
-
+  joint->m_child = this->m_child;
+  joint->m_parent = this->m_parent;
   return joint;
 }
 

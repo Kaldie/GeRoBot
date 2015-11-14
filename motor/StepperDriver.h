@@ -8,6 +8,17 @@ class StateSequence;
 class SequenceVector;
 
 class StepperDriver: public BaseMotor {
+  /// Maximum frequency (in deca hertz) which the motor starts from
+  GETSET(int, m_pullIn, PullIn);
+
+  /// Maximum frequency (in deca hertz) which the motor can stop from
+  GETSET(int, m_pullOut, PullOut);
+
+  /// Maximum frequency (in deca hertz)
+  GETSET(int, m_maxSpeed, MaxSpeed);
+
+  /// How manny step between pullIn and maxSpeed
+  GETSET(int, m_incremental, Incremental);
  private:
   // Private methods to have easy acces to certain pins, such as enable pin
   const int getPin(const int i_number) const
@@ -30,19 +41,33 @@ class StepperDriver: public BaseMotor {
 
   // Constructor given pin number and default direction
   StepperDriver(const PinVector& i_pinVector,
-                const std::string& i_defaultDirection);
+                const std::string& i_defaultDirection,
+                const int& i_pullIn,
+                const int& i_pullOut,
+                const int& i_max);
 
   // Enable functions of the driver!
   virtual bool setEnable(const bool&);
 
-  // Move Steps
+  /// Add to the Statesequence states which will ensure the motor sets a step
   virtual void moveStep(const std::string&,
                         StateSequence*);
+
 
   virtual void moveSteps(const std::string& i_motorDirection,
                          const int& i_numberOfSteps,
                          SequenceVector* i_vector);
 
+  /// return the maximum speed the motor could achive right now
+  /// including acceleration etc.
+  virtual int getMaximumSpeed() const;
+
+  /// return the minimum speed the motor could achive right now
+  /// including breaking etc.
+  virtual int getMinimumSpeed() const;
+
+
+  /// Return the number of states needed per step
   virtual  int numberOfStatesPerStep() const {return 2;}
 
   // Display pin state vector

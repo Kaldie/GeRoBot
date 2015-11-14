@@ -6,32 +6,43 @@
 
 // Constructor
 StepperDriver::StepperDriver()
-  : BaseMotor({2, 3, 4})
-{}
+  : BaseMotor({2, 3, 4}),
+    m_pullIn(200),
+    m_pullOut(200),
+    m_maxSpeed(500),
+    m_incremental(10){}
 
 
 StepperDriver::StepperDriver(const PinVector& i_pinVector)
-    : BaseMotor(i_pinVector)
-{}
+  : BaseMotor(i_pinVector),
+    m_pullIn(200),
+    m_pullOut(200),
+    m_maxSpeed(500),
+    m_incremental(10){}
 
 
-StepperDriver::StepperDriver(
-    const PinVector& i_pinVector, const std::string& i_defaultDirection)
-    : BaseMotor(i_pinVector, i_defaultDirection)
-{}
+StepperDriver::StepperDriver
+(const PinVector& i_pinVector,
+ const std::string& i_defaultDirection,
+ const int& i_pullIn,
+ const int& i_pullOut,
+ const int& i_max)
+  : BaseMotor(i_pinVector, i_defaultDirection),
+    m_pullIn(i_pullIn),
+    m_pullOut(i_pullOut),
+    m_maxSpeed(i_max),
+    m_incremental(10){}
 
 
 bool StepperDriver::setEnable(const bool& i_setEnable) {
-    PinState pinState = getCurrentPinState();
     int newState;
     if (i_setEnable) {
       newState = !DEFAULT_STATE;
     } else {
       newState = DEFAULT_STATE;
     }
-    if (newState != pinState.getPinState(enablePin())) {
-      pinState.update(enablePin(), newState);
-      setCurrentPinState(pinState);
+    if (newState != m_currentPinState.getPinState(enablePin())) {
+      m_currentPinState.update(enablePin(), newState);
       return true;
     } else {
       LOG_DEBUG("No need to change the pin state!");
@@ -56,15 +67,11 @@ int StepperDriver::getPinValueForDirection(
 
 
 bool StepperDriver::setDirection(const std::string& i_directionString) {
-  PinState pinState = getCurrentPinState();
   int newPinValue = getPinValueForDirection(i_directionString);
-
-  if (newPinValue != pinState.getPinState(directionPin())) {
-    LOG_INFO("Current Pin Value: " << pinState.getPinState(directionPin()) <<
+  if (newPinValue != m_currentPinState.getPinState(directionPin())) {
+    LOG_INFO("Current Pin Value: " << m_currentPinState.getPinState(directionPin()) <<
             "\t" << "New pin Value: " << newPinValue);
-    if (newPinValue != pinState.getPinState(directionPin()))
-      pinState.update(directionPin(), newPinValue);
-    setCurrentPinState(pinState);
+      m_currentPinState.update(directionPin(), newPinValue);
     return true;
   } else {
     return false;
@@ -79,18 +86,17 @@ void StepperDriver::moveStep(
   PinStateVector pinStateVector;
   // Enable the driver!
   if (setEnable(true) | setDirection(i_direction))
-    pinStateVector.push_back(getCurrentPinState());
+    pinStateVector.push_back(m_currentPinState);
 
-  PinState pinState = getCurrentPinState();
-  pinState.update(stepPin(), !DEFAULT_STATE);
-  pinStateVector.push_back(pinState);
-  pinState.update(stepPin(), DEFAULT_STATE);
-  pinStateVector.push_back(pinState);
+  m_currentPinState.update(stepPin(), !DEFAULT_STATE);
+  pinStateVector.push_back(m_currentPinState);
+  m_currentPinState.update(stepPin(), DEFAULT_STATE);
+  pinStateVector.push_back(m_currentPinState);
 
   if (!getHoldMotor()) {
     // Disable the driver!!
     if (setEnable(false))
-      pinStateVector.push_back(getCurrentPinState());
+      pinStateVector.push_back(m_currentPinState);
   }
 
   if (!i_stateSequence->addToSequence(pinStateVector))
@@ -141,6 +147,39 @@ void StepperDriver::moveSteps(
     }
   }
 }
+
+
+int StepperDriver::getMaximumSpeed() const {
+  // if it was statonary
+  if (m_speed == 0) {
+    return m_pullIn;
+  }
+  // Suggest 1/m_incremental of the diff between minimum and max + current
+  int suggestion = m_speed + (m_maxSpeed - m_pullIn) / m_incremental;
+  if (suggestion < m_pullIn) {
+    return m_pullIn;
+  }
+  if (suggestion >= m_maxSpeed) {
+    return m_maxSpeed;
+  } else {
+    return suggestion;
+  }
+}
+
+
+int StepperDriver::getMinimumSpeed() const {
+  if (m_speed < m_pullOut) {
+    return m_pullOut;
+  }
+  // Suggest the current speed minus a bit
+  int suggestion = m_speed - (m_maxSpeed - m_pullOut) / m_incremental;
+  if (suggestion < m_pullOut) {
+    return m_pullOut;
+  } else {
+    return suggestion;
+  }
+}
+
 
 void StepperDriver::displayPinState(const PinState& i_pinState) const {
   std::string pinName;

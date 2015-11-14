@@ -7,28 +7,45 @@ class Point2D;
 class SequenceVector;
 class BaseMotor;
 
+
 class BaseJoint {
-    GETSET(double, m_currentPosition, Position)
-    GETSET(double, m_movementPerStep, MovementPerStep)
-    GET(std::vector<double>, m_range, Range)
-    GETSET(MovementType, m_movementType, MovementType)
+ public:
+    // shared pointer type def
+    typedef std::shared_ptr<BaseJoint> JointPointer;
+    // weak pointer type def
+    typedef std::weak_ptr<BaseJoint> WeakJointPointer;
+    // declaration of the movement type
+    enum MovementType {None, Rotational, Translational};
+
+    /// Current position of the joint
+    GETSETPROTECTED(traceType, m_currentPosition, Position);
+
+    // Movement of the joint per step
+    GETSETPROTECTED(traceType, m_movementPerStep, MovementPerStep);
+
+    // Range in which the joint can move
+    GET(std::vector<traceType>, m_range, Range);
+
+    // Type of the movement of the Joint
+    GETSET(MovementType, m_movementType, MovementType);
+
+    // Direction conversion map of the joint
     GETSET(DirectionConversionMap,
            m_directionConversion,
-           DirectionConversionMap)
- public:
-    typedef std::shared_ptr<BaseJoint> JointPointer;
+           DirectionConversionMap);
 
+    // Pointer to the child of this joint
+    GETSETPROTECTED(JointPointer, m_child, Child);
+
+    // pointer to the parent of this joint
+    GETSETPROTECTED(JointPointer, m_parent, Parent);
+
+ public:
     /**
      * Set the range of the joint
-     * @param[in] i_rangeVector Vector<double> 2 entries, start and end of the range of the joint
+     * @param[in] i_rangeVector Vector<traceType> 2 entries, start and end of the range of the joint
      */
-    void setRange(const std::vector<double>& i_rangeVector);
-
-    /**
-     * Convert the direction the joint moves to the direction the motor has to move.
-     * @param[in] i_direction direction the joint has to move
-     */
-    const std::string convertDirection(const std::string i_direction)const;
+    void setRange(const std::vector<traceType>& i_rangeVector);
 
     /**
      * Method to give acces to the motor of the joint.
@@ -52,16 +69,18 @@ class BaseJoint {
                    SequenceVector* i_vector);
 
     /**
-     * Predict a step
-     * method calls predictSteps with number of steps = 1
-     * @param[in] io_robotPosition Current position of the robot
-     * @param[in] i_direction Direction of movement
-     * @param[in] i_number number of steps
+     * Predict the final position after setting steps
+     * @param[in] io_robotPosition position of the robot
+     * @param[in] i_direction Direction which the joint will move
+     * @param[in] i_number Number of steps to be taken
      */
-    // Actual methods!
     virtual void predictSteps(Point2D* io_robotPosition,
                               const std::string& i_direction,
-                              const int& i_number) const = 0;
+                              const int& i_number) = 0;
+
+    /// Return the distance traveled with one step
+    virtual traceType distancePerStep() const = 0;
+
     /**
      * Method to clone the joint and return a smart point to the cloned BaseJoint
      * Method call cloneImpl() which is pure virtual method.
@@ -72,28 +91,36 @@ class BaseJoint {
 
     /// default constructor
     BaseJoint();
-    /// constructor with position and step size
-    BaseJoint(const double& i_currentPosition,
-              const double& i_movementPerStep);
-    /// Constructor with position, step size and direction conversion map
-    BaseJoint(const double& i_currentPosition,
-              const double& i_movementPerStep,
-              const DirectionConversionMap& i_directionConverionMap);
-    /// fully fledged constructor
-    BaseJoint(const double& i_currentPosition,
-              const double& i_movementPerStep,
-              const std::vector<double> i_rangeVector,
-              const MovementType& i_movementType,
-              const DirectionConversionMap& i_directionConverionMap);
+
     /// Mandatory virtual destructor
     virtual ~BaseJoint(){};
+
  protected:
     /// Pure virtual implementation of the clone implementation
     virtual BaseJoint* cloneImpl() const = 0;
+
     /// Is in range of the joint.
-    void isInRange(double i_jointPosition) const;
+    void isInRange(traceType i_jointPosition) const;
+
+    // return child position
+    Point2D childPosition() const;
+
+    void childPosition(Point2D* o_position, traceType* o_angle) const;
+
+    // return length of the Joint
+    virtual traceType getLength() const = 0;
+
+    // return the angle of the Joint
+    virtual traceType getAngle() const = 0;
+
  private:
     /// Given a direction, give the modifier: does the position in or descrease
     virtual int getPositionModifier(const std::string&) const = 0;
+
+    /**
+     * Convert the direction the joint moves to the direction the motor has to move.
+     * @param[in] i_direction direction the joint has to move
+     */
+    const std::string convertDirection(const std::string i_direction)const;
 };
 #endif  // MOTOR_BASEJOINT_H_

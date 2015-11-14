@@ -10,7 +10,6 @@
 JointController::JointController()
   :m_jointPointerVector({}),
    m_actuator(ArduinoMotorDriver("/dev/ttyUSB*")) {
-  LOG_DEBUG("yay2");
 }
 
 JointController::~JointController()
@@ -18,6 +17,9 @@ JointController::~JointController()
 
 bool JointController::validateJoint(const BaseJoint::JointPointer& i_baseJoint) const {
   // pins should not be other then 2 t/m 7
+  if (!i_baseJoint) {
+    LOG_ERROR("bad shabba!");
+  }
   PinVector pins = i_baseJoint->getMotor()->getPins();
   for (PinVector::const_iterator itr = pins.begin();
       itr != pins.end();
@@ -103,7 +105,7 @@ bool JointController::addJoint(const BaseJoint::JointPointer& i_joint) {
 }
 
 
-BaseJoint::JointPointer JointController::getJoint(const MovementType &i_movementType) {
+BaseJoint::JointPointer JointController::getJoint(const BaseJoint::MovementType &i_movementType) {
   if (m_jointPointerVector.size() == 0)
     LOG_ERROR("No joints defined yet");
 
@@ -185,15 +187,15 @@ void JointController::uploadSequence(const bool& i_condense) {
 
 BaseJoint::JointPointer JointController::resolveJoint(const std::string& i_movementDirection) {
   if (i_movementDirection == "CCW" or i_movementDirection == "CW") {
-    return getJoint(Rotational);
+    return getJoint(BaseJoint::Rotational);
   }
   if (i_movementDirection == "IN" or i_movementDirection == "OUT") {
-    return getJoint(Translational);
+    return getJoint(BaseJoint::Translational);
   }
   LOG_ERROR("Could not resolve movement direction: " << i_movementDirection);
 }
 
 
-BaseJoint::JointPointer JointController::resolveJoint(const MovementType& i_movementType) {
+BaseJoint::JointPointer JointController::resolveJoint(const BaseJoint::MovementType& i_movementType) {
   return getJoint(i_movementType);
 }

@@ -22,11 +22,12 @@ class StepperDriverUnitTest : public CxxTest::TestSuite {
                      false);
     PinVector pinVector{2, 3, 4};
     StepperDriver stepperDriver1(pinVector);
-    TS_ASSERT_EQUALS(stepperDriver.getPinStatePointer()->getPinVector(),
+    TS_ASSERT_EQUALS(stepperDriver.getCurrentPinState().getPinVector(),
                      pinVector);
     std::string defaultDirection = "CCW";
     StepperDriver stepperDriver2(pinVector,
-                                 defaultDirection);
+                                 defaultDirection,
+                                 200, 200, 500);
     TS_ASSERT_EQUALS(stepperDriver2.getDefaultDirection(),
                      defaultDirection);
   }

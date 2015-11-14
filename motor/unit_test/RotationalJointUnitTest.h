@@ -13,72 +13,57 @@
 
 class RotationalJointUnitTest : public CxxTest::TestSuite {
  public:
+  RotationalJoint<StepperDriver> rotationalJoint2;
+
+  void setUp(void) {
+    rotationalJoint2.setPosition(0.0);
+    rotationalJoint2.setMovementPerStep(1.0);
+    rotationalJoint2.setFixedLength(50.0);
+  }
+
+
   void testCreation(void) {
     RotationalJoint<StepperDriver> rotationalJoint1;
-
-    RotationalJoint<StepperDriver> rotationalJoint2(10.1,
-                                                    0.3);
-
-    StepperDriver driver;
-    RotationalJoint<StepperDriver> rotationalJoint3(10.1,
-                                                    0.3,
-                                                    driver);
-
-    RotationalJoint<StepperDriver> rotationalJoint4(0.0,
-                                                    1.0,
-                                                    DirectionConversionMap {
-                                                      {"CCW","CCW"},
-                                                      {"CW","CW"}
-                                                    },
-                                                    driver);
   }
 
   void testPredictStep() {
-    RotationalJoint<StepperDriver> rotationalJoint(90, 1);
-    rotationalJoint.setRange(std::vector<traceType>{0, 180});
-    Point2D point(0, 50);
+    rotationalJoint2.setRange(std::vector<traceType>{0, 180});
+    Point2D point(50, 0);
     for (int i = 0;
          i < 45;
          i++) {
-      rotationalJoint.predictSteps(&point, "CCW", 1);
+      rotationalJoint2.predictSteps(&point, "CCW", 1);
     }
-    TS_ASSERT_EQUALS(point, Point2D(-35.3553, 35.3553));
+    TS_ASSERT_EQUALS(point, Point2D(35.3553, 35.3553));
   }
 
 
   void testPredictSteps() {
-    RotationalJoint<StepperDriver> rotationalJoint(90, 1);
-    rotationalJoint.setRange(std::vector<traceType>{0, 180});
-    Point2D point(0, 50);
-
+    Point2D point(50, 0);
     std::string direction("CW");
     std::string contraDirection("CCW");
-    rotationalJoint.predictSteps(&point, direction, 90);
+    rotationalJoint2.predictSteps(&point, direction, 90);
     LOG_DEBUG(point.x << ", "<< point.y);
+    TS_ASSERT_EQUALS(point, Point2D(0, -50));
+    rotationalJoint2.predictSteps(&point, contraDirection, 90);
     TS_ASSERT_EQUALS(point, Point2D(50, 0));
-    rotationalJoint.predictSteps(&point, contraDirection, 90);
-    TS_ASSERT_EQUALS(point, Point2D(0, 50));
   }
 
   void testClone() {
-
-    StepperDriver stepperDriver({5,7,4});
-    RotationalJoint<StepperDriver> rotationalJoint(90, 1, stepperDriver);
-    PinVector pinVector = rotationalJoint.getMotor()->getPins();
+    PinVector pinVector = rotationalJoint2.getMotor()->getPins();
     std::vector<traceType> rangeVector {0, 180};
-    int currentPosition = rotationalJoint.getPosition();
-    rotationalJoint.setRange(rangeVector);
+    rotationalJoint2.setRange(rangeVector);
+    int currentPosition = rotationalJoint2.getPosition();
 
-    std::shared_ptr<BaseJoint> cloned = rotationalJoint.clone();
-
+    std::shared_ptr<BaseJoint> cloned = rotationalJoint2.clone();
     TS_ASSERT_EQUALS(cloned->getMotor()->getPins(), pinVector);
     TS_ASSERT_EQUALS(cloned->getPosition(), currentPosition);
     TS_ASSERT_EQUALS(cloned->getRange(), rangeVector);
     TS_ASSERT_EQUALS(cloned->getMovementPerStep(),
-                     rotationalJoint.getMovementPerStep());
+                     rotationalJoint2.getMovementPerStep());
 
     TS_ASSERT_EQUALS(cloned->getDirectionConversionMap(),
-                     rotationalJoint.getDirectionConversionMap());
+                     rotationalJoint2.getDirectionConversionMap());
   }
 };
 

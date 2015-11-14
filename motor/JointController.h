@@ -69,7 +69,7 @@ class JointController {
    * The method determines which joint is necesary based on the movement direction
    * Means that each joint produces a specific motion
    */
-  BaseJoint::JointPointer resolveJoint(const MovementType& i_movementType);
+  BaseJoint::JointPointer resolveJoint(const BaseJoint::MovementType& i_movementType);
 
   /**
    * returns the number of joints currently registed
@@ -93,7 +93,7 @@ class JointController {
   bool hasJoint(const BaseJoint::JointPointer&) const;
 
   /// Method to retrieve the joint of the type
-  BaseJoint::JointPointer getJoint(const MovementType&);
+  BaseJoint::JointPointer getJoint(const BaseJoint::MovementType&);
 };
 
 #endif  // MOTOR_JOINTCONTROLLER_H_

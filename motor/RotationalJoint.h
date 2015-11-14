@@ -8,39 +8,35 @@
 
 template <class ActuatorType>
 class RotationalJoint: public BaseJoint {
+  GETSET(traceType, m_length, FixedLength);
  public:
-  // Can also be used as a "setter (*joint.getMotor())=exampleMotor;
+  // Can also be used as a setter: (*joint.getMotor())=exampleMotor;
   virtual ActuatorType* getMotor();
 
   // Actual methods!
-  void predictSteps(Point2D*,
-                    const std::string&,
-                    const int&) const;
+  void predictSteps(Point2D*, const std::string&, const int&);
 
   std::shared_ptr<RotationalJoint<ActuatorType>> clone() const {
     return std::shared_ptr
       <RotationalJoint<ActuatorType> >(this->cloneImpl());
-  };
+  }
+
+  /// Return the distance set per step
+  virtual traceType distancePerStep() const;
 
   // Constructors
   RotationalJoint();
 
-  RotationalJoint(const double& i_currentPosition,
-                  const double& i_movementPerStep);
-
-  RotationalJoint(const double& i_currentPosition,
-                  const double& i_movementPerStep,
-                  ActuatorType& i_actuator);
-
-  RotationalJoint(const double& i_currentPosition,
-                  const double& i_movementPerStep,
-                  const DirectionConversionMap&,
-                  ActuatorType&);
-
-  ~RotationalJoint(){};
+  virtual ~RotationalJoint(){};
 
  protected:
   virtual RotationalJoint<ActuatorType>* cloneImpl() const;
+
+  /// return length of the Joint
+  virtual traceType getLength() const;
+
+  /// return the angle of the Joint
+  virtual traceType getAngle() const;
 
  private:
   ActuatorType m_actuator;
@@ -51,42 +47,10 @@ class RotationalJoint: public BaseJoint {
 // Constructors
 template <class ActuatorType>
 RotationalJoint<ActuatorType>::RotationalJoint()
-:BaseJoint() {
+:BaseJoint(), m_length(0) {
   setMovementType(Rotational);
 }
 
-
-template <class ActuatorType>
-RotationalJoint<ActuatorType>::RotationalJoint(const double& i_currentPosition,
-                                               const double& i_movementPerStep)
-: BaseJoint(i_currentPosition,
-            i_movementPerStep) {
-  setMovementType(Rotational);
-}
-
-
-template <class ActuatorType>
-RotationalJoint<ActuatorType>::RotationalJoint(const double& i_currentPosition,
-                                               const double& i_movementPerStep,
-                                               ActuatorType& i_actuator)
-: BaseJoint(i_currentPosition,
-            i_movementPerStep),
-  m_actuator(i_actuator) {
-  setMovementType(Rotational);
-  }
-
-
-template <class ActuatorType>
-RotationalJoint<ActuatorType>::RotationalJoint(const double& i_currentPosition,
-                                               const double& i_movementPerStep,
-                                               const DirectionConversionMap& i_directionConversionMap,
-                                               ActuatorType& i_actuator)
-: BaseJoint(i_currentPosition,
-            i_movementPerStep,
-            i_directionConversionMap),
-  m_actuator(i_actuator) {
-  setMovementType(Rotational);
-  }
 
 
 // Actual methods
@@ -97,9 +61,20 @@ ActuatorType* RotationalJoint<ActuatorType>::getMotor() {
 
 
 template <class ActuatorType>
+traceType RotationalJoint<ActuatorType>::getLength() const {
+  return m_length;
+}
+
+
+template <class ActuatorType>
+traceType RotationalJoint<ActuatorType>::getAngle() const {
+  return m_currentPosition;
+}
+
+
+template <class ActuatorType>
 int RotationalJoint<ActuatorType>::
 getPositionModifier(const std::string& i_direction) const {
-
   if (i_direction == "CCW") {
     return 1;
   } else if (i_direction == "CW") {
@@ -111,24 +86,41 @@ getPositionModifier(const std::string& i_direction) const {
 
 
 template <class ActuatorType>
-void RotationalJoint<ActuatorType>::predictSteps(Point2D* o_position,
+void RotationalJoint<ActuatorType>::predictSteps(Point2D* o_robotPosition,
                                                  const std::string& i_directionString,
-                                                 const int& i_numberOfSteps) const {
-  int positionModifier = getPositionModifier(i_directionString);
-  LOG_DEBUG("Position modifier is: "<< positionModifier);
-  LOG_DEBUG("Movement per step is: " << getMovementPerStep());
-  LOG_DEBUG("Current position: " << o_position->x << " , " << o_position->y);
-  o_position->rotate
-    (getMovementPerStep() * (PI/180.0) *
-     static_cast<double>(positionModifier) * i_numberOfSteps);
-  LOG_DEBUG("New position: " << o_position->x << " , " << o_position->y);
+                                                 const int& i_numberOfSteps) {
+  Point2D relativePosition(childPosition());
+  Point2D rotationPoint(*o_robotPosition - relativePosition);
+  traceType addedRotation = m_movementPerStep * PI / 180.0 *
+    (getPositionModifier(i_directionString) * i_numberOfSteps);
+  // Debug info
+  LOG_DEBUG("Position modifier is: "<< getPositionModifier(i_directionString));
+  LOG_DEBUG("Movement per step is: " << m_movementPerStep);
+  LOG_DEBUG("Robot position: " << *o_robotPosition);
+  LOG_DEBUG("Child position: " << relativePosition);
+  LOG_DEBUG("Rotation position: " << rotationPoint);
+  LOG_DEBUG("Added rotation: " << addedRotation);
+
+  // Rotate the robot around the rotation point
+  relativePosition.rotate(addedRotation);
+  // update current position
+  m_currentPosition += addedRotation;
+  // Update the robot position
+  *o_robotPosition = rotationPoint + relativePosition;
+  LOG_DEBUG("New position: " << *o_robotPosition);
+}
+
+
+template <class ActuatorType>
+traceType RotationalJoint<ActuatorType>::distancePerStep() const {
+  LOG_DEBUG("Current position: " << childPosition());
+  return Magnitude(childPosition())*(m_movementPerStep * PI/180);
 }
 
 
 template <class ActuatorType>
 RotationalJoint<ActuatorType>*
 RotationalJoint<ActuatorType>::cloneImpl() const {
-
   RotationalJoint<ActuatorType>* joint= new RotationalJoint<ActuatorType>;
   joint->setPosition(this->getPosition());
   joint->setMovementPerStep(this->getMovementPerStep());
@@ -137,6 +129,8 @@ RotationalJoint<ActuatorType>::cloneImpl() const {
   joint->setRange(this->getRange());
   joint->setMovementType(this->getMovementType());
   joint->m_actuator = this->m_actuator;
+  joint->m_child = this->m_child;
+  joint->m_parent = this->m_parent;
   return joint;
 }
 #endif  // MOTOR_ROTATIONALJOINT_H_
