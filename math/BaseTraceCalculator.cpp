@@ -50,8 +50,8 @@ bool BaseTraceCalculator::hasRobot() const {
 
 void BaseTraceCalculator::setTolerances() {
   if (hasRobot()) {
-   m_rotationTolerance = m_robot->getMovementPerStep(Rotational) / 1.0;
-   m_translationTolerance = m_robot->getMovementPerStep(Translational) / 2.0;
+    m_rotationTolerance = m_robot->getMovementPerStep(BaseJoint::Rotational) / 1.0;
+    m_translationTolerance = m_robot->getMovementPerStep(BaseJoint::Translational) / 2.0;
   }
   m_tolerance = std::min(m_rotationTolerance, m_translationTolerance);
 }
@@ -60,27 +60,22 @@ void BaseTraceCalculator::setTolerances() {
 std::vector<int> BaseTraceCalculator::getNumberOfSteps
 (const Trace& i_trace,
  const Point2D& i_position) const {
-  if (!hasRobot())
+  if (!hasRobot()) {
     LOG_ERROR("Does not have a joint controller!");
-
+  }
   Point2D endPoint = i_trace.getEndPoint();
-  LOG_INFO
-    ("Translational movement per step: "<<
-     m_robot->getMovementPerStep(Translational));
-
-  LOG_INFO
-    ("Rotationalal movement per step: "<<
-     m_robot->getMovementPerStep(Rotational));
-
+  LOG_INFO("Translational movement per step: "<<
+           m_robot->getMovementPerStep(BaseJoint::Translational));
+  LOG_INFO ("Rotationalal movement per step: "<<
+            m_robot->getMovementPerStep(BaseJoint::Rotational));
   // Magnitude difference / movement per step of Translational joint
   int numberOfTranslationSteps =
       std::abs(Magnitude(i_position)-Magnitude(endPoint))/
-      (m_robot->getMovementPerStep(Translational));
-
+    (m_robot->getMovementPerStep(BaseJoint::Translational));
   // Rotational difference / movement per step of Rotational joint
   int numberOfRotationSteps =
     (std::abs(i_position.getAlpha()-endPoint.getAlpha())*(180/PI)) /
-    m_robot->getMovementPerStep(Rotational);
+    m_robot->getMovementPerStep(BaseJoint::Rotational);
   LOG_DEBUG("Number of translation steps: " << numberOfTranslationSteps);
   LOG_DEBUG("Number of rotation steps: " << numberOfRotationSteps);
   return std::vector<int> {numberOfRotationSteps, numberOfTranslationSteps} ;
@@ -102,25 +97,19 @@ bool BaseTraceCalculator::shouldTranslate(const Trace& i_trace,
   /*
     Translate if the magnitude differs between the current point and the endpoint.
   */
-#ifdef DEBUG
   traceType pointMagnitude = Magnitude(i_point2D);
   traceType endPointMagnitude = Magnitude(i_trace.getEndPoint());
-#endif
-  traceType difference = std::abs(Magnitude(i_point2D) -
-                                  Magnitude(i_trace.getEndPoint()));
-  bool shouldTranslate;
-  if (difference > m_translationTolerance)
-    shouldTranslate = true;
-  else
-    shouldTranslate = false;
-#ifdef DEBUG
+  traceType difference = std::abs(endPointMagnitude - endPointMagnitude);
+  LOG_INFO("Current magnitude: " << pointMagnitude << ". ");
+  LOG_INFO("Wanted magnitude: " << endPointMagnitude);
+  LOG_INFO("diff: " << difference);
+  LOG_INFO("translation tolerance: " << m_translationTolerance);
+  if (difference > m_translationTolerance) {
     LOG_INFO("Not translating!! ");
-    LOG_INFO("Current magnitude: " << pointMagnitude << ". ");
-    LOG_INFO("Wanted magnitude: " << endPointMagnitude);
-    LOG_INFO("diff: " << difference);
-    LOG_INFO("translation tolerance: " << m_translationTolerance);
-#endif
-  return shouldTranslate;
+    return true;
+  } else {
+    return false;
+  }
 }
 
 
@@ -128,23 +117,16 @@ bool BaseTraceCalculator::shouldRotate(const Trace& i_trace,
                                        const Point2D &i_point2D) const {
   traceType difference = std::abs(i_point2D.getAlpha()-
                                   i_trace.getEndPoint().getAlpha());
-  difference *= 180 / PI;
-  bool shouldRotate;
-
-  if (difference > m_rotationTolerance)
-    shouldRotate = true;
-  else
-    shouldRotate = false;
-
-#ifdef DEBUG
-  if (!shouldRotate) {
+  difference *= 180.0 / PI;
+  LOG_INFO("current angle: " << i_point2D.getAlpha() * 180 / PI << " ");
+  LOG_INFO("wanted angle: " << i_trace.getEndPoint().getAlpha() * 180 / PI);
+  LOG_INFO("diff: " << difference);
+  if (difference > m_rotationTolerance) {
+    return true;
+  } else {
     LOG_INFO("Not rotating!!");
-    LOG_INFO("current angle: " << i_point2D.getAlpha() * 180 / PI << " ");
-    LOG_INFO("wanted angle: " << i_trace.getEndPoint().getAlpha() * 180 / PI);
-    LOG_INFO("diff: " << difference);
+    return false;
   }
-#endif
-  return shouldRotate;
 }
 
 

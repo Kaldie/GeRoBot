@@ -5,11 +5,11 @@
 
 #include "./TSA.h"  // the tsa
 
-/**
- * Namespace which defines all algorithms which could deterine ordering of traces
- * This namespace is part of the tsa namespace
- */
 namespace tsa {
+    /**
+     * Namespace which defines all algorithms which could deterine ordering of traces
+     * This namespace is part of the tsa namespace
+     */
     namespace otsa {
         /**
          * Given TraceSections create an order for which:

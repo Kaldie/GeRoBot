@@ -103,7 +103,8 @@ bool LineTraceCalculator::correctRotation(const Trace& i_trace) const {
   }
   LOG_DEBUG("Current position: " << currentRobotPosition.x
             << " , "<< currentRobotPosition.y);
-  LOG_DEBUG("Intersecting point: " << intersectingPoint.x << " , "<< intersectingPoint.y);
+  LOG_DEBUG("Intersecting point: " << intersectingPoint.x
+            << " , "<< intersectingPoint.y);
   // The distance to the enpoint after the correction is applied*/
   traceType distenceEndPointIntersectingPoint =
       Magnitude(intersectingPoint - i_trace.getEndPoint());
@@ -142,7 +143,7 @@ bool LineTraceCalculator::correctRotation(const Trace& i_trace) const {
            destinationPoint->x << ", " << destinationPoint->y);
   // calculate the number of steps needed to correct
   int numberOfSteps = std::floor((jointPointDifference) / m_robot->
-                                 getMovementPerStep(Translational));
+                                 getMovementPerStep(BaseJoint::Translational));
 
   if (numberOfSteps>0) {
     // calculate the direction and prepare them
@@ -158,6 +159,7 @@ bool LineTraceCalculator::correctRotation(const Trace& i_trace) const {
     return false;
   }
 }
+
 
 bool LineTraceCalculator::correctTranslation(const Trace& i_trace) const {
   /* The distance to the enpoint after the correction is applied*/
@@ -222,7 +224,7 @@ bool LineTraceCalculator::correctTranslation(const Trace& i_trace) const {
   }
   // calculate the number of steps needed to correct
   int numberOfSteps = std::floor(jointPointDifference/
-                                 m_robot->getMovementPerStep(Rotational));
+                                 m_robot->getMovementPerStep(BaseJoint::Rotational));
 
   if (numberOfSteps>0) {
     // direction of correction
