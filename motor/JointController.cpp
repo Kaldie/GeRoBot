@@ -15,10 +15,11 @@ JointController::JointController()
 JointController::~JointController()
 {}
 
+
 bool JointController::validateJoint(const BaseJoint::JointPointer& i_baseJoint) const {
   // pins should not be other then 2 t/m 7
   if (!i_baseJoint) {
-    LOG_ERROR("bad shabba!");
+    LOG_ERROR("Invalid JointPointer!");
   }
   PinVector pins = i_baseJoint->getMotor()->getPins();
   for (PinVector::const_iterator itr = pins.begin();
@@ -36,7 +37,6 @@ bool JointController::validateJoint(const BaseJoint::JointPointer& i_baseJoint) 
 
 bool JointController::validateJointVector(
     const JointController::JointPointerVector& i_jointVector) const {
-
   // determines if the pinIterator-> is able to grow into a good JointVector
   for (JointController::JointPointerVector::const_iterator itr = i_jointVector.begin();
        itr != i_jointVector.end();
@@ -48,16 +48,13 @@ bool JointController::validateJointVector(
   // Number of joints should not be other then 2....or max 2...
   if (i_jointVector.size() > 2)
     return false;
-
   // If the number of joints is 1 we're done!
   if (i_jointVector.size() == 1)
     return true;
-
   // Movement type of the joints should not be equal
   if (i_jointVector[0]->getMovementType() ==
       i_jointVector[1]->getMovementType())
     return false;
-
   // get all pins
   PinVector pinVector;
   for (auto jointIterator = i_jointVector.begin();
@@ -66,7 +63,6 @@ bool JointController::validateJointVector(
     PinVector jointPins = (*jointIterator)->getMotor()->getPins();
     pinVector.insert(pinVector.end(), jointPins.begin(), jointPins.end());
   }
-  
   for (auto pinIterator = pinVector.begin();
        pinIterator != pinVector.end();
        pinIterator++) {
