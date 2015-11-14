@@ -42,9 +42,8 @@ class TraceDesignWidget: public QWidget, private Ui::TraceDesignWidget {
 		      Trace::TraceType i_type);
     /**
      * Given the a pointer, change the direction of the trace.
-     * Only implemented for a rotation trace, change it from ccw to cw etc.
      */
-    void convertDirection(Trace::TracePointer i_pointer);
+    void reverse(Trace::TracePointer i_pointer);
  private:
    /**
     * Set up the gui and creat an example trace for show and debugging purposes

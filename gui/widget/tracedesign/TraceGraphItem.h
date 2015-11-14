@@ -42,7 +42,7 @@ class TraceGraphItem : public QGraphicsObject {
  signals:
    void removeThisTrace(Trace::TracePointer);
    void convertThisTrace(Trace::TracePointer, Trace::TraceType);
-   void convertDirection(Trace::TracePointer);
+   void reverse(Trace::TracePointer);
 
  protected:
    virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) Q_DECL_OVERRIDE;

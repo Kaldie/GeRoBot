@@ -133,8 +133,8 @@ void TraceDesignWidget::addTrace(Trace::TracePointer newTrace) {
   connect(item, SIGNAL(convertThisTrace(Trace::TracePointer, Trace::TraceType)),
           this, SLOT(replaceTrace(Trace::TracePointer,Trace::TraceType)));
 
-  connect(item, SIGNAL(convertDirection(Trace::TracePointer)),
-          this, SLOT(convertDirection(Trace::TracePointer)));
+  connect(item, SIGNAL(reverse(Trace::TracePointer)),
+          this, SLOT(reverse(Trace::TracePointer)));
   //  connect(item, SIGNAL(removeThis(Trace::TracePointer),
   //                   this, SLOT(removeTrace(Trace::TracePointer);
 }
@@ -161,14 +161,11 @@ void TraceDesignWidget::removeTrace(Trace::TracePointer i_pointer) {
 }
 
 
-void TraceDesignWidget::convertDirection(Trace::TracePointer i_pointer) {
+void TraceDesignWidget::reverse(Trace::TracePointer i_pointer) {
   RotationTrace::RotationTracePointer rotationTrace = std::dynamic_pointer_cast<RotationTrace>(i_pointer);
-  if (rotationTrace) {
-    LOG_DEBUG("is currently clockwise: " << rotationTrace->getIsClockwise());
-    rotationTrace->setIsClockwise(!rotationTrace->getIsClockwise());
-    LOG_DEBUG("Novel is clockwise: " << rotationTrace->getIsClockwise());
-    m_traceGraphView->update();
-  }
+  i_pointer->reverse();
+  m_traceGraphView->update();
+
 }
 
 
