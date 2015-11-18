@@ -130,7 +130,6 @@ RotationalJoint<ActuatorType>::cloneImpl() const {
   joint->setMovementType(this->getMovementType());
   joint->m_actuator = this->m_actuator;
   joint->m_child = this->m_child;
-  joint->m_parent = this->m_parent;
   return joint;
 }
 #endif  // MOTOR_ROTATIONALJOINT_H_

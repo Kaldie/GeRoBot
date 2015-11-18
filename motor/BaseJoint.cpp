@@ -79,6 +79,5 @@ BaseJoint::BaseJoint()
      m_range({0,1}),
      m_movementType(None),
      m_directionConversion({}),
-     m_child(nullptr),
-     m_parent(nullptr)
+     m_child(nullptr)
 {}

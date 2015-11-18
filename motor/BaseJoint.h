@@ -37,9 +37,6 @@ class BaseJoint {
     // Pointer to the child of this joint
     GETSETPROTECTED(JointPointer, m_child, Child);
 
-    // pointer to the parent of this joint
-    GETSETPROTECTED(JointPointer, m_parent, Parent);
-
  public:
     /**
      * Set the range of the joint

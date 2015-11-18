@@ -132,7 +132,6 @@ TranslationalJoint<ActuatorType>* TranslationalJoint<ActuatorType>::
   joint->setMovementType(this->getMovementType());
   joint->m_actuator = this->m_actuator;
   joint->m_child = this->m_child;
-  joint->m_parent = this->m_parent;
   return joint;
 }
 
