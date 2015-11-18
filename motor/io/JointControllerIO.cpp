@@ -1,3 +1,5 @@
+// Copyright [2015] Ruud Cools
+
 #include <macroHeader.h>
 #include "JointControllerIO.h"
 #include "JointIO.h"
@@ -15,9 +17,21 @@ void JointControllerIO::build() {
 
 void JointControllerIO::addJoints(){
   LOG_DEBUG("Adding Joints");
-  typedef std::tuple<pugi::xml_node, BaseJoint::JointPointer, std::string> JointTupple;
-  std::vector<JointTupple> jointTupleVector;
+  // get all the joints from the xml file
+  JointTupleVector jointTupleVector = buildAllJoints();
+  // Resolve the dependancies
+  resolveDependencies(jointTupleVector);
+  // And finaly add them to tje joint controller
+  for (const auto& jointTuple : jointTupleVector) {
+    m_jointController.addJoint
+      (std::get<BaseJoint::JointPointer>(jointTuple));
+  }
+}
+
+
+JointControllerIO::JointTupleVector JointControllerIO::buildAllJoints() const {
   BaseJoint::JointPointer jointPointer;
+  JointTupleVector jointTupleVector;
   std::string identificationString;
   for (pugi::xml_node jointNode = getNodeFromPath("./JOINT");
       jointNode;
@@ -26,12 +40,36 @@ void JointControllerIO::addJoints(){
     // if the sibling is named Joint
     if(std::string(jointNode.name()) == "JOINT") {
       LOG_DEBUG("adding a joint!!");
-      jointPointer = parseJoint(jointNode);
-      identificationString = 
-	getNodeFromPath(jointNode, "IDENTIFICATIONSTRING").text().as_string();
+      JointIO jointIO(jointNode);
+      jointIO.build();
       jointTupleVector.push_back
-	(std::make_tuple(jointNode, jointPointer, identificationString));
+        (std::make_tuple(jointNode,                    // pugi::xml_node
+                         jointIO.getJointPointer()));   // BaseJoint::JointPointer
+    }
+  }
+  return jointTupleVector;
+}
 
+
+void JointControllerIO::resolveDependencies
+(const JointTupleVector& i_jointTupleVector) const {
+  BaseJoint::JointPointer jointPointer;
+  std::string parentString;
+  std::string childString;
+  pugi::xml_node jointNode;
+  for (const auto& jointTuple : i_jointTupleVector) {
+    jointNode = std::get<pugi::xml_node>(jointTuple);
+    childString = getNodeFromPath(jointNode, "CHILD").text.as_string();
+    jointPointer = std::get<BaseJoint::JointPointer>(jointTuple);
+    std::string decendentName;
+    for (const auto& decendentTuple : i_jointTupleVector) {
+      decendentName = getNodeFromPath(std::get<pugi::xml_node>(decendentTuple),
+                                      "IDENTIFICATION").text().to_string();
+      if (decendentName == childString) {
+        jointPointer->setChild
+          (std::get<BaseJoint::JointPointer>(decendentTuple));
+        break;
+      }
     }
   }
 }

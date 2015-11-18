@@ -98,6 +98,7 @@ bool JointIO::isValidNode(const pugi::xml_node& i_node) const {
 
 
 void JointIO::makeSharedJoint() {
+  m_jointPointer.reset();
   std::string movementType =
     getNodeFromPath(m_node, "./MOVEMENT_TYPE").text().as_string();
   if (movementType == "ROTATIONAL") {

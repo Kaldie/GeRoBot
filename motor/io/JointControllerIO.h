@@ -11,6 +11,14 @@ class JointControllerIO: public XMLBuilder {
                   JointController);
 
  private:
+  typedef std::tuple<pugi::xml_node,
+                     BaseJoint::JointPointer> JointTupple;
+  typedef std::vector<JointTupple> JointTupleVector;
+
+  /// Build all the joints and store with the id and node
+  JointTupleVector buildAllJoints() const;
+  /// For each joint, find its child in the vector
+  resolveDependencies(const JointTupleVector& i_vector) const;
   // no default contructor!
   JointControllerIO();
   void addJoints();
@@ -24,5 +32,7 @@ class JointControllerIO: public XMLBuilder {
 
   virtual void build();
   bool update(const JointController& i_newJointController);
+
+  virtual ~JointControllerIO(){};
 };
 #endif // JointControllerIO
