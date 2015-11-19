@@ -24,7 +24,7 @@ void JointControllerIO::addJoints(){
   // And finaly add them to tje joint controller
   for (const auto& jointTuple : jointTupleVector) {
     m_jointController.addJoint
-      (std::get<BaseJoint::JointPointer>(jointTuple));
+      (std::get<1>(jointTuple));
   }
 }
 
@@ -58,16 +58,16 @@ void JointControllerIO::resolveDependencies
   std::string childString;
   pugi::xml_node jointNode;
   for (const auto& jointTuple : i_jointTupleVector) {
-    jointNode = std::get<pugi::xml_node>(jointTuple);
-    childString = getNodeFromPath(jointNode, "CHILD").text.as_string();
-    jointPointer = std::get<BaseJoint::JointPointer>(jointTuple);
+    jointNode = std::get<0>(jointTuple);
+    childString = getNodeFromPath(jointNode, "CHILD").text().as_string();
+    jointPointer = std::get<1>(jointTuple);
     std::string decendentName;
     for (const auto& decendentTuple : i_jointTupleVector) {
-      decendentName = getNodeFromPath(std::get<pugi::xml_node>(decendentTuple),
-                                      "IDENTIFICATION").text().to_string();
+      decendentName = getNodeFromPath(std::get<0>(decendentTuple),
+                                      "IDENTIFICATION").text().as_string();
       if (decendentName == childString) {
         jointPointer->setChild
-          (std::get<BaseJoint::JointPointer>(decendentTuple));
+          (std::get<1>(decendentTuple));
         break;
       }
     }

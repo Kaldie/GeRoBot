@@ -18,7 +18,7 @@ class JointControllerIO: public XMLBuilder {
   /// Build all the joints and store with the id and node
   JointTupleVector buildAllJoints() const;
   /// For each joint, find its child in the vector
-  resolveDependencies(const JointTupleVector& i_vector) const;
+  void resolveDependencies(const JointTupleVector& i_vector) const;
   // no default contructor!
   JointControllerIO();
   void addJoints();
