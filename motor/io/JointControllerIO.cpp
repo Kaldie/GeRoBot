@@ -32,7 +32,6 @@ void JointControllerIO::addJoints(){
 JointControllerIO::JointTupleVector JointControllerIO::buildAllJoints() const {
   BaseJoint::JointPointer jointPointer;
   JointTupleVector jointTupleVector;
-  std::string identificationString;
   for (pugi::xml_node jointNode = getNodeFromPath("./JOINT");
       jointNode;
       jointNode = jointNode.next_sibling()) {
@@ -60,13 +59,14 @@ void JointControllerIO::resolveDependencies
   for (const auto& jointTuple : i_jointTupleVector) {
     jointNode = std::get<0>(jointTuple);
     childString = getNodeFromPath(jointNode, "CHILD").text().as_string();
-    jointPointer = std::get<1>(jointTuple);
+    if (childString == "null"){
+      continue;
+    }
     std::string decendentName;
     for (const auto& decendentTuple : i_jointTupleVector) {
-      decendentName = getNodeFromPath(std::get<0>(decendentTuple),
-                                      "IDENTIFICATION").text().as_string();
+      decendentName = std::get<0>(decendentTuple).attribute("name").as_string();
       if (decendentName == childString) {
-        jointPointer->setChild
+        std::get<1>(jointTuple)->setChild
           (std::get<1>(decendentTuple));
         break;
       }

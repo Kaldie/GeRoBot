@@ -88,7 +88,10 @@ bool JointIO::isValidNode(const pugi::xml_node& i_node) const {
   for (pugi::xml_attribute attribute = i_node.first_attribute();
        attribute;
        attribute = attribute.next_attribute()) {
-    if (std::string(attribute.name()) != "type" and
+    if (std::string(attribute.name()) == "name") {
+      continue;
+    }
+    if (std::string(attribute.name()) == "type" and
         std::string(attribute.value()) != "StepperDriver") {
       return false;
     }
