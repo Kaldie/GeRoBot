@@ -10,16 +10,23 @@
 
 class JointControllerIOUnitTest : public CxxTest::TestSuite {
  public:
-  JointControllerIO jointControllerIO;
 
-  void setUp() {
+  void testBuild() {
     RobotIO robotIO("test_robot.xml");
-    jointControllerIO.setNode(robotIO.getNode("JOINTCONTROLLER"););
+    JointControllerIO jointControllerIO
+      (robotIO.getNodeFromPath(robotIO.getNodeFromPath("ROBOT"),"JOINTCONTROLLER"));
+    jointControllerIO.build();
+    JointController jointController = jointControllerIO.getJointController();
+    //Test if the rotation joint has a child, the translational joint!
+    TS_ASSERT_EQUALS(jointController.resolveJoint(BaseJoint::Rotational)->getChild(),
+                     jointController.resolveJoint(BaseJoint::Translational));
+    // Test if the translational joint has no child
+    TS_ASSERT_EQUALS(jointController.resolveJoint(BaseJoint::Translational)->getChild(),
+                     nullptr);
   }
 
-  void testBuild(void) {
-    JointController jointController2;
-    TS_ASSERT_EQUALS(1,1);
+  void testBuildValues() {
+
   }
 
 };
