@@ -64,11 +64,11 @@ bool JointIO::update(const BaseJoint::JointPointer& i_jointPointer) {
   rangeNode.next_sibling().text().set(i_jointPointer->getRange()[1]);
 
   // Direction conversion
-  DirectionConversionMap directionConversionMap(
-                                                i_jointPointer->getDirectionConversionMap());
+  DirectionConversionMap directionConversionMap
+    (i_jointPointer->getDirectionConversionMap());
 
-  pugi::xml_node directionConversionNode = getNodeFromPath(
-                                                           "./DIRECTION_CONVERSION_MAP/VALUE");
+  pugi::xml_node directionConversionNode = getNodeFromPath
+    ("./DIRECTION_CONVERSION_MAP/VALUE");
 
   for (auto itr = directionConversionMap.begin();
        itr != directionConversionMap.end();
@@ -132,4 +132,32 @@ void JointIO::handleConversionMap() {
       (*itr).substr(delimPosition+1);
   }
   m_jointPointer->setDirectionConversionMap(directionMap);
+}
+
+
+bool JointIO::createNode(pugi::xml_node* i_parent) {
+  pugi::xml_node jointNode = i_parent->append_child("JOINT");
+  jointNode.append_child("CHILD")
+    .append_child(pugi::node_pcdata).set_value("null");
+  jointNode.append_child("MOVEMENT_PER_STEP")
+    .append_child(pugi::node_pcdata).set_value("0.1");
+  jointNode.append_child("MOVEMENT_TYPE")
+    .append_child(pugi::node_pcdata).set_value("ROTATIONAL");
+  jointNode.append_child("DEFAULT_POSITION")
+    .append_child(pugi::node_pcdata).set_value("90");
+  pugi::xml_node tmp;
+  // create range node
+  tmp = jointNode.append_child("RANGE");
+  tmp.append_child("VALUE")
+    .append_child(pugi::node_pcdata).set_value("0");
+  tmp.append_child("VALUE")
+    .append_child(pugi::node_pcdata).set_value("360");
+  // create direction conversion map
+  tmp = jointNode.append_child("DIRECTION_CONVERSION_MAP");
+  tmp.append_child("VALUE")
+    .append_child(pugi::node_pcdata).set_value("CCW,CCW");
+  tmp.append_child("VALUE")
+    .append_child(pugi::node_pcdata).set_value("CW,CW");
+  StepperDriverIO::createNode(&jointNode);
+  return true;
 }

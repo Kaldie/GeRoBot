@@ -8,7 +8,7 @@ void StepperDriverIO::build() {
   if (actuatorType != "STEPPERDRIVER") {
     LOG_ERROR("Actuator type is only stepper driver!!!!");
   }
-  std::vector<int> pinVector = getIntList(getNode(), "./PINS", 3);
+  std::vector<int> pinVector = getIntList(m_node, "./PINS", 3);
   StepperDriver stepperDriver(pinVector);
   stepperDriver.setDefaultDirection(
       getNodeFromPath("./DEFAULT_DIRECTION").text().as_string());
@@ -25,10 +25,14 @@ void StepperDriverIO::build() {
 bool StepperDriverIO::update(const BaseMotor* i_stepperDriver) {
   bool hasSucceded(true);
   hasSucceded&=updatePins(i_stepperDriver->getCurrentPinState().getPinVector());
-  getNodeFromPath("./DEFAULT_DIRECTION").text().set(
-      i_stepperDriver->getDefaultDirection().c_str());
-
+  getNodeFromPath("./DEFAULT_DIRECTION").text().set
+    (i_stepperDriver->getDefaultDirection().c_str());
   getNodeFromPath("./HOLD_MOTOR").text().set(i_stepperDriver->getHoldMotor());
+  // update stepperdriver specific stuff
+  const StepperDriver* driver = static_cast<const StepperDriver*>(i_stepperDriver);
+  getNodeFromPath("./MAX_SPEED").text().set(driver->getMaxSpeed());
+  getNodeFromPath("./PULL_IN").text().set(driver->getPullIn());
+  getNodeFromPath("./PULL_OUT").text().set(driver->getPullOut());
   return hasSucceded;
 }
 
@@ -55,6 +59,29 @@ bool StepperDriverIO::updatePins(const PinVector& i_pinVector) {
   if (pinIterator != i_pinVector.end())
     LOG_ERROR("Number of pins defined in the StepperDriver" <<
               "is bigger then the xml file!");
+  return true;
+}
+
+
+bool StepperDriverIO::createNode(pugi::xml_node *i_parent) {
+  pugi::xml_node stepper = i_parent->append_child("ACTUATOR");
+  stepper.append_child("ACTUATOR_TYPE").
+    append_child(pugi::node_pcdata).set_value("STEPPERDRIVER");
+  pugi::xml_node tmp;
+  tmp = stepper.append_child("PINS");
+  tmp.append_child("VALUE").append_child(pugi::node_pcdata).set_value("5");
+  tmp.append_child("VALUE").append_child(pugi::node_pcdata).set_value("6");
+  tmp.append_child("VALUE").append_child(pugi::node_pcdata).set_value("7");
+  stepper.append_child("DEFAULT_DIRECTION").
+    append_child(pugi::node_pcdata).set_value("CCW");
+  stepper.append_child("HOLD_MOTOR").
+    append_child(pugi::node_pcdata).set_value("true");
+  stepper.append_child("MAX_SPEED").
+    append_child(pugi::node_pcdata).set_value("300");
+  stepper.append_child("PULL_IN").
+    append_child(pugi::node_pcdata).set_value("190");
+  stepper.append_child("PULL_OUT").
+    append_child(pugi::node_pcdata).set_value("190");
   return true;
 }
 
