@@ -12,7 +12,8 @@ class JointIO: public XMLBuilder {
   virtual void build();
   explicit JointIO(const pugi::xml_node&);
   bool update(const BaseJoint::JointPointer& i_jointPointer);
-
+  /// Create a new joint node
+  static bool createNode(pugi::xml_node*);
  private:
   // No default contructor!!
   JointIO();

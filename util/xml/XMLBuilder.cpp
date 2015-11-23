@@ -37,15 +37,13 @@ void XMLBuilder::build() {
 
 pugi::xml_node XMLBuilder::loadXMLFile() {
   if (m_fileName == "")
-    LOG_ERROR("XML file name is empty!");
+    LOG_ERROR("File name is not yet set!!");
 
   m_documentPointer = std::make_shared<pugi::xml_document>();
 
   pugi::xml_parse_result result =
       m_documentPointer->load_file(m_fileName.c_str());
-  if (result)
-    LOG_INFO("Load result: " << result.description());
-  else
+  if (!result)
     LOG_ERROR("Load result: " << result.description());
 
   if (!m_documentPointer->first_child())

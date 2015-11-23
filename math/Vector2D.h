@@ -1,6 +1,8 @@
 #ifndef Vector2D_h
 #define Vector2D_h
 
+#include <macroHeader.h>
+
 class Vector2D
 {
  public:

@@ -9,11 +9,6 @@
 class StepperDriverIO: public XMLBuilder {
   GETSET(StepperDriver, m_stepperDriver, StepperDriver);
   
-private:
-  // No default construction!
-  StepperDriverIO();
-  bool updatePins(const PinVector& i_stepperDriver);
-
 public:
   /// Build the stepperdiver from the xml node
   virtual void build();
@@ -21,6 +16,14 @@ public:
   bool update(const BaseMotor* i_stepperDriver);
   /// Constructor, the one and only
   explicit StepperDriverIO(const pugi::xml_node&);
+  /// Create a StepperDriver xml node in the given parent node
+  static bool createNode(pugi::xml_node* i_parent);
+
+private:
+  /// No default construction!
+  StepperDriverIO();
+  /// update the pins given a stepper driver
+  bool updatePins(const PinVector& i_stepperDriver);
 };
 
 #endif  // MOTOR_IO_STEPPERDRIVERIO_H_

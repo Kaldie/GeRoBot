@@ -4,7 +4,6 @@
 #define MATH_CIRCLE2D_H_
 
 #include <Point2D.h>
-#include <macroHeader.h>
 
 class Line2D;  // used as reference
 

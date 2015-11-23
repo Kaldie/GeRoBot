@@ -1,5 +1,4 @@
 // Copyright [2015] Ruud Cools
-
 #include <macroHeader.h>
 #include "JointControllerIO.h"
 #include "JointIO.h"
@@ -33,18 +32,12 @@ JointControllerIO::JointTupleVector JointControllerIO::buildAllJoints() const {
   BaseJoint::JointPointer jointPointer;
   JointTupleVector jointTupleVector;
   for (pugi::xml_node jointNode = getNodeFromPath("./JOINT");
-      jointNode;
-      jointNode = jointNode.next_sibling()) {
-    LOG_DEBUG(jointNode.name());
-    // if the sibling is named Joint
-    if(std::string(jointNode.name()) == "JOINT") {
-      LOG_DEBUG("adding a joint!!");
-      JointIO jointIO(jointNode);
-      jointIO.build();
-      jointTupleVector.push_back
-        (std::make_tuple(jointNode,                    // pugi::xml_node
-                         jointIO.getJointPointer()));   // BaseJoint::JointPointer
-    }
+       jointNode;
+       jointNode = jointNode.next_sibling("JOINT")) {
+    JointIO jointIO(jointNode);
+    jointIO.build();
+    jointTupleVector.push_back
+      (std::make_tuple(jointNode, jointIO.getJointPointer()));
   }
   return jointTupleVector;
 }
@@ -102,14 +95,14 @@ bool JointControllerIO::update(
   bool hasSucceeded(true);
   setJointController(i_jointController);
   hasSucceeded &= updateActuatorNode();
-  hasSucceeded &= updateJointNodes();
+  JointTupleVector vector = updateJointNodes();
+  hasSucceeded &= updateDependancies(vector);
   return hasSucceeded;
 }
 
 
 bool JointControllerIO::updateActuatorNode() {
   pugi::xml_node actuatorNode = getNodeFromPath("./ACTUATOR");
-
   getNodeFromPath(actuatorNode, "./REGULAR_EXPRESSION").text().
       set(m_jointController.getActuator().
           getSerialRegularExpresion().c_str());
@@ -117,40 +110,117 @@ bool JointControllerIO::updateActuatorNode() {
 }
 
 
-bool JointControllerIO::updateJointNodes() {
-  bool hasSucceeded(true);
-  JointController::JointPointerVector jointVector =
-    m_jointController.getJointPointerVector();
-  // current found joint pointer
-  BaseJoint::JointPointer jointPointer;
-  // current movement type
-  BaseJoint::MovementType movementType;
-  std::string movementString;
-  for (pugi::xml_node jointNode = getNodeFromPath("./JOINT");
-      jointNode;
-      jointNode = jointNode.next_sibling()) {
-    movementString = getNodeFromPath(jointNode, "./MOVEMENT_TYPE").text().as_string();
-    if (movementString.compare(std::string("Rotational")) != 0) {
-      movementType = BaseJoint::Rotational;
-    } else if (movementString.compare("Translational") != 0) {
-      movementType = BaseJoint::Translational;
+JointControllerIO::JointTupleVector JointControllerIO::updateJointNodes() {
+  updateNumberOfJointNode();
+  pugi::xml_node jointNode = getNodeFromPath("JOINT");
+  JointController::JointPointerVector vector 
+  =m_jointController.getJointPointerVector();
+  JointTupleVector jointTupleVector;
+  unsigned int jointNumber(1);
+  for(auto jointItr = vector.begin();
+      jointItr != vector.end();
+      ++jointItr) {
+    JointIO jointIO(jointNode);
+    jointIO.update(*jointItr);
+    jointTupleVector.push_back
+      (std::make_tuple(jointIO.getNode(),*jointItr));
+    // set the name for the joint
+    jointNode.attribute("name").set_value
+      (("Joint " + std::to_string(jointNumber)).c_str());
+    ++jointNumber;
+    // if the current joint is not the last
+    if (jointItr + 1 != vector.end()) {
+    // get a new joint node to update
+      getNextJointNode(&jointNode);
     }
-    for (auto& jointPointer : jointVector) {
-      if (jointPointer->getMovementType() == movementType) {
-        jointVector.erase(std::remove(jointVector.begin(), jointVector.end(), jointPointer));
-        break;
+  }
+  return jointTupleVector;
+}
+
+
+void JointControllerIO::updateNumberOfJointNode() {
+  unsigned int numberOfJoints = 
+    m_jointController.getJointPointerVector().size();
+  unsigned int numberOfXMLJoints = 0;
+  for (pugi::xml_node node = m_node.child("JOINT");
+       node;
+       node = node.next_sibling("JOINT")) {
+      ++numberOfXMLJoints;
+      LOG_DEBUG(node.name());
+  }
+  LOG_DEBUG("Number of Joints: " << numberOfJoints);
+  LOG_DEBUG("Number of JointNode: " << numberOfXMLJoints);
+  // No update necesary, they are of equal length
+  if (numberOfJoints == numberOfXMLJoints) {
+    return;
+  } 
+  // remove XML nodes
+  if (numberOfJoints < numberOfXMLJoints) {
+    while (numberOfJoints < numberOfXMLJoints) {
+      if (removeLastJointNode()) {
+	--numberOfXMLJoints;
+      } else {
+	LOG_ERROR("Could not remove Joint node!");
       }
     }
-    // check if the proper joint is found!
-    if (jointPointer->getMovementType() != movementType) {
-      LOG_ERROR("Could not find a joint with the proper movement type!");
+    return;
+  } 
+  // Add xml nodes
+  if (numberOfJoints > numberOfXMLJoints) {
+    while (numberOfJoints > numberOfXMLJoints) {
+      if (!addJointNode()) {
+	LOG_ERROR("Creation of node went wrong!");
+      }
+      ++numberOfXMLJoints;
     }
-    // create an IO instance
-    JointIO jointIO(jointNode);
-    // try to update it
-    hasSucceeded &= jointIO.update(jointPointer);
+    return;
   }
-  return hasSucceeded;
+}
+
+
+bool JointControllerIO::removeLastJointNode() {
+  for (pugi::xml_node jointNode = m_node.last_child();
+       jointNode;
+       jointNode = jointNode.previous_sibling()) {
+    if (strcmp(jointNode.name(),"JOINT") == 0) {
+      m_node.remove_child(jointNode);
+      return true;
+    }
+  }
+  return false;
+}
+
+
+bool JointControllerIO::updateDependancies
+(const JointControllerIO::JointTupleVector& i_vector) {
+  BaseJoint::JointPointer childJoint;
+  LOG_DEBUG("Update Dependancies!");
+  for (const auto& tuple : i_vector) {
+    LOG_DEBUG("Check a joint");
+    childJoint = std::get<1>(tuple)->getChild();
+    if (childJoint) {
+      LOG_DEBUG("Has a child!");
+      // this joint has a child
+      for (const auto& tupleWithChild : i_vector) {
+	if (std::get<1>(tupleWithChild) == childJoint) {
+	  // fond the corrisponding child
+	  std::get<0>(tuple).child("CHILD").text() =
+	    (std::get<0>(tupleWithChild).attribute("name").value());
+	  break;
+	}
+      }
+    }
+  }
+  return true;
+}
+
+
+bool JointControllerIO::addJointNode() {
+  if (JointIO::createNode(&m_node)) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 
@@ -159,3 +229,11 @@ JointControllerIO::JointControllerIO(const pugi::xml_node& i_node)
   LOG_DEBUG("Creating a JointControllerIO with node: " << i_node.name());
 }
 
+
+void JointControllerIO::getNextJointNode(pugi::xml_node* i_node) const {
+  pugi::xml_node newNode = i_node->next_sibling("JOINT");
+  if (!newNode){
+   LOG_ERROR("Expected an Joint node, did not find any!");
+  }
+  *i_node = newNode;
+}
