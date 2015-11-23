@@ -1,5 +1,4 @@
 // Copyright [2015] Ruud Cools
-
 #ifndef MOTOR_UNIT_TEST_JOINTCONTROLLERIOUNITTEST_H_
 #define MOTOR_UNIT_TEST_JOINTCONTROLLERIOUNITTEST_H_
 
@@ -94,7 +93,7 @@ class JointControllerIOUnitTest : public CxxTest::TestSuite {
 	  joint->getChild() != controller.getJointPointerVector()[1])
 	LOG_ERROR("Should be able to find the child in the joint vector!");
     }
-    //    std::remove("write.xml");
+    std::remove("write.xml");
   } 
 
   void testRemoveAJoint() {
