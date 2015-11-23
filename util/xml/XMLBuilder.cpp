@@ -37,21 +37,18 @@ void XMLBuilder::build() {
 
 pugi::xml_node XMLBuilder::loadXMLFile() {
   if (m_fileName == "")
-    LOG_ERROR("File name is not known!");
+    LOG_ERROR("XML file name is empty!");
 
   m_documentPointer = std::make_shared<pugi::xml_document>();
 
   pugi::xml_parse_result result =
       m_documentPointer->load_file(m_fileName.c_str());
-
-  LOG_DEBUG("showing tree!");
-
   if (result)
     LOG_INFO("Load result: " << result.description());
   else
     LOG_ERROR("Load result: " << result.description());
 
-  if (m_documentPointer->first_child() == NULL)
+  if (!m_documentPointer->first_child())
     LOG_ERROR("No first child found!!");
 
   if (std::string(m_documentPointer->first_child().name()) != "ROBOTBUILDER") {
@@ -67,8 +64,6 @@ pugi::xml_node XMLBuilder::getNodeFromPath(const pugi::xml_node& i_parrentNode,
                                            const std::string& i_path) const {
   pugi::xml_node childNode =
       i_parrentNode.first_element_by_path(i_path.c_str());
-
-  LOG_DEBUG(childNode.name());
   if (childNode) {
     return childNode;
   } else {
@@ -89,15 +84,11 @@ std::vector<T> XMLBuilder::getList(const pugi::xml_node& i_node,
                                    T (*f)(const pugi::xml_text&)) const {
   std::vector<T> list;
   pugi::xml_node parrentNode = i_node.first_element_by_path(i_path.c_str());
-  std::string attributeType = parrentNode.first_attribute().value();
-  
   for (pugi::xml_node node = parrentNode.first_child();
        node;
        node = node.next_sibling()) {
-    LOG_DEBUG("Value: "<< node.text().as_string());
     list.push_back((*f)(node.text()));
   }
-
   if (static_cast<int>(list.size()) != i_expectedNumberOfValues) {
     LOG_ERROR("Number of expected values: " << i_expectedNumberOfValues <<
               " is not equal to: " << list.size());
