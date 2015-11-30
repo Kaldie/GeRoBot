@@ -18,11 +18,11 @@ class TranslationalJointUnitTest : public CxxTest::TestSuite {
   void setUp() {
     translationalJoint.setPosition(50);
     translationalJoint.setMovementPerStep(1);
+    translationalJoint.setRange(std::vector<traceType>{50, 180});
   }
 
 
   void testPredictStep() {
-    translationalJoint.setRange(std::vector<traceType>{50, 180});
     Point2D point(50, 0);
     for (int i = 0;
          i < 45;
@@ -34,9 +34,7 @@ class TranslationalJointUnitTest : public CxxTest::TestSuite {
 
 
   void testPredictSteps() {
-      translationalJoint.setRange(std::vector<traceType>{50, 180});
     Point2D point(50, 0);
-
     std::string direction("OUT");
     std::string contraDirection("IN");
     translationalJoint.predictSteps(&point, direction, 90);
@@ -45,6 +43,37 @@ class TranslationalJointUnitTest : public CxxTest::TestSuite {
     translationalJoint.predictSteps(&point, contraDirection, 90);
     TS_ASSERT_EQUALS(point, Point2D(50, 0));
   }
+
+
+  void testJointCombo() {
+    auto rotationJointPointer =
+      std::make_shared<RotationalJoint<StepperDriver>>();
+    auto translationJointPointer =
+      std::make_shared<TranslationalJoint<StepperDriver>>(translationalJoint);
+    rotationJointPointer->setMovementPerStep(PI/180);
+    rotationJointPointer->setPosition(PI/4);
+    rotationJointPointer->setChild(translationJointPointer);
+    translationJointPointer->setParent(rotationJointPointer);
+    translationJointPointer->setPosition(50);
+    Point2D point(sqrt((50*50)/2),
+                  sqrt((50*50)/2));
+    std::string direction;
+    for (int i = 0;
+         i < 18;
+         i++) {
+      translationJointPointer->predictSteps(&point,"OUT", 5);
+      direction = "CCW";
+      rotationJointPointer->predictSteps(&point,direction, 5);
+    }
+    LOG_DEBUG(point);
+    traceType jointPosition = translationJointPointer->getPosition();
+    LOG_DEBUG(jointPosition);
+    LOG_DEBUG(Point2D(-sqrt((jointPosition*jointPosition)/2),
+                      sqrt((jointPosition*jointPosition)/2)));
+    TS_ASSERT_EQUALS(point, Point2D(-sqrt((jointPosition*jointPosition)/2),
+                                    sqrt((jointPosition*jointPosition)/2)));
+  }
+
 
   void testClone() {
     StepperDriver stepperDriver({5,7,4});

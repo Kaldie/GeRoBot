@@ -42,7 +42,6 @@ class JointControllerUnitTest : public CxxTest::TestSuite {
     rotationalJoint->setChild(translationalJoint);
 
     *translationalJoint->getMotor() = stepperDriver2;
-    translationalJoint->setParent(rotationalJoint);
 
     jointController = JointController();
     jointController.addJoint(rotationalJoint);

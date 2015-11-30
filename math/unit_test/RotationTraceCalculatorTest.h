@@ -33,7 +33,7 @@ class RotationTraceCalculatorTest : public CxxTest::TestSuite {
   void testRotationTraceCalculation() {
     Point2D startPoint(-0, 255);
     Point2D endPoint(-0, 255);
-    Point2D centrePoint(-0, 385);
+    Point2D centrePoint(-0, 580);
     RotationTrace trace(startPoint, endPoint, centrePoint);
     robot.setVirtualPosition(startPoint);
     robot.setPosition(startPoint);
@@ -59,7 +59,6 @@ class RotationTraceCalculatorTest : public CxxTest::TestSuite {
 
     RotationTraceCalculator rotationTraceCalculator(&robot);
     rotationTraceCalculator.setWriteLog(true);
-    LOG_DEBUG("Bitch please!");
     rotationTraceCalculator.calculateTrace(trace);
 
     SequenceVector sequenceVector = robot.getJointController()->getSequenceVector();
