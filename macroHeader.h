@@ -147,8 +147,6 @@ class BaseJoint;
 class Robot;
 class RobotTreeModel;
 
-enum MovementType {None, Rotational, Translational};
-
 enum GUIMovementMode {ToolMode, AxisMode};
 
 /// conversion of motor direction to joint direction
