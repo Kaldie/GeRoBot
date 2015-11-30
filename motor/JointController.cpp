@@ -144,8 +144,8 @@ bool JointController::hasJoint(const BaseJoint::JointPointer& i_jointPointer) co
 
 void JointController::moveSteps(const std::string& i_directionString,
                                 const int& i_numberOfSteps) {
-  BaseJoint::JointPointer joint = resolveJoint(i_directionString);
-  joint->moveSteps(i_directionString, i_numberOfSteps, &m_sequenceVector);
+  resolveJoint(i_directionString)->
+    moveSteps(i_directionString, i_numberOfSteps, &m_sequenceVector);
 }
 
 
