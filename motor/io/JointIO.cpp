@@ -20,8 +20,15 @@ void JointIO::build() {
   m_jointPointer->setPosition
     (getNodeFromPath(m_node, "./DEFAULT_POSITION").text().as_double());
   LOG_DEBUG("Default position: " << m_jointPointer->getPosition());
+  // Correct gradians to radians
+  if (m_jointPointer->getMovementType() == BaseJoint::Rotational) {
+    m_jointPointer->setMovementPerStep
+      (m_jointPointer->getMovementPerStep() * PI / 180);
+    m_jointPointer->setPosition
+      (m_jointPointer->getPosition() * PI / 180);
+  }
   //StepperDriver
-  *(m_jointPointer->getMotor()) =
+  *m_jointPointer->getMotor() =
     parseStepperDriver(getNodeFromPath(m_node, "./ACTUATOR"));
   //Range
   m_jointPointer->setRange(getDoubleList(m_node, "./RANGE", 2));

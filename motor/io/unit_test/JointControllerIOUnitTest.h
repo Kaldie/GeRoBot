@@ -21,6 +21,7 @@ class JointControllerIOUnitTest : public CxxTest::TestSuite {
     JointController jointController = jointControllerIO.getJointController();
   }
 
+
   void testBuildValues() {
     RobotIO robotIO("test_robot.xml");
     JointControllerIO jointControllerIO
@@ -30,11 +31,15 @@ class JointControllerIOUnitTest : public CxxTest::TestSuite {
     // test if the joint pointer vector is as expected
     TS_ASSERT_EQUALS(jointController.getJointPointerVector().size(), 2);
     //Test if the rotation joint has a child, the translational joint!
-    TS_ASSERT_EQUALS(jointController.resolveJoint(BaseJoint::Rotational)->getChild(),
+    TS_ASSERT_EQUALS(jointController.resolveJoint(BaseJoint::Rotational)->getChild().lock(),
                      jointController.resolveJoint(BaseJoint::Translational));
-    // Test if the translational joint has no child
-    TS_ASSERT_EQUALS(jointController.resolveJoint(BaseJoint::Translational)->getChild(),
+    TS_ASSERT_EQUALS(jointController.resolveJoint(BaseJoint::Rotational)->getParent().lock(),
                      nullptr);
+    // Test if the translational joint has no child
+    TS_ASSERT_EQUALS(jointController.resolveJoint(BaseJoint::Translational)->getChild().lock(),
+                     nullptr);
+    TS_ASSERT_EQUALS(jointController.resolveJoint(BaseJoint::Translational)->getParent().lock(),
+                     jointController.resolveJoint(BaseJoint::Rotational));
     TS_ASSERT_EQUALS(jointController.getSequenceVector().getSequenceVector().size(), 1);
     // test if there is one state sequence is known
     TS_ASSERT_EQUALS
@@ -88,13 +93,14 @@ class JointControllerIOUnitTest : public CxxTest::TestSuite {
     jointControllerIO2.build();
     controller = jointControllerIO2.getJointController();
     for (const auto& joint : controller.getJointPointerVector()) {
-      TS_ASSERT(joint->getChild());
-      if (joint->getChild() != controller.getJointPointerVector()[0] and
-	  joint->getChild() != controller.getJointPointerVector()[1])
+      TS_ASSERT(joint->getChild().lock());
+      if (joint->getChild().lock() != controller.getJointPointerVector()[0] and
+          joint->getChild().lock() != controller.getJointPointerVector()[1])
 	LOG_ERROR("Should be able to find the child in the joint vector!");
     }
     std::remove("write.xml");
-  } 
+  }
+
 
   void testRemoveAJoint() {
     // check if it is possible to change the dependancy and

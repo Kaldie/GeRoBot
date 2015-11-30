@@ -22,8 +22,9 @@ void JointControllerIO::addJoints(){
   resolveDependencies(jointTupleVector);
   // And finaly add them to tje joint controller
   for (const auto& jointTuple : jointTupleVector) {
-    m_jointController.addJoint
-      (std::get<1>(jointTuple));
+    if (auto jointPointer = std::get<1>(jointTuple)) {
+      m_jointController.addJoint(jointPointer);
+    }
   }
 }
 
@@ -45,22 +46,26 @@ JointControllerIO::JointTupleVector JointControllerIO::buildAllJoints() const {
 
 void JointControllerIO::resolveDependencies
 (const JointTupleVector& i_jointTupleVector) const {
-  BaseJoint::JointPointer jointPointer;
-  std::string parentString;
+  BaseJoint::JointPointer parentJoint;
+  BaseJoint::JointPointer childJoint;
   std::string childString;
-  pugi::xml_node jointNode;
+  std::string decendentName;
   for (const auto& jointTuple : i_jointTupleVector) {
-    jointNode = std::get<0>(jointTuple);
-    childString = getNodeFromPath(jointNode, "CHILD").text().as_string();
+    parentJoint = std::get<1>(jointTuple);
+    if (!parentJoint) {
+      LOG_ERROR("Fuck up!");
+    }
+    childString = getNodeFromPath(std::get<0>(jointTuple), "CHILD")
+      .text().as_string();
     if (childString == "null"){
       continue;
     }
-    std::string decendentName;
     for (const auto& decendentTuple : i_jointTupleVector) {
       decendentName = std::get<0>(decendentTuple).attribute("name").as_string();
       if (decendentName == childString) {
-        std::get<1>(jointTuple)->setChild
-          (std::get<1>(decendentTuple));
+        childJoint = std::get<1>(decendentTuple);
+        parentJoint->setChild(childJoint);
+        childJoint->setParent(parentJoint);
         break;
       }
     }
@@ -80,10 +85,8 @@ ArduinoMotorDriver JointControllerIO::parseActuator(
   if (std::string(getNodeFromPath(i_node, "./TYPE").text().as_string())
       != "Arduino")
     LOG_ERROR("None other arduino actuators are defined yet!");
-
   std::string serialExpression =
-      getNodeFromPath(i_node,
-                      "./REGULAR_EXPRESSION").text().as_string();
+    i_node.child("REGULAR_EXPRESSION").text().as_string();
   LOG_DEBUG("Serial port regular expression is: " << serialExpression);
   ArduinoMotorDriver arduinoMotorDriver(serialExpression);
   return arduinoMotorDriver;
@@ -193,16 +196,14 @@ bool JointControllerIO::removeLastJointNode() {
 
 bool JointControllerIO::updateDependancies
 (const JointControllerIO::JointTupleVector& i_vector) {
-  BaseJoint::JointPointer childJoint;
   LOG_DEBUG("Update Dependancies!");
   for (const auto& tuple : i_vector) {
     LOG_DEBUG("Check a joint");
-    childJoint = std::get<1>(tuple)->getChild();
-    if (childJoint) {
+    if (auto childJoint = std::get<1>(tuple)->getChild().lock()) {
       LOG_DEBUG("Has a child!");
       // this joint has a child
       for (const auto& tupleWithChild : i_vector) {
-	if (std::get<1>(tupleWithChild) == childJoint) {
+        if (std::get<1>(tupleWithChild) == childJoint) {
 	  // fond the corrisponding child
 	  std::get<0>(tuple).child("CHILD").text() =
 	    (std::get<0>(tupleWithChild).attribute("name").value());

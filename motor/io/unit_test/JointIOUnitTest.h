@@ -35,7 +35,7 @@ class JointIOUnitTest : public CxxTest::TestSuite {
     TS_ASSERT_EQUALS(jointpointer->getDirectionConversionMap(),
 		     map);
     TS_ASSERT_EQUALS(jointpointer->getRange(), std::vector<traceType>({0,185}));
-    TS_ASSERT_EQUALS(jointpointer->getPosition(), 90.0);
+    TS_ASSERT_EQUALS(jointpointer->getPosition(), PI/2);
     TS_ASSERT_EQUALS(jointpointer->getMovementType(), BaseJoint::Rotational);
     TS_ASSERT_DELTA(jointpointer->getMovementPerStep(),0.0016,0.01);
   }
