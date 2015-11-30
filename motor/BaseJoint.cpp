@@ -58,8 +58,21 @@ void BaseJoint::childPosition(Point2D* o_position, traceType* o_angle) const {
   LOG_DEBUG("Current angle: " << *o_angle);
   LOG_DEBUG("Current length: " << getLength());
   LOG_DEBUG("Current child position: " << *o_position);
-  if (m_child) {
-    m_child->childPosition(o_position, o_angle);
+  if (auto child = m_child.lock()) {
+    child->childPosition(o_position, o_angle);
+  }
+}
+
+
+void BaseJoint::parentPosition(Point2D* o_position, traceType* o_angle) const {
+  if (auto parent = m_parent.lock()) {
+    *o_angle += parent->getAngle();
+    o_position->x += parent->getLength() * cos(*o_angle);
+    o_position->y += parent->getLength() * sin(*o_angle);
+    LOG_DEBUG("Current angle: " << *o_angle);
+    LOG_DEBUG("Current length: " << getLength());
+    LOG_DEBUG("Current child position: " << *o_position);
+    parent->parentPosition(o_position, o_angle);
   }
 }
 
@@ -79,5 +92,6 @@ BaseJoint::BaseJoint()
      m_range({0,1}),
      m_movementType(None),
      m_directionConversion({}),
-     m_child(nullptr)
+     m_child(),
+     m_parent()
 {}

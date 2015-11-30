@@ -35,7 +35,10 @@ class BaseJoint {
            DirectionConversionMap);
 
     // Pointer to the child of this joint
-    GETSETPROTECTED(JointPointer, m_child, Child);
+    GETSETPROTECTED(WeakJointPointer, m_child, Child);
+
+    // Pointer to the parent of this Joint
+    GETSETPROTECTED(WeakJointPointer, m_parent, Parent);
 
  public:
     /**
@@ -103,6 +106,9 @@ class BaseJoint {
     Point2D childPosition() const;
 
     void childPosition(Point2D* o_position, traceType* o_angle) const;
+
+    // return the angle and position of the parent
+    void parentPosition(Point2D* o_position, traceType* o_angle) const;
 
     // return length of the Joint
     virtual traceType getLength() const = 0;
