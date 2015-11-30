@@ -89,16 +89,10 @@ predictSteps(Point2D* o_robotPosition,
              const std::string& i_directionString,
              const int& i_numberOfSteps) {
   //initialise variable
-  Point2D relativeRobotPosition(0, 0), jointPosition;
+  Point2D relativeRobotPosition(0,0);
   traceType angle(0.0);
   // calculate the relative robot position from this joint
-  childPosition(&relativeRobotPosition, &angle);
-  // get the absolute joint position from this
-  jointPosition = *o_robotPosition - relativeRobotPosition;
-  // Show debug info
-  LOG_DEBUG("Current Robot position: " << *o_robotPosition);
-  LOG_DEBUG("Relative Robot position: " << relativeRobotPosition);
-  LOG_DEBUG("Joint position: " << jointPosition);
+  parentPosition(&relativeRobotPosition, &angle);
   // how much will this joint shift
   traceType addedExtension = getMovementPerStep() *
     getPositionModifier(i_directionString) * i_numberOfSteps;
@@ -107,8 +101,8 @@ predictSteps(Point2D* o_robotPosition,
   // Update the current position of the joint
   m_currentPosition += addedExtension;
   // Update the current end position of the robot
-  o_robotPosition->x = cos(angle) * newLength + jointPosition.x;
-  o_robotPosition->y = sin(angle) * newLength + jointPosition.y;
+  o_robotPosition->x += cos(angle) * newLength;
+  o_robotPosition->y += sin(angle) * newLength;
   LOG_INFO("Position after translation is: " <<*o_robotPosition);
 }
 
