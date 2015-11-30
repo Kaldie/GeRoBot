@@ -17,7 +17,7 @@ class RotationalJointUnitTest : public CxxTest::TestSuite {
 
   void setUp(void) {
     rotationalJoint2.setPosition(0.0);
-    rotationalJoint2.setMovementPerStep(1.0);
+    rotationalJoint2.setMovementPerStep(1.0*PI/180);
     rotationalJoint2.setFixedLength(50.0);
   }
 

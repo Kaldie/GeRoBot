@@ -186,17 +186,7 @@ void SequenceVector::appendStateSequence(
     return;
   }
 
-  //  for (const auto& stateSequence : m_sequenceVector) {
-  //    stateSequence.displaySequence();
-  //  }
   if (m_sequenceVector.back().addToSequence(i_newStateSequence)) {
-    //LOG_DEBUG("New sequence: ");
-    ///    i_newStateSequence.displaySequence();
-    // LOG_DEBUG("Adding the new state sequence to the previous one!");
-    //    for (const auto& stateSequence : m_sequenceVector) {
-    //      stateSequence.displaySequence();
-    //x    }
-
     return;
   }
 
@@ -212,6 +202,12 @@ void SequenceVector::appendStateSequence(
   }
   m_sequenceVector.push_back(i_newStateSequence);
   return;
+}
+
+
+void SequenceVector::addEmptySequenc() {
+  StateSequence emptySequence;
+  m_sequenceVector.push_back(emptySequence);
 }
 
 

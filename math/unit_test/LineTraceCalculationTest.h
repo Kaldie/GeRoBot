@@ -18,16 +18,21 @@ class LineTraceCalculationTest : public CxxTest::TestSuite {
   void setUp() {
     StepperDriver stepperDriver1({5, 6, 7});
     StepperDriver stepperDriver2({2, 3, 4});
-    TranslationalJoint<StepperDriver> translationalJoint(50.0, 0.01);
-    RotationalJoint<StepperDriver> rotationalJoint(90.0, 0.01);
-    (*rotationalJoint.getMotor()) = stepperDriver1;
-    (*translationalJoint.getMotor()) = stepperDriver2;
+    TranslationalJoint<StepperDriver> translationalJoint;
+    translationalJoint.setPosition(50.0);
+    translationalJoint.setMovementPerStep(0.01);
+    RotationalJoint<StepperDriver> rotationalJoint;
+    rotationalJoint.setPosition(PI/2);
+    rotationalJoint.setMovementPerStep(0.01 * PI/180);
+    *rotationalJoint.getMotor() = stepperDriver1;
+    *translationalJoint.getMotor() = stepperDriver2;
     JointController jointController;
     jointController.addJoint(rotationalJoint.clone());
     jointController.addJoint(translationalJoint.clone());
     robot.setJointController(std::make_shared<JointController>(jointController));
     LOG_DEBUG("Number of joints: " << jointController.getNumberOfJoints());
-    LOG_DEBUG("Position: " << robot.getJointController()->resolveJoint(Rotational)->getPosition());
+    LOG_DEBUG("Position: " << 
+	      robot.getJointController()->resolveJoint(BaseJoint::Rotational)->getPosition());
     LOG_DEBUG("Number of joints: " << robot.getJointController()->getNumberOfJoints());
   }
 

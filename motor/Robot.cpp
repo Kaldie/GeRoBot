@@ -65,20 +65,19 @@ void Robot::goToPosition(const Point2D &i_position) {
 void Robot::prepareSteps(const std::string& i_direction,
                          const int& i_numberOfSteps) {
   // predict the next step
-  //  int preNumberOfSteps = m_jointController->getSequenceVector().numberOfSteps();
-  m_jointController->resolveJoint(i_direction)->
-    predictSteps(&m_virtualPosition, i_direction, i_numberOfSteps);
+  BaseJoint::JointPointer joint = m_jointController->resolveJoint(i_direction);
+  joint->predictSteps(&m_virtualPosition, i_direction, i_numberOfSteps);
   // add the point to the traveled points
   m_traveledPoints.push_back(m_virtualPosition);
   // add the step to the sequence
   m_jointController->moveSteps(i_direction, i_numberOfSteps);
-  //if (preNumberOfSteps >
-  //  m_jointController->getSequenceVector().numberOfSteps() - (2 * i_numberOfSteps)) {
-  //LOG_DEBUG("Step is wanted, however not set!" << std::endl <<
-  //          "Current steps: " << preNumberOfSteps << ", new steps: " <<
-  //          m_jointController->getSequenceVector().numberOfSteps());
-  //++stepsMissed;
-  //LOG_DEBUG("Current steps missed: " << stepsMissed);
+  m_speedController.notifyStep(joint, i_numberOfSteps);
+  int motorSpeed;
+  if (m_speedController.adviseSpeed(&motorSpeed)) {
+    // add a clean sequence to force the speed to be nice
+    m_jointController->getSequenceVectorPointer()->addEmptySequenc();
+    m_speedController.acknowledgeSpeed(motorSpeed);
+  }
 }
 
 

@@ -4,7 +4,7 @@
 #include <PinState.h>
 #include "BasePropertyItem.h"
 
-bconst QList<QString> PinStateItem::propertyList{"NumericValue"};
+const QList<QString> PinStateItem::propertyList{"NumericValue"};
 
 PinStateItem::PinStateItem(BaseRobotItem* i_parent,
                            PinState* i_pinState)

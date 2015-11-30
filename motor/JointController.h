@@ -11,10 +11,13 @@ class JointController {
  public:
   typedef std::vector<BaseJoint::JointPointer> JointPointerVector;
   typedef std::shared_ptr<JointController> JointControllerPointer;
+
   /// vector with the shared pointers to joints
   GETSET(JointPointerVector, m_jointPointerVector, JointPointerVector);
+
   /// The actuator
   GETSET(ArduinoMotorDriver, m_actuator, Actuator);
+
   /// Vector where all the sequences will be stored in!
   GETSET(SequenceVector, m_sequenceVector, SequenceVector);
  public:

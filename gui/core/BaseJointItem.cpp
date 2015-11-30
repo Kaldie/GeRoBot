@@ -47,7 +47,7 @@ QVariant BaseJointItem::getPropertyData(int i_row,int i_column) const {
 	
 	else if(i_row==BaseJointItem::propertyList.indexOf("MovementType")){
 		if(i_column==1){
-			MovementType movementType=m_jointPointer->getMovementType();
+            BaseJoint::MovementType movementType=m_jointPointer->getMovementType();
 			if(movementType==1)
 				return QVariant(QString("Rotational"));
 			else if(movementType==2)
@@ -88,14 +88,14 @@ bool BaseJointItem::setPropertyData(int i_row,int i_column,const QVariant& i_dat
 	}
 
 	else if(i_row==BaseJointItem::propertyList.indexOf("MovementType")){
-		MovementType movementType;
+        BaseJoint::MovementType movementType;
 		
 		if("Rotational"==i_data.toString().toStdString()){
-			movementType=Rotational;
+            movementType = BaseJoint::Rotational;
 			isConverted=true;
 		}
 		else if("Translational"==i_data.toString().toStdString()){
-			movementType=Translational;
+            movementType=BaseJoint::Translational;
 			isConverted=(*hasConverted);
 		}
 		else

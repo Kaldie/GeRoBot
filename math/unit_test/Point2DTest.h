@@ -52,6 +52,7 @@ class Point2DTest : public CxxTest::TestSuite {
                     PI * 0.5, 0.0001);
   }
 
+#ifdef QT
   void testQPointFCast() {
     Point2D point(10.0,-10.0);
     QPointF qPoint = point;
@@ -61,6 +62,7 @@ class Point2DTest : public CxxTest::TestSuite {
                      qPoint);
   }
 
+
   void testConstrucionFromQPointF() {
     QPointF qPoint(-10,25);
     Point2D point(qPoint);
@@ -69,6 +71,7 @@ class Point2DTest : public CxxTest::TestSuite {
     TS_ASSERT_DIFFERS(Point2D(10.0, 25.0),
                      point);
   }
+#endif  // QT
 };
 
 #endif  // MATH_UNIT_TEST_POINT2DTEST_H_

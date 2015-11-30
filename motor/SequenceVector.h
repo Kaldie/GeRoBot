@@ -8,9 +8,7 @@
 typedef std::vector<StateSequence> PinStateSequenceVector;
 
 class SequenceVector {
-  GETSET(PinStateSequenceVector,
-         m_sequenceVector,
-         SequenceVector);
+  GETSET(PinStateSequenceVector, m_sequenceVector, SequenceVector);
 
  public:
   int numberOfSteps() const;
@@ -54,6 +52,9 @@ class SequenceVector {
   /// Try to add a StateSequence to the last one
   bool addToSequence(const StateSequence& i_otherSequence) {
     return getLastSequence()->addToSequence(i_otherSequence);};
+
+  /// Add an empty StateSequence to the sequence vector.
+  void addEmptySequenc();
 
   /// Remove all the sequences from the vector
   void clean();

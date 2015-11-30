@@ -5,6 +5,8 @@
 #include <BaseJoint.h>
 #include <JointController.h>
 #include <Point2D.h>
+#include <SpeedController.h>
+
 class Trace;
 
 /**
@@ -18,9 +20,6 @@ class Robot {
   // Handles the joints and can update the position after a step
   GETSET(JointController::JointControllerPointer, m_jointController, JointController);
 
-  // Speed of the robot during the movement
-  GETSET(float, m_speed, Speed);
-
   // Position of the head of the robot
   GETSET(Point2D, m_position, Position);
 
@@ -29,6 +28,9 @@ class Robot {
 
   // Positions which has been seen during stepping
   GETSET(std::vector<Point2D>, m_traveledPoints, TraveledPoints);
+
+  /// Controller which is in charge of the speed of the robot
+  GETSET(SpeedController, m_speedController, SpeedController);
 
  public:
   typedef std::shared_ptr<Robot> RobotPointer;
@@ -82,6 +84,7 @@ class Robot {
   Robot(const JointController::JointControllerPointer& i_pointer,
         const int& i_speed,
         const Point2D& i_point);
+
  private:
   int getNumberOfSequences(const JointController::JointControllerPointer&);
   int getNumberOfSequences(const bool&);
