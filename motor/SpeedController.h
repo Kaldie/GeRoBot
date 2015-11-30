@@ -18,10 +18,10 @@ class SpeedController {
   /// Mapping the number of consecutive steps with the joint
   GETSET(JointMap, m_stepMap, StepMap);
 
-  /// Required speed with which the robot should travel
+  /// The current frequency with which the actuator is currently setting steps
   GETSET(int, m_motorSpeed, MotorSpeed);
 
-  /// Current speed
+  /// Current speed of the robot
   GETSET(traceType , m_robotSpeed, RobotSpeed);
 
   /**
@@ -93,6 +93,9 @@ class SpeedController {
 
   /// Validates all the weak pointers in the m_stepMap
   void validatedJoints() const;
+
+  /// Return the distance which will be stepped in this block
+  traceType steppedDistance() const;
 };
 
 #endif  // MOTOR_SPEEDCONTROLLER_H_

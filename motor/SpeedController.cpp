@@ -42,33 +42,59 @@ int SpeedController::getMaximumConsecutiveSteps() const {
 }
 
 
-traceType SpeedController::getRobotSpeed(const int i_speed) const {
+traceType SpeedController::steppedDistance() const {
   traceType steppedDistance = 0.0;
   for (const auto& stepItem : m_stepMap) {
     LOG_DEBUG("Distance per step: " << stepItem.first.lock()->distancePerStep());
     steppedDistance +=
       stepItem.first.lock()->distancePerStep() * stepItem.second;
   }
-  // based on the steps currently known and the given speed i_speed
-  // what is the robot speed
-  LOG_DEBUG("Stepped distance: " << steppedDistance);
-  return steppedDistance / getMaximumConsecutiveSteps() * i_speed;
+  return steppedDistance;
+}
+
+
+traceType SpeedController::getRobotSpeed(const int i_speed) const {
+  traceType distance(steppedDistance());
+  LOG_DEBUG("Stepped distance: " << distance);
+  return distance / getMaximumConsecutiveSteps() * i_speed;
 }
 
 
 bool SpeedController::adviseSpeed(int* o_speed) const {
   validatedJoints();
   traceType currentRobotSpeed = getRobotSpeed(m_motorSpeed);
+
   // if the robot is running at the requested speed then it is ok
   if (currentRobotSpeed * 0.95 < m_robotSpeed &&
       currentRobotSpeed * 1.05 > m_robotSpeed) {
+    LOG_DEBUG("Current robot speed: " << currentRobotSpeed);
+    LOG_DEBUG("IS OK!");
     *o_speed = m_motorSpeed;
     return false;
   }
+  int maxSteps = getMaximumConsecutiveSteps();
+  traceType distance = steppedDistance();
+  // speed that the motors should operate on to provide the robot speed
+  int  wantedMotorSpeed = maxSteps/ (distance / m_robotSpeed);
+  LOG_DEBUG("Max steps: " <<  maxSteps);
+  LOG_DEBUG("Stepped distance: " << distance);
+  LOG_DEBUG("Current robot speed: " << currentRobotSpeed);
+  LOG_DEBUG("Motor speed : " << m_motorSpeed);
+  LOG_DEBUG("Wanted motor speed: " << wantedMotorSpeed);
+  LOG_DEBUG("Wanted Robot speed: " << m_robotSpeed);
+
+  // Check if that speed is possible
   if ( currentRobotSpeed < m_robotSpeed) {
     *o_speed = getLimitingMotorSpeed(&BaseMotor::getMaximumSpeed, true);
+    if (*o_speed > wantedMotorSpeed){
+      *o_speed = wantedMotorSpeed;
+    }
   } else {
+    LOG_DEBUG("Breaking!!");
     *o_speed = getLimitingMotorSpeed(&BaseMotor::getMinimumSpeed, false);
+    if (*o_speed < wantedMotorSpeed){
+      *o_speed = wantedMotorSpeed;
+    }
   }
   return true;
 }
