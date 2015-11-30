@@ -91,7 +91,7 @@ void RotationalJoint<ActuatorType>::predictSteps(Point2D* o_robotPosition,
                                                  const int& i_numberOfSteps) {
   Point2D relativePosition(childPosition());
   Point2D rotationPoint(*o_robotPosition - relativePosition);
-  traceType addedRotation = m_movementPerStep * PI / 180.0 *
+  traceType addedRotation = m_movementPerStep *
     (getPositionModifier(i_directionString) * i_numberOfSteps);
   // Debug info
   LOG_DEBUG("Position modifier is: "<< getPositionModifier(i_directionString));
@@ -113,8 +113,7 @@ void RotationalJoint<ActuatorType>::predictSteps(Point2D* o_robotPosition,
 
 template <class ActuatorType>
 traceType RotationalJoint<ActuatorType>::distancePerStep() const {
-  LOG_DEBUG("Current position: " << childPosition());
-  return Magnitude(childPosition())*(m_movementPerStep * PI/180);
+  return Magnitude(childPosition())*(m_movementPerStep);
 }
 
 
