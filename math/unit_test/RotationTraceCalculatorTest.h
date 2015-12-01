@@ -20,8 +20,12 @@ class RotationTraceCalculatorTest : public CxxTest::TestSuite {
   void setUp() {
     StepperDriver stepperDriver1({5, 6, 7});
     StepperDriver stepperDriver2({2, 3, 4});
-    TranslationalJoint<StepperDriver> translationalJoint(50.0, 0.01);
-    RotationalJoint<StepperDriver> rotationalJoint(90.0, 0.01);
+    TranslationalJoint<StepperDriver> translationalJoint;
+    translationalJoint.setPosition(50.0);
+    translationalJoint.setMovementPerStep(0.01);
+    RotationalJoint<StepperDriver> rotationalJoint;
+    rotationalJoint.setPosition(PI/2);
+    rotationalJoint.setMovementPerStep(PI/180 * 0.01);
     (*rotationalJoint.getMotor()) = stepperDriver1;
     (*translationalJoint.getMotor()) = stepperDriver2;
     JointController jointController;
@@ -50,7 +54,7 @@ class RotationTraceCalculatorTest : public CxxTest::TestSuite {
     robot.getJointController()->resolveJoint(Translational)->getMotor()->setHoldMotor(true);
     robot.getJointController()->resolveJoint(Rotational)->getMotor()->setHoldMotor(true);
     */
-    RobotIO robotBuilder("/home/ruud/project/gerobot/gui/defaultRobot.xml");
+    RobotIO robotBuilder("defaultRobot.xml");
     robotBuilder.build();
     //    robotBuilder.getRobotPointer();
     Robot robot = *robotBuilder.getRobotPointer();

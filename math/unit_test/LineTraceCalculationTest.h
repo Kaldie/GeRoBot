@@ -37,7 +37,7 @@ class LineTraceCalculationTest : public CxxTest::TestSuite {
   }
 
   void testLineTraceCalculation() {
-    RobotIO robotBuilder("/home/ruud/project/gerobot/gui/defaultRobot.xml");
+    RobotIO robotBuilder("defaultRobot.xml");
     robotBuilder.build();
     //    robotBuilder.getRobotPointer();
     Robot robot = *robotBuilder.getRobotPointer();
@@ -53,12 +53,13 @@ class LineTraceCalculationTest : public CxxTest::TestSuite {
     lineTraceCalculator.setWriteLog(true);
     lineTraceCalculator.calculateTrace(trace);
     SequenceVector sequenceVector = robot.getJointController()->getSequenceVector();
-    sequenceVector.condenseVector();
+    //    sequenceVector.condenseVector();
     sequenceVector.exportValue();
         try {
         LOG_DEBUG("here!!");
         robot.actuate();
-    } catch(std::runtime_error) {
+    } catch(const std::runtime_error& e) {
+	  throw e;
         LOG_INFO("Could not find sizzle");
     }
     return;
