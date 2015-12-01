@@ -50,8 +50,8 @@ bool BaseTraceCalculator::hasRobot() const {
 
 void BaseTraceCalculator::setTolerances() {
   if (hasRobot()) {
-    m_rotationTolerance = m_robot->getMovementPerStep(BaseJoint::Rotational) / 1.0;
-    m_translationTolerance = m_robot->getMovementPerStep(BaseJoint::Translational) / 2.0;
+    m_rotationTolerance = m_robot->getMovementPerStep(BaseJoint::Rotational) * 2.0;
+    m_translationTolerance = m_robot->getMovementPerStep(BaseJoint::Translational) * 2.0;
   }
   m_tolerance = std::min(m_rotationTolerance, m_translationTolerance);
 }
@@ -117,10 +117,9 @@ bool BaseTraceCalculator::shouldRotate(const Trace& i_trace,
                                        const Point2D &i_point2D) const {
   traceType difference = std::abs(i_point2D.getAlpha()-
                                   i_trace.getEndPoint().getAlpha());
-  difference *= 180.0 / PI;
   LOG_INFO("current angle: " << i_point2D.getAlpha() * 180 / PI << " ");
   LOG_INFO("wanted angle: " << i_trace.getEndPoint().getAlpha() * 180 / PI);
-  LOG_INFO("diff: " << difference);
+  LOG_INFO("diff: " << difference * 180 / PI);
   if (difference > m_rotationTolerance) {
     return true;
   } else {
