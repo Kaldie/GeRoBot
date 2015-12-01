@@ -42,7 +42,11 @@ void SequenceVector::normalise(const bool i_condenseVector /* = false*/) {
       thisPinState = currentSequence->getPinStateVector().back();
     }
     if (currentSequence != m_sequenceVector.end()) {
-      thisPinState = *currentSequence->getPinStateVector().begin();
+      if(currentSequence->getPinStateVector().size() > 0) {
+	thisPinState = *currentSequence->getPinStateVector().begin();
+      } else {
+	LOG_ERROR("BooBoo!");
+      }
     } else {
       break;
     }
@@ -205,9 +209,8 @@ void SequenceVector::appendStateSequence(
 }
 
 
-void SequenceVector::addEmptySequenc() {
-  StateSequence emptySequence;
-  m_sequenceVector.push_back(emptySequence);
+void SequenceVector::addEmptySequence() {
+  m_sequenceVector.push_back(StateSequence());
 }
 
 

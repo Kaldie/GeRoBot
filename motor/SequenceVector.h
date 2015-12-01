@@ -54,7 +54,7 @@ class SequenceVector {
     return getLastSequence()->addToSequence(i_otherSequence);};
 
   /// Add an empty StateSequence to the sequence vector.
-  void addEmptySequenc();
+  void addEmptySequence();
 
   /// Remove all the sequences from the vector
   void clean();
