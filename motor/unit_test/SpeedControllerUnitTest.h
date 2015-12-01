@@ -121,7 +121,7 @@ class SpeedControllerUnitTest : public CxxTest::TestSuite {
     SpeedController speedController(10);
     Point2D startPoint(0, 50.0);
     int speed;
-    int prevSpeed = std::num
+    //    int prevSpeed = std::num
     for (int numberOfSteps = 100;
          numberOfSteps > 0;
          --numberOfSteps) {
