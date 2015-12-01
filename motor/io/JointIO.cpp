@@ -35,8 +35,12 @@ void JointIO::build() {
     m_jointPointer->setRange(convertedRangeVector);
   }
   //StepperDriver
-  *m_jointPointer->getMotor() =
-    parseStepperDriver(getNodeFromPath(m_node, "./ACTUATOR"));
+  // cast it first to a proper stepperdriver pointer then set it
+  // otherwise it get sliced
+  // need to first pointer: the static_cast call is a rvalue not lvalue!
+  StepperDriver* stepperDriver = static_cast<StepperDriver*>(m_jointPointer->getMotor());
+  *stepperDriver = parseStepperDriver(getNodeFromPath(m_node, "./ACTUATOR"));
+
   handleConversionMap();
   LOG_DEBUG("Construction of the pointer is finished!");
   LOG_DEBUG("Joint Build is finshed!");
