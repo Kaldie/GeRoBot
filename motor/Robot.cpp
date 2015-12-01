@@ -9,28 +9,21 @@
 int stepsMissed = 0;
 
 Robot::Robot()
-  : Robot( nullptr, 30, Point2D(0, 50))
+  : Robot( nullptr,  Point2D(0, 50))
 {}
 
 
 Robot::Robot(const JointController::JointControllerPointer& i_pointer)
-  : Robot(i_pointer, 30, Point2D(0, 50))
+  : Robot(i_pointer, Point2D(0, 50))
 {}
 
 
 Robot::Robot(const JointController::JointControllerPointer& i_pointer,
-             const int& i_speed)
-  : Robot(i_pointer, i_speed, Point2D(0, 50))
-{}
-
-
-Robot::Robot(const JointController::JointControllerPointer& i_pointer,
-             const int& i_speed,
              const Point2D& i_currentPosition)
   : m_jointController(i_pointer),
-    m_speed(i_speed),
     m_position(i_currentPosition),
-    m_virtualPosition(i_currentPosition) {
+    m_virtualPosition(i_currentPosition),
+    m_speedController(10) {
 }
 
 
@@ -74,8 +67,9 @@ void Robot::prepareSteps(const std::string& i_direction,
   m_speedController.notifyStep(joint, i_numberOfSteps);
   int motorSpeed;
   if (m_speedController.adviseSpeed(&motorSpeed)) {
+    LOG_DEBUG("Speed controler has a mandatory speed change.");
     // add a clean sequence to force the speed to be nice
-    m_jointController->getSequenceVectorPointer()->addEmptySequenc();
+    m_jointController->getSequenceVectorPointer()->addEmptySequence();
     m_speedController.acknowledgeSpeed(motorSpeed);
   }
 }

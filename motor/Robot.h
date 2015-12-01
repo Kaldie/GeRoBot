@@ -76,13 +76,8 @@ class Robot {
   /// defines controlle
   Robot(const JointController::JointControllerPointer& i_pointer);
 
-  /// defines controller and speed
-  Robot(const JointController::JointControllerPointer& i_pointer,
-        const int& i_speed);
-
   /// fully fledged constructor
   Robot(const JointController::JointControllerPointer& i_pointer,
-        const int& i_speed,
         const Point2D& i_point);
 
  private:
