@@ -16,8 +16,8 @@ class SpeedControllerUnitTest : public CxxTest::TestSuite {
   void setUp() {
     m_rotationalJoint = std::make_shared<RotationalJoint<StepperDriver>>();
     m_rotationalJoint->setPosition(90.0 * PI/180);
-    m_rotationalJoint->setMovementPerStep(0.1);
-    m_rotationalJoint->setRange(std::vector<traceType>({0, 180}));
+    m_rotationalJoint->setMovementPerStep(0.001);
+    m_rotationalJoint->setRange(std::vector<traceType>({0, PI}));
     m_rotationalJoint->setDirectionConversionMap
       (DirectionConversionMap({{"CCW","CCW"},{"CW","CW"}}));
 
@@ -121,6 +121,7 @@ class SpeedControllerUnitTest : public CxxTest::TestSuite {
     SpeedController speedController(10);
     Point2D startPoint(0, 50.0);
     int speed;
+    //    int prevSpeed = std::num
     for (int numberOfSteps = 100;
          numberOfSteps > 0;
          --numberOfSteps) {
@@ -129,6 +130,7 @@ class SpeedControllerUnitTest : public CxxTest::TestSuite {
       m_translationalJoint->predictSteps(&startPoint, "OUT", 5);
       speedController.notifyStep(m_translationalJoint, 5);
       speedController.adviseSpeed(&speed);
+      TS_ASSERT(speed >= 23 && speed <= 33);
       speedController.acknowledgeSpeed(speed);
     }
   }

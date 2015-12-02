@@ -52,22 +52,34 @@ class Point2DTest : public CxxTest::TestSuite {
                     PI * 0.5, 0.0001);
   }
 
+
   void testQPointFCast() {
+#ifndef QT
+    TS_SKIP("Test is skiped due to lack of QT");
+    return;
+#else
     Point2D point(10.0,-10.0);
     QPointF qPoint = point;
     TS_ASSERT_EQUALS(QPointF(10.0,10.0),
                      qPoint);
     TS_ASSERT_DIFFERS(QPointF(10.0,-10.0),
                      qPoint);
+#endif
   }
 
+
   void testConstrucionFromQPointF() {
+#ifndef QT
+    TS_SKIP("Test is skiped due to lack of QT");
+    return;
+#else
     QPointF qPoint(-10,25);
     Point2D point(qPoint);
     TS_ASSERT_EQUALS(Point2D(-10.0, -25.0),
                      point);
     TS_ASSERT_DIFFERS(Point2D(10.0, 25.0),
                      point);
+#endif  // QT
   }
 };
 

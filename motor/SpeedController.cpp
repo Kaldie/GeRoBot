@@ -65,8 +65,8 @@ bool SpeedController::adviseSpeed(int* o_speed) const {
   traceType currentRobotSpeed = getRobotSpeed(m_motorSpeed);
 
   // if the robot is running at the requested speed then it is ok
-  if (currentRobotSpeed * 0.95 < m_robotSpeed &&
-      currentRobotSpeed * 1.05 > m_robotSpeed) {
+  if (currentRobotSpeed < m_robotSpeed * 1.05 &&
+      currentRobotSpeed > m_robotSpeed * 0.95) {
     LOG_DEBUG("Current robot speed: " << currentRobotSpeed);
     LOG_DEBUG("IS OK!");
     *o_speed = m_motorSpeed;
@@ -118,9 +118,11 @@ int SpeedController::getLimitingMotorSpeed(int (BaseMotor::*getLimitingSpeed)() 
   if (m_stepMap.begin()->first.expired()) {
     LOG_ERROR("Joint has been unexpectly destructed!!");
   }
-  int suggestedMotorSpeed = (m_stepMap.begin()->first.lock()->getMotor()->*getLimitingSpeed)();
+  int suggestedMotorSpeed = 
+    (m_stepMap.begin()->first.lock()->getMotor()->*getLimitingSpeed)();
   int maxSteps(getMaximumConsecutiveSteps());
   int thisMotorSpeed, resultingSpeed;
+
   for (const auto& stepItem : m_stepMap) {
     if (stepItem.first.expired()) {
       LOG_ERROR("Joint has been unexpectly destructed!!");

@@ -112,7 +112,7 @@ void PinState::displayPinState() const {
 
 
 bool PinState::operator==(const PinState& rhs) const {
-  if(rhs.getNumericValue() != getNumericValue())
+  if(rhs.m_numericValue != m_numericValue)
     return false;
   std::vector<int> lhsPinVector = getPinVector();
   std::vector<int> rhsPinVector = rhs.getPinVector();

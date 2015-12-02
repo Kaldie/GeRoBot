@@ -25,16 +25,16 @@ class JointIOUnitTest : public CxxTest::TestSuite {
     BaseJoint::JointPointer jointpointer(jointIO.getJointPointer());
     // test StepperDriver
     StepperDriver* driver = static_cast<StepperDriver*>(jointpointer->getMotor());
-    TS_ASSERT_EQUALS(driver->getPullIn(),200);
-    TS_ASSERT_EQUALS(driver->getPullOut(),200);
-    TS_ASSERT_EQUALS(driver->getMaxSpeed(),500);
+    TS_ASSERT_EQUALS(driver->getPullIn(),124);
+    TS_ASSERT_EQUALS(driver->getPullOut(),123);
+    TS_ASSERT_EQUALS(driver->getMaxSpeed(),12345);
     TS_ASSERT_EQUALS(driver->getCurrentPinState().getPinVector(),
 		     std::vector<int>({5,6,7}));
     TS_ASSERT(driver->getHoldMotor());
     DirectionConversionMap map = {{"CCW","CCW"},{"CW","CW"}};
     TS_ASSERT_EQUALS(jointpointer->getDirectionConversionMap(),
 		     map);
-    TS_ASSERT_EQUALS(jointpointer->getRange(), std::vector<traceType>({0,185}));
+    TS_ASSERT_EQUALS(jointpointer->getRange(), std::vector<traceType>({0, 185 * PI/180}));
     TS_ASSERT_EQUALS(jointpointer->getPosition(), PI/2);
     TS_ASSERT_EQUALS(jointpointer->getMovementType(), BaseJoint::Rotational);
     TS_ASSERT_DELTA(jointpointer->getMovementPerStep(),0.0016,0.01);

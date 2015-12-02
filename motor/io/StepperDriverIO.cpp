@@ -16,6 +16,7 @@ void StepperDriverIO::build() {
   stepperDriver.setHoldMotor(getNodeFromPath("./HOLD_MOTOR").text().as_bool());
   LOG_DEBUG("Hold motor: " << stepperDriver.getHoldMotor());
   stepperDriver.setMaxSpeed(getNodeFromPath("./MAX_SPEED").text().as_int());
+  LOG_DEBUG("Max speed is: " << stepperDriver.getMaxSpeed());
   stepperDriver.setPullIn(getNodeFromPath("./PULL_IN").text().as_int());
   stepperDriver.setPullOut(getNodeFromPath("./PULL_OUT").text().as_int());
   setStepperDriver(stepperDriver);

@@ -20,18 +20,27 @@ void JointIO::build() {
   m_jointPointer->setPosition
     (getNodeFromPath(m_node, "./DEFAULT_POSITION").text().as_double());
   LOG_DEBUG("Default position: " << m_jointPointer->getPosition());
+  //Range
+  m_jointPointer->setRange(getDoubleList(m_node, "./RANGE", 2));
   // Correct gradians to radians
   if (m_jointPointer->getMovementType() == BaseJoint::Rotational) {
     m_jointPointer->setMovementPerStep
       (m_jointPointer->getMovementPerStep() * PI / 180);
     m_jointPointer->setPosition
       (m_jointPointer->getPosition() * PI / 180);
+    std::vector<traceType> convertedRangeVector;
+    for (const auto& point : m_jointPointer->getRange()) {
+      convertedRangeVector.push_back(point * PI / 180 );
+    }
+    m_jointPointer->setRange(convertedRangeVector);
   }
   //StepperDriver
-  *m_jointPointer->getMotor() =
-    parseStepperDriver(getNodeFromPath(m_node, "./ACTUATOR"));
-  //Range
-  m_jointPointer->setRange(getDoubleList(m_node, "./RANGE", 2));
+  // cast it first to a proper stepperdriver pointer then set it
+  // otherwise it get sliced
+  // need to first pointer: the static_cast call is a rvalue not lvalue!
+  StepperDriver* stepperDriver = static_cast<StepperDriver*>(m_jointPointer->getMotor());
+  *stepperDriver = parseStepperDriver(getNodeFromPath(m_node, "./ACTUATOR"));
+
   handleConversionMap();
   LOG_DEBUG("Construction of the pointer is finished!");
   LOG_DEBUG("Joint Build is finshed!");

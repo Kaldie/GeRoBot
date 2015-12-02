@@ -1,5 +1,4 @@
 // Copyright [2015] Ruud Cools
-
 #include <macroHeader.h>
 #include <Point2D.h>
 #include <Line2D.h>

@@ -8,6 +8,12 @@ Arc2D::Arc2D(const Point2D& i_startPoint,
              const Point2D& i_endPoint,
              const Point2D& i_centrePoint)
   : Circle2D(i_startPoint, i_centrePoint), m_secondPoint(i_endPoint) {
+  if (!isPointOnCircle(m_secondPoint)) {
+    LOG_DEBUG("Given the first point: " << m_firstPoint <<
+	      " and the radius: " << radius() );
+    LOG_ERROR("Second point does not lay on the defined circle!");
+  }
+
   traceType startAngle = (m_firstPoint-m_centrePoint).getAlpha();
   LOG_DEBUG("m_firstPoint: " << m_firstPoint.x << " , " << m_firstPoint.y);
   LOG_DEBUG("Start angle: " << startAngle);
@@ -25,10 +31,9 @@ Arc2D::Arc2D(const Point2D& i_startPoint,
              const Point2D& i_endPoint,
              const Point2D& i_centrePoint,
              const bool& i_isClockwise)
-  : Circle2D(i_startPoint, i_centrePoint),
-    m_secondPoint(i_endPoint),
-    m_isClockwise(i_isClockwise)
-{}
+  : Arc2D(i_startPoint, i_endPoint, i_centrePoint) {
+  m_isClockwise = i_isClockwise;
+} 
 
 
 Arc2D::Arc2D(const Point2D& i_startPoint,

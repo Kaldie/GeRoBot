@@ -27,9 +27,9 @@
 	  </PINS>
 	  <DEFAULT_DIRECTION>CCW</DEFAULT_DIRECTION>
 	  <HOLD_MOTOR>true</HOLD_MOTOR>
-	  <MAX_SPEED>300</MAX_SPEED>
-	  <PULL_IN>190</PULL_IN>
-	  <PULL_OUT>190</PULL_OUT>
+	  <MAX_SPEED>12345</MAX_SPEED>
+	  <PULL_IN>124</PULL_IN>
+	  <PULL_OUT>123</PULL_OUT>
 	</ACTUATOR>
       </JOINT>
       <JOINT name="TranslationalJoint" type="StepperDriver">

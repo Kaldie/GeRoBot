@@ -9,28 +9,21 @@
 int stepsMissed = 0;
 
 Robot::Robot()
-  : Robot( nullptr, 30, Point2D(0, 50))
+  : Robot( nullptr,  Point2D(0, 50))
 {}
 
 
 Robot::Robot(const JointController::JointControllerPointer& i_pointer)
-  : Robot(i_pointer, 30, Point2D(0, 50))
+  : Robot(i_pointer, Point2D(0, 50))
 {}
 
 
 Robot::Robot(const JointController::JointControllerPointer& i_pointer,
-             const int& i_speed)
-  : Robot(i_pointer, i_speed, Point2D(0, 50))
-{}
-
-
-Robot::Robot(const JointController::JointControllerPointer& i_pointer,
-             const int& i_speed,
              const Point2D& i_currentPosition)
   : m_jointController(i_pointer),
-    m_speed(i_speed),
     m_position(i_currentPosition),
-    m_virtualPosition(i_currentPosition) {
+    m_virtualPosition(i_currentPosition),
+    m_speedController(10) {
 }
 
 
@@ -65,20 +58,20 @@ void Robot::goToPosition(const Point2D &i_position) {
 void Robot::prepareSteps(const std::string& i_direction,
                          const int& i_numberOfSteps) {
   // predict the next step
-  //  int preNumberOfSteps = m_jointController->getSequenceVector().numberOfSteps();
-  m_jointController->resolveJoint(i_direction)->
-    predictSteps(&m_virtualPosition, i_direction, i_numberOfSteps);
+  BaseJoint::JointPointer joint = m_jointController->resolveJoint(i_direction);
+  joint->predictSteps(&m_virtualPosition, i_direction, i_numberOfSteps);
   // add the point to the traveled points
   m_traveledPoints.push_back(m_virtualPosition);
   // add the step to the sequence
   m_jointController->moveSteps(i_direction, i_numberOfSteps);
-  //if (preNumberOfSteps >
-  //  m_jointController->getSequenceVector().numberOfSteps() - (2 * i_numberOfSteps)) {
-  //LOG_DEBUG("Step is wanted, however not set!" << std::endl <<
-  //          "Current steps: " << preNumberOfSteps << ", new steps: " <<
-  //          m_jointController->getSequenceVector().numberOfSteps());
-  //++stepsMissed;
-  //LOG_DEBUG("Current steps missed: " << stepsMissed);
+  m_speedController.notifyStep(joint, i_numberOfSteps);
+  int motorSpeed;
+  if (m_speedController.adviseSpeed(&motorSpeed)) {
+    LOG_DEBUG("Speed controler has a mandatory speed change.");
+    // add a clean sequence to force the speed to be nice
+    m_jointController->getSequenceVectorPointer()->addEmptySequence();
+    m_speedController.acknowledgeSpeed(motorSpeed);
+  }
 }
 
 
