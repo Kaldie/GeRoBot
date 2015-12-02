@@ -56,10 +56,15 @@ class RotationTraceCalculatorTest : public CxxTest::TestSuite {
     */
     RobotIO robotBuilder("defaultRobot.xml");
     robotBuilder.build();
+
+
     //    robotBuilder.getRobotPointer();
     Robot robot = *robotBuilder.getRobotPointer();
     robot.setVirtualPosition(startPoint);
     robot.setPosition(startPoint);
+
+    robot.getJointController()->resolveJoint(BaseJoint::Rotational)->setPosition(PI/2);
+    robot.getJointController()->resolveJoint(BaseJoint::Translational)->setPosition(255);
 
     RotationTraceCalculator rotationTraceCalculator(&robot);
     rotationTraceCalculator.setWriteLog(true);
