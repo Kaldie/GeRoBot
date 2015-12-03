@@ -16,7 +16,8 @@ SpeedController::SpeedController(const int& i_defaultSpeed)
 
 void SpeedController::notifyStep(const BaseJoint::JointPointer& i_joint,
 				 const int& i_numberOfSteps) {
- updateStepMap(WeakJoint(i_joint), i_numberOfSteps);
+  WeakJoint weakJoint(i_joint);
+  updateStepMap(weakJoint, i_numberOfSteps);
 }
 
 
@@ -108,8 +109,17 @@ void SpeedController::acknowledgeSpeed(const int& i_speed) {
   m_motorSpeed = i_speed;
   int maxSteps(getMaximumConsecutiveSteps());
   for (auto& mapItem : m_stepMap) {
-    resultingSpeed = i_speed * (static_cast<float>(mapItem.second)/ maxSteps);
-    mapItem.first.lock()->getMotor()->setSpeed(resultingSpeed);
+    if (mapItem.second > 0) {
+      resultingSpeed = i_speed * (static_cast<float>(mapItem.second)/ maxSteps);
+      mapItem.first.lock()->getMotor()->setSpeed(resultingSpeed);
+    } else {
+      LOG_DEBUG("Joint has not been used, let the motor know it has reduced its speed");
+      int currentMotorSpeed =
+        mapItem.first.lock()->getMotor()->getSpeed();
+
+    }
+
+    mapItem.second = 0;
   }
     m_stepMap.clear();
 }
@@ -189,11 +199,7 @@ bool SpeedController::getAchievable
     LOG_ERROR("Could not resolve the speed question!");
     return false;
   }
-  if (i_findMax) {
-    *o_speed = maxSpeed;
-  } else {
-    *o_speed = minSpeed;
-  }
+  *o_speed = minSpeed;
   return true;
 }
 
