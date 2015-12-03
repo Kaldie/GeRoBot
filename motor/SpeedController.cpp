@@ -27,7 +27,11 @@ void SpeedController::updateStepMap(const WeakJoint& i_joint,
   if (m_stepMap.find(i_joint) == m_stepMap.end()) {
     m_stepMap[i_joint] = i_numberOfSteps;
   } else {
-    m_stepMap[i_joint] += i_numberOfSteps;
+    if (m_stepMap[i_joint] <= 0) {
+      m_stepMap[i_joint] = i_numberOfSteps;
+    } else {
+      m_stepMap[i_joint] += i_numberOfSteps;
+    }
   }
 }
 
@@ -46,6 +50,9 @@ int SpeedController::getMaximumConsecutiveSteps() const {
 traceType SpeedController::steppedDistance() const {
   traceType steppedDistance = 0.0;
   for (const auto& stepItem : m_stepMap) {
+    if (stepItem.second <= 0) {
+      continue;
+    }
     LOG_DEBUG("Distance per step: " << stepItem.first.lock()->distancePerStep());
     steppedDistance +=
       stepItem.first.lock()->distancePerStep() * stepItem.second;
@@ -113,10 +120,11 @@ void SpeedController::acknowledgeSpeed(const int& i_speed) {
       resultingSpeed = i_speed * (static_cast<float>(mapItem.second)/ maxSteps);
       mapItem.first.lock()->getMotor()->setSpeed(resultingSpeed);
     } else {
-      LOG_DEBUG("Joint has not been used, let the motor know it has reduced its speed");
-      int currentMotorSpeed =
-        mapItem.first.lock()->getMotor()->getSpeed();
-
+      LOG_DEBUG("Joint has not been used, lets keep track on how slow it goes");
+      // if steps is zero or negative, 
+      // it indicates how many steps it has slowed down based on its own speed
+      mapItem.second -= 
+	maxSteps * i_speed / mapItem.first.lock()->getMotor()->getSpeed();
     }
 
     mapItem.second = 0;
