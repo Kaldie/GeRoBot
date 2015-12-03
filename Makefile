@@ -24,10 +24,11 @@ MACROHEADER: $(TOROOT)/$(INCLUDEFOLDER)/macroHeader.h.gch
 
 LINKHEADERS:
 	@echo "Creating symbolic links for all .h files in the project"
-	@echo $(SHAREDFOLDERS)
+	# Link the macro header
 	$(LINK) ../$(MACROHEADER) $(INCLUDEFOLDER)
-	$(foreach FOLDER,$(SHAREDFOLDERS), $(foreach HFILE,$(wildcard $(FOLDER)/*.h),$(LINK) .$(HFILE) $(INCLUDEFOLDER);))
-	$(foreach FOLDER,$(SHAREDFOLDERS), $(foreach HFILE,$(wildcard $(FOLDER)/*.hpp),$(LINK) .$(HFILE) $(INCLUDEFOLDER);))
+	# link the h-files in each shared folder where we use relative paths to resolve them
+	$(foreach FOLDER,$(SHAREDFOLDERS), $(foreach HFILE,$(wildcard $(FOLDER)/*.h),\
+	$(LINK) $(patsubst $(TOROOT)%,..%,$(HFILE)) $(INCLUDEFOLDER);))
 
 SHAREDTARGET:
 	$(foreach FOLDER,$(SHAREDFOLDERS), cd $(FOLDER); $(MAKE);)
