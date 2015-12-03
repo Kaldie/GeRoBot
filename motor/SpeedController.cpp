@@ -85,6 +85,7 @@ bool SpeedController::adviseSpeed(int* o_speed) const {
 
   // Check if that speed is possible
   if ( currentRobotSpeed < m_robotSpeed) {
+    LOG_DEBUG("Speeding up!");
     *o_speed = getLimitingMotorSpeed(&BaseMotor::getMaximumSpeed, true);
     if (*o_speed > wantedMotorSpeed){
       *o_speed = wantedMotorSpeed;
@@ -115,18 +116,12 @@ void SpeedController::acknowledgeSpeed(const int& i_speed) {
 
 int SpeedController::getLimitingMotorSpeed(int (BaseMotor::*getLimitingSpeed)() const,
 					   const bool& i_findMaxAcceleration) const {
-  if (m_stepMap.begin()->first.expired()) {
-    LOG_ERROR("Joint has been unexpectly destructed!!");
-  }
   int suggestedMotorSpeed = 
     (m_stepMap.begin()->first.lock()->getMotor()->*getLimitingSpeed)();
   int maxSteps(getMaximumConsecutiveSteps());
   int thisMotorSpeed, resultingSpeed;
 
   for (const auto& stepItem : m_stepMap) {
-    if (stepItem.first.expired()) {
-      LOG_ERROR("Joint has been unexpectly destructed!!");
-    }
     thisMotorSpeed = (stepItem.first.lock()->getMotor()->*getLimitingSpeed)();
     if (i_findMaxAcceleration) {
       resultingSpeed = thisMotorSpeed * (maxSteps / stepItem.second);
@@ -149,10 +144,12 @@ bool SpeedController::
 isAchievable(const int& i_speed, WeakJoint* speedyJoint) const {
   for(const auto& mapItem : m_stepMap) {
     if (mapItem.first.lock()->getMotor()->getMinimumSpeed() > i_speed) {
+      LOG_DEBUG("Minimum speed is: " << mapItem.first.lock()->getMotor()->getMinimumSpeed());
       *speedyJoint = mapItem.first;
       return false;
     }
     if (mapItem.first.lock()->getMotor()->getMaximumSpeed() < i_speed) {
+      LOG_DEBUG("Maximum speed is: " << mapItem.first.lock()->getMotor()->getMinimumSpeed());
       *speedyJoint = mapItem.first;
       return false;
     }
@@ -167,20 +164,37 @@ bool SpeedController::getAchievable
   if (isAchievable(*o_speed, &weakJoint)) {
     return true;
   }
-  // there is a joint which would not be able to handle the speed
-  // Which speed can it handle
-  int newSpeed;
+  // The requested speed was not available
+  // Try to find a common ground
+  int minSpeed = 0;
+  int maxSpeed = 111111111;
+  int maxSteps = getMaximumConsecutiveSteps();
+  for (const auto& mapItem : m_stepMap) {
+    BaseMotor* motor = mapItem.first.lock()->getMotor();
+    LOG_DEBUG("Number of steps this motor sets is: " << mapItem.second);
+    LOG_DEBUG("Minimum speed of this motor is: "<< motor->getMinimumSpeed());
+    LOG_DEBUG("Maximum speed of this motor is: "<< motor->getMaximumSpeed());
+    LOG_DEBUG("This motor would be able to handle the motor speed: " <<
+	      maxSteps << " / " <<  mapItem.second << " * " << 
+	      motor->getMaximumSpeed() << " = " << 
+	      maxSteps / mapItem.second * motor->getMaximumSpeed());
+    minSpeed = std::max(motor->getMinimumSpeed(), minSpeed);
+    maxSpeed = std::min(maxSteps / mapItem.second * motor->getMaximumSpeed(), 
+			maxSpeed);
+  }
+  LOG_DEBUG("Lowest maximums speed is: " << maxSpeed);
+  LOG_DEBUG("Highest minimum speed is: " << minSpeed);
+
+  if (minSpeed > maxSpeed) {
+    LOG_ERROR("Could not resolve the speed question!");
+    return false;
+  }
   if (i_findMax) {
-    newSpeed = weakJoint.lock()->getMotor()->getMaximumSpeed();
+    *o_speed = maxSpeed;
   } else {
-    newSpeed = weakJoint.lock()->getMotor()->getMinimumSpeed();
+    *o_speed = minSpeed;
   }
-  if (isAchievable(newSpeed, &weakJoint)) {
-    *o_speed = newSpeed;
-  } else {
-    LOG_ERROR("Could not resolve a speed question!");
-  }
-  return false;
+  return true;
 }
 
 
