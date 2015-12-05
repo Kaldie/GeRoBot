@@ -116,6 +116,23 @@ class SpeedControllerUnitTest : public CxxTest::TestSuite {
     }
   }
 
+
+  void testSpeedWhileIdle() {
+    int speed;
+    SpeedController speedController(150);
+    speedController.notifyStep(m_translationalJoint,1);
+    speedController.notifyStep(m_rotationalJoint,1);
+    TS_ASSERT(speedController.adviseSpeed(&speed));
+    speedController.acknowledgeSpeed(speed);
+    TS_ASSERT_EQUALS(speed, 142);
+    speedController.notifyStep(m_rotationalJoint,2);
+    TS_ASSERT(speedController.adviseSpeed(&speed));
+    speedController.acknowledgeSpeed(speed);
+    TS_ASSERT_EQUALS(speed,234);
+    TS_ASSERT_EQUALS(m_translationalJoint->getMotor()->getSpeed(), 142);
+  }
+
+
   void testDrawLine() {
     m_translationalJoint->setMovementPerStep(0.25);
     SpeedController speedController(10);
@@ -134,6 +151,7 @@ class SpeedControllerUnitTest : public CxxTest::TestSuite {
       speedController.acknowledgeSpeed(speed);
     }
   }
+
 };
 
 #endif  // MOTOR_UNITTEST_SPEEDCONTROLLERUNITTEST_H_

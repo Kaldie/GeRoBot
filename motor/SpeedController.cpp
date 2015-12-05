@@ -28,6 +28,10 @@ void SpeedController::updateStepMap(const WeakJoint& i_joint,
     m_stepMap[i_joint] = i_numberOfSteps;
   } else {
     if (m_stepMap[i_joint] <= 0) {
+      if (BaseJoint::JointPointer joint = i_joint.lock()) {
+        joint->getMotor()->setSpeed
+          (joint->getMotor()->getSpeed() / m_stepMap[i_joint]);
+      }
       m_stepMap[i_joint] = i_numberOfSteps;
     } else {
       m_stepMap[i_joint] += i_numberOfSteps;

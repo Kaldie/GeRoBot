@@ -15,6 +15,9 @@ class SpeedController {
   /// shared pointer of the class
   typedef std::shared_ptr<SpeedController> SpeedControllerPointer;
 
+  /// Vector of seen joints
+  typedef std::vector<BaseJoint::WeakJointPointer> WeakJoints;
+
   /// Mapping the number of consecutive steps with the joint
   GETSET(JointMap, m_stepMap, StepMap);
 
