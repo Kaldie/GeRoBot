@@ -4,28 +4,42 @@
 #define MOTOR_SPEEDCONTROLLER_H_
 
 #include "./BaseJoint.h"
+#include <forward_list>
 class JointController;
 class StateSequence;
 
 class SpeedController {
+  struct JointInfo
+  {
+    int m_numberOfSteps;
+    std::forward_list<float> m_frequency;
+    std::forward_list<float> m_missedSteps;
+    bool m_missedStepIsUpdated;
+  };
+
   /// Current speed of the joints
-  typedef std::map<BaseJoint::WeakJointPointer, int,
-    std::owner_less<BaseJoint::WeakJointPointer>> JointMap;
+  typedef std::map<BaseJoint::WeakJointPointer,
+                   JointInfo,
+                   std::owner_less<BaseJoint::WeakJointPointer>> JointMap;
 
   /// shared pointer of the class
   typedef std::shared_ptr<SpeedController> SpeedControllerPointer;
 
-  /// Vector of seen joints
-  typedef std::vector<BaseJoint::WeakJointPointer> WeakJoints;
-
   /// Mapping the number of consecutive steps with the joint
-  GETSET(JointMap, m_stepMap, StepMap);
+  GETSET(JointMap, m_jointMap, StepMap);
 
   /// The current frequency with which the actuator is currently setting steps
-  GETSET(int, m_motorSpeed, MotorSpeed);
+  GETSET(int, m_motorFrequency, MotorFrequency);
 
-  /// Current speed of the robot
+  /// Wanted speed of the robot
   GETSET(traceType , m_robotSpeed, RobotSpeed);
+
+  /// Speeds the robot moved recently
+  GETSET(std::forward_list<float>, m_achievedSpeeds, AchievedSpeeds);
+
+  /// number of elements to average over
+  GETSET(int, m_averageElements, AverageElements);
+
 
   /**
    * Notify the controller that steps have been taken
@@ -34,7 +48,7 @@ class SpeedController {
    * @param [in] i_numberOfSteps the number of steps
    */
   void notifyStep(const BaseJoint::JointPointer& i_joint,
-                  const int& i_numberOfSteps);
+                  const unsigned int& i_numberOfSteps);
 
   /// Request speed
   bool adviseSpeed(int* o_speed) const;
@@ -43,62 +57,60 @@ class SpeedController {
    * Let the controller know a speed is selected
    * The controller will hanlde setting the speeds to the joint actuators
    */
-  void acknowledgeSpeed(const int& i_speed);
+  void acknowledgeSpeed(const unsigned int& i_speed);
 
-  /**
-   * Given the steps in the stepmap and there corrisponding motor speeds
-   * give an approximation of the robot speed
-   */
-  traceType approximateRobotSpeed() const {return getRobotSpeed(m_motorSpeed);}
+  /// calculate the current speed of the robot
+  float estimateCurrentSpeed() const;
+
+  /// get the distance steped in this session
+  float getCurrentStepedDistance() const;
 
   /// easy constructor
   SpeedController();
 
   /// Fully fledged
-  SpeedController(const int& i_speed);
+  SpeedController(const traceType& i_speed);
 
  private:
-  typedef BaseJoint::WeakJointPointer WeakJoint;
-  typedef std::vector<WeakJoint> WeakJointVector;
-  void updateStepMap(const WeakJoint& i_joint,
-                            const int& i_numberOfSteps);
+  ///
+  float adviceAction(const float& i_currentSpeed,
+                     const bool& i_accelerate) const;
 
-  void updateSpeedMap();
+  /// get average of the iterator
+  template <class T>
+  static void average(const std::forward_list<T>& i_forwardList, T* o_average);
 
-  int getMaximumConsecutiveSteps() const;
-  /**
-   * Get the limiting speed based on the active joints
-   * Warning c++ magic. Too lazy to write 2 of the same functions
-   * @param[in] getLimitingSpeed function pointer to the method of
-   * BaseMotor that will give the speed limit of the motor.
-   * Use &BaseMotor::getMinimumspeed() for minimum and &BaseMotor::getMaximumspeed()
-   */
-  int getLimitingMotorSpeed(int (BaseMotor::*getLimitingSpeed)() const,
-                            const bool& i_findMaxAcceleration) const;
+  template <class T>
+  static T average(const std::forward_list<T>& i_forwardList);
 
-  /**
-   * return if i_speed is possible for all the joints,
-   * if it is not possible returns false and speedyJoint will point to the bad boy
-   */
-  bool isAchievable(const int& i_speed, WeakJoint* speedyJoint) const;
+  /// trim a forward list to the requested size if needed
+  template <class T>
+  static void trimList(std::forward_list<T>* i_forwardList,
+                const int& i_size);
 
-  /**
-   * returns the achievable speed in o_speed
-   * If the speed needed to be adjusted for other joints it will return true
-   * @param[out] o_speed The found achievable speed for all the joints
-   * @param[in] i_findMax indicate if the maximum or
-   * minimum speed needs to be found
-   */
-  bool getAchievable(int* o_speed, const bool& i_findMax) const;
 
-  /// return the speed of the robot give the motor speed
-  traceType getRobotSpeed(const int i_speed) const;
+  /// get the number if steps currently under decision
+  int currentNumberOfSteps() const;
 
-  /// Validates all the weak pointers in the m_stepMap
-  void validatedJoints() const;
+  /// Update an element of the JointMap based on the number of steps
+  void updateJointMapElement(JointInfo* i_info,
+                             const int i_numberOfSteps);
 
-  /// Return the distance which will be stepped in this block
-  traceType steppedDistance() const;
+  /// Get the maximum frequency of all the joints
+  float getMaximumFrequency(const bool& i_excludeIdle = false) const;
+
+  /// Get the minimum frequency of all the joints
+  float getMinimumFrequency(const bool& i_excludeIdle = false) const;
+
+  /// get the frequency bounds of the current joints
+  bool getFrequencyBounds(int* o_lowerBound,
+                          int* o_upperBound) const;
+
+  /// Based on the current frequency, calculate the current speed
+  float calculateCurrentSpeed() const;
+
+  /// initialise the motor frequence based on the first joint
+  void initialiseMotorFrequency(const BaseJoint::JointPointer& i_joint);
 };
 
 #endif  // MOTOR_SPEEDCONTROLLER_H_
