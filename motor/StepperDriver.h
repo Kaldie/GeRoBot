@@ -68,7 +68,7 @@ class StepperDriver: public BaseMotor {
 
 
   /// Return the number of states needed per step
-  virtual  int numberOfStatesPerStep() const {return 2;}
+  virtual int numberOfStatesPerStep() const {return 2;}
 
   // Display pin state vector
   virtual void displayPinState(const PinState&) const;
