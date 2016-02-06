@@ -21,6 +21,7 @@ class BaseMotor {
 
   /// Current speed of the motor
   GETSETPROTECTED(int, m_speed, Speed);
+
  public:
   PinState* getPinStatePointer() {return &m_currentPinState;}
 
