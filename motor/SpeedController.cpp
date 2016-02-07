@@ -76,6 +76,7 @@ void SpeedController::acknowledgeSpeed(const unsigned int& i_frequency) {
   // number of steps the most active join sets
   int numberOfSteps(currentNumberOfSteps());
   // for each joint
+  LOG_DEBUG("Acknowledging speed of " << i_frequency);
   for (auto& element : m_jointMap) {
     JointInfo* jointInfo = &element.second;
     // update the isUpdated
@@ -85,10 +86,22 @@ void SpeedController::acknowledgeSpeed(const unsigned int& i_frequency) {
     if (!joint) { LOG_ERROR("Could not get the shared pointer!");}
     if (jointInfo->m_numberOfSteps > 0) {
       // update the joint info if the joint was not idle
-      float newFrequency = jointInfo->m_numberOfSteps /
-        (numberOfSteps + jointInfo->m_missedSteps.front()) * i_frequency;
+      // calculate the number of missed steps for the acknodged speed
+      float missedSteps =
+        jointInfo->m_missedSteps.front() * joint->getMotor()->getSpeed() / i_frequency;
+      // calculate the frequency of the motor
+      float newFrequency = std::round(jointInfo->m_numberOfSteps /
+                                      (numberOfSteps + missedSteps) * i_frequency);
       // update the joint
       joint->getMotor()->setSpeed(newFrequency);
+#ifdef DEBUG
+      if (jointInfo->m_missedSteps.front() != 0) {
+        LOG_DEBUG("Total number of set steps is: " << numberOfSteps);
+        LOG_DEBUG("Has set : " << jointInfo->m_numberOfSteps << " number of steps.");
+        LOG_DEBUG("This joint has missed steps: " <<  missedSteps);
+        LOG_DEBUG("The resulting speed is thus: " << newFrequency);
+      }
+#endif
       // update the frequency list
       jointInfo->m_frequency.emplace_front(newFrequency);
       trimList(&jointInfo->m_frequency, m_averageElements);

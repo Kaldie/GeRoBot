@@ -12,14 +12,14 @@ def FILE_MSG(i_message):
         fileName=r'/home/ruud/Projects/GeRoArm/tracer/stepLog.log'
         if PRINT_TO_FILE:
                 with open(fileName,'a') as debugLogFile:
-                        debugLogFile.write(str(i_message) +'\n')                  
-                
+                        debugLogFile.write(str(i_message) +'\n')
+
 class Trace (object) :
     """
-    tracer is an helper class 
+    tracer is an helper class
     which traces the motion of the robot
     and converts steps and delays in x, y positions
-    
+
     parameters:
     minimalArmLength
     maximalArmLength
@@ -34,8 +34,8 @@ class Trace (object) :
 
     def __init__(self):
        "Robot settings"
-       self.__rotStep = 0.01 # rotation per step
-       self.__transStep = 0.01 #translation in mm
+       self.__rotStep = 0.001654411764706 # rotation per step
+       self.__transStep = 0.005 #translation in mm
 
        self.__minArm = 50.0# length of the minimum arm
        self.__maxArm = 500.0#length of the arm in mm
@@ -51,7 +51,7 @@ class Trace (object) :
 
        "Position settings"
        #position of the head in x,y viewed from back of robot, where robot is (0,0)
-       self.__currentPosition = numpy.array([-10.00 ,30.00])
+       self.__currentPosition = numpy.array([0.00 ,255.00])
 
        #rotation in degree where 0 is perpendicular to the work piece minus angle ccw and positive cw
        self.__currentRotation = numpy.arctan2(self.__currentPosition[1],
@@ -159,7 +159,6 @@ class Trace (object) :
             raise ValueError("Unknown direction")
 
     def __doTranslationSteps(self,i_direction,i_numberOfSteps):
-            
       if i_direction=="IN":
           translationPolarity=-1.0
       elif i_direction=="OUT":
@@ -171,7 +170,6 @@ class Trace (object) :
       DBG_MSG (self.__currentRotation)
       unitTranslation = numpy.array([numpy.cos(self.__currentRotation * (numpy.pi / 180.)), 
                                      numpy.sin(self.__currentRotation * (numpy.pi / 180.))])
-      
       DBG_MSG("Current extension: " + str(self.__currentExtension))
       DBG_MSG("Current rotation: " + str(self.__currentRotation))
 
@@ -189,7 +187,7 @@ class Trace (object) :
       if i_direction=="CW":
         rotationPolarity=-1.0
       elif i_direction=="CCW":
-        rotationPolarity=1.0
+        rotationPolarity= 1.0
           
       self.__currentRotation += self.__rotStep * rotationPolarity * i_numberOfSteps
       
@@ -213,7 +211,7 @@ class Trace (object) :
       DBG_MSG( "Current Position Robot: x: {x:0.2f}, y: {y:0.2f}.".\
           format(x = self.__currentPosition[0], y = self.__currentPosition[1]))
       self.__trace.append(numpy.copy(self.__currentPosition))
-      
+
 
     def __addCalculatedPosition(self, i_position):
             self.__newTrace.append(numpy.copy(i_position))
@@ -223,7 +221,7 @@ class Trace (object) :
         from matplotlib.pyplot import plot,show,figure,Circle
 	myFigure=figure()
 	myAxes=myFigure.add_subplot(111)
-        circle1=Circle((-0, 415),50.,color='r')
+        circle1=Circle((-0, 580),325.,color='r')
 	myAxes.plot(zip(*self.__trace)[0], zip(*self.__trace)[1], 'g.-')
         myAxes.plot(zip(*self.__newTrace)[0], zip(*self.__newTrace)[1], 'b.-')
 
@@ -242,6 +240,7 @@ class Trace (object) :
         plot(values,translation)
         show()
 
+
     def getFrequencies(self):
 	step=10**6
 	begin=0
@@ -255,14 +254,13 @@ class Trace (object) :
         DBG_MSG( "got the translation list")
 	rotationArray=self.__convertToCummulative(self.__motorDelayLists[1][0])
         DBG_MSG( "got the rotation list")
-	maxValue=max([max(rotationArray),max(translationArray)])
-
+        maxValue=max([max(rotationArray),max(translationArray)])
 	while end<maxValue:
 	  end=begin+step
 	  translationEntries.append(self.__countValuesInRange(translationArray,
                                                               begin,
                                                               end))
-          
+
           rotationEntries.append(self.__countValuesInRange(rotationArray,
                                                           begin,
                                                           end))
@@ -273,11 +271,11 @@ class Trace (object) :
         return values,translationEntries,rotationEntries
 
 
-		
     def __convertToCummulative(self,i_array):
 	array=[sum(i_array[i:]) for i in range(len(i_array))]
 	return array
-	
+
+
     def __countValuesInRange(self,i_array,i_start,i_end):
       DBG_MSG ("doing : %i" % i_start)
       array=numpy.array(i_array)
@@ -286,11 +284,11 @@ class Trace (object) :
           if value>=i_start and value<=i_end:
               counts+=1
       return counts
-		    
+
 if __name__=="__main__":
     import os
     import sys
-	
+
     trace=Trace()
     if len(sys.argv)==1:
 	fileName=r"/home/ruud/Projects/GeRoArm/motor/stepLog.log"
@@ -298,7 +296,7 @@ if __name__=="__main__":
     else:
 	fileName=sys.argv[1]
         print fileName
-        
+
     trace.createTrace(fileName)
     print trace
 #    trace.plotFrequency()
