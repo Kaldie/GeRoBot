@@ -14,6 +14,7 @@ class SpeedController {
     int m_numberOfSteps;
     std::forward_list<float> m_frequency;
     std::forward_list<float> m_missedSteps;
+    int m_driverFrequency;
     bool m_missedStepIsUpdated;
   };
 
@@ -39,6 +40,9 @@ class SpeedController {
 
   /// number of elements to average over
   GETSET(int, m_averageElements, AverageElements);
+
+  /// Set the speed constroller to a conservative mode
+  GETSET(bool, m_isConservative, IsConservative);
 
 
   /**
@@ -88,6 +92,10 @@ class SpeedController {
   static void trimList(std::forward_list<T>* i_forwardList,
                 const int& i_size);
 
+  /// use the previous results to estimate the upcoming value
+  template <class T>
+  float estimateNextElement(const std::forward_list<T>& i_forwardList,
+                            const int& i_numberOfDerivatives = 3) const;
 
   /// get the number if steps currently under decision
   int currentNumberOfSteps() const;
@@ -105,6 +113,19 @@ class SpeedController {
   /// get the frequency bounds of the current joints
   bool getFrequencyBounds(int* o_lowerBound,
                           int* o_upperBound) const;
+
+
+  /// calculate the frequency bounds of a working motor
+  void boundsOfWorkingMotor(float* o_lowerBound,
+                            float* o_upperBound,
+                            const JointInfo& i_jointInfo,
+                            const BaseMotor* i_motor) const;
+
+  /// calculate the frequency bounds of an idle motor
+  void boundsOfIdleMotor(float* o_lowerBound,
+                         float* o_upperBound,
+                         const JointInfo& i_jointInfo,
+                         BaseMotor* i_motor) const;
 
   /// Based on the current frequency, calculate the current speed
   float calculateCurrentSpeed() const;

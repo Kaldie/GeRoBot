@@ -31,6 +31,7 @@ class SpeedControllerUnitTest : public CxxTest::TestSuite {
     m_translationalJoint->setParent(m_rotationalJoint);
   }
 
+
   void testCreation(void) {
     // Does it work...at all
     SpeedController speedController;
@@ -41,6 +42,7 @@ class SpeedControllerUnitTest : public CxxTest::TestSuite {
     SpeedController speedController2(100);
     TS_ASSERT_EQUALS(speedController2.getRobotSpeed(), 100);
   }
+
 
   void testNotifyStep1(void) {
     // Make the speed controller react when

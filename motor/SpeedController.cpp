@@ -4,7 +4,7 @@
 #include "./SpeedController.h"
 #include "./BaseMotor.h"
 #include "./StepperDriver.h"
-
+#include <list>
 SpeedController::SpeedController()
   : SpeedController(0)
 {}
@@ -15,8 +15,9 @@ SpeedController::SpeedController(const traceType& i_robotSpeed)
     m_motorFrequency(0),
     m_robotSpeed(i_robotSpeed),
     m_achievedSpeeds{0},
-    m_averageElements(5)
-{}
+    m_averageElements(5),
+    m_isConservative(false)
+    {}
 
 
 bool SpeedController::adviseSpeed(int* o_speed) const {
@@ -56,6 +57,7 @@ void SpeedController::notifyStep(const BaseJoint::JointPointer& i_joint,
       {0,                                            // number of steps
        {static_cast<float>(motor->getSpeed())},      // front_list frequency
        {},                                           // front list missed steps
+       0,                                            // number of steps taken
        false};                                       // updated the missed step list
     // check if the motor frequency is initialised
     if (m_motorFrequency == 0) {
@@ -71,29 +73,36 @@ void SpeedController::acknowledgeSpeed(const unsigned int& i_frequency) {
     LOG_ERROR("Speed of 0 is not allowed!");
   }
   // update the achieved speed list based on this input
+  LOG_DEBUG("Acknowledging speed of " << i_frequency);
   m_motorFrequency = i_frequency;
   m_achievedSpeeds.emplace_front(calculateCurrentSpeed());
   // number of steps the most active join sets
   int numberOfSteps(currentNumberOfSteps());
+  BaseJoint::JointPointer joint;
   // for each joint
-  LOG_DEBUG("Acknowledging speed of " << i_frequency);
   for (auto& element : m_jointMap) {
     JointInfo* jointInfo = &element.second;
     // update the isUpdated
     jointInfo->m_missedStepIsUpdated = false;
     // get a shared joint pointer
-    BaseJoint::JointPointer joint(element.first.lock());
+    joint = element.first.lock();
     if (!joint) { LOG_ERROR("Could not get the shared pointer!");}
     if (jointInfo->m_numberOfSteps > 0) {
       // update the joint info if the joint was not idle
       // calculate the number of missed steps for the acknodged speed
-      float missedSteps =
-        jointInfo->m_missedSteps.front() * joint->getMotor()->getSpeed() / i_frequency;
+      float missedSteps = jointInfo->m_missedSteps.front() *
+        joint->getMotor()->getSpeed() / m_motorFrequency;
       // calculate the frequency of the motor
       float newFrequency = std::round(jointInfo->m_numberOfSteps /
                                       (numberOfSteps + missedSteps) * i_frequency);
       // update the joint
       joint->getMotor()->setSpeed(newFrequency);
+      // update the frequency and number of steps taken list
+      jointInfo->m_frequency.emplace_front(newFrequency);
+      jointInfo->m_driverFrequency = m_motorFrequency;
+      trimList(&jointInfo->m_frequency, m_averageElements);
+      // reset the number of steps
+      jointInfo->m_numberOfSteps = 0;
 #ifdef DEBUG
       if (jointInfo->m_missedSteps.front() != 0) {
         LOG_DEBUG("Total number of set steps is: " << numberOfSteps);
@@ -102,15 +111,10 @@ void SpeedController::acknowledgeSpeed(const unsigned int& i_frequency) {
         LOG_DEBUG("The resulting speed is thus: " << newFrequency);
       }
 #endif
-      // update the frequency list
-      jointInfo->m_frequency.emplace_front(newFrequency);
-      trimList(&jointInfo->m_frequency, m_averageElements);
-      // reset the number of steps
-      jointInfo->m_numberOfSteps = 0;
     } else {
       // update the number of steps if the joint was idle
-      float missedSteps =
-        static_cast<float>(joint->getMotor()->getSpeed()) / i_frequency * numberOfSteps;
+      float missedSteps = static_cast<float>(joint->getMotor()->getSpeed()) /
+        m_motorFrequency * numberOfSteps;
       jointInfo->m_numberOfSteps -= round(missedSteps);
       LOG_DEBUG("Frequency: " << i_frequency);
       LOG_DEBUG("Number of steps in this session: " << numberOfSteps);
@@ -158,10 +162,10 @@ void SpeedController::updateJointMapElement
     if (i_info->m_numberOfSteps < 0) {
       // add the new missed steps
       i_info->m_missedSteps.emplace_front
-        (std::abs(i_info->m_numberOfSteps));
+        (-1 * i_info->m_numberOfSteps);
     } else {
       i_info->m_missedSteps.emplace_front(0);
-     }
+    }
     // check the bounds, update if needed
     trimList(&i_info->m_missedSteps, m_averageElements);
     // set  that we updated the missed step list
@@ -190,6 +194,8 @@ float SpeedController::adviceAction(const float& i_estimatedSpeed,
               " Upper bound is: " << upperBound);
     LOG_ERROR("Could not solve breaking question!");
   }
+  LOG_DEBUG("Lower bound is: " << lowerBound);
+  LOG_DEBUG("Upper bound is: " << upperBound);
   if (i_accelerate) {
     if (upperBound < requestedFrequency) {
       return upperBound;
@@ -245,74 +251,73 @@ T SpeedController::average(const std::forward_list<T>& i_forwardList) {
 template <class T>
 void SpeedController::trimList(std::forward_list<T>* i_forwardList,
                                const int& i_size) {
-    if (std::distance(i_forwardList->begin(),
-                      i_forwardList->end()) > i_size) {
-      auto begin = i_forwardList->begin();
-      for (int i = 0;
-           i < i_size;
-           ++i) {
-        ++begin;
-      }
-      i_forwardList->erase_after(begin, i_forwardList->end());
+  if (std::distance(i_forwardList->begin(),
+                    i_forwardList->end()) > i_size) {
+    auto cutOfPoint = i_forwardList->begin();
+    for (int i = 0;
+         i < i_size;
+         ++i) {
+      ++cutOfPoint;
     }
+    i_forwardList->erase_after(cutOfPoint, i_forwardList->end());
+  }
 }
 
 
-float SpeedController::getMaximumFrequency(const bool& i_excludeIdle /*= false*/) const {
+/*
+  Possible decricaded code
+  remove in next version
+  float SpeedController::getMaximumFrequency(const bool& i_excludeIdle /= false/) const {
   float max = std::numeric_limits<float>::min();
   for (const auto element : m_jointMap) {
-    if (i_excludeIdle && element.second.m_numberOfSteps <= 0) {
-      continue;
-    }
-    if (!element.second.m_frequency.empty()) {
-      if (max < element.second.m_frequency.front()) {
-        max = element.second.m_frequency.front();
-      }
-    }
+  if (i_excludeIdle && element.second.m_numberOfSteps <= 0) {
+  continue;
+  }
+  if (!element.second.m_frequency.empty()) {
+  if (max < element.second.m_frequency.front()) {
+  max = element.second.m_frequency.front();
+  }
+  }
   }
   return max;
-}
+  }
 
 
-float SpeedController::getMinimumFrequency(const bool& i_excludeIdle /*= false*/) const {
+  float SpeedController::getMinimumFrequency(const bool& i_excludeIdle /*= false/) const {
   float min = std::numeric_limits<float>::max();
   for (const auto element : m_jointMap) {
-    if (i_excludeIdle && element.second.m_numberOfSteps <= 0) {
-      continue;
-    }
-    if (min > element.second.m_frequency.front()) {
-      min = element.second.m_frequency.front();
-    }
+  if (i_excludeIdle && element.second.m_numberOfSteps <= 0) {
+  continue;
+  }
+  if (min > element.second.m_frequency.front()) {
+  min = element.second.m_frequency.front();
+  }
   }
   return min;
-}
-
+  }
+*/
 
 bool SpeedController::getFrequencyBounds(int* o_lowerBound,
                                          int* o_upperBound) const {
   *o_lowerBound = std::numeric_limits<int>::min();
   *o_upperBound = std::numeric_limits<int>::max();
-  BaseMotor* motor;
-  int maxSpeed, minSpeed;
-  float averageMissedSteps;
-  for (const auto& element : m_jointMap) {
-    average(element.second.m_missedSteps, &averageMissedSteps);
-    motor = element.first.lock()->getMotor();
-    maxSpeed = motor->getMaximumSpeed() *
-      (averageMissedSteps + 1);
-    if (element.second.m_numberOfSteps > 0) {
-      minSpeed = motor->getMinimumSpeed() *
-        currentNumberOfSteps() / element.second.m_numberOfSteps;
+  float tmpLowerBound, tmpUpperBound;
+  for (auto element : m_jointMap) {
+    BaseMotor* motor = element.first.lock()->getMotor();
+    if (element.second.m_numberOfSteps <= 0) {
+      LOG_DEBUG("Getting bounds of idle motor!");
+      boundsOfIdleMotor(&tmpLowerBound, &tmpUpperBound,
+                        element.second, motor);
     } else {
-      float tmpMinSpeed;
-      average(element.second.m_frequency, &tmpMinSpeed);
-      minSpeed = static_cast<int>(tmpMinSpeed);
+      LOG_DEBUG("Getting bounds of working motor!");
+      boundsOfWorkingMotor(&tmpLowerBound, &tmpUpperBound,
+                           element.second, motor);
     }
-      if (maxSpeed < *o_upperBound) {
-      *o_upperBound = maxSpeed;
+    if (tmpUpperBound < *o_upperBound) {
+      *o_upperBound = tmpUpperBound;
     }
-    if (minSpeed > *o_lowerBound) {
-      *o_lowerBound = minSpeed;
+    if (tmpLowerBound > *o_lowerBound) {
+      *o_lowerBound = tmpLowerBound;
     }
   }
   // check if it is withing bounds
@@ -320,6 +325,40 @@ bool SpeedController::getFrequencyBounds(int* o_lowerBound,
     return false;
   }
   return true;
+}
+
+
+void SpeedController::boundsOfWorkingMotor(float* o_lowerBound,
+                                           float* o_upperBound,
+                                           const JointInfo& i_jointInfo,
+                                           const BaseMotor* i_motor) const {
+  float averageMissedSteps;
+  average(i_jointInfo.m_missedSteps, &averageMissedSteps);
+  // ratio to which this motor works and the hardest working motor
+  float utilisationFactor =
+    static_cast<float>(i_jointInfo.m_numberOfSteps) / currentNumberOfSteps();
+  *o_upperBound = static_cast<float>(i_motor->getMaximumSpeed()) *
+    (averageMissedSteps + utilisationFactor);
+  *o_lowerBound = i_motor->getMinimumSpeed() * utilisationFactor;
+  LOG_DEBUG("Maximum speed is: " << i_motor->getMaximumSpeed());
+  LOG_DEBUG("Minimum speed is: " << i_motor->getMinimumSpeed());
+  LOG_DEBUG("Utilisation factor is: " << utilisationFactor);
+  LOG_DEBUG("Average missed steps: " << averageMissedSteps);
+}
+
+
+void SpeedController::boundsOfIdleMotor(float* o_lowerBound,
+                                        float* o_upperBound,
+                                        const JointInfo& i_jointInfo,
+                                        BaseMotor* i_motor) const {
+  int currentSpeedMotor = i_motor->getSpeed();
+  i_motor->setSpeed(i_jointInfo.m_driverFrequency);
+  float changeRatio =
+    estimateNextElement(i_jointInfo.m_frequency) / i_jointInfo.m_frequency.front();
+  *o_lowerBound = i_motor->getMinimumSpeed() * changeRatio;
+  *o_upperBound = i_motor->getMaximumSpeed() * changeRatio;
+  i_motor->setSpeed(currentSpeedMotor);
+  LOG_DEBUG("The change ratio is: " << changeRatio);
 }
 
 
@@ -332,4 +371,51 @@ void SpeedController::initialiseMotorFrequency(const BaseJoint::JointPointer& i_
   } else {
     LOG_ERROR("Could not resolve the motor pointer");
   }
+}
+
+
+template <class T>
+float SpeedController::estimateNextElement(const std::forward_list<T>& i_forwardList,
+                                           const int& i_numberOfDerivatives /*3*/) const {
+  if (i_forwardList.empty()) {
+    LOG_ERROR("Could not send an empty list to estimate next element");
+  }
+  //  unsigned int sizeOfList = i_forwardList.size();
+  std::forward_list<T> values(i_forwardList);
+  std::forward_list<T> deravetive;
+  T averageDirevative;
+  float nextElement(0.0);
+  T previousValue(0);
+  bool isValid(false);
+  for (int numberOfDerivatives = 0;
+       numberOfDerivatives < i_numberOfDerivatives;
+       ++numberOfDerivatives) {
+    // determine the element 1 before the end
+    auto listIterator =  values.begin();
+    while (true) {
+      previousValue = *listIterator;
+      ++listIterator;
+      // Continue loop while next element is not the end
+      if (listIterator == i_forwardList.end()) {
+        break;
+      }
+      deravetive.emplace_front(*listIterator - previousValue);
+      isValid = true;
+    }
+    // check if we found at least 1 value
+    if (!isValid) {
+      break;
+    }
+    // calculate the average derivative
+    average(deravetive, &averageDirevative);
+    // if it changes alot the the first one
+    if (averageDirevative > deravetive.front() * 1.05 or
+        averageDirevative < deravetive.front() * 0.95) {
+      nextElement += static_cast<float>(deravetive.front());
+    } else {
+      nextElement += static_cast<float>(averageDirevative);
+    }
+    values = deravetive;
+  }
+  return nextElement;
 }
