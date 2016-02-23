@@ -19,7 +19,6 @@ SpeedController::SpeedController(const traceType& i_robotSpeed)
     m_isConservative(false)
     {}
 
-
 bool SpeedController::adviseSpeed(int* o_speed) const {
   // check if the speed needs to be changed
   float currentSpeed = calculateCurrentSpeed();
@@ -38,7 +37,7 @@ bool SpeedController::adviseSpeed(int* o_speed) const {
     LOG_DEBUG("Acceleration is needed!");
     *o_speed = adviceAction(currentSpeed,
                             true);
-    LOG_DEBUG("advised speed " << *o_speed);
+    LOG_DEBUG("Advised speed " << *o_speed);
   }
   return true;
 }
@@ -385,21 +384,24 @@ float SpeedController::estimateNextElement(const std::forward_list<T>& i_forward
   std::forward_list<T> deravetive;
   T averageDirevative;
   float nextElement(0.0);
-  T previousValue(0);
+  float fraction(1.0);
+  T nextValue(0);
   bool isValid(false);
-  for (int numberOfDerivatives = 0;
-       numberOfDerivatives < i_numberOfDerivatives;
+  for (int numberOfDerivatives = 1;
+       numberOfDerivatives <= i_numberOfDerivatives;
        ++numberOfDerivatives) {
+    // adjust fraction
+    fraction *= 1/numberOfDerivatives;
     // determine the element 1 before the end
-    auto listIterator =  values.begin();
+   auto listIterator =  values.begin();
     while (true) {
-      previousValue = *listIterator;
+      nextValue = *listIterator;
       ++listIterator;
       // Continue loop while next element is not the end
       if (listIterator == i_forwardList.end()) {
         break;
       }
-      deravetive.emplace_front(*listIterator - previousValue);
+      deravetive.emplace_front(nextValue - *listIterator);
       isValid = true;
     }
     // check if we found at least 1 value
@@ -411,11 +413,13 @@ float SpeedController::estimateNextElement(const std::forward_list<T>& i_forward
     // if it changes alot the the first one
     if (averageDirevative > deravetive.front() * 1.05 or
         averageDirevative < deravetive.front() * 0.95) {
-      nextElement += static_cast<float>(deravetive.front());
+      nextElement += static_cast<float>(deravetive.front()) * fraction;
     } else {
-      nextElement += static_cast<float>(averageDirevative);
+      nextElement += static_cast<float>(averageDirevative) * fraction;
     }
     values = deravetive;
+    deravetive.clear();
+    isValid = false;
   }
   return nextElement;
 }

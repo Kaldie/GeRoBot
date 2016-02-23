@@ -138,6 +138,7 @@ class SpeedControllerUnitTest : public CxxTest::TestSuite {
     // both joints get a step, test wheter the translation joint speed is reduced
     speedController.notifyStep(m_translationalJoint, 1);
     speedController.notifyStep(m_rotationalJoint,1);
+    TS_ASSERT(speedController.adviseSpeed(&speed));
     speedController.acknowledgeSpeed(speed);
     TS_ASSERT_EQUALS(m_translationalJoint->getMotor()->getSpeed(), 84);
     LOG_DEBUG(" Idle speed: " << m_translationalJoint->getMotor()->getSpeed());
