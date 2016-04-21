@@ -56,7 +56,7 @@ enum ReturnState {
 
 // Global variables
 // Size of an received in bytes
-int SIZE_OF_INT = 4;
+#define SIZE_OF_INT 4
 
 // Buffer needed to write the integers from the serial connection
 unsigned char INTEGER_BUFFER[4];
