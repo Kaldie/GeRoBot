@@ -23,14 +23,14 @@ QVariant BaseJointItem::getPropertyData(int i_row,int i_column) const {
 		else
 			return QVariant(QString("Position"));
 	}
-	
+
 	else if(i_row==BaseJointItem::propertyList.indexOf("MovementPerStep")){
 		if(i_column==1)
 			return QVariant(m_jointPointer->getMovementPerStep());
 		else
 			return QVariant(QString("Movment per step"));
 	}
-	
+
 	else if(i_row==BaseJointItem::propertyList.indexOf("LowerRange")){
 		if(i_column==1)
 			return QVariant(m_jointPointer->getRange()[0]);
@@ -44,7 +44,6 @@ QVariant BaseJointItem::getPropertyData(int i_row,int i_column) const {
 		else
 			return QVariant(QString("Upper position range"));
 	}
-	
 	else if(i_row==BaseJointItem::propertyList.indexOf("MovementType")){
 		if(i_column==1){
             BaseJoint::MovementType movementType=m_jointPointer->getMovementType();
@@ -58,10 +57,9 @@ QVariant BaseJointItem::getPropertyData(int i_row,int i_column) const {
 		else
 			return QVariant(QString("Movement type"));
 	}
-	
 	else
 		return QVariant();
-}		
+}
 
 bool BaseJointItem::setPropertyData(int i_row,int i_column,const QVariant& i_data){
 	if(i_column!=1)
@@ -69,13 +67,13 @@ bool BaseJointItem::setPropertyData(int i_row,int i_column,const QVariant& i_dat
 
 	bool isConverted=bool(false);
 	bool* hasConverted = &isConverted;
-	
+
 	if(i_row==BaseJointItem::propertyList.indexOf("Position"))
 		m_jointPointer->setPosition(i_data.toDouble(hasConverted));
 
 	else if(i_row==BaseJointItem::propertyList.indexOf("MovementPerStep"))
 		m_jointPointer->setMovementPerStep(i_data.toDouble(hasConverted));
-	
+
 	else if(i_row==BaseJointItem::propertyList.indexOf("LowerRange")){
 		float upperRange=m_jointPointer->getRange()[1];
 		float lowerRange=i_data.toDouble(hasConverted);
@@ -89,7 +87,7 @@ bool BaseJointItem::setPropertyData(int i_row,int i_column,const QVariant& i_dat
 
 	else if(i_row==BaseJointItem::propertyList.indexOf("MovementType")){
         BaseJoint::MovementType movementType;
-		
+
 		if("Rotational"==i_data.toString().toStdString()){
             movementType = BaseJoint::Rotational;
 			isConverted=true;
@@ -103,7 +101,7 @@ bool BaseJointItem::setPropertyData(int i_row,int i_column,const QVariant& i_dat
 		m_jointPointer->setMovementType(movementType);
 	}
 	return isConverted;
-}		
+}
 
 bool BaseJointItem::construct(){
 	return addBaseMotor() && createChilderen(BaseJointItem::propertyList);
@@ -117,6 +115,6 @@ bool BaseJointItem::addBaseMotor(){
 	//Create a base motor item with this as the parent
 	BaseMotorItem* baseMotorItem= new BaseMotorItem(this,(m_jointPointer->getMotor()));
 	baseMotorItem->construct();
-	insertChild(0,baseMotorItem);	
+	insertChild(0,baseMotorItem);
 	return true;
 }
