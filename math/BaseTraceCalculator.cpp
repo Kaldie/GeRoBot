@@ -70,7 +70,7 @@ std::vector<int> BaseTraceCalculator::getNumberOfSteps
             m_robot->getMovementPerStep(BaseJoint::Rotational));
   // Magnitude difference / movement per step of Translational joint
   int numberOfTranslationSteps =
-      std::abs(Magnitude(i_position)-Magnitude(endPoint))/
+      std::abs(magnitude(i_position)-magnitude(endPoint))/
     (m_robot->getMovementPerStep(BaseJoint::Translational));
   // Rotational difference / movement per step of Rotational joint
   int numberOfRotationSteps =
@@ -97,8 +97,8 @@ bool BaseTraceCalculator::shouldTranslate(const Trace& i_trace,
   /*
     Translate if the magnitude differs between the current point and the endpoint.
   */
-  traceType pointMagnitude = Magnitude(i_point2D);
-  traceType endPointMagnitude = Magnitude(i_trace.getEndPoint());
+  traceType pointMagnitude = magnitude(i_point2D);
+  traceType endPointMagnitude = magnitude(i_trace.getEndPoint());
   traceType difference = std::abs(endPointMagnitude - endPointMagnitude);
   LOG_INFO("Current magnitude: " << pointMagnitude << ". ");
   LOG_INFO("Wanted magnitude: " << endPointMagnitude);
@@ -129,24 +129,24 @@ bool BaseTraceCalculator::shouldRotate(const Trace& i_trace,
 }
 
 
-void BaseTraceCalculator::calculateTrace(const Trace& i_trace) {
+void BaseTraceCalculator::calculateTrace(const Trace* i_trace) {
   if (!hasRobot()) {
     LOG_ERROR("Does not have a joint controller!");
   }
   Point2D currentVirtualPosition = m_robot->getVirtualPosition();
   LOG_INFO("Current robot position: " << currentVirtualPosition.x <<
            ", " << currentVirtualPosition.y);
-  LOG_INFO("Going to position: " << i_trace.getEndPoint().x <<
-           ", " << i_trace.getEndPoint().y);
+  LOG_INFO("Going to position: " << i_trace->getEndPoint().x <<
+           ", " << i_trace->getEndPoint().y);
   // Get rotation direction
-  std::string rotationDirection = i_trace.
+  std::string rotationDirection = i_trace->
       getRotationDirectionToEndPoint(currentVirtualPosition);
   // Get translation direction
-  std::string translationDirection = i_trace.
+  std::string translationDirection = i_trace->
       getTranslationDirectionToEndPoint(currentVirtualPosition);
   // get number of steps
   std::vector<int> numberOfSteps =
-    getNumberOfSteps(i_trace, currentVirtualPosition);
+    getNumberOfSteps(*i_trace, currentVirtualPosition);
   // set steps
   if (numberOfSteps[0] > 0) {
     m_robot->prepareSteps(rotationDirection, numberOfSteps[0]);
