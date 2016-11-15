@@ -37,7 +37,8 @@ class BaseTraceCalculator {
     The base trace calculate simply makes the robot go to the specific point,
     override this function when implementing new types of trace calculators
   */
-  virtual void calculateTrace(const Trace&);
+  virtual void calculateTrace(const Trace*);
+
   /*
      To re-create the steps taking during the calculation
      a file where all the steps are specified can be created.
