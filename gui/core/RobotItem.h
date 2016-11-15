@@ -13,7 +13,7 @@ class RobotItem:public BaseRobotItem
 
   RobotItem();
   bool addJointControllerItem();
-
+  bool addSpeedControllerItem();
  public:
   RobotItem(BaseRobotItem* i_parent,
 	    Robot::RobotPointer i_robotPointer);

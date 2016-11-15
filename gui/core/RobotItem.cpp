@@ -5,9 +5,10 @@
 #include "./RobotItem.h"
 #include "./JointControllerItem.h"
 #include "./BasePropertyItem.h"
+#include "./SpeedControllerItem.h"
 
 const QList<QString> RobotItem::
-  propertyList({"Speed", "CurrentPositionX", "CurrentPositionY"});
+  propertyList({"CurrentPositionX", "CurrentPositionY"});
 
 
 RobotItem::RobotItem(BaseRobotItem* i_parent,
@@ -20,12 +21,7 @@ RobotItem::RobotItem(BaseRobotItem* i_parent,
 
 
 QVariant RobotItem::getPropertyData(int i_row, int i_column) const {
-  if (i_row == RobotItem::propertyList.indexOf("Speed")) {
-    if (i_column == 1)
-      return QVariant(m_robotPointer->getSpeed());
-    else
-      return QVariant(QString("Speed"));
-  } else if (i_row == RobotItem::propertyList.indexOf("CurrentPositionX")) {
+  if (i_row == RobotItem::propertyList.indexOf("CurrentPositionX")) {
     if (i_column == 1)
       return QVariant(static_cast<float>(m_robotPointer->getPosition().x));
     else
@@ -47,10 +43,7 @@ bool RobotItem::setPropertyData(int i_row,
   if (i_column != 1)
     return false;
 
-  if (i_row == RobotItem::propertyList.indexOf("Speed")) {
-    m_robotPointer->setSpeed(i_data.toFloat());
-    return true;
-  } else if (i_row == RobotItem::propertyList.indexOf("CurrentPositionX")) {
+  if (i_row == RobotItem::propertyList.indexOf("CurrentPositionX")) {
     Point2D point = m_robotPointer->getPosition();
     point.x = i_data.toDouble();
     m_robotPointer->setPosition(point);
@@ -79,13 +72,24 @@ bool RobotItem::construct() {
     LOG_DEBUG("Creation of property childeren has failed");
 
   LOG_DEBUG("Adding new Joint controller!");
-  return addJointControllerItem();
+  bool hasSucceded(false);
+  hasSucceded |= addJointControllerItem();
+  hasSucceded |= addSpeedControllerItem();
+  return hasSucceded;
 }
 
 
 bool RobotItem::addJointControllerItem() {
   JointControllerItem* child = new JointControllerItem(
       this, m_robotPointer->getJointController());
+  child->construct();
+  return insertChild(childCount(), child);
+}
+
+
+bool RobotItem::addSpeedControllerItem() {
+  SpeedControllerItem* child = new SpeedControllerItem(
+    this, m_robotPointer->getSpeedController());
   child->construct();
   return insertChild(childCount(), child);
 }
