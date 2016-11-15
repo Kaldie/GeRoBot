@@ -11,6 +11,7 @@ const QString TraceGraphItem::RemoveTraceActionText("Remove Trace");
 const QString TraceGraphItem::ConvertToLineActionText("Convert to Line");
 const QString TraceGraphItem::ConvertToCurveActionText("Convert to Curve");
 const QString TraceGraphItem::ConvertDirection("Alter direction");
+
 TraceGraphItem::TraceGraphItem(Trace::TracePointer i_trace /*= 0*/)
    : m_trace(i_trace) {
    setFlag(QGraphicsItem::ItemIsSelectable);
@@ -189,7 +190,7 @@ void TraceGraphItem::handleTrigger() {
       emit convertThisTrace(m_trace.lock(), Trace::Curve);
    } else if (action->text() == TraceGraphItem::ConvertDirection) {
       LOG_DEBUG("Emit signal to change direction");
-      emit convertDirection(m_trace.lock());
+      emit reverse(m_trace.lock());
    } else {
       LOG_ERROR("Action: '" << action->text().toStdString() << "' is not resolved!");
    }
