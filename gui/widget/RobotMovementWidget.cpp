@@ -93,7 +93,7 @@ void RobotMovementWidget::updatePositionWidget() {
   yPositionLineEdit->setText(textualRepresentation);
 
   // update extension line edit
-  textualRepresentation.setNum(Magnitude(robotPosition));
+  textualRepresentation.setNum(magnitude(robotPosition));
   extensionLineEdit->setText(textualRepresentation);
 
   // update angle line edit
@@ -245,7 +245,7 @@ void RobotMovementWidget::movementExtent() {
   if (m_mode != ToolMode)
     return;
   double stepSize = stepSizeLineEdit->text().toDouble();
-  double robotStepSize = m_robotPointer->getMovementPerStep(Translational);
+  double robotStepSize = m_robotPointer->getMovementPerStep(BaseJoint::MovementType::Translational);
   int numberOfSteps = stepSize / robotStepSize;
   if (numberOfSteps == 0) {
     numberOfSteps = 1;
@@ -265,7 +265,7 @@ void RobotMovementWidget::movementRetract() {
   if (m_mode != ToolMode)
     return;
   double stepSize = stepSizeLineEdit->text().toDouble();
-  double robotStepSize = m_robotPointer->getMovementPerStep(Translational);
+  double robotStepSize = m_robotPointer->getMovementPerStep(BaseJoint::MovementType::Translational);
   int numberOfSteps = stepSize / robotStepSize;
   if (numberOfSteps == 0) {
     numberOfSteps = 1;
@@ -285,7 +285,7 @@ void RobotMovementWidget::movementClockWise() {
   if (m_mode != ToolMode)
     return;
   double stepSize = stepSizeLineEdit->text().toDouble();
-  double robotStepSize = m_robotPointer->getMovementPerStep(Rotational);
+  double robotStepSize = m_robotPointer->getMovementPerStep(BaseJoint::MovementType::Rotational);
   int numberOfSteps = stepSize / robotStepSize;
   if (numberOfSteps == 0) {
     numberOfSteps = 1;
@@ -305,7 +305,7 @@ void RobotMovementWidget::movementCounterClockWise() {
   if (m_mode != ToolMode)
     return;
   double stepSize = stepSizeLineEdit->text().toDouble();
-  double robotStepSize = m_robotPointer->getMovementPerStep(Rotational);
+  double robotStepSize = m_robotPointer->getMovementPerStep(BaseJoint::MovementType::Rotational);
   int numberOfSteps = stepSize / robotStepSize;
   if (numberOfSteps == 0) {
     numberOfSteps = 1;
