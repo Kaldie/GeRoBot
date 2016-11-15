@@ -49,10 +49,8 @@ CXX:
 	$(MKDIR_P) $(CXX)
 	tar -xvzf $(TOROOT)/cxx.tar.gz --strip=1 -C $(CXX)
 	$(MKDIR_P) $(INCLUDEFOLDER)/cxxtest
-	$(foreach HFILE,$(wildcard $(CXXSRC)/*.h),$(LINK) ../../$(HFILE) $(INCLUDEFOLDER)/cxxtest;)
-	$(foreach HFILE,$(wildcard $(CXXSRC)/*.h),$(LINK) ../../$(HFILE) $(INCLUDEFOLDER)/cxxtest;)
-
-
+	$(foreach HFILE,$(wildcard $(CXXSRC)/*.h),$(LINK) $(HFILE) $(INCLUDEFOLDER)/cxxtest;)
+	$(foreach HFILE,$(wildcard $(CXXSRC)/*.cpp),$(LINK) $(HFILE) $(INCLUDEFOLDER)/cxxtest;)
 
 UPLOADEDTARGET:
 	$(foreach FOLDER,$(UPLOADEDFOLDERS), cd $(FOLDER); make -i upload; cd ..; )
