@@ -228,7 +228,7 @@ bool TraceGraphPoint::curveNeedsCorrection
   switch (m_positionOnTrace) {
   case TraceGraphPoint::CenterPoint : {
     try {
-      Circle2D(i_rotationTrace->getStartPoint(),
+      Arc2D(i_rotationTrace->getStartPoint(),
                i_rotationTrace->getEndPoint(),
                i_newPoint);
       return false;
@@ -238,7 +238,7 @@ bool TraceGraphPoint::curveNeedsCorrection
   }
   case TraceGraphPoint::StartPoint : {
     try {
-      Circle2D(i_newPoint,
+      Arc2D(i_newPoint,
                i_rotationTrace->getEndPoint(),
                i_rotationTrace->getCentrePoint());
       return false;
@@ -248,7 +248,7 @@ bool TraceGraphPoint::curveNeedsCorrection
   }
   case TraceGraphPoint::EndPoint : {
     try {
-      Circle2D(i_rotationTrace->getStartPoint(),
+      Arc2D(i_rotationTrace->getStartPoint(),
                i_newPoint,
                i_rotationTrace->getCentrePoint());
       return false;
