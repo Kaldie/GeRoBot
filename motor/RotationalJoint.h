@@ -113,7 +113,7 @@ void RotationalJoint<ActuatorType>::predictSteps(Point2D* o_robotPosition,
 
 template <class ActuatorType>
 traceType RotationalJoint<ActuatorType>::distancePerStep() const {
-  return Magnitude(childPosition())*(m_movementPerStep);
+  return magnitude(childPosition())*(m_movementPerStep);
 }
 
 
