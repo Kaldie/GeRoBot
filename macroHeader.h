@@ -20,10 +20,12 @@
 #include <vector>
 #include <iomanip>
 #include <cassert>
+#include <pugixml.hpp>
+
 #ifdef QT
 #include <QtCore/QPointF>
 #endif
-#include <pugixml.hpp>
+
 
 #define PIN_HIGH 1
 #define PIN_LOW 0
