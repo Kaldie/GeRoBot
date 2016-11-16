@@ -14,8 +14,7 @@ LineTraceCalculator::LineTraceCalculator()
 {}
 
 
-LineTraceCalculator::LineTraceCalculator
-(Robot* i_robotPointer)
+LineTraceCalculator::LineTraceCalculator(Robot* i_robotPointer)
     : BaseTraceCalculator(i_robotPointer)
 {}
 
@@ -34,29 +33,27 @@ void LineTraceCalculator::calculateTrace(const Trace& i_trace) {
   bool hasStepped(true);
   do {
     hasStepped = calculateStep(i_trace);
-    i++;
+    ++i;
   }while(hasStepped);  // and i<1000);
 }
 
 
 bool LineTraceCalculator::calculateStep(const Trace& i_trace) const {
   LOG_DEBUG("Calculate step");
-  // keeping track if the robot is orded to translate or rotated
-  bool hasStepped = false;
   // should rotate?
   if (shouldRotate(i_trace,
                    m_robot->getVirtualPosition())) {
     LOG_DEBUG("Needs to rotate");
     // add rotation to the delay list and correct translations
     prepareRotation(i_trace);
-    hasStepped = true;
+    return true;
   } else if (shouldTranslate(i_trace,
                              m_robot->getVirtualPosition())) {
     LOG_DEBUG("Needs to translate.");
     prepareTranslation(i_trace);
-    hasStepped = true;
+    return true;
   }
-  return hasStepped;
+  return false;
 }
 
 
@@ -107,10 +104,10 @@ bool LineTraceCalculator::correctRotation(const Trace& i_trace) const {
             << " , "<< intersectingPoint.y);
   // The distance to the enpoint after the correction is applied*/
   traceType distenceEndPointIntersectingPoint =
-      Magnitude(intersectingPoint - i_trace.getEndPoint());
+      magnitude(intersectingPoint - i_trace.getEndPoint());
   // The distance traveled in this correction
   traceType distanceBeginPointIntersectingPoint =
-      Magnitude(intersectingPoint - currentRobotPosition);
+      magnitude(intersectingPoint - currentRobotPosition);
   // calculate the correction distance and destination after correction
   traceType jointPointDifference;
   const Point2D* destinationPoint;
@@ -118,7 +115,7 @@ bool LineTraceCalculator::correctRotation(const Trace& i_trace) const {
     /*if the distance needed in the next step is smaller then the distance we travel in this correction step
       Don't overshoot
     */
-    jointPointDifference = Magnitude(i_trace.getEndPoint()-currentRobotPosition);
+    jointPointDifference = magnitude(i_trace.getEndPoint()-currentRobotPosition);
     destinationPoint=&i_trace.getEndPoint();
   } else {
     /*
@@ -138,7 +135,6 @@ bool LineTraceCalculator::correctRotation(const Trace& i_trace) const {
     }
     destinationPoint=&intersectingPoint;
   }
-
   LOG_INFO("Destination point is: " <<
            destinationPoint->x << ", " << destinationPoint->y);
   // calculate the number of steps needed to correct

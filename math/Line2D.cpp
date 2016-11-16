@@ -50,7 +50,7 @@ Point2D Line2D::getIntersectingPoint(const Point2D &i_point) const {
 }
 
 traceType Line2D::getLength() {
-  return Magnitude(m_endPoint-m_startPoint);
+  return magnitude(m_endPoint-m_startPoint);
 }
 
 

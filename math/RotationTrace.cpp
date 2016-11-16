@@ -191,7 +191,7 @@ void RotationTrace::getPointAtExtremeAngle
    * gives the two points for which the angle to the origin is
    * minimum or maximum
    */
-  traceType centreMagnitude = Magnitude(m_centrePoint);
+  traceType centreMagnitude = magnitude(m_centrePoint);
   traceType radius = getArc().radius();
   if (centreMagnitude > radius) {
     traceType rotationAngle = asin(radius/centreMagnitude);
@@ -254,5 +254,5 @@ traceType RotationTrace::getPerpendicularDistance
 (const Point2D& i_position) const {
   Vector2D gradient(i_position.y, -1 * i_position.x);
   Line2D gradientLine(i_position, i_position + gradient);
-  return Magnitude(getArc().nearestIntersection(gradientLine) - i_position);
+  return magnitude(getArc().nearestIntersection(gradientLine) - i_position);
 }

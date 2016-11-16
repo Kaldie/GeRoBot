@@ -1,7 +1,7 @@
 #include <macroHeader.h>
 #include "./Point2D.h"
 
-traceType Magnitude(const Vector2D& v) {
+traceType magnitude(const Vector2D& v) {
   return (sqrtf(v.x * v.x + v.y * v.y));
 }
 

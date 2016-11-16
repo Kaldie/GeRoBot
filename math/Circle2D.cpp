@@ -36,8 +36,8 @@ Point2D Circle2D::getCentrePoint(const Point2D& i_firstPoint,
    * http://math.stackexchange.com/questions/27535/how-to-find-center-of-an-arc-given-start-point-end-point-radius-and-arc-direc
    */
   Vector2D V = i_secondPoint - i_firstPoint;
-  traceType h = sqrt( (i_radius * i_radius) - (Magnitude(V) * Magnitude(V)) / 4);
-  Vector2D unitH = 1 / Magnitude(V) * Vector2D(V.y,-1*V.x);
+  traceType h = sqrt( (i_radius * i_radius) - (magnitude(V) * magnitude(V)) / 4);
+  Vector2D unitH = 1 / magnitude(V) * Vector2D(V.y,-1*V.x);
 
   Point2D centrePoint=i_firstPoint + 0.5 * V + h * unitH;
   traceType startAngle=(i_firstPoint-centrePoint).getAlpha();
@@ -62,12 +62,12 @@ Point2D Circle2D::getCentrePoint(const Point2D& i_firstPoint,
 
 
 traceType Circle2D::radius() const {
-  return Magnitude(m_firstPoint-m_centrePoint);
+  return magnitude(m_firstPoint-m_centrePoint);
 }
 
 
 bool Circle2D::isPointOnCircle(const Point2D& i_point) const {
-  traceType pointRadius = Magnitude(i_point-m_centrePoint);
+  traceType pointRadius = magnitude(i_point-m_centrePoint);
   traceType circleRadius = radius();
   if ((pointRadius+0.001 > circleRadius) &&
      pointRadius-0.001 < circleRadius) {

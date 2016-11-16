@@ -86,7 +86,7 @@ class Point2D:public Vector2D {
 
 std::ostream& operator<<(std::ostream& os, const Point2D& i_point);
 
-traceType Magnitude(const Vector2D& v);
+traceType magnitude(const Vector2D& v);
 
 traceType InverseMag(const Vector2D& v);
 

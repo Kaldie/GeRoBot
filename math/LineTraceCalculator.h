@@ -16,8 +16,7 @@ class LineTraceCalculator: public BaseTraceCalculator {
   // Constructors
   LineTraceCalculator();
 
-  explicit LineTraceCalculator
-    (Robot* i_robotPointer);
+  explicit LineTraceCalculator(Robot* i_robotPointer);
 
   LineTraceCalculator(Robot* i_robotPointer,
                       const traceType& i_tolerance);

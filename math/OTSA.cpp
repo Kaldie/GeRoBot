@@ -114,7 +114,7 @@ namespace tsa {
                                                            &currentDistance);
         // reverse it if necessary
         traceType startPointDistance =
-          Magnitude(*i_virtualPosition - currentTrace->getStartPoint());
+          magnitude(*i_virtualPosition - currentTrace->getStartPoint());
         currentDistance = std::abs(currentDistance);
         if (!(currentDistance - TOLERANCE < startPointDistance &&
               currentDistance + TOLERANCE > startPointDistance)) {
