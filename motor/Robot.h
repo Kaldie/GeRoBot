@@ -6,9 +6,7 @@
 #include <JointController.h>
 #include <Point2D.h>
 #include <SpeedController.h>
-
-class Trace;
-
+#include <Trace.h>
 /**
  * Robot is the basis of the project.
  *  Robot is the root of a object which looks like: Robot->Joint->Actuator
@@ -30,7 +28,7 @@ class Robot {
   GETSET(std::vector<Point2D>, m_traveledPoints, TraveledPoints);
 
   /// Controller which is in charge of the speed of the robot
-  GETSET(SpeedController, m_speedController, SpeedController);
+  GETSET(SpeedController::SpeedControllerPointer, m_speedController, SpeedController);
 
  public:
   typedef std::shared_ptr<Robot> RobotPointer;
@@ -43,7 +41,7 @@ class Robot {
 
 
   /// Creates a state which will switch the tool to a active or inactive state
-  void switchTool(const bool& i_shouldBeActive){}; // no yet implemented!
+  void switchTool(const bool& i_shouldBeActive) {}; // no yet implemented!
 
   /// move to a position, independend on maner
   void goToPosition(const Point2D&);
@@ -57,15 +55,16 @@ class Robot {
   /// Get the amount of movement per step given a direction
   traceType getMovementPerStep(const BaseJoint::MovementType&) const ;
 
+
+  void traceCalculation(const Trace::TracePointer& i_trace);
   /**
    * prepares to take steps with the given movement type, direction and number
    * This function pepares the joint controller to take steps when actuate is called
-   * @param[in] i_movementType Type of movement, Rotational or Translational
    * @param[in] i_direction direction which the step has to be taken, currently IN/OUT or CCW/CW
    * @param[in] i_numberOfSteps Number of steps that has to be taken
    */
   void prepareSteps(const std::string& i_direction,
-                   const int& i_numberOfSteps);
+                    const int& i_numberOfSteps);
 
   /// Add an StateSequence to the vector. Use this for instance when a wait is required
   void addToSequence(const StateSequence& i_sequence);

@@ -1,10 +1,14 @@
 // Copyright [2015] Ruud Cools
 #include <macroHeader.h>
 #include "Robot.h"
+#include <SpeedController.h>
+#include <ConstantSpeedController.h>
 #include <BaseTraceCalculator.h>
 #include <BaseMotor.h>
 #include <PinState.h>
 #include <Trace.h>
+#include <RotationTraceCalculator.h>
+#include <RotationTrace.h>
 
 int stepsMissed = 0;
 
@@ -23,7 +27,7 @@ Robot::Robot(const JointController::JointControllerPointer& i_pointer,
   : m_jointController(i_pointer),
     m_position(i_currentPosition),
     m_virtualPosition(i_currentPosition),
-    m_speedController(10) {
+    m_speedController(std::make_shared<ConstantSpeedController>()) {
 }
 
 
@@ -49,9 +53,22 @@ void Robot::goToPosition(const Point2D &i_position) {
   LOG_DEBUG("current position: " << m_position.x << m_position.y);
   BaseTraceCalculator baseTraceCalculator(this);
   Trace thisTrace(m_position, i_position);
-  baseTraceCalculator.calculateTrace(thisTrace);
-  LOG_DEBUG("new position: " << m_position.x << m_position.y);
+  baseTraceCalculator.calculateTrace(&thisTrace);
+  LOG_DEBUG("new position: " << m_virtualPosition.x << m_virtualPosition.y);
   actuate();
+}
+
+
+void Robot::traceCalculation(const Trace::TracePointer& i_trace) {
+  std::unique_ptr<BaseTraceCalculator> traceCalculator;
+
+  if (i_trace->getTraceType() == Trace::TraceType::Curve) {
+    traceCalculator = std::unique_ptr<BaseTraceCalculator>(new RotationTraceCalculator(this));
+  } else {
+    traceCalculator = std::unique_ptr<BaseTraceCalculator>(new LineTraceCalculator(this));
+  }
+  m_speedController->prepareSpeedController(*i_trace, *m_jointController);
+  traceCalculator->calculateTrace(i_trace.get());
 }
 
 
@@ -64,13 +81,13 @@ void Robot::prepareSteps(const std::string& i_direction,
   m_traveledPoints.push_back(m_virtualPosition);
   // add the step to the sequence
   m_jointController->moveSteps(i_direction, i_numberOfSteps);
-  m_speedController.notifyStep(joint, i_numberOfSteps);
+  m_speedController->notifyStep(joint, i_numberOfSteps);
   int motorSpeed;
-  if (m_speedController.adviseSpeed(&motorSpeed)) {
+  if (m_speedController->adviseSpeed(&motorSpeed)) {
     LOG_DEBUG("Speed controler has a mandatory speed change.");
     // add a clean sequence to force the speed to be nice
     m_jointController->getSequenceVectorPointer()->addEmptySequence();
-    m_speedController.acknowledgeSpeed(motorSpeed);
+    m_speedController->acknowledgeSpeed(motorSpeed);
   }
 }
 
