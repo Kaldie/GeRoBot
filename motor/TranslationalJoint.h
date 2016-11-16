@@ -97,7 +97,7 @@ predictSteps(Point2D* o_robotPosition,
   traceType addedExtension = getMovementPerStep() *
     getPositionModifier(i_directionString) * i_numberOfSteps;
   // Determine the new relative length of the robot
-  double newLength = Magnitude(relativeRobotPosition) + addedExtension;
+  double newLength = magnitude(relativeRobotPosition) + addedExtension;
   // Update the current position of the joint
   m_currentPosition += addedExtension;
   // Update the current end position of the robot
