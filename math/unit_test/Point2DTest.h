@@ -58,7 +58,8 @@ class Point2DTest : public CxxTest::TestSuite {
     TS_SKIP("Test is skiped due to lack of QT");
     return;
 #else
-    Point2D point(10.0,-10.0);
+    LOG_DEBUG("bitch");
+    const Point2D point(10.0,-10.0);
     QPointF qPoint = point;
     TS_ASSERT_EQUALS(QPointF(10.0,10.0),
                      qPoint);
@@ -80,6 +81,12 @@ class Point2DTest : public CxxTest::TestSuite {
     TS_ASSERT_DIFFERS(Point2D(10.0, 25.0),
                      point);
 #endif  // QT
+  }
+
+  void testConversionFromPointToQPointF() {
+    const Point2D x(10,12);
+    QPointF y = x;
+    LOG_DEBUG(y.x());
   }
 };
 
