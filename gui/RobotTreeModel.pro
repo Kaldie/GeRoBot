@@ -15,6 +15,7 @@
     core/JointControllerItem.h \
     core/PinStateItem.h \
     core/RobotItem.h \
+    core/SpeedControllerItem.h \
     core/RobotTreeModel.h \
     widget/Point2DWidget.h \
     widget/RobotMovementWidget.h \
@@ -38,6 +39,7 @@
     core/JointControllerItem.cpp \
     core/PinStateItem.cpp \
     core/RobotItem.cpp \
+    core/SpeedControllerItem.cpp \
     core/RobotTreeModel.cpp \
     widget/Point2DWidget.cpp \
     widget/RobotMovementWidget.cpp \
@@ -51,16 +53,16 @@
     MainWindow.cpp \
     main.cpp
 
- CONFIG  += qt
+ CONFIG  += qt#
  CONFIG += c++11
-# QMAKE_MOC_OPTIONS = -f../../../include/macroHeader.h
- QMAKE_CXXFLAGS += -Wfatal-errors
+
+ QMAKE_CXXFLAGS += -Wfatal-errors -DQT
 # QMAKE_CXXFLAGS += -H
 
  QT += widgets
- INCLUDEPATH += /home/ruud/project/gerobot/include/
-
- LIBS += /home/ruud/project/gerobot/bin/lib/libGeRobot.so
+ INCLUDEPATH += /home/ruud/projects/gerobot/include/
+ #QMAKE_MOC_OPTIONS = -f $$INCLUDEPATH/macroHeader.h
+ LIBS += /home/ruud/projects/gerobot/bin/lib/libGeRobot.so
 
  #QMAKE_RPATHDIR += /home/ruud/project/gerobot/bin/lib/
 

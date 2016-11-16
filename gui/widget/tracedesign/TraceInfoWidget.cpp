@@ -173,9 +173,9 @@ void TraceInfoWidget::shouldSignalHasNewPosition() {
     assert(rotationPointer);
     // check if a circle can be made
     try {
-      Circle2D circle(trace->getStartPoint(),
-                      trace->getEndPoint(),
-                      rotationPointer->getCentrePoint());
+      Arc2D arc(trace->getStartPoint(),
+                trace->getEndPoint(),
+                rotationPointer->getCentrePoint());
       if (!traceTypeComboBox->isEnabled()) {
           traceTypeComboBox->setEnabled(true);
       }
