@@ -144,7 +144,7 @@ namespace tsa {
     traceType currentDistance;
     for (auto& trace : i_section) {
       currentDistance =
-	Magnitude(trace->getStartPoint() - i_position) * mutiplier;
+  magnitude(trace->getStartPoint() - i_position) * mutiplier;
       LOG_DEBUG("Current distance: " << currentDistance);
       LOG_DEBUG("Current Selected distance: " << *o_distance);
       LOG_DEBUG("Multiplier: " << mutiplier);
@@ -153,7 +153,7 @@ namespace tsa {
 	extreme = trace;
       }
       currentDistance =
-	Magnitude(trace->getEndPoint() - i_position) * mutiplier;
+  magnitude(trace->getEndPoint() - i_position) * mutiplier;
             LOG_DEBUG("Current distance: " << currentDistance);
       LOG_DEBUG("Current Selected distance: " << *o_distance);
       LOG_DEBUG("Multiplier: " << mutiplier);

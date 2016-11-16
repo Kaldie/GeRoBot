@@ -23,9 +23,9 @@ RotationTraceCalculator::RotationTraceCalculator
 {}
 
 
-void RotationTraceCalculator::calculateTrace
-(const RotationTrace& i_rotationTrace) {
-  std::vector<RotationTrace> traces = i_rotationTrace.getNecessaryTraces();
+void RotationTraceCalculator::calculateTrace(const Trace* i_trace) {
+  const RotationTrace* rotationTrace = static_cast<const RotationTrace*>(i_trace);
+  std::vector<RotationTrace> traces = rotationTrace->getNecessaryTraces();
   LOG_DEBUG("Number of traces: " << traces.size());
   Point2D startPointOfThisTrace;
   for (std::vector<RotationTrace>::const_iterator itr = traces.begin();

@@ -46,12 +46,12 @@ void SequentialTraceCalculator::calculatedTraces() {
 			 m_robot->getVirtualPosition());
   for (const auto& trace : m_traceSection) {
     traceType distance  =
-      Magnitude(trace->getStartPoint() - m_robot->getVirtualPosition());
+      magnitude(trace->getStartPoint() - m_robot->getVirtualPosition());
     if (distance > baseTraceCalculator.getTolerance()) {
       Trace movementTrace(m_robot->getVirtualPosition(),
                           trace->getStartPoint());
       m_robot->switchTool(false);
-      baseTraceCalculator.calculateTrace(movementTrace);
+      baseTraceCalculator.calculateTrace(&movementTrace);
       m_robot->switchTool(true);
     }
 
@@ -60,7 +60,7 @@ void SequentialTraceCalculator::calculatedTraces() {
     } else if (trace->getTraceType() == Trace::Curve) {
       RotationTrace::RotationTracePointer rotationTrace =
         std::static_pointer_cast<RotationTrace>(trace);
-      rotationTraceCalculator.calculateTrace(*rotationTrace);
+      rotationTraceCalculator.calculateTrace(rotationTrace.get());
     }
   }
 }

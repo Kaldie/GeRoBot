@@ -22,7 +22,6 @@ Vector2D& Vector2D::rotate(traceType angle)
  */
 traceType Vector2D::getAlpha() const {
   if((x * x + y * y) < 0.001) {
-    std::cout<<"0 to 0";
     return 0;
   }
 

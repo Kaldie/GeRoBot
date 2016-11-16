@@ -67,8 +67,8 @@ std::string Trace::getRotationDirection(Point2D const &i_currentPoint,
 std::string Trace::
   getTranslationDirectionToEndPoint(Point2D const &i_point2D) const {
 #ifdef DEBUG
-  traceType currentPointMagnitude = Magnitude(i_point2D);
-  traceType endPointMagnitude = Magnitude(m_endPoint);
+  traceType currentPointMagnitude = magnitude(i_point2D);
+  traceType endPointMagnitude = magnitude(m_endPoint);
   LOG_INFO("Current magnitude:"  << currentPointMagnitude);
   LOG_INFO("desired magnitude: " << endPointMagnitude);
 #endif
@@ -79,8 +79,8 @@ std::string Trace::
 std::string Trace::
   getTranslationDirection(Point2D const &i_currentPoint,
                           Point2D const &i_desiredPoint) const {
-  traceType currentPointMagnitude = Magnitude(i_currentPoint);
-  traceType desiredPointMagnitude = Magnitude(i_desiredPoint);
+  traceType currentPointMagnitude = magnitude(i_currentPoint);
+  traceType desiredPointMagnitude = magnitude(i_desiredPoint);
 
   if (currentPointMagnitude < desiredPointMagnitude)
     return "OUT";
@@ -162,5 +162,5 @@ traceType Trace::getPerpendicularDistance(const Point2D& i_position) const {
   /// Determine gradient of the line
   Vector2D gradient(i_position.y, -1 * i_position.x);
   Line2D gradientLine(i_position, i_position + gradient);
-  return Magnitude(i_position - getTraceLine().getIntersectingPoint(gradientLine));
+  return magnitude(i_position - getTraceLine().getIntersectingPoint(gradientLine));
 }
