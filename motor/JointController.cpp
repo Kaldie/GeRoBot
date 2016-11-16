@@ -101,7 +101,7 @@ bool JointController::addJoint(const BaseJoint::JointPointer& i_joint) {
 }
 
 
-BaseJoint::JointPointer JointController::getJoint(const BaseJoint::MovementType &i_movementType) {
+BaseJoint::JointPointer JointController::getJoint(const BaseJoint::MovementType &i_movementType) const {
   if (m_jointPointerVector.size() == 0)
     LOG_ERROR("No joints defined yet");
 
@@ -110,7 +110,7 @@ BaseJoint::JointPointer JointController::getJoint(const BaseJoint::MovementType 
       return m_jointPointerVector[0];
 
   if (m_jointPointerVector.size() == 2)
-    for (JointController::JointPointerVector::iterator itr = m_jointPointerVector.begin();
+    for (JointController::JointPointerVector::const_iterator itr = m_jointPointerVector.begin();
          itr != m_jointPointerVector.end();
          itr++) {
       if ((*itr)->getMovementType() == i_movementType) {
@@ -181,7 +181,7 @@ void JointController::uploadSequence(const bool& i_condense) {
 }
 
 
-BaseJoint::JointPointer JointController::resolveJoint(const std::string& i_movementDirection) {
+BaseJoint::JointPointer JointController::resolveJoint(const std::string& i_movementDirection) const {
   if (i_movementDirection == "CCW" or i_movementDirection == "CW") {
     return getJoint(BaseJoint::Rotational);
   }
@@ -192,6 +192,6 @@ BaseJoint::JointPointer JointController::resolveJoint(const std::string& i_movem
 }
 
 
-BaseJoint::JointPointer JointController::resolveJoint(const BaseJoint::MovementType& i_movementType) {
+BaseJoint::JointPointer JointController::resolveJoint(const BaseJoint::MovementType& i_movementType) const {
   return getJoint(i_movementType);
 }
