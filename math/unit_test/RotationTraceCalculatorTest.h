@@ -12,6 +12,7 @@
 #include <RotationTrace.h>
 #include <RotationTraceCalculator.h>
 #include <RobotIO.h>
+#include <ConstantSpeedController.h>
 
 
 class RotationTraceCalculatorTest : public CxxTest::TestSuite {
@@ -68,7 +69,7 @@ class RotationTraceCalculatorTest : public CxxTest::TestSuite {
 
     RotationTraceCalculator rotationTraceCalculator(&robot);
     rotationTraceCalculator.setWriteLog(true);
-    rotationTraceCalculator.calculateTrace(trace);
+    rotationTraceCalculator.calculateTrace(&trace);
 
     SequenceVector sequenceVector = robot.getJointController()->getSequenceVector();
     /*
