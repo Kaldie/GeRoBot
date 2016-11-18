@@ -48,6 +48,10 @@ class BaseRobotItem {
   virtual QVariant data(int row,int column) const;
   virtual bool setData(int row,int column, const QVariant &value);
 
+  /**
+   *  brief: Preforming all the stuff needed to show a valid/ full item.
+   *  Including making child elements
+   */
   virtual bool construct() = 0;
   virtual QVariant getPropertyData(int row,int column) const =0;
   virtual bool setPropertyData(int row,int column, const QVariant &value) =0;
