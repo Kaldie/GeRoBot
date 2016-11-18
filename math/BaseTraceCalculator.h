@@ -2,8 +2,7 @@
 #ifndef MATH_BASETRACECALCULATOR_H_
 #define MATH_BASETRACECALCULATOR_H_
 
-#include <Robot.h>
-
+class Robot;
 class Point2D;
 class Trace;
 

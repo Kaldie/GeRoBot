@@ -2,6 +2,7 @@
 
 #include <macroHeader.h>
 #include <Point2D.h>
+#include <Robot.h>
 #include <PinState.h>
 #include <BaseJoint.h>
 #include <JointController.h>

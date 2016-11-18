@@ -1,9 +1,11 @@
 // Copyright Ruud Cools [2015]
 #include <macroHeader.h>
 #include <Point2D.h>
-#include "./OTSA.h"
+#include <OTSA.h>
+
 namespace tsa {
   namespace otsa {
+
     // order an group of traces
     void orderVector(TraceSection* io_traces,
                      const Point2D& i_startPosition) {

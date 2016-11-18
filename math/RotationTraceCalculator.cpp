@@ -1,4 +1,5 @@
 #include <macroHeader.h>
+#include <Robot.h>
 #include <RotationTraceCalculator.h>
 #include <LineTraceCalculator.h>
 #include <RotationTrace.h>

@@ -2,6 +2,7 @@
 #include <macroHeader.h>
 #include <Point2D.h>
 #include <BaseTraceCalculator.h>
+#include <Robot.h>
 #include <Trace.h>
 #include <BaseMotor.h>
 #include <BaseJoint.h>
