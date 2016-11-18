@@ -16,10 +16,12 @@ ConstantSpeedController::ConstantSpeedController(float i_speed)
   : ConstantSpeedController(i_speed, 0) {
 }
 
+
 ConstantSpeedController::ConstantSpeedController(float i_robotSpeed, float i_motorSpeed)
   : SpeedController("ConstantSpeedController", i_robotSpeed),
     m_jointSpeed(i_motorSpeed) {
 }
+
 
 /// This method will be called at the moment the robot needs to decied on some speed
 bool ConstantSpeedController::adviseSpeed(int* o_speed) {
@@ -27,13 +29,12 @@ bool ConstantSpeedController::adviseSpeed(int* o_speed) {
   return false;
 }
 
+
 /**
  * This is call just before a algorithm determins movement of the robot
  */
 void ConstantSpeedController::prepareSpeedController(
-  const Trace& i_trace,
-  const JointController& i_controller) {
-
+  const Trace& i_trace,  const JointController& i_controller) {
   int estimateNumberOfRotationSteps = abs(
     i_trace.getStartPoint().getAngleBetweenPoints(i_trace.getEndPoint()) /
     (i_controller.resolveJoint(BaseJoint::Rotational))->getMovementPerStep());

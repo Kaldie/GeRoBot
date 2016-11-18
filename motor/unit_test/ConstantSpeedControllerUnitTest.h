@@ -51,7 +51,7 @@ class ConstantSpeedControllerUnitTest : public CxxTest::TestSuite {
     ConstantSpeedController b = ConstantSpeedController(40);
     b.prepareSpeedController(trace, controller);
     int speed;
-    // test speed when the robot speed is limiting
+    // test speed when the robot speed/ linear joint is limiting
     b.adviseSpeed(&speed);
     TS_ASSERT_EQUALS(speed, 160);
 
@@ -68,9 +68,10 @@ class ConstantSpeedControllerUnitTest : public CxxTest::TestSuite {
     b.adviseSpeed(&speed);
     TS_ASSERT_EQUALS(speed, 300);
 
-    // test that increasing the motor which is not responsible for the most part of the movement is not responsible for setting the max speed
+    /* test that increasing the motor which is not responsible for the most part of the movement
+       is not responsible for setting the max speed */
     driver = static_cast<StepperDriver*>(m_rotationalJoint->getMotor());
-    driver->setPullIn(400);
+    driver->setPullIn(500);
     b.prepareSpeedController(trace, controller);
     b.adviseSpeed(&speed);
     TS_ASSERT_EQUALS(speed, 300);
@@ -83,6 +84,7 @@ class ConstantSpeedControllerUnitTest : public CxxTest::TestSuite {
     controller.addJoint(m_translationalJoint);
     Trace trace = Trace(Point2D(10,0), Point2D(10,10));
 
+    // test speed when the robot speed/ linear joint is limiting
     StepperDriver* driver = static_cast<StepperDriver*>(m_rotationalJoint->getMotor());
     driver->setPullIn(400);
 

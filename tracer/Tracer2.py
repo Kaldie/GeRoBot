@@ -225,11 +225,11 @@ class Trace (object) :
 	myAxes.plot(zip(*self.__trace)[0], zip(*self.__trace)[1], 'g.-')
         myAxes.plot(zip(*self.__newTrace)[0], zip(*self.__newTrace)[1], 'b.-')
 
-	myAxes.plot([0,-44.1369],[0,15.8587])
-	myAxes.plot([0,-15.8587],[0,44.1369])
+        #myAxes.plot([0,-44.1369],[0,15.8587])
+        #xmyAxes.plot([0,-15.8587],[0,44.1369])
         #myAxes.set_ylim([-100,100])
         #myAxes.set_xlim([-100,100])
-        myAxes.add_artist(circle1)
+        #myAxes.add_artist(circle1)
         show()
 
 
@@ -291,11 +291,10 @@ if __name__=="__main__":
 
     trace=Trace()
     if len(sys.argv)==1:
-	fileName=r"/home/ruud/Projects/GeRoArm/motor/stepLog.log"
-        print fileName
+        fileName=r"/home/ruud/Projects/GeRoArm/motor/stepLog.log"
     else:
 	fileName=sys.argv[1]
-        print fileName
+    print fileName
 
     trace.createTrace(fileName)
     print trace

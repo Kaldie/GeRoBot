@@ -16,24 +16,6 @@ class LineTraceCalculationTest : public CxxTest::TestSuite {
  public:
   Robot robot;
   void setUp() {
-    StepperDriver stepperDriver1({5, 6, 7});
-    StepperDriver stepperDriver2({2, 3, 4});
-    TranslationalJoint<StepperDriver> translationalJoint;
-    translationalJoint.setPosition(50.0);
-    translationalJoint.setMovementPerStep(0.01);
-    RotationalJoint<StepperDriver> rotationalJoint;
-    rotationalJoint.setPosition(PI/2);
-    rotationalJoint.setMovementPerStep(0.01 * PI/180);
-    *rotationalJoint.getMotor() = stepperDriver1;
-    *translationalJoint.getMotor() = stepperDriver2;
-    JointController jointController;
-    jointController.addJoint(rotationalJoint.clone());
-    jointController.addJoint(translationalJoint.clone());
-    robot.setJointController(std::make_shared<JointController>(jointController));
-    LOG_DEBUG("Number of joints: " << jointController.getNumberOfJoints());
-    LOG_DEBUG("Position: " << 
-	      robot.getJointController()->resolveJoint(BaseJoint::Rotational)->getPosition());
-    LOG_DEBUG("Number of joints: " << robot.getJointController()->getNumberOfJoints());
   }
 
   void testLineTraceCalculation() {
@@ -57,12 +39,12 @@ class LineTraceCalculationTest : public CxxTest::TestSuite {
     sequenceVector.exportValue();
         try {
         LOG_DEBUG("here!!");
-        robot.actuate();
+        //     robot.actuate();
     } catch(const std::runtime_error& e) {
 	  throw e;
         LOG_INFO("Could not find sizzle");
     }
-    return;
+        //    return;
 
 
     /// Tests
@@ -72,7 +54,7 @@ class LineTraceCalculationTest : public CxxTest::TestSuite {
                      26458);
 
     SequenceVector sequenceVector1 = robot.getJointController()->getSequenceVector();
-    
+
     /// testing condensing on this big vector
     sequenceVector1.normalise();
     long totalNumberOfReps = 0;

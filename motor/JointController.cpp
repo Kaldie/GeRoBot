@@ -163,16 +163,16 @@ void JointController::uploadSequence(const bool& i_condense) {
   if (i_condense) {
     m_sequenceVector.condenseVector();
   }
-  unsigned long sendCount = 0;
 #ifdef DEBUG
+  unsigned long sendCount = 0;
   unsigned long totalSize = m_sequenceVector.getSequenceVector().size();
 #endif
   for (const auto& stateSequence : m_sequenceVector) {
     /// Get the integer sequence of this pin state
     if (stateSequence.getNumberOfRepetitions() > 0) {
       m_actuator.upload(stateSequence.createArduinoBuffer());
-      ++sendCount;
 #ifdef DEBUG
+      ++sendCount;
       LOG_DEBUG("Percentage send: " <<
                 static_cast<float>(sendCount) / totalSize * 100 << "%.");
 #endif
