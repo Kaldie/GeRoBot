@@ -6,7 +6,7 @@
 const QList<QString> SpeedControllerItem::propertyList{"Name", "RobotSpeed"};
 
 SpeedControllerItem::SpeedControllerItem(BaseRobotItem* i_parent,
-                                         SpeedController::SpeedControllerPointer i_speedController)
+                                         const SpeedController::SpeedControllerPointer& i_speedController)
         : BaseRobotItem("SpeedController",i_parent),
           m_speedController(i_speedController) {
   LOG_DEBUG(getElementName().toStdString());
@@ -14,8 +14,8 @@ SpeedControllerItem::SpeedControllerItem(BaseRobotItem* i_parent,
 }
 
 bool SpeedControllerItem::setPropertyData(int i_row,
-                                   int i_column,
-                                   const QVariant& i_data){
+                                          int i_column,
+                                          const QVariant& i_data){
   if(i_column!=1)
     return false;
 

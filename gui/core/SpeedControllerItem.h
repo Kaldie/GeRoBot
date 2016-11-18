@@ -18,7 +18,7 @@ private:
 
 public:
         SpeedControllerItem(BaseRobotItem* i_parent,
-                            SpeedController::SpeedControllerPointer i_speedController);
+                            const SpeedController::SpeedControllerPointer& i_speedController);
         virtual bool construct();
         virtual QVariant getPropertyData(int row,int column) const;
         virtual bool setPropertyData(int row,int column, const QVariant &value);
