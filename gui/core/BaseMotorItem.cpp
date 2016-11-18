@@ -19,14 +19,14 @@ QVariant BaseMotorItem::getPropertyData(int i_row,
   } else if(i_row == BaseMotorItem::
 	    propertyList.indexOf("DefaultDirection")) {
     if (i_column == 0) {
-      return QVariant(QString("Default Direction"));
+      return QVariant("Default Direction");
     } else {
       return QVariant(QString(m_baseMotor->getDefaultDirection().c_str()));
     }
   } else if(i_row == BaseMotorItem::
 	    propertyList.indexOf("HoldMotor")) {
     if(i_column == 0) {
-      return QVariant(QString("Hold Motor"));
+      return QVariant("Hold Motor");
     } else {
       return m_baseMotor->getHoldMotor();
     }
@@ -71,5 +71,5 @@ bool BaseMotorItem::addPinStateItem(){
 }
 
 bool BaseMotorItem::construct(){
-	return addPinStateItem() &&createChilderen(BaseMotorItem::propertyList); 
+        return addPinStateItem() && createChilderen(BaseMotorItem::propertyList);
 }
