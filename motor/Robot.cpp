@@ -9,6 +9,7 @@
 #include <Trace.h>
 #include <RotationTraceCalculator.h>
 #include <RotationTrace.h>
+#include <Point2D.h>
 
 int stepsMissed = 0;
 
@@ -57,6 +58,19 @@ void Robot::goToPosition(const Point2D &i_position) {
   LOG_DEBUG("new position: " << m_virtualPosition.x << m_virtualPosition.y);
   actuate();
 }
+
+
+void Robot::setPosition(const Point2D& i_position) {
+  if (m_jointController->getNumberOfJoints() != 2) {
+    LOG_ERROR("Cannot set the position if the number of joints is more then 2");
+  }
+
+  m_jointController->resolveJoint(BaseJoint::MovementType::Translational)->setPosition(magnitude(i_position));
+  m_jointController->resolveJoint(BaseJoint::MovementType::Rotational)->setPosition(i_position.getAngleToOrigin());
+
+
+}
+
 
 
 void Robot::traceCalculation(const Trace::TracePointer& i_trace) {
