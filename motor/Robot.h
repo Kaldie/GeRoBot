@@ -19,7 +19,7 @@ class Robot {
   GETSET(JointController::JointControllerPointer, m_jointController, JointController);
 
   // Position of the head of the robot
-  GETSET(Point2D, m_position, Position);
+  GET(Point2D, m_position, Position);
 
   // Position after current actuations
   GETSET(Point2D, m_virtualPosition, VirtualPosition);
@@ -39,6 +39,8 @@ class Robot {
   /// returns a pointer to the actual position
   Point2D* getPositionPointer() {return &m_position;}
 
+  /// sets the robot to a position updates its joints to go there 2!
+  void setPosition(const Point2D& i_position);
 
   /// Creates a state which will switch the tool to a active or inactive state
   void switchTool(const bool& i_shouldBeActive) {}; // no yet implemented!
