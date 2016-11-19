@@ -34,7 +34,8 @@ class Trace (object) :
 
     def __init__(self):
        "Robot settings"
-       self.__rotStep = 0.001654411764706 # rotation per step
+       self.__rotStep = 0.001654411764706 * (numpy.pi / 180.0) # rotation per step in radians
+       print self.__rotStep
        self.__transStep = 0.005 #translation in mm
 
        self.__minArm = 50.0# length of the minimum arm
@@ -55,7 +56,7 @@ class Trace (object) :
 
        #rotation in degree where 0 is perpendicular to the work piece minus angle ccw and positive cw
        self.__currentRotation = numpy.arctan2(self.__currentPosition[1],
-                                              self.__currentPosition[0])*180/numpy.pi
+                                              self.__currentPosition[0])
 
        self.__currentExtension = (self.__currentPosition[0] * self.__currentPosition[0] +
                                  self.__currentPosition[1] * self.__currentPosition[1])**0.5
@@ -168,8 +169,8 @@ class Trace (object) :
 
       DBG_MSG( "Starting translation")
       DBG_MSG (self.__currentRotation)
-      unitTranslation = numpy.array([numpy.cos(self.__currentRotation * (numpy.pi / 180.)), 
-                                     numpy.sin(self.__currentRotation * (numpy.pi / 180.))])
+      unitTranslation = numpy.array([numpy.cos(self.__currentRotation),
+                                     numpy.sin(self.__currentRotation)])
       DBG_MSG("Current extension: " + str(self.__currentExtension))
       DBG_MSG("Current rotation: " + str(self.__currentRotation))
 
@@ -196,7 +197,7 @@ class Trace (object) :
       currentX=numpy.copy(self.__currentPosition[0])
       currentY=numpy.copy(self.__currentPosition[1])
 
-      rotation = self.__rotStep * (numpy.pi / 180.) * rotationPolarity * i_numberOfSteps
+      rotation = self.__rotStep * rotationPolarity * i_numberOfSteps
       
       self.__currentPosition[0] = numpy.cos(rotation) * currentX - numpy.sin(rotation) * currentY
       self.__currentPosition[1] = numpy.sin(rotation) * currentX + numpy.cos(rotation) * currentY
