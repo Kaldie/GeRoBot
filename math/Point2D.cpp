@@ -40,7 +40,7 @@ bool Point2D::operator==(const Point2D& i_other) const {
 }
 
 
-traceType Point2D::getAngleToOrigin() {
+traceType Point2D::getAngleToOrigin() const {
   return getAlpha();
 }
 
