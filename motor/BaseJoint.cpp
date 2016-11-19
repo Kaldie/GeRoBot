@@ -53,11 +53,13 @@ Point2D BaseJoint::childPosition() const {
 // return child position
 void BaseJoint::childPosition(Point2D* o_position, traceType* o_angle) const {
   *o_angle += getAngle();
-  o_position->x += getLength() * cos(*o_angle);
-  o_position->y += getLength() * sin(*o_angle);
-  LOG_DEBUG("Current angle: " << *o_angle);
-  LOG_DEBUG("Current length: " << getLength());
-  LOG_DEBUG("Current child position: " << *o_position);
+  if (getLength() != 0) {
+    o_position->x += getLength() * cos(*o_angle);
+    o_position->y += getLength() * sin(*o_angle);
+    LOG_DEBUG("Current angle: " << *o_angle);
+    LOG_DEBUG("Current length: " << getLength());
+    LOG_DEBUG("Current child position: " << *o_position);
+  }
   if (auto child = m_child.lock()) {
     child->childPosition(o_position, o_angle);
   }
