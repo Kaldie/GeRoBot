@@ -60,9 +60,7 @@ class BaseJoint {
 
     /**
      * Set actual steps
-     * This function updates the position of the joint
-     * Call this function when you have determined
-     * that setting the step is a great idea and want to actualise it
+     * Updates the Sequencevector so when actuate is called it does this
      */
     void moveSteps(const std::string& i_directionString,
                    const int& i_numberOfSteps,
@@ -70,13 +68,13 @@ class BaseJoint {
 
     /**
      * Predict the final position after setting steps
-     * @param[in] io_robotPosition position of the robot
+     * @param[in] io_currentPosition current position of the robot
      * @param[in] i_direction Direction which the joint will move
      * @param[in] i_number Number of steps to be taken
      */
-    virtual void predictSteps(Point2D* io_robotPosition,
+    virtual void predictSteps(Point2D* io_currentPosition,
                               const std::string& i_direction,
-                              const int& i_number) = 0;
+                              const int& i_number) const = 0;
 
     /// Return the distance traveled with one step
     virtual traceType distancePerStep() const = 0;
@@ -88,6 +86,9 @@ class BaseJoint {
      */
     std::shared_ptr<BaseJoint> clone() const {
       return std::shared_ptr<BaseJoint>( this->cloneImpl() ); }
+
+    /// from this joint, walk down the tree and get the extension of the farthest child
+    const Point2D childPosition() const;
 
     /// default constructor
     BaseJoint();
@@ -101,11 +102,6 @@ class BaseJoint {
 
     /// Is in range of the joint.
     void isInRange(traceType i_jointPosition) const;
-
-    // return child position
-    Point2D childPosition() const;
-
-    void childPosition(Point2D* o_position, traceType* o_angle) const;
 
     // return the angle and position of the parent
     void parentPosition(Point2D* o_position, traceType* o_angle) const;
@@ -125,5 +121,8 @@ class BaseJoint {
      * @param[in] i_direction direction the joint has to move
      */
     const std::string convertDirection(const std::string i_direction)const;
+
+
+    void childPosition(Point2D* o_position, traceType* o_angle) const;
 };
 #endif  // MOTOR_BASEJOINT_H_
