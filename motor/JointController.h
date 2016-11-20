@@ -3,7 +3,6 @@
 #define MOTOR_JOINTCONTROLLER_H_
 
 #include <ArduinoMotorDriver.h>
-#include <StateSequence.h>
 #include <SequenceVector.h>
 #include <BaseJoint.h>
 
@@ -78,7 +77,13 @@ class JointController {
    * returns the number of joints currently registed
    */
    int getNumberOfJoints() {return m_jointPointerVector.size();}
- private:
+
+
+   /**
+    * Get the root joint, this joint is therefor the base of the robot
+    */
+   const BaseJoint::JointPointer getRootJoint() const;
+private:
 
    /**
    * returns if the joint is ready to be added to the robot
