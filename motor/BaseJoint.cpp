@@ -42,7 +42,7 @@ const std::string BaseJoint::convertDirection(
 }
 
 
-Point2D BaseJoint::childPosition() const {
+const Point2D BaseJoint::childPosition() const {
   Point2D position(0,0);
   traceType angle = 0.0;
   childPosition(&position, &angle);
@@ -50,7 +50,7 @@ Point2D BaseJoint::childPosition() const {
 }
 
 
-// return child position
+// calculate the child position
 void BaseJoint::childPosition(Point2D* o_position, traceType* o_angle) const {
   *o_angle += getAngle();
   if (getLength() != 0) {
@@ -85,6 +85,8 @@ void BaseJoint::moveSteps(const std::string& i_directionString,
   getMotor()->moveSteps(convertDirection(i_directionString),
                        i_numberOfSteps,
                        i_vector);
+  m_currentPosition +=
+    getMovementPerStep() * getPositionModifier(i_directionString) * i_numberOfSteps;
 }
 
 
