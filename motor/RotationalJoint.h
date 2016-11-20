@@ -14,7 +14,7 @@ class RotationalJoint: public BaseJoint {
   virtual ActuatorType* getMotor();
 
   // Actual methods!
-  void predictSteps(Point2D*, const std::string&, const int&);
+  void predictSteps(Point2D*, const std::string&, const int&) const;
 
   std::shared_ptr<RotationalJoint<ActuatorType>> clone() const {
     return std::shared_ptr
@@ -88,11 +88,12 @@ getPositionModifier(const std::string& i_direction) const {
 template <class ActuatorType>
 void RotationalJoint<ActuatorType>::predictSteps(Point2D* o_robotPosition,
                                                  const std::string& i_directionString,
-                                                 const int& i_numberOfSteps) {
+                                                 const int& i_numberOfSteps) const {
+  LOG_ERROR("lala");
   Point2D relativePosition(childPosition());
   Point2D rotationPoint(*o_robotPosition - relativePosition);
   traceType addedRotation = m_movementPerStep *
-    (getPositionModifier(i_directionString) * i_numberOfSteps);
+    getPositionModifier(i_directionString) * i_numberOfSteps;
   // Debug info
   LOG_DEBUG("Position modifier is: "<< getPositionModifier(i_directionString));
   LOG_DEBUG("Movement per step is: " << m_movementPerStep);
@@ -103,8 +104,6 @@ void RotationalJoint<ActuatorType>::predictSteps(Point2D* o_robotPosition,
 
   // Rotate the robot around the rotation point
   relativePosition.rotate(addedRotation);
-  // update current position
-  m_currentPosition += addedRotation;
   // Update the robot position
   *o_robotPosition = rotationPoint + relativePosition;
   LOG_DEBUG("New position: " << *o_robotPosition);

@@ -11,7 +11,7 @@ class TranslationalJoint: public BaseJoint {
     // Actual methods!
     virtual void predictSteps(Point2D*,
                               const std::string&,
-                              const int&);
+                              const int&) const;
 
     virtual ActuatorType* getMotor();
 
@@ -87,7 +87,7 @@ template <class ActuatorType>
 void TranslationalJoint<ActuatorType>::
 predictSteps(Point2D* o_robotPosition,
              const std::string& i_directionString,
-             const int& i_numberOfSteps) {
+             const int& i_numberOfSteps) const {
   //initialise variable
   Point2D relativeRobotPosition(0,0);
   traceType angle(0.0);
@@ -98,8 +98,6 @@ predictSteps(Point2D* o_robotPosition,
     getPositionModifier(i_directionString) * i_numberOfSteps;
   // Determine the new relative length of the robot
   double newLength = magnitude(relativeRobotPosition) + addedExtension;
-  // Update the current position of the joint
-  m_currentPosition += addedExtension;
   // Update the current end position of the robot
   o_robotPosition->x += cos(angle) * newLength;
   o_robotPosition->y += sin(angle) * newLength;
