@@ -142,6 +142,16 @@ bool JointController::hasJoint(const BaseJoint::JointPointer& i_jointPointer) co
 }
 
 
+const BaseJoint::JointPointer JointController::getRootJoint() const {
+  for (auto jointPointer : m_jointPointerVector) {
+    if (jointPointer->getParent().expired()) {
+      return jointPointer;
+    }
+  }
+  LOG_ERROR("Could not find a parent joint!");
+}
+
+
 void JointController::moveSteps(const std::string& i_directionString,
                                 const int& i_numberOfSteps) {
   resolveJoint(i_directionString)->
