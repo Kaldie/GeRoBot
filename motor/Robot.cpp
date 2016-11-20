@@ -27,7 +27,6 @@ Robot::Robot(const JointController::JointControllerPointer& i_pointer,
              const Point2D& i_currentPosition)
   : m_jointController(i_pointer),
     m_position(i_currentPosition),
-    m_virtualPosition(i_currentPosition),
     m_speedController(std::make_shared<ConstantSpeedController>()) {
 }
 
@@ -39,7 +38,7 @@ bool Robot::hasValidConnection() {
       return true;
     }
   }
-  return true;
+  return false;
 }
 
 
@@ -55,7 +54,7 @@ void Robot::goToPosition(const Point2D &i_position) {
   BaseTraceCalculator baseTraceCalculator(this);
   Trace thisTrace(m_position, i_position);
   baseTraceCalculator.calculateTrace(&thisTrace);
-  LOG_DEBUG("new position: " << m_virtualPosition.x << m_virtualPosition.y);
+  LOG_DEBUG("new position: " << getVirutalPosition().x << getVirutalPosition().y);
   actuate();
 }
 
@@ -65,10 +64,16 @@ void Robot::setPosition(const Point2D& i_position) {
     LOG_ERROR("Cannot set the position if the number of joints is more then 2");
   }
 
-  m_jointController->resolveJoint(BaseJoint::MovementType::Translational)->setPosition(magnitude(i_position));
-  m_jointController->resolveJoint(BaseJoint::MovementType::Rotational)->setPosition(i_position.getAngleToOrigin());
+  m_jointController->resolveJoint(BaseJoint::MovementType::Translational)
+    ->setPosition(magnitude(i_position));
+  m_jointController->resolveJoint(BaseJoint::MovementType::Rotational)
+    ->setPosition(i_position.getAngleToOrigin());
+  m_position = i_position;
+}
 
 
+const Point2D Robot::getVirtualPosition() const {
+  return m_jointController->getRootJoint()->childPosition();
 }
 
 
@@ -78,8 +83,10 @@ void Robot::traceCalculation(const Trace::TracePointer& i_trace) {
 
   if (i_trace->getTraceType() == Trace::TraceType::Curve) {
     traceCalculator = std::unique_ptr<BaseTraceCalculator>(new RotationTraceCalculator(this));
-  } else {
+  } else if (i_trace->getTraceType() == Trace::TraceType::Line) {
     traceCalculator = std::unique_ptr<BaseTraceCalculator>(new LineTraceCalculator(this));
+  } else {
+    LOG_ERROR("Could not resolve trace type!");
   }
   m_speedController->prepareSpeedController(*i_trace, *m_jointController);
   traceCalculator->calculateTrace(i_trace.get());
@@ -90,9 +97,9 @@ void Robot::prepareSteps(const std::string& i_direction,
                          const int& i_numberOfSteps) {
   // predict the next step
   BaseJoint::JointPointer joint = m_jointController->resolveJoint(i_direction);
-  joint->predictSteps(&m_virtualPosition, i_direction, i_numberOfSteps);
-  // add the point to the traveled points
-  m_traveledPoints.push_back(m_virtualPosition);
+#ifdef DEBUG
+  m_traveledPoints.push_back(getVirtualPosition());
+#endif
   // add the step to the sequence
   m_jointController->moveSteps(i_direction, i_numberOfSteps);
   m_speedController->notifyStep(joint, i_numberOfSteps);
@@ -115,8 +122,7 @@ void Robot::actuate() {
   // reset the traveledPoints vector
   std::vector<Point2D> empty;
   m_traveledPoints.swap(empty);
-  // After the actuation, the virtual position is the actual position
-  m_position = m_virtualPosition;
+  m_position = getVirtualPosition();
 }
 
 

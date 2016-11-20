@@ -18,11 +18,8 @@ class Robot {
   // Handles the joints and can update the position after a step
   GETSET(JointController::JointControllerPointer, m_jointController, JointController);
 
-  // Position of the head of the robot
+  // The current position of the head of the robot
   GET(Point2D, m_position, Position);
-
-  // Position after current actuations
-  GETSET(Point2D, m_virtualPosition, VirtualPosition);
 
   // Positions which has been seen during stepping
   GETSET(std::vector<Point2D>, m_traveledPoints, TraveledPoints);
@@ -36,8 +33,9 @@ class Robot {
   /// Returns if there is a valid arduino connenction
   bool hasValidConnection();
 
-  /// returns a pointer to the actual position
-  Point2D* getPositionPointer() {return &m_position;}
+
+  /// Based on the joints in the controller, calculated the current position
+  const Point2D getVirtualPosition() const;
 
   /// sets the robot to a position updates its joints to go there 2!
   void setPosition(const Point2D& i_position);
