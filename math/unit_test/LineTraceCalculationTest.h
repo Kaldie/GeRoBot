@@ -28,7 +28,6 @@ class LineTraceCalculationTest : public CxxTest::TestSuite {
     Point2D startPoint(0, 255);
     Point2D endPoint(-100, 255);
     Trace trace(startPoint, endPoint);
-    robot.setVirtualPosition(startPoint);
     robot.setPosition(startPoint);
 
     LineTraceCalculator lineTraceCalculator(&robot);

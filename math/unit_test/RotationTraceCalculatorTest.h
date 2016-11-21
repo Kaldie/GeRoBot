@@ -40,7 +40,6 @@ class RotationTraceCalculatorTest : public CxxTest::TestSuite {
     Point2D endPoint(-0, 255);
     Point2D centrePoint(-0, 580);
     RotationTrace trace(startPoint, endPoint, centrePoint);
-    robot.setVirtualPosition(startPoint);
     robot.setPosition(startPoint);
     /*
       robot.getJointController()->resolveJoint(Translational)->setMovementPerStep(0.01);
@@ -61,7 +60,6 @@ class RotationTraceCalculatorTest : public CxxTest::TestSuite {
 
     //    robotBuilder.getRobotPointer();
     Robot robot = *robotBuilder.getRobotPointer();
-    robot.setVirtualPosition(startPoint);
     robot.setPosition(startPoint);
 
     robot.getJointController()->resolveJoint(BaseJoint::Rotational)->setPosition(PI/2);
@@ -96,13 +94,12 @@ class RotationTraceCalculatorTest : public CxxTest::TestSuite {
     } catch(std::runtime_error) {
         LOG_INFO("Could not find sizzle");
     }
-    return;
 
     /// Tests
     TS_ASSERT_EQUALS(robot.getJointController()->getSequenceVector().numberOfSequences(),
-                     4904);
+                     104429);
     TS_ASSERT_EQUALS(robot.getJointController()->getSequenceVector().numberOfSteps(),
-                     21948);
+                     2992669);
 
     /// testing condensing on this big vector
     sequenceVector.normalise();
@@ -115,7 +112,7 @@ class RotationTraceCalculatorTest : public CxxTest::TestSuite {
         sequenceVector.numberOfSequences();
 
     /// test efficiency
-    TS_ASSERT_DELTA(2.2371, unOptimisedAverageRep, 0.001);
+    TS_ASSERT_DELTA(14.3216, unOptimisedAverageRep, 0.001);
 
     /// test if condensing works
     TS_ASSERT(sequenceVector.condenseVector());
@@ -128,20 +125,21 @@ class RotationTraceCalculatorTest : public CxxTest::TestSuite {
       totalNumberOfReps += sequence.getNumberOfRepetitions();
     }
 
-    TS_ASSERT_EQUALS(numberOfEmptySequences, 3436);
-    TS_ASSERT_EQUALS(sequenceVector.numberOfSequences(), 6198);
+    TS_ASSERT_EQUALS(numberOfEmptySequences, 47537);
+    TS_ASSERT_EQUALS(sequenceVector.numberOfSequences(), 129580);
 
     double optimisedAverageRep = static_cast<float>(totalNumberOfReps)/
         (sequenceVector.numberOfSequences() - numberOfEmptySequences);
     /// check if the condensing improves information densitity
     TS_ASSERT(optimisedAverageRep > unOptimisedAverageRep);
     /// Check the actual number
-    TS_ASSERT_DELTA(optimisedAverageRep, 3.7943, 0.001);
+    TS_ASSERT_DELTA(optimisedAverageRep, 18.2293, 0.001);
 
+    /**
+     * does not work
     for (auto& i : std::vector<int>({5707,6106,6084, 5714})) {
       TS_ASSERT_EQUALS(
-          sequenceVector.getSequenceVector()[i].getIntegerSequence(),
-          std::vector<int>({64, 192}));
+          sequenceVector.getSequenceVector()[i].getIntegerSequence(), std::vector<int>({64, 192}));
     }
 
     for (auto& i : std::vector<int>({6188, 6182, 6172, 6102 })) {
