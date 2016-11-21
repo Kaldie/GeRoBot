@@ -252,7 +252,5 @@ void RotationTrace::reverse() {
 
 traceType RotationTrace::getPerpendicularDistance
 (const Point2D& i_position) const {
-  Vector2D gradient(i_position.y, -1 * i_position.x);
-  Line2D gradientLine(i_position, i_position + gradient);
-  return magnitude(getArc().nearestIntersection(gradientLine) - i_position);
+  return abs(magnitude(i_position - m_centrePoint) - getArc().radius());
 }
