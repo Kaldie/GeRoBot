@@ -12,7 +12,7 @@ const int ArduinoMotorDriver::UPLOAD_MODE_VALUE =
 
 
 ArduinoMotorDriver::ArduinoMotorDriver()
-  : m_serialRegularExpresion("lalal") {
+  : m_serialRegularExpresion("") {
 }
 
 
