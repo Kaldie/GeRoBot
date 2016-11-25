@@ -33,10 +33,7 @@ Robot::Robot(const JointController::JointControllerPointer& i_pointer,
 
 bool Robot::hasValidConnection() {
   if (m_jointController) {
-    if (m_jointController->getActuatorPointer()->
-        getArduinoConnection().hasConnection()) {
-      return true;
-    }
+    return m_jointController->getActuatorPointer()->hasConnection(true);
   }
   return false;
 }
@@ -54,7 +51,7 @@ void Robot::goToPosition(const Point2D &i_position) {
   BaseTraceCalculator baseTraceCalculator(this);
   Trace thisTrace(m_position, i_position);
   baseTraceCalculator.calculateTrace(&thisTrace);
-  LOG_DEBUG("new position: " << getVirutalPosition().x << getVirutalPosition().y);
+  LOG_DEBUG("new position: " << getVirtualPosition().x << getVirtualPosition().y);
   actuate();
 }
 
@@ -63,7 +60,6 @@ void Robot::setPosition(const Point2D& i_position) {
   if (m_jointController->getNumberOfJoints() != 2) {
     LOG_ERROR("Cannot set the position if the number of joints is more then 2");
   }
-
   m_jointController->resolveJoint(BaseJoint::MovementType::Translational)
     ->setPosition(magnitude(i_position));
   m_jointController->resolveJoint(BaseJoint::MovementType::Rotational)
@@ -80,7 +76,6 @@ const Point2D Robot::getVirtualPosition() const {
 
 void Robot::traceCalculation(const Trace::TracePointer& i_trace) {
   std::unique_ptr<BaseTraceCalculator> traceCalculator;
-
   if (i_trace->getTraceType() == Trace::TraceType::Curve) {
     traceCalculator = std::unique_ptr<BaseTraceCalculator>(new RotationTraceCalculator(this));
   } else if (i_trace->getTraceType() == Trace::TraceType::Line) {
@@ -115,6 +110,7 @@ void Robot::prepareSteps(const std::string& i_direction,
 
 void Robot::actuate() {
   LOG_DEBUG("Steps missed: " << stepsMissed);
+  LOG_DEBUG("Regular expression: " << m_jointController->getActuator().getSerialRegularExpresion());
   // upload the current sequence
   m_jointController->uploadSequence(false);
   // Send the command to actuate the sequence

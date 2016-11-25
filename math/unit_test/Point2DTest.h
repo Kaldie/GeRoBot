@@ -84,9 +84,14 @@ class Point2DTest : public CxxTest::TestSuite {
   }
 
   void testConversionFromPointToQPointF() {
+#ifndef QT
+    TS_SKIP("Test is skiped due to lack of QT");
+    return;
+#else
     const Point2D x(10,12);
     QPointF y = x;
     LOG_DEBUG(y.x());
+#endif  // QT
   }
 };
 

@@ -32,13 +32,15 @@ class LineTraceCalculationTest : public CxxTest::TestSuite {
 
     LineTraceCalculator lineTraceCalculator(&robot);
     lineTraceCalculator.setWriteLog(true);
+    LOG_DEBUG("Expression: " << robot.getJointController()->getActuator().getSerialRegularExpresion());
     lineTraceCalculator.calculateTrace(trace);
+
     SequenceVector sequenceVector = robot.getJointController()->getSequenceVector();
     //    sequenceVector.condenseVector();
     sequenceVector.exportValue();
         try {
         LOG_DEBUG("here!!");
-        //     robot.actuate();
+        robot.actuate();
     } catch(const std::runtime_error& e) {
 	  throw e;
         LOG_INFO("Could not find sizzle");

@@ -3,7 +3,7 @@
     <JOINTCONTROLLER>
       <ACTUATOR>
 	<TYPE>Arduino</TYPE>
-	<REGULAR_EXPRESSION>RuudWorld</REGULAR_EXPRESSION>
+	<REGULAR_EXPRESSION>/dev/ttyUSB*</REGULAR_EXPRESSION>
       </ACTUATOR>
       <JOINT name="RotationalJoint" type="StepperDriver">
 	<CHILD>TranslationalJoint</CHILD>
