@@ -113,6 +113,8 @@ void ArduinoMotorDriver::upload(const std::vector<int> i_messageVector) {
     LOG_ERROR("Message is bigger then 255 chars," <<
               " which cannot be send easely of the serial");
 
+  initialiseArduinoConnection();
+  
   // Shake it like a polaroid picture, at least untill it works
   while (!handShake(ArduinoMotorDriver::UPLOAD)) {}
 
@@ -175,6 +177,19 @@ bool ArduinoMotorDriver::sendTestBit() {
     return sendTestBit();
   }
   return true;
+}
+
+
+bool ArduinoMotorDriver::hasConnection(const bool& i_makeConnection) {
+  if (m_arduinoConnection.hasConnection()) {
+    return true;
+  }
+
+  if(i_makeConnection) {
+    initialiseArduinoConnection();
+    return hasConnection(false);
+  }
+  return false;
 }
 
 

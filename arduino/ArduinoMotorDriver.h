@@ -25,7 +25,6 @@ class ArduinoMotorDriver {
     static const int DELETE_FILE_MODE_VALUE;
 
  private:
-    std::string getSerialFileName();
     void initialiseArduinoConnection();
     bool handShake(DriverStatus i_status);
     void createRandomMessages(const int& i_numberOfMessages,
@@ -42,6 +41,8 @@ public:
     void deleteFile();
     /// Request that the arduino display its information of messages
     void echo();
+    // check if there is a connection, the input argument tells if an connection will be made if in first instance no connection is there
+    bool hasConnection(const bool& i_makeConnection);
     /// Benchmark the SD card on the system. Testing purpose often
     bool benchmarkSD(const int& i_numberOfMessages);
     bool benchmarkCurrentRobot(const SequenceVector& i_sequenceVector);
