@@ -47,13 +47,11 @@ bool RobotItem::setPropertyData(int i_row,
     Point2D point = m_robotPointer->getPosition();
     point.x = i_data.toDouble();
     m_robotPointer->setPosition(point);
-    m_robotPointer->setVirtualPosition(point);
     return true;
   } else if (i_row == RobotItem::propertyList.indexOf("CurrentPositionY")) {
     Point2D point = m_robotPointer->getPosition();
     point.y = i_data.toDouble();
     m_robotPointer->setPosition(point);
-    m_robotPointer->setVirtualPosition(point);
     return true;
   }
   return false;
