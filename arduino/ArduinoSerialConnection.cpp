@@ -241,22 +241,21 @@ int ArduinoSerialConnection::rawSerialRead(const int& i_numberOfBytes,
   int currentRead = 0;
   if (m_fileHandle == -1)
     openConnection();
-
+  LOG_INFO("Raw serial read!");
   for (int i = 0; i < i_numberOfBytes; i++) {
     /* Reads ttyO port, stores data into byte_in. */
-    currentRead = read(m_fileHandle, reinterpret_cast<void*>(buffer + i),
+    currentRead = read(m_fileHandle, static_cast<void*>(buffer + i),
                        1);
     if (currentRead == -1) {
       i--;
       numberOfFails++;
-      //      LOG_DEBUG("FAILED to read the bit, will try again!");
+      LOG_DEBUG("FAILED to read the bit, will try again!");
       // block the processor for a bit to with for arduino sending
     } else {
       bytes_read += currentRead;
       numberOfFails = 0;
-      //   LOG_INFO("read (as int): "<< static_cast<int>(buffer[i]) << " ");
+      LOG_DEBUG("read (as int): "<< static_cast<int>(buffer[i]) << " ");
     }
-
     if (numberOfFails > 100000) {
       LOG_ERROR("Failed to read out the bit!");
     }
