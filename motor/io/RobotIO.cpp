@@ -23,6 +23,12 @@ void RobotIO::build() {
 }
 
 
+Robot::RobotPointer RobotIO::buildRobot() {
+  build();
+  return m_robotPointer;
+}
+
+
 JointController RobotIO::parseJointController(
     const pugi::xml_node& i_node) {
   JointControllerIO jointControllerIO(i_node);

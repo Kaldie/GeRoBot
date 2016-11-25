@@ -22,6 +22,7 @@ class RobotIO: public XMLBuilder {
  public:
   explicit RobotIO(const std::string&);
   virtual void build();
+  Robot::RobotPointer buildRobot();
   virtual void displayTree();
   void setRobotPointer(Robot* i_robotPointer);
   bool update(const Robot::RobotPointer& i_newRobotPointer);
