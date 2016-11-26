@@ -1,7 +1,7 @@
 // Copyright [2014] Ruud Cools
 
 #include <Arduino.h>
-#include <ByteBuffer.h>
+#include "./ByteBuffer.h"
 #include <SdFat.h>
 
 // defines
@@ -56,7 +56,7 @@ enum ReturnState {
 
 // Global variables
 // Size of an received in bytes
-#define SIZE_OF_INT 4
+int SIZE_OF_INT(4);
 
 // Buffer needed to write the integers from the serial connection
 unsigned char INTEGER_BUFFER[4];
