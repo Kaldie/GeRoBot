@@ -17,6 +17,16 @@ PinState::PinState(const PinVector& i_pins)
 }
 
 
+PinState::PinState(const PinVector& i_pins, const bool& i_areSet)
+  : m_pinVector(i_pins),
+    m_numericValue(0) {
+  setPins(i_pins);
+  if (!i_areSet) {
+    m_numericValue = 0;
+  }
+}
+
+
 void PinState::resetPinState() {
   std::vector<int> zero {};
   m_pinVector.swap(zero);

@@ -42,6 +42,8 @@ class PinState {
 
   // vector of pin numbers which will be set to default value
   explicit PinState(const PinVector&);
+
+  explicit PinState(const PinVector& i_vector, const bool& i_setting);
 };
 
 #endif  // MOTOR_PINSTATE_H_
