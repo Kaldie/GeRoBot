@@ -75,7 +75,7 @@ std::vector<int> BaseTraceCalculator::getNumberOfSteps
     (m_robot->getMovementPerStep(BaseJoint::Translational));
   // Rotational difference / movement per step of Rotational joint
   int numberOfRotationSteps =
-    (std::abs(i_position.getAlpha()-endPoint.getAlpha())*(180/PI)) /
+    (std::abs(i_position.getAlpha()-endPoint.getAlpha())) /
     m_robot->getMovementPerStep(BaseJoint::Rotational);
   LOG_DEBUG("Number of translation steps: " << numberOfTranslationSteps);
   LOG_DEBUG("Number of rotation steps: " << numberOfRotationSteps);
