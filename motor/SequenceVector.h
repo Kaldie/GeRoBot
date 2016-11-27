@@ -25,11 +25,20 @@ class SequenceVector {
                            const bool& i_merge);
 
   /// shortcut the the first sequence
-  std::vector<StateSequence>::const_iterator begin()
-      const { return m_sequenceVector.begin();};
+  PinStateSequenceVector::const_iterator begin()
+       const { return m_sequenceVector.begin();};
   /// Shortcut to the one after the last sequences
-  std::vector<StateSequence>::const_iterator end()
-      const { return m_sequenceVector.end();};
+  PinStateSequenceVector::const_iterator end()
+       const { return m_sequenceVector.end();};
+
+  /// update the speed of the whole sequence
+  void modifySpeed(int i_speed);
+
+  // update the speed of the vector starting from start position
+  void modifySpeed(int i_speed, int i_startPosition);
+
+  // update the speed of the vector starting from start to end
+  void modifySpeed(int i_speed, int i_startPosition, int i_endPosition);
 
   /// Condense the sequence vector using Conderser.
   /// @param[in] i_removeElements remove elements from the vector

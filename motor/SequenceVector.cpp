@@ -227,3 +227,26 @@ void SequenceVector::exportValue() const {
     sequence.exportValue();
   }
 }
+
+
+/// update the speed of the whole sequence
+void SequenceVector::modifySpeed(int i_speed) {
+  modifySpeed(i_speed, 0, m_sequenceVector.size() - 1);
+}
+
+// update the speed of the vector starting from start position
+void SequenceVector::modifySpeed(int i_speed, int i_startPosition) {
+  modifySpeed(i_speed, i_startPosition, m_sequenceVector.size() - 1);
+}
+
+// update the speed of the vector starting from start to end
+void SequenceVector::modifySpeed(int i_speed, int i_startPosition, int i_endPosition) {
+  auto begin_iterator = m_sequenceVector.begin() + i_startPosition;
+  auto end_iterator = m_sequenceVector.begin() + i_endPosition + 1;
+
+  for (auto iterator = begin_iterator;
+       iterator != end_iterator;
+       ++iterator) {
+    iterator->setSpeed(i_speed);
+  }
+}
