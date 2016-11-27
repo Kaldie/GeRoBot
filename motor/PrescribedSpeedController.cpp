@@ -68,8 +68,9 @@ void PrescribedSpeedController::notifyStep(const BaseJoint::JointPointer& i_join
   updateJointMapElement(&m_jointMap[joint], i_numberOfSteps);
 }
 
-
-void PrescribedSpeedController::acknowledgeSpeed(const unsigned int& i_frequency) {
+void PrescribedSpeedController::acknowledgeSpeed(const unsigned int& i_frequency,
+                                                 SequenceVector* i_sequenceVector) {
+  SpeedController::acknowledgeSpeed(i_frequency, i_sequenceVector);
   if (i_frequency == 0) {
     LOG_ERROR("Speed of 0 is not allowed!");
   }
