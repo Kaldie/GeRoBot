@@ -96,15 +96,17 @@ void Robot::prepareSteps(const std::string& i_direction,
   m_traveledPoints.push_back(getVirtualPosition());
 #endif
   // add the step to the sequence
-  m_jointController->moveSteps(i_direction, i_numberOfSteps);
   m_speedController->notifyStep(joint, i_numberOfSteps);
+  m_jointController->moveSteps(i_direction, i_numberOfSteps);
   int motorSpeed;
   if (m_speedController->adviseSpeed(&motorSpeed)) {
     LOG_DEBUG("Speed controler has a mandatory speed change.");
     // add a clean sequence to force the speed to be nice
     m_jointController->getSequenceVectorPointer()->addEmptySequence();
-    m_speedController->acknowledgeSpeed(motorSpeed);
   }
+  ///TODO: check if this can be helped
+  m_speedController->acknowledgeSpeed
+    (motorSpeed,m_jointController->getSequenceVectorPointer());
 }
 
 

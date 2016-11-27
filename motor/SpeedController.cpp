@@ -2,20 +2,28 @@
 #include <BaseJoint.h>
 #include <Trace.h>
 #include "SpeedController.h"
+#include <SequenceVector.h>
 
 SpeedController::SpeedController()
-        : SpeedController("SpeedController", 0)
+  : SpeedController("SpeedController", 0)
 {}
 
 
 SpeedController::SpeedController(std::string i_name)
-        : m_name(i_name, 0){
+  : SpeedController(i_name, 0, 0){
 }
 
 SpeedController::SpeedController(std::string i_name, float i_robotSpeed)
-        : m_name(i_name, 0),
-          m_robotSpeed(i_robotSpeed){
+  : SpeedController(i_name, i_robotSpeed, 0){
 }
+
+SpeedController::SpeedController(std::string i_controllerName,
+                float i_robotSpeed,
+                int i_currentSequenceVectorPosition)
+  : m_name(i_controllerName),
+    m_robotSpeed(i_robotSpeed),
+    m_currentSequenceVectorPosition(i_currentSequenceVectorPosition) {
+    }
 
 
 
@@ -24,7 +32,11 @@ void SpeedController::notifyStep(const BaseJoint::JointPointer& i_joint,
 }
 
 
-void SpeedController::acknowledgeSpeed(const unsigned int& i_speed) {
+void SpeedController::acknowledgeSpeed(const unsigned int& i_speed,
+                                       SequenceVector* i_sequenceVector) {
+  i_sequenceVector->modifySpeed(i_speed, m_currentSequenceVectorPosition);
+  m_currentSequenceVectorPosition = i_sequenceVector->getSequenceVector().size();
+
 }
 
 

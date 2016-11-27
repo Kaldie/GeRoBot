@@ -12,6 +12,8 @@
 #include <JointController.h>
 #include <StepperDriver.h>
 #include <Trace.h>
+#include <Robot.h>
+#include <RobotIO.h>
 
 class ConstantSpeedControllerUnitTest : public CxxTest::TestSuite {
  public:
@@ -94,6 +96,24 @@ class ConstantSpeedControllerUnitTest : public CxxTest::TestSuite {
     // test speed when the robot speed is limiting
     b.adviseSpeed(&speed);
     TS_ASSERT_EQUALS(speed, 400);
+  }
+
+  void testActualSpeedControlling() {
+      // In this test we actually will check the speed of the robot at the state sequence level
+
+      Robot::RobotPointer robot = RobotIO("defaultRobot.xml").buildRobot();
+      SpeedController::SpeedControllerPointer speedController =
+          std::make_shared<ConstantSpeedController>(0.1);
+
+      robot->setSpeedController(speedController);
+      robot->setPosition(Point2D(50,0));
+      robot->traceCalculation(std::make_shared<Trace>(Point2D(50,0), Point2D(50,10)));
+
+      robot->getJointController()->getSequenceVector();
+      for (const auto x : robot->getJointController()->getSequenceVector()) {
+          LOG_DEBUG(x.getSpeed());
+      }
+
   }
 
 };
