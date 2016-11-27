@@ -8,6 +8,7 @@
 class RotationTrace;
 class Point2D;
 class JointController;
+class Robot;
 
 class RotationTraceCalculator: public LineTraceCalculator {
  public:
