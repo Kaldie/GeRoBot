@@ -38,9 +38,12 @@ void ConstantSpeedController::prepareSpeedController(
   int estimateNumberOfRotationSteps = abs(
     i_trace.getStartPoint().getAngleBetweenPoints(i_trace.getEndPoint()) /
     (i_controller.resolveJoint(BaseJoint::Rotational))->getMovementPerStep());
-  int estimateNumberOfTranslationSteps = abs(
-    magnitude(i_trace.getEndPoint() - i_trace.getStartPoint()) /
-    i_controller.resolveJoint(BaseJoint::Translational)->getMovementPerStep());
+
+
+  int estimateNumberOfTranslationSteps =
+    abs(magnitude(i_trace.getEndPoint()) - magnitude(i_trace.getStartPoint()) /
+        i_controller.resolveJoint(BaseJoint::Translational)->getMovementPerStep());
+
   LOG_DEBUG("Number of rotation steps: " << estimateNumberOfRotationSteps);
   LOG_DEBUG("Number of translation steps: " << estimateNumberOfTranslationSteps);
   // get the joint who sees the most work
@@ -65,4 +68,5 @@ void ConstantSpeedController::prepareSpeedController(
   } else {
     m_jointSpeed = pullInFrequency;
   }
+  LOG_DEBUG("Joint speed will be: " << m_jointSpeed);
 }
