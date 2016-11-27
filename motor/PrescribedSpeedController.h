@@ -64,7 +64,8 @@ class PrescribedSpeedController : public SpeedController {
    * Let the controller know a speed is selected
    * The controller will hanlde setting the speeds to the joint actuators
    */
-  void acknowledgeSpeed(const unsigned int& i_speed);
+  virtual void acknowledgeSpeed(const unsigned int& i_frequency,
+                                SequenceVector* i_sequenceVector);
 
   /// calculate the current speed of the robot
   float estimateCurrentSpeed() const;
