@@ -513,9 +513,7 @@ class SequenceVectorUnitTest : public CxxTest::TestSuite {
     stateSequence.setPinStateVector(pinStatevector);
     stateSequence.setNumberOfRepetitions(1);
 
-    sequenceVector.setSequenceVector(
-        PinStateSequenceVector(
-            {stateSequence}));
+    sequenceVector.setSequenceVector(PinStateSequenceVector({stateSequence}));
 
     std::vector<int> x = stateSequence.getIntegerSequence();
     int numberOfOriginalSteps = sequenceVector.numberOfSteps();
@@ -534,6 +532,76 @@ class SequenceVectorUnitTest : public CxxTest::TestSuite {
                      std::vector<int>({14, 4}));
     TS_ASSERT_EQUALS(sequenceVector.getSequenceVector()[3].getIntegerSequence(),
                      std::vector<int>({4}));
+  }
+
+
+  void testUpdateSpeed() {
+      //StateSequence a = StateSequence({PinState(std::vector<int>{1,2,3},true),
+      //           PinState(std::vector<int>{1,2,3},false),
+      //          PinState(std::vector<int>{1,2,3},true)});
+      int notDefinedSpeed = 10;
+      StateSequence b = StateSequence(notDefinedSpeed,1,{
+                      PinState(std::vector<int>{1,2,3},false),
+                      PinState(std::vector<int>{1,2,3},true),
+                      PinState(std::vector<int>{1,2,3},false)}
+          );
+
+      StateSequence a = StateSequence(notDefinedSpeed,1,{
+              PinState(std::vector<int>{1,2,3},true),
+                  PinState(std::vector<int>{1,2,3},false),
+                  PinState(std::vector<int>{1,2,3},true)}
+          );
+      for (int i = 0;
+           i < 10;
+           ++i) {
+          sequenceVector.appendStateSequence(a, false);
+          sequenceVector.appendStateSequence(b, false);
+      }
+      // check if there are sequences which will be there and a default something speed
+      TS_ASSERT_EQUALS(sequenceVector.begin()->getSpeed(), notDefinedSpeed);
+      TS_ASSERT_EQUALS(sequenceVector.numberOfSequences(), 20);
+
+      SequenceVector testSequenceVector = sequenceVector;
+
+      int secondSpeed = 100;
+      testSequenceVector.modifySpeed(secondSpeed);
+      TS_ASSERT_EQUALS(testSequenceVector.begin()->getSpeed(),
+                       (testSequenceVector.end()-1)->getSpeed());
+      TS_ASSERT_EQUALS(testSequenceVector.begin()->getSpeed(),secondSpeed);
+
+      int thirdSpeed = 200;
+      testSequenceVector.modifySpeed(thirdSpeed, 4);
+      TS_ASSERT_DIFFERS((testSequenceVector.begin()+3)->getSpeed(),
+                        (testSequenceVector.end()-1)->getSpeed());
+      TS_ASSERT_EQUALS((testSequenceVector.begin()+4)->getSpeed(),
+                        (testSequenceVector.end()-1)->getSpeed());
+
+      int fourthSpeed = 300;
+      testSequenceVector.modifySpeed(fourthSpeed, 10, 15);
+      TS_ASSERT_DIFFERS((testSequenceVector.begin()+9)->getSpeed(),
+                        (testSequenceVector.begin()+10)->getSpeed());
+      TS_ASSERT((testSequenceVector.begin()+9)->getSpeed() <
+                (testSequenceVector.begin()+10)->getSpeed());
+      TS_ASSERT_EQUALS((testSequenceVector.begin()+10)->getSpeed(), fourthSpeed);
+
+      TS_ASSERT_DIFFERS((testSequenceVector.begin()+15)->getSpeed(),
+                        (testSequenceVector.begin()+16)->getSpeed());
+      TS_ASSERT((testSequenceVector.begin()+15)->getSpeed() >
+                (testSequenceVector.begin()+16)->getSpeed());
+      TS_ASSERT_EQUALS((testSequenceVector.begin()+15)->getSpeed(), fourthSpeed);
+      TS_ASSERT_EQUALS((testSequenceVector.begin()+16)->getSpeed(), thirdSpeed);
+
+      std::vector<int> estimatedSpeedVector({
+                  100,100,100,100,200,
+                  200,200,200,200,200,
+                  300,300,300,300,300,300,
+                  200,200,200,200});
+
+      std::vector<int> speedVector;
+      for (auto& x : testSequenceVector.getSequenceVector()) {
+          speedVector.push_back(x.getSpeed());
+      }
+      TS_ASSERT_EQUALS(speedVector, estimatedSpeedVector);
   }
 };
 
