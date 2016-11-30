@@ -284,7 +284,7 @@ int ArduinoSerialConnection::serialRead(const int& i_numberOfBytes) {
   return output;
 }
 
-bool ArduinoSerialConnection::flushConnection() {
+bool ArduinoSerialConnection::flushConnection() const {
   int hasFlushed = tcflush(m_fileHandle, TCIOFLUSH);
   if (!hasFlushed)
     return true;
