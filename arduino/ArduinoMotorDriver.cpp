@@ -112,8 +112,8 @@ void ArduinoMotorDriver::upload(const std::vector<int> i_messageVector) {
   if (i_messageVector.size() * sizeof(*i_messageVector.data()) > 255)
     LOG_ERROR("Message is bigger then 255 chars," <<
               " which cannot be send easely of the serial");
-
-  initialiseArduinoConnection();
+  
+  m_arduinoConnection.flushConnection();
   
   // Shake it like a polaroid picture, at least untill it works
   while (!handShake(ArduinoMotorDriver::UPLOAD)) {}
@@ -180,7 +180,7 @@ bool ArduinoMotorDriver::sendTestBit() {
 }
 
 
-bool ArduinoMotorDriver::hasConnection(const bool& i_makeConnection) {
+bool ArduinoMotorDriver::hasConnection(const bool& i_makeConnection/*= false */) {
   if (m_arduinoConnection.hasConnection()) {
     return true;
   }
@@ -196,6 +196,8 @@ bool ArduinoMotorDriver::hasConnection(const bool& i_makeConnection) {
 void ArduinoMotorDriver::deleteFile() {
   if (!m_arduinoConnection.hasConnection()) {
     initialiseArduinoConnection();
+  } else {
+    m_arduinoConnection.flushConnection();
   }
   while (!handShake(ArduinoMotorDriver::DELETE_FILE)) {}
 }
@@ -205,6 +207,8 @@ void ArduinoMotorDriver::echo() {
   // initialise the connection if necessary
   if (!m_arduinoConnection.hasConnection()) {
     initialiseArduinoConnection();
+  } else {
+    m_arduinoConnection.flushConnection();
   }
   // handshake untill we get the proper response!
   while (!handShake(ArduinoMotorDriver::SERIAL_ECHO_VERBOSE)) {}
@@ -241,7 +245,7 @@ bool ArduinoMotorDriver::benchmarkSD(const int& i_numberOfMessages) {
     if (numberOfBytes !=  expectedSize) {
       LOG_DEBUG("Expected number of bytes: " << expectedSize);
       LOG_DEBUG("Number of bytes send by arduino: " << numberOfBytes);
-      //      LOG_ERROR("Number of send bytes is not what expected!");
+      LOG_ERROR("Number of send bytes is not what expected!");
     }
 
     int value;
@@ -290,6 +294,12 @@ void ArduinoMotorDriver::createRandomMessages
 
 
 bool ArduinoMotorDriver::benchmarkCurrentRobot(const SequenceVector& i_sequenceVector) {
+  if (!m_arduinoConnection.hasConnection()) {
+    initialiseArduinoConnection();
+  } else {
+    m_arduinoConnection.flushConnection();
+  }
+  
   std::vector<std::vector<int>> messageVector;
   for (const auto& stateSequence : i_sequenceVector) {
     messageVector.push_back(stateSequence.createArduinoBuffer());
@@ -297,7 +307,6 @@ bool ArduinoMotorDriver::benchmarkCurrentRobot(const SequenceVector& i_sequenceV
   }
 
   while (!handShake(ArduinoMotorDriver::SERIAL_ECHO));
-  //  return true;
 
   int i = 0;
   int numberOfBytes;
