@@ -41,8 +41,11 @@ public:
     void deleteFile();
     /// Request that the arduino display its information of messages
     void echo();
-    // check if there is a connection, the input argument tells if an connection will be made if in first instance no connection is there
-    bool hasConnection(const bool& i_makeConnection);
+    /**
+     * Brief Check if there is a connection,
+     * if i_makeConnection is true, 1 attempt is made to connect to the driver
+     */
+    bool hasConnection(const bool& i_makeConnection = false);
     /// Benchmark the SD card on the system. Testing purpose often
     bool benchmarkSD(const int& i_numberOfMessages);
     bool benchmarkCurrentRobot(const SequenceVector& i_sequenceVector);
