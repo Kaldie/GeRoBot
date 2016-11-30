@@ -33,7 +33,7 @@ class ArduinoSerialConnection {
   void serialWrite(const unsigned char*, const int&);
   void serialWrite(std::vector<int>::iterator&, const int&);
 
-  bool flushConnection();
+  bool flushConnection() const;
   // Constructors
   ArduinoSerialConnection();
 
