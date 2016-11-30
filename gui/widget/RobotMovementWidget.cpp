@@ -54,6 +54,7 @@ void RobotMovementWidget::initialise() {
   connect(moveDownButton, SIGNAL(clicked()), this, SLOT(movementRetract()));
 
   robotCanvas->layout()->addWidget(new RobotPositionWidget(m_robotPointer, this));
+
   if (m_robotPointer) {
     updateMovementType(true);
     connect(simulateRadioButton,
@@ -146,7 +147,6 @@ bool RobotMovementWidget::hasValidRobot() {
     based on the availability of the RobotPointer and
     if a connection can be established to an arduino motor driver    
   */
-
   bool hasRobotPointer(false);
   bool hasArduinoConnection(false);
 
@@ -284,9 +284,9 @@ void RobotMovementWidget::movementRetract() {
 void RobotMovementWidget::movementClockWise() {
   if (m_mode != ToolMode)
     return;
-  double stepSize = stepSizeLineEdit->text().toDouble();
+  double stepSizeInDegree = stepSizeLineEdit->text().toDouble();
   double robotStepSize = m_robotPointer->getMovementPerStep(BaseJoint::MovementType::Rotational);
-  int numberOfSteps = stepSize / robotStepSize;
+  int numberOfSteps = (stepSizeInDegree * (PI/180.0)) / robotStepSize;
   if (numberOfSteps == 0) {
     numberOfSteps = 1;
   }
@@ -304,9 +304,9 @@ void RobotMovementWidget::movementClockWise() {
 void RobotMovementWidget::movementCounterClockWise() {
   if (m_mode != ToolMode)
     return;
-  double stepSize = stepSizeLineEdit->text().toDouble();
+  double stepSizeInDegree = stepSizeLineEdit->text().toDouble();
   double robotStepSize = m_robotPointer->getMovementPerStep(BaseJoint::MovementType::Rotational);
-  int numberOfSteps = stepSize / robotStepSize;
+  int numberOfSteps = (stepSizeInDegree * (PI/180.0)) / robotStepSize;
   if (numberOfSteps == 0) {
     numberOfSteps = 1;
   }
