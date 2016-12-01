@@ -3,8 +3,9 @@
 #ifndef MOTOR_STEPPERDRIVERUNITTEST_H_
 #define MOTOR_STEPPERDRIVERUNITTEST_H_
 
-#include <cxxtest/TestSuite.h>
+
 #include <macroHeader.h>
+#include <cxxtest/TestSuite.h>
 #include <vector>
 #include <string>
 #include <SequenceVector.h>
@@ -16,6 +17,7 @@ class StepperDriverUnitTest : public CxxTest::TestSuite {
   void testCreation(void) {
     LOG_DEBUG("Starting StepperDriverUnitTest::testCreation");
     StepperDriver stepperDriver;
+    TS_ASSERT_EQUALS(stepperDriver.getType(), BaseMotor::MotorType::StepperDriver);
     TS_ASSERT_EQUALS(stepperDriver.numberOfStatesPerStep(),
                      2);
     TS_ASSERT_EQUALS(stepperDriver.getHoldMotor(),

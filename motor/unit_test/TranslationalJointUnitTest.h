@@ -19,6 +19,7 @@ class TranslationalJointUnitTest : public CxxTest::TestSuite {
     translationalJoint.setPosition(50);
     translationalJoint.setMovementPerStep(1);
     translationalJoint.setRange(std::vector<traceType>{50, 180});
+    translationalJoint.setDirectionConversionMap({{"IN","CW"}, {"OUT","CCW"}});
   }
 
 
@@ -54,24 +55,21 @@ class TranslationalJointUnitTest : public CxxTest::TestSuite {
     rotationJointPointer->setPosition(PI/4);
     rotationJointPointer->setChild(translationJointPointer);
     translationJointPointer->setParent(rotationJointPointer);
-    translationJointPointer->setPosition(50);
+
     Point2D point(sqrt((50*50)/2),
                   sqrt((50*50)/2));
-    std::string direction;
-    for (int i = 0;
-         i < 18;
-         i++) {
+    for (int i = 1; i < 19; ++i) {
+      LOG_DEBUG("i: " << i);
       translationJointPointer->predictSteps(&point,"OUT", 5);
-      direction = "CCW";
-      rotationJointPointer->predictSteps(&point,direction, 5);
+      translationJointPointer->setPosition(50 + (5*i*translationJointPointer->getMovementPerStep()));
+      rotationJointPointer->predictSteps(&point,"CCW", 5);
+      rotationJointPointer->setPosition(PI/4 + (5*i*rotationJointPointer->getMovementPerStep()));
+      LOG_DEBUG("Current point: " << point);
     }
     LOG_DEBUG(point);
-    traceType jointPosition = translationJointPointer->getPosition();
-    LOG_DEBUG(jointPosition);
-    LOG_DEBUG(Point2D(-sqrt((jointPosition*jointPosition)/2),
-                      sqrt((jointPosition*jointPosition)/2)));
-    TS_ASSERT_EQUALS(point, Point2D(-sqrt((jointPosition*jointPosition)/2),
-                                    sqrt((jointPosition*jointPosition)/2)));
+    LOG_DEBUG(Point2D(-1 * sqrt((140*140)/2),
+		      sqrt((140*140)/2)));
+    TS_ASSERT_EQUALS(point, Point2D(-1 * sqrt((140*140)/2), sqrt((140*140)/2)));
   }
 
 

@@ -24,7 +24,7 @@ class PinStateTestSuite : public CxxTest::TestSuite {
                 DEFAULT_STATE*16);
 
       PinState testPinState3(pinVector, false);
-      TS_ASSERT(testPinState2.getNumericValue() == 0);
+      TS_ASSERT(testPinState3.getNumericValue() == 0);
     }
 
 

@@ -26,13 +26,15 @@ class RotationalJointUnitTest : public CxxTest::TestSuite {
     RotationalJoint<StepperDriver> rotationalJoint1;
   }
 
+  
   void testPredictStep() {
     rotationalJoint2.setRange(std::vector<traceType>{0, 180});
     Point2D point(50, 0);
-    for (int i = 0;
-         i < 45;
+    for (int i = 1;
+         i < 46;
          i++) {
       rotationalJoint2.predictSteps(&point, "CCW", 1);
+      rotationalJoint2.setPosition(i*rotationalJoint2.getMovementPerStep());
     }
     TS_ASSERT_EQUALS(point, Point2D(35.3553, 35.3553));
   }
@@ -43,9 +45,11 @@ class RotationalJointUnitTest : public CxxTest::TestSuite {
     std::string direction("CW");
     std::string contraDirection("CCW");
     rotationalJoint2.predictSteps(&point, direction, 90);
+    rotationalJoint2.setPosition(-90*rotationalJoint2.getMovementPerStep());
     LOG_DEBUG(point.x << ", "<< point.y);
     TS_ASSERT_EQUALS(point, Point2D(0, -50));
     rotationalJoint2.predictSteps(&point, contraDirection, 90);
+    rotationalJoint2.setPosition(90*rotationalJoint2.getMovementPerStep());
     TS_ASSERT_EQUALS(point, Point2D(50, 0));
   }
 
