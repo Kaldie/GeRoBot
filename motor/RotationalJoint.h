@@ -89,14 +89,13 @@ template <class ActuatorType>
 void RotationalJoint<ActuatorType>::predictSteps(Point2D* o_robotPosition,
                                                  const std::string& i_directionString,
                                                  const int& i_numberOfSteps) const {
-  LOG_ERROR("lala");
   Point2D relativePosition(childPosition());
   Point2D rotationPoint(*o_robotPosition - relativePosition);
   traceType addedRotation = m_movementPerStep *
     getPositionModifier(i_directionString) * i_numberOfSteps;
   // Debug info
   LOG_DEBUG("Position modifier is: "<< getPositionModifier(i_directionString));
-  LOG_DEBUG("Movement per step is: " << m_movementPerStep);
+  LOG_DEBUG("Movement per step is: " << m_movementPerStep * 180/PI << " degree.");
   LOG_DEBUG("Robot position: " << *o_robotPosition);
   LOG_DEBUG("Child position: " << relativePosition);
   LOG_DEBUG("Rotation position: " << rotationPoint);
