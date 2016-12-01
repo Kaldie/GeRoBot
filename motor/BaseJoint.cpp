@@ -56,7 +56,7 @@ void BaseJoint::childPosition(Point2D* o_position, traceType* o_angle) const {
   if (getLength() != 0) {
     o_position->x += getLength() * cos(*o_angle);
     o_position->y += getLength() * sin(*o_angle);
-    LOG_DEBUG("Current angle: " << *o_angle);
+    LOG_DEBUG("Current angle: " << *o_angle *180/PI << " degree." );
     LOG_DEBUG("Current length: " << getLength());
     LOG_DEBUG("Current child position: " << *o_position);
   }
@@ -91,11 +91,34 @@ void BaseJoint::moveSteps(const std::string& i_directionString,
 
 
 BaseJoint::BaseJoint()
-    :m_currentPosition(0),
-     m_movementPerStep(0),
-     m_range({0,1}),
-     m_movementType(None),
-     m_directionConversion({}),
-     m_child(),
-     m_parent()
-{}
+  :BaseJoint(0, 0, {0, 1}, MovementType::None, {}, WeakJointPointer(), WeakJointPointer()) {
+}
+
+BaseJoint::BaseJoint(const traceType& i_currentPosition,
+		     const traceType& i_movementPerStep,
+		     const MovementType i_type,
+		     const DirectionConversionMap& i_conversionMap)
+  : BaseJoint(i_currentPosition,
+	      i_movementPerStep,
+	      {0, 1},
+	      i_type,
+	      i_conversionMap,
+	      WeakJointPointer(),
+	      WeakJointPointer()) {
+}
+
+BaseJoint::BaseJoint(const traceType& i_currentPosition,
+		     const traceType& i_movementPerStep,
+		     const std::vector<traceType>& i_rangeVector,
+		     const MovementType i_type,
+		     const DirectionConversionMap& i_conversionMap,
+		     const WeakJointPointer& i_child,
+		     const WeakJointPointer& i_parent)
+  :m_currentPosition(i_currentPosition),
+   m_movementPerStep(i_movementPerStep),
+   m_range(i_rangeVector),
+   m_movementType(i_type),
+   m_directionConversion(i_conversionMap),
+   m_child(i_child),
+   m_parent(i_parent) {
+}

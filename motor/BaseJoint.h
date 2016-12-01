@@ -93,6 +93,21 @@ class BaseJoint {
     /// default constructor
     BaseJoint();
 
+    /// Constructor which is kind of nice
+    BaseJoint(const traceType& i_currentPosition,
+	      const traceType& i_movementPerStep,
+	      const MovementType i_type,
+	      const DirectionConversionMap& i_conversionMap);
+
+    /// Full fledged constructor
+    BaseJoint(const traceType& i_currentPosition,
+	      const traceType& i_movementPerStep,
+	      const std::vector<traceType>& i_rangeVector,
+	      const MovementType i_type,
+	      const DirectionConversionMap& i_conversionMap,
+	      const WeakJointPointer& i_child,
+	      const WeakJointPointer& i_parent);
+
     /// Mandatory virtual destructor
     virtual ~BaseJoint(){};
 
