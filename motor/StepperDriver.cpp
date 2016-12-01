@@ -6,32 +6,33 @@
 
 // Constructor
 StepperDriver::StepperDriver()
-  : BaseMotor({2, 3, 4}),
-    m_pullIn(200),
-    m_pullOut(200),
-    m_maxSpeed(500),
-    m_incremental(10){}
+  : StepperDriver({2, 3, 4},
+		  "CW",
+		  200,
+		  200,
+		  500) {
+}
 
 
 StepperDriver::StepperDriver(const PinVector& i_pinVector)
-  : BaseMotor(i_pinVector),
-    m_pullIn(200),
-    m_pullOut(200),
-    m_maxSpeed(500),
-    m_incremental(10){}
+  : StepperDriver(i_pinVector,
+		  "CW",
+		  200,
+		  200,
+		  500) {
+}
 
-
-StepperDriver::StepperDriver
-(const PinVector& i_pinVector,
- const std::string& i_defaultDirection,
- const int& i_pullIn,
- const int& i_pullOut,
- const int& i_max)
-  : BaseMotor(i_pinVector, i_defaultDirection),
+StepperDriver::StepperDriver(const PinVector& i_pinVector,
+			     const std::string& i_defaultDirection,
+			     const int& i_pullIn,
+			     const int& i_pullOut,
+			     const int& i_max)
+  : BaseMotor(BaseMotor::MotorType::StepperDriver, i_pinVector, i_defaultDirection),
     m_pullIn(i_pullIn),
     m_pullOut(i_pullOut),
     m_maxSpeed(i_max),
-    m_incremental(10){}
+    m_incremental(10) {
+}
 
 
 bool StepperDriver::setEnable(const bool& i_setEnable) {
