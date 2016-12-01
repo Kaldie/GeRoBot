@@ -10,6 +10,11 @@ class SequenceVector;
 class StateSequence;
 
 class BaseMotor {
+ public:
+  enum MotorType {StepperDriver, StepperMotor, None};
+  // Motor type
+  GETSET(MotorType, m_motorType, Type);
+  
   /// State in which the pins currently resides
   GETSETPROTECTED(PinState, m_currentPinState, CurrentPinState);
 
@@ -56,15 +61,21 @@ class BaseMotor {
   // Base Constructor
   BaseMotor();
 
+  // Defining the type
+  BaseMotor(const MotorType&);
+
   // Vector with pin IDs
-  explicit BaseMotor(const PinVector&);
+  explicit BaseMotor(const MotorType&,
+		     const PinVector&);
 
   // Pin IDs and default direction
-  BaseMotor(const PinVector&,
+  BaseMotor(const MotorType&,
+	    const PinVector&,
             const std::string&);
 
     // Pin IDs and default direction
-  BaseMotor(const PinVector& i_pinVector,
+  BaseMotor(const MotorType&,
+	    const PinVector& i_pinVector,
             const std::string& i_defaultDirection,
             const bool i_holdMotor);
 

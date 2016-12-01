@@ -8,31 +8,46 @@
 
 // Constructors
 BaseMotor::BaseMotor()
-  : BaseMotor({1, 2, 3, 4},
+  : BaseMotor(BaseMotor::MotorType::None,
+	      {1, 2, 3, 4},
               "CW",
               false)
 {}
 
 
-BaseMotor::BaseMotor(const PinVector& i_pins)
-  : BaseMotor(i_pins,
+BaseMotor::BaseMotor(const MotorType& i_type)
+  : BaseMotor(i_type,
+	      {1, 2, 3, 4},
+              "CW",
+              false) {
+}
+
+
+BaseMotor::BaseMotor(const MotorType& i_type,
+		     const PinVector& i_pins)
+  : BaseMotor(i_type,
+	      i_pins,
               "CW",
               false)
 {}
 
 
-BaseMotor::BaseMotor(const PinVector& i_pins,
+BaseMotor::BaseMotor(const MotorType& i_type,
+		     const PinVector& i_pins,
                      const std::string& i_defaultDirection)
-  : BaseMotor(i_pins,
-              i_defaultDirection,
-              false)
+  : BaseMotor(i_type,
+	      i_pins,
+	      i_defaultDirection,
+	      false)
 {}
 
 
-BaseMotor::BaseMotor(const PinVector& i_pins,
+BaseMotor::BaseMotor(const MotorType& i_type,
+		     const PinVector& i_pins,
                      const std::string& i_defaultDirection,
                      const bool i_holdMotor)
-  : m_defaultDirection(i_defaultDirection),
+  : m_motorType(i_type),
+    m_defaultDirection(i_defaultDirection),
     m_holdMotor(i_holdMotor),
     m_speed(0) {
   setPins(i_pins);
