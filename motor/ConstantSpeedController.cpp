@@ -12,14 +12,15 @@ ConstantSpeedController::ConstantSpeedController()
 }
 
 
-ConstantSpeedController::ConstantSpeedController(float i_speed)
-  : ConstantSpeedController(i_speed, 0) {
+ConstantSpeedController::ConstantSpeedController(const float& i_robotSpeed)
+  : ConstantSpeedController(i_robotSpeed, 0) {
 }
 
 
-ConstantSpeedController::ConstantSpeedController(float i_robotSpeed, float i_motorSpeed)
-  : SpeedController("ConstantSpeedController", i_robotSpeed),
-    m_jointSpeed(i_motorSpeed) {
+ConstantSpeedController::ConstantSpeedController(const float& i_robotSpeed,
+						 const int& i_vectorPosition)
+  : SpeedController(SpeedController::Type::Constant, i_robotSpeed, i_vectorPosition),
+    m_jointSpeed(0) {
 }
 
 
@@ -35,28 +36,29 @@ bool ConstantSpeedController::adviseSpeed(int* o_speed) {
  */
 void ConstantSpeedController::prepareSpeedController(
   const Trace& i_trace,  const JointController& i_controller) {
-  int estimateNumberOfRotationSteps = abs(
-    i_trace.getStartPoint().getAngleBetweenPoints(i_trace.getEndPoint()) /
-    (i_controller.resolveJoint(BaseJoint::Rotational))->getMovementPerStep());
+  SpeedController::JointStepVector jointStepVector = estimateSteps(i_trace, i_controller);
 
-
-  int estimateNumberOfTranslationSteps =
-    abs(magnitude(i_trace.getEndPoint()) - magnitude(i_trace.getStartPoint()) /
-        i_controller.resolveJoint(BaseJoint::Translational)->getMovementPerStep());
-
-  LOG_DEBUG("Number of rotation steps: " << estimateNumberOfRotationSteps);
-  LOG_DEBUG("Number of translation steps: " << estimateNumberOfTranslationSteps);
-  // get the joint who sees the most work
   BaseJoint::JointPointer joint;
+
+  int currentMax = 0;
+  for (const auto jointAndSteps : jointStepVector) {
+    if (currentMax < std::get<1>(jointAndSteps)) {
+      joint = std::get<0>(jointAndSteps);
+      currentMax = std::get<1>(jointAndSteps);
+    }
+  }
+  if (joint->getMovementType() == BaseJoint::Rotational) { 
+    LOG_DEBUG("Number of rotation steps: " << currentMax);
+  } else if (joint->getMovementType() == BaseJoint::Translational) {
+    LOG_DEBUG("Number of translation steps: " << currentMax);
+  }
+
   traceType movementPerStep;
-  if (estimateNumberOfRotationSteps > estimateNumberOfTranslationSteps) {
-    // rotation is predominant
-     joint = i_controller.resolveJoint(BaseJoint::Rotational);
+  if (joint->getMovementType() == BaseJoint::Rotational) {
      float averageMagnitude =
        (magnitude(i_trace.getEndPoint()) + magnitude(i_trace.getStartPoint())) / 2;
      movementPerStep = averageMagnitude * joint->getMovementPerStep();
   } else {
-    joint = i_controller.resolveJoint(BaseJoint::Translational);
     movementPerStep = joint->getMovementPerStep();
   }
 

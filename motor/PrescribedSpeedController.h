@@ -79,6 +79,11 @@ class PrescribedSpeedController : public SpeedController {
   /// Fully fledged
   PrescribedSpeedController(const traceType& i_speed);
 
+  /// Fully fledged
+  PrescribedSpeedController(const traceType& i_speed,
+			    const int& i_vectorPosition);
+
+  
  private:
   ///
   float adviceAction(const float& i_currentSpeed,

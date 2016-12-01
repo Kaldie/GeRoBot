@@ -12,9 +12,10 @@ class SequenceVector;
 // Interface of speed controllers, there will be some
 class SpeedController {
 public:
+  enum Type {None, Constant, Prescribed, Relative};
   typedef  std::shared_ptr<SpeedController> SpeedControllerPointer;
 
-  GETSET(std::string, m_name, Name);
+  GETSET(Type, m_type, Type);
   GETSETPROTECTED(float, m_robotSpeed, RobotSpeed);
   GETSET(int, m_currentSequenceVectorPosition, CurrentSequenceVectorPosition);
 
@@ -30,7 +31,6 @@ public:
   virtual void acknowledgeSpeed(const unsigned int& i_speed,
                                 SequenceVector* i_sequenceVector);
 
-
   /**
    * This is call just before a algorithm determins movement of the robot
    *
@@ -39,11 +39,20 @@ public:
 
   SpeedController();
 
-  SpeedController(std::string i_controllerName);
-  SpeedController(std::string i_controllerName, float i_robotSpeed);
-  SpeedController(std::string i_controllerName,
-                  float i_robotSpeed,
-                  int i_currentSequenceVectorPosition);
+  SpeedController(const Type& i_type);
+  
+  SpeedController(const Type& i_type,
+		  float i_robotSpeed);
+  
+  SpeedController(const Type& i_type,
+		  float i_robotSpeed,
+		  int i_currentSequenceVectorPosition);
+ protected:  
+  typedef std::vector<std::tuple<BaseJoint::JointPointer,int>> JointStepVector;
+  /**
+   * Brief: estimate the number of steps for each joint has to set during to complete the trace
+   */
+  JointStepVector estimateSteps(const Trace& i_trace, const JointController& i_controller);
 };
 
 #endif  // MOTOR_SPEEDCONTROLLER_H_

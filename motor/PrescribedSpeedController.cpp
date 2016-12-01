@@ -7,20 +7,30 @@
 #include "./StepperDriver.h"
 #include <list>
 
+
 PrescribedSpeedController::PrescribedSpeedController()
-  : PrescribedSpeedController(0)
-{}
+  : PrescribedSpeedController(0, 0){
+}
 
 
 PrescribedSpeedController::PrescribedSpeedController(const traceType& i_robotSpeed)
-  : m_jointMap({}),
+  : PrescribedSpeedController(i_robotSpeed, 0) {
+}
+
+
+PrescribedSpeedController::PrescribedSpeedController(const traceType& i_robotSpeed,
+						     const int& i_vectorPosition)
+  : SpeedController(SpeedController::Type::Prescribed,
+		    i_robotSpeed,
+		    i_vectorPosition),
+    m_jointMap({}),
     m_motorFrequency(0),
-    m_robotSpeed(i_robotSpeed),
     m_achievedSpeeds{0},
     m_averageElements(5),
     m_isConservative(false)
     {}
 
+	       
 bool PrescribedSpeedController::adviseSpeed(int* o_speed) const {
   // check if the speed needs to be changed
   float currentSpeed = calculateCurrentSpeed();
@@ -57,7 +67,7 @@ void PrescribedSpeedController::notifyStep(const BaseJoint::JointPointer& i_join
     m_jointMap[joint] = JointInfo
       {0,                                            // number of steps
        {static_cast<float>(motor->getSpeed())},      // front_list frequency
-       {},                                           // front list missed steps
+       std::forward_list<float>(),                                           // front list missed steps
        0,                                            // number of steps taken
        false};                                       // updated the missed step list
     // check if the motor frequency is initialised

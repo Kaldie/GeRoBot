@@ -22,9 +22,9 @@ public:
   ConstantSpeedController();
 
   /// Constructor with a speed defined
-   ConstantSpeedController(float speed);
+   ConstantSpeedController(const float& speed);
 
-   ConstantSpeedController(float i_robotSpeed, float i_motorSpeed);
+   ConstantSpeedController(const float& i_robotSpeed, const int& i_vectorPosition);
 
   virtual ~ConstantSpeedController(){};
 private:
