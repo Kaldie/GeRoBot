@@ -3,7 +3,7 @@
 #ifndef MATH_LINE2D_H_
 #define MATH_LINE2D_H_
 
-#include "./Point2D.h"
+#include <Point2D.h>
 
 class Line2D {
  private:

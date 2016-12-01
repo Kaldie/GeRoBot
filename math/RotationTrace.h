@@ -3,8 +3,8 @@
 #ifndef MATH_ROTATIONTRACE_H_
 #define MATH_ROTATIONTRACE_H_
 
-#include "./Trace.h"
-#include "./Arc2D.h"
+#include <Trace.h>
+#include <Arc2D.h>
 /**
  * Rotation trace is a track which defines a part of an arc.
  * Rotation trace can be defined in 2 manners:
