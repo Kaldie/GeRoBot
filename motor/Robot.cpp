@@ -50,6 +50,7 @@ void Robot::goToPosition(const Point2D &i_position) {
   LOG_DEBUG("current position: " << m_position.x << m_position.y);
   BaseTraceCalculator baseTraceCalculator(this);
   Trace thisTrace(m_position, i_position);
+  m_speedController->prepareSpeedController(thisTrace, *m_jointController);
   baseTraceCalculator.calculateTrace(&thisTrace);
   LOG_DEBUG("new position: " << getVirtualPosition().x << getVirtualPosition().y);
   actuate();
@@ -90,14 +91,13 @@ void Robot::traceCalculation(const Trace::TracePointer& i_trace) {
 
 void Robot::prepareSteps(const std::string& i_direction,
                          const int& i_numberOfSteps) {
-  // predict the next step
   BaseJoint::JointPointer joint = m_jointController->resolveJoint(i_direction);
-#ifdef DEBUG
-  m_traveledPoints.push_back(getVirtualPosition());
-#endif
   // add the step to the sequence
   m_speedController->notifyStep(joint, i_numberOfSteps);
   m_jointController->moveSteps(i_direction, i_numberOfSteps);
+#ifdef DEBUG
+  m_traveledPoints.push_back(getVirtualPosition());
+#endif
   int motorSpeed;
   if (m_speedController->adviseSpeed(&motorSpeed)) {
     LOG_DEBUG("Speed controler has a mandatory speed change.");
@@ -118,6 +118,7 @@ void Robot::actuate() {
   // Send the command to actuate the sequence
   m_jointController->actuate();
   // reset the traveledPoints vector
+  m_speedController->setCurrentSequenceVectorPosition(0);
   std::vector<Point2D> empty;
   m_traveledPoints.swap(empty);
   m_position = getVirtualPosition();

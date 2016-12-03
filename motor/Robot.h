@@ -57,9 +57,11 @@ class Robot {
 
 
   void traceCalculation(const Trace::TracePointer& i_trace);
+
   /**
    * prepares to take steps with the given movement type, direction and number
    * This function pepares the joint controller to take steps when actuate is called
+   * It will handle to Speedcontroller so the correct speed is used
    * @param[in] i_direction direction which the step has to be taken, currently IN/OUT or CCW/CW
    * @param[in] i_numberOfSteps Number of steps that has to be taken
    */
