@@ -23,8 +23,8 @@ bool SpeedControllerItem::setPropertyData(int i_row,
   bool* hasConverted = &isConverted;
 
   if(i_row==SpeedControllerItem::propertyList.indexOf("Name")) {
-    m_speedController->setName(i_data.toString().toStdString());
-  } else if (i_row==SpeedControllerItem::propertyList.indexOf("Name")) {
+    return false;
+  } else if (i_row==SpeedControllerItem::propertyList.indexOf("RobotSpeed")) {
     m_speedController->setRobotSpeed(i_data.toDouble(hasConverted));
   }
   return isConverted;
@@ -37,7 +37,16 @@ QVariant SpeedControllerItem::getPropertyData(int i_row,
     if(i_column==0) {
       return QVariant("Name");
     } else {
-      return QVariant(QString::fromStdString(m_speedController->getName()));
+        switch (m_speedController->getType()) {
+        case SpeedController::Type::Constant:
+            return QVariant("ConstantSpeedController");
+        case SpeedController::Type::Relative:
+            return QVariant("RelativeSpeedController");
+        case SpeedController::Type::Prescribed:
+            return QVariant("PrescribedSpeedController");
+        default:
+            return QVariant("UnknownSpeedController");
+        }
     }
   } else if(i_row==SpeedControllerItem::propertyList.indexOf("RobotSpeed")){
     if(i_column==0)
