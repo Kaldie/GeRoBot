@@ -37,14 +37,19 @@ void SpeedController::notifyStep(const BaseJoint::JointPointer& i_joint,
 
 void SpeedController::acknowledgeSpeed(const unsigned int& i_speed,
                                        SequenceVector* i_sequenceVector) {
+  LOG_DEBUG("Set motor speed is: " << i_speed);
   i_sequenceVector->modifySpeed(i_speed, m_currentSequenceVectorPosition);
-  m_currentSequenceVectorPosition = i_sequenceVector->getSequenceVector().size();
+  m_currentSequenceVectorPosition = i_sequenceVector->getSequenceVector().size() - 1;
 
 }
 
 
 void SpeedController::prepareSpeedController(const Trace& i_trace,
                                             const JointController& i_controller) {
+}
+
+
+void SpeedController::prepareSpeedController(const BaseJoint::JointPointer& i_joint) {
 }
 
 

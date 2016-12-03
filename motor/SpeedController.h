@@ -13,12 +13,16 @@ class SequenceVector;
 class SpeedController {
 public:
   enum Type {None, Constant, Prescribed, Relative};
-  typedef  std::shared_ptr<SpeedController> SpeedControllerPointer;
 
+  typedef  std::shared_ptr<SpeedController> SpeedControllerPointer;
+  /// Defines the type of speed controller
   GETSET(Type, m_type, Type);
+  /// Defines the requested speed of the robot in mm/sec
   GETSETPROTECTED(float, m_robotSpeed, RobotSpeed);
+  /// Defines the current position the speedcontroller will update the sequence vector to achieve the selected speed
   GETSET(int, m_currentSequenceVectorPosition, CurrentSequenceVectorPosition);
 
+  /// The controller is notified that steps will be taken
   virtual void notifyStep(const BaseJoint::JointPointer& i_joint,
                           const unsigned int& i_numberOfSteps);
 
@@ -36,6 +40,13 @@ public:
    *
    */
   virtual void prepareSpeedController(const Trace& i_trace, const JointController&);
+
+  /**
+   * Prepare the controller that steps with this joint will be set
+   * it is unknown how many and in which direction
+   * if a "Constant" type controller is used, use the current position as a base to calculate the speed
+   */
+  virtual void prepareSpeedController(const BaseJoint::JointPointer& i_pointer);
 
   SpeedController();
 

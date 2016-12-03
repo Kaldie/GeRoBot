@@ -18,6 +18,13 @@ public:
   virtual void prepareSpeedController(const Trace& i_trace,
                                       const JointController& i_controller);
 
+  /**
+   * Prepare the controller that steps with this joint will be set
+   * it is unknown how many and in which direction
+   * if a "Constant" type controller is used, use the current position as a base to calculate the speed
+   */
+  virtual void prepareSpeedController(const BaseJoint::JointPointer& i_pointer);
+
   /// Default constructor
   ConstantSpeedController();
 
@@ -28,7 +35,11 @@ public:
 
   virtual ~ConstantSpeedController(){};
 private:
-  float m_jointSpeed;
+
+  void updateJointSpeed(const BaseJoint::JointPointer& i_joint,
+			const traceType& i_movementPerStep);
+
+  float m_frequency;
 };
 
 #endif  // MOTOR_CONSTANTSPEEDCONTROLLER_H_

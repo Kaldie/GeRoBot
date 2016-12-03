@@ -20,13 +20,13 @@ ConstantSpeedController::ConstantSpeedController(const float& i_robotSpeed)
 ConstantSpeedController::ConstantSpeedController(const float& i_robotSpeed,
 						 const int& i_vectorPosition)
   : SpeedController(SpeedController::Type::Constant, i_robotSpeed, i_vectorPosition),
-    m_jointSpeed(0) {
+    m_frequency(0) {
 }
 
 
 /// This method will be called at the moment the robot needs to decied on some speed
 bool ConstantSpeedController::adviseSpeed(int* o_speed) {
-  *o_speed = m_jointSpeed;
+  *o_speed = m_frequency;
   return false;
 }
 
@@ -37,9 +37,7 @@ bool ConstantSpeedController::adviseSpeed(int* o_speed) {
 void ConstantSpeedController::prepareSpeedController(
   const Trace& i_trace,  const JointController& i_controller) {
   SpeedController::JointStepVector jointStepVector = estimateSteps(i_trace, i_controller);
-
   BaseJoint::JointPointer joint;
-
   int currentMax = 0;
   for (const auto jointAndSteps : jointStepVector) {
     if (currentMax < std::get<1>(jointAndSteps)) {
@@ -61,14 +59,32 @@ void ConstantSpeedController::prepareSpeedController(
   } else {
     movementPerStep = joint->getMovementPerStep();
   }
-
-  // select the frequency, take the pull in frequency if the robot speed is to high to handle
-  int requiredFrequency = m_robotSpeed / movementPerStep;
-  int pullInFrequency = joint->getMotor()->getMaximumSpeed();
-  if (requiredFrequency <= pullInFrequency) {
-    m_jointSpeed = requiredFrequency;
-  } else {
-    m_jointSpeed = pullInFrequency;
-  }
-  LOG_DEBUG("Joint speed will be: " << m_jointSpeed);
+  updateJointSpeed(joint, movementPerStep);
 }
+
+
+void ConstantSpeedController::prepareSpeedController(const BaseJoint::JointPointer& i_joint) {
+  float movementPerStep;
+  if (i_joint->getMovementType() == BaseJoint::Rotational) {
+    traceType childLength = magnitude(i_joint->childPosition());
+    movementPerStep = childLength * i_joint->getMovementPerStep();
+  } else {
+    movementPerStep = i_joint->getMovementPerStep();
+  }
+  updateJointSpeed(i_joint, movementPerStep);
+}
+
+
+void ConstantSpeedController::updateJointSpeed(const BaseJoint::JointPointer& i_joint,
+					       const traceType& i_movementPerStep) {
+ int requiredFrequency = m_robotSpeed / i_movementPerStep;
+  int pullInFrequency = i_joint->getMotor()->getMaximumSpeed();
+  if (requiredFrequency <= pullInFrequency) {
+    m_frequency = requiredFrequency;
+  } else {
+    m_frequency = pullInFrequency;
+  }
+  LOG_DEBUG("Joint speed will be: " << m_frequency);
+}
+
+
