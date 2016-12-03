@@ -4,6 +4,7 @@
 #include <QtGui>
 #include <QPainter>
 #include <Robot.h>
+#include <BaseJoint.h>
 #include "./RobotPositionWidget.h"
 #include "./RobotMovementWidget.h"
 
@@ -52,6 +53,7 @@ void RobotMovementWidget::initialise() {
   connect(moveUpButton, SIGNAL(clicked()), this, SLOT(movementUp()));
   connect(moveUpButton, SIGNAL(clicked()), this, SLOT(movementExtent()));
   connect(moveDownButton, SIGNAL(clicked()), this, SLOT(movementRetract()));
+  connect(moveDownButton, SIGNAL(clicked()), this, SLOT(movementDown()));
 
   robotCanvas->layout()->addWidget(new RobotPositionWidget(m_robotPointer, this));
 
@@ -246,11 +248,13 @@ void RobotMovementWidget::movementExtent() {
     return;
   double stepSize = stepSizeLineEdit->text().toDouble();
   double robotStepSize = m_robotPointer->getMovementPerStep(BaseJoint::MovementType::Translational);
-  int numberOfSteps = stepSize / robotStepSize;
+  int numberOfSteps = std::abs(stepSize / robotStepSize);
   if (numberOfSteps == 0) {
     numberOfSteps = 1;
   }
   // Calculate the new position and prepare to actual take the steps
+  m_robotPointer->getSpeedController()->prepareSpeedController
+    (m_robotPointer->getJointController()->resolveJoint(BaseJoint::Translational));
   m_robotPointer->prepareSteps("OUT",numberOfSteps);
   if (hasValidRobot() && actuateRadioButton->isChecked()) {
     m_robotPointer->actuate();
@@ -266,10 +270,13 @@ void RobotMovementWidget::movementRetract() {
     return;
   double stepSize = stepSizeLineEdit->text().toDouble();
   double robotStepSize = m_robotPointer->getMovementPerStep(BaseJoint::MovementType::Translational);
-  int numberOfSteps = stepSize / robotStepSize;
+  int numberOfSteps = std::abs(stepSize / robotStepSize);
   if (numberOfSteps == 0) {
     numberOfSteps = 1;
   }
+
+  m_robotPointer->getSpeedController()->prepareSpeedController
+    (m_robotPointer->getJointController()->resolveJoint(BaseJoint::Translational));
   // Calculate the new position and prepare to actual take the steps
   m_robotPointer->prepareSteps("IN",numberOfSteps);
   if (hasValidRobot() && actuateRadioButton->isChecked()) {
@@ -291,6 +298,8 @@ void RobotMovementWidget::movementClockWise() {
     numberOfSteps = 1;
   }
   // Calculate the new position and prepare to actual take the steps
+  m_robotPointer->getSpeedController()->prepareSpeedController
+    (m_robotPointer->getJointController()->resolveJoint(BaseJoint::Rotational));
   m_robotPointer->prepareSteps("CW",numberOfSteps);
   if (hasValidRobot() && actuateRadioButton->isChecked()) {
     m_robotPointer->actuate();
@@ -311,6 +320,8 @@ void RobotMovementWidget::movementCounterClockWise() {
     numberOfSteps = 1;
   }
   // Calculate the new position and prepare to actual take the steps
+  m_robotPointer->getSpeedController()->prepareSpeedController
+    (m_robotPointer->getJointController()->resolveJoint(BaseJoint::Rotational));
   m_robotPointer->prepareSteps("CCW",numberOfSteps);
   if (hasValidRobot() && actuateRadioButton->isChecked()) {
     m_robotPointer->actuate();

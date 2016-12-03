@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>597</width>
-    <height>324</height>
+    <height>326</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -70,6 +70,9 @@
       </item>
       <item>
        <widget class="QFrame" name="PostionDisplayFrame">
+        <property name="toolTip">
+         <string>T</string>
+        </property>
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
         </property>
@@ -103,6 +106,12 @@
          </property>
          <item row="0" column="0">
           <widget class="QLabel" name="xPositionLabel">
+           <property name="toolTipDuration">
+            <number>-1</number>
+           </property>
+           <property name="statusTip">
+            <string>Current robot x (mm)</string>
+           </property>
            <property name="text">
             <string>X position</string>
            </property>
@@ -119,6 +128,9 @@
              <height>16777215</height>
             </size>
            </property>
+           <property name="toolTip">
+            <string>Lateral position of the robot in mm</string>
+           </property>
            <property name="text">
             <string>0</string>
            </property>
@@ -129,6 +141,15 @@
          </item>
          <item row="2" column="0">
           <widget class="QLabel" name="yPositionLabel">
+           <property name="toolTip">
+            <string>Current robot y (mm)</string>
+           </property>
+           <property name="toolTipDuration">
+            <number>3</number>
+           </property>
+           <property name="statusTip">
+            <string>Current robot y (mm)</string>
+           </property>
            <property name="text">
             <string>Y position</string>
            </property>
@@ -145,6 +166,12 @@
              <height>16777215</height>
             </size>
            </property>
+           <property name="toolTip">
+            <string>Current robot y (mm)</string>
+           </property>
+           <property name="toolTipDuration">
+            <number>-1</number>
+           </property>
            <property name="text">
             <string>0</string>
            </property>
@@ -155,6 +182,15 @@
          </item>
          <item row="4" column="0">
           <widget class="QLabel" name="extensionLabel">
+           <property name="toolTip">
+            <string/>
+           </property>
+           <property name="toolTipDuration">
+            <number>3</number>
+           </property>
+           <property name="statusTip">
+            <string>Linear extension (mm)</string>
+           </property>
            <property name="text">
             <string>Extension</string>
            </property>
@@ -171,6 +207,12 @@
              <height>16777215</height>
             </size>
            </property>
+           <property name="toolTip">
+            <string>Linear extension (mm)</string>
+           </property>
+           <property name="toolTipDuration">
+            <number>-1</number>
+           </property>
            <property name="text">
             <string>0</string>
            </property>
@@ -181,6 +223,12 @@
          </item>
          <item row="7" column="0">
           <widget class="QLabel" name="angleLabel">
+           <property name="toolTip">
+            <string/>
+           </property>
+           <property name="statusTip">
+            <string>Current angle (degree)</string>
+           </property>
            <property name="text">
             <string>Angle</string>
            </property>
@@ -196,6 +244,12 @@
              <width>100</width>
              <height>16777215</height>
             </size>
+           </property>
+           <property name="toolTip">
+            <string>Current angle (degree)</string>
+           </property>
+           <property name="toolTipDuration">
+            <number>-1</number>
            </property>
            <property name="text">
             <string>90</string>
@@ -223,8 +277,31 @@
              <height>16777215</height>
             </size>
            </property>
+           <property name="toolTip">
+            <string>Step size of the robot in mm or degree</string>
+           </property>
            <property name="text">
             <string>1</string>
+           </property>
+          </widget>
+         </item>
+         <item row="9" column="0">
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Speed</string>
+           </property>
+          </widget>
+         </item>
+         <item row="9" column="1">
+          <widget class="QSlider" name="horizontalSlider">
+           <property name="toolTip">
+            <string>Relative speed the robot will travel</string>
+           </property>
+           <property name="value">
+            <number>25</number>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
            </property>
           </widget>
          </item>
@@ -254,6 +331,12 @@
          </property>
          <item>
           <widget class="QRadioButton" name="toolModeRadioButton">
+           <property name="toolTip">
+            <string>Tool mode will directly acces the joints</string>
+           </property>
+           <property name="statusTip">
+            <string/>
+           </property>
            <property name="text">
             <string>&amp;Tool Mode</string>
            </property>
@@ -267,6 +350,9 @@
          </item>
          <item>
           <widget class="QRadioButton" name="axisModeRadioButton">
+           <property name="toolTip">
+            <string>Axis mode will alow movement around the X and Y axis</string>
+           </property>
            <property name="text">
             <string>&amp;Axis Mode</string>
            </property>
@@ -304,6 +390,9 @@
          </property>
          <item>
           <widget class="QRadioButton" name="actuateRadioButton">
+           <property name="toolTip">
+            <string>The robot will move when given commands</string>
+           </property>
            <property name="text">
             <string>Actuate</string>
            </property>
@@ -314,6 +403,9 @@
          </item>
          <item>
           <widget class="QRadioButton" name="simulateRadioButton">
+           <property name="toolTip">
+            <string>The robot will not move if a command is given.</string>
+           </property>
            <property name="text">
             <string>Simulate</string>
            </property>
@@ -455,6 +547,9 @@
              <width>40</width>
              <height>40</height>
             </size>
+           </property>
+           <property name="toolTip">
+            <string>T</string>
            </property>
            <property name="text">
             <string/>
