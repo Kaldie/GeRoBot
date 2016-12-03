@@ -76,7 +76,7 @@ class JointController {
   /**
    * returns the number of joints currently registed
    */
-   int getNumberOfJoints() {return m_jointPointerVector.size();}
+   int getNumberOfJoints() const {return m_jointPointerVector.size();}
 
 
    /**
