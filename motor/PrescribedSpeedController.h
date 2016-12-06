@@ -26,9 +26,6 @@ class PrescribedSpeedController : public SpeedController {
                    JointInfo,
                    std::owner_less<BaseJoint::WeakJointPointer>> JointMap;
 
-  /// shared pointer of the class
-  typedef std::shared_ptr<SpeedController> SpeedControllerPointer;
-
   /// Mapping the number of consecutive steps with the joint
   GETSET(JointMap, m_jointMap, StepMap);
 

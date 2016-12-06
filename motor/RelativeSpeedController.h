@@ -10,7 +10,7 @@ class Trace;
 class RelativeSpeedController : public SpeedController {
 public:
   /// This method will be called at the moment the robot needs to decied on some speed
-  virtual bool adviseSpeed(int* o_speed);
+  virtual bool adviseSpeed(int* o_speed) const;
 
   virtual void acknowledgeSpeed(const unsigned int& i_speed,
                                 SequenceVector* i_sequenceVector);
@@ -24,7 +24,10 @@ public:
   RelativeSpeedController();
 
   /// Constructor with a speed defined
-  RelativeSpeedController(float i_robotSpeed);
+  RelativeSpeedController(const float& i_robotSpeed);
+
+  /// Constructor with a speed defined
+  RelativeSpeedController(const float& i_robotSpeed, const int& i_vectorPosition);
 
   virtual ~RelativeSpeedController(){};
  private:

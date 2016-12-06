@@ -25,7 +25,7 @@ ConstantSpeedController::ConstantSpeedController(const float& i_robotSpeed,
 
 
 /// This method will be called at the moment the robot needs to decied on some speed
-bool ConstantSpeedController::adviseSpeed(int* o_speed) {
+bool ConstantSpeedController::adviseSpeed(int* o_speed) const {
   *o_speed = m_frequency;
   return false;
 }

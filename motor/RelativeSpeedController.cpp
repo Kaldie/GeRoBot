@@ -6,25 +6,30 @@
 
 
 RelativeSpeedController::RelativeSpeedController()
-  :RelativeSpeedController(0){
+  :RelativeSpeedController(0, 0) {
+}
+
+RelativeSpeedController::RelativeSpeedController(const float& speed )
+  : RelativeSpeedController(speed, 0) {
 }
 
 
 /// Constructor with a speed defined
-RelativeSpeedController::RelativeSpeedController(float speed)
-  : SpeedController(SpeedController::Type::Relative, speed),
+RelativeSpeedController::RelativeSpeedController(const float& speed, const int& i_vectorPosition )
+  : SpeedController(SpeedController::Type::Relative, speed, i_vectorPosition),
     m_minSpeed(0),
     m_maxSpeed(std::numeric_limits<int>::max()) {
 }
 
 
-bool RelativeSpeedController::adviseSpeed(int* o_speed) {
-  if (m_robotSpeed < 1) {
-    m_robotSpeed = 1;
-  } else if (m_robotSpeed > 100) {
-    m_robotSpeed = 100;
+bool RelativeSpeedController::adviseSpeed(int* o_speed) const {
+  int robotSpeed = m_robotSpeed;
+  if (robotSpeed < 1) {
+    robotSpeed = 1;
+  } else if (robotSpeed > 100) {
+    robotSpeed = 100;
   }
-  *o_speed = (m_maxSpeed - m_minSpeed) / (m_robotSpeed / 100.0) + m_minSpeed;
+  *o_speed = (m_maxSpeed - m_minSpeed) / (robotSpeed / 100.0) + m_minSpeed;
   return false;
 }
 

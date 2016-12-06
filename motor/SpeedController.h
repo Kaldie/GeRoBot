@@ -27,7 +27,7 @@ public:
                           const unsigned int& i_numberOfSteps);
 
   /// This method will be called at the moment the robot needs to decied on some speed
-  virtual bool adviseSpeed(int* o_speed) = 0;
+  virtual bool adviseSpeed(int* o_speed) const = 0;
 
   /**
    * This method will be called at the moment the robot deciedes to use the certain speed for the previously notified steps
@@ -36,6 +36,7 @@ public:
                                 SequenceVector* i_sequenceVector);
 
   /**
+
    * This is call just before a algorithm determins movement of the robot
    *
    */
@@ -53,11 +54,11 @@ public:
   SpeedController(const Type& i_type);
   
   SpeedController(const Type& i_type,
-		  float i_robotSpeed);
+		  const float& i_robotSpeed);
   
   SpeedController(const Type& i_type,
-		  float i_robotSpeed,
-		  int i_currentSequenceVectorPosition);
+		  const float& i_robotSpeed,
+		  const int& i_currentSequenceVectorPosition);
  protected:  
   typedef std::vector<std::tuple<BaseJoint::JointPointer,int>> JointStepVector;
   /**

@@ -15,13 +15,13 @@ SpeedController::SpeedController(const Type& i_type)
   : SpeedController(i_type, 0, 0){
 }
 
-SpeedController::SpeedController(const Type& i_type, float i_robotSpeed)
+SpeedController::SpeedController(const Type& i_type, const float& i_robotSpeed)
   : SpeedController(i_type, i_robotSpeed, 0){
 }
 
 SpeedController::SpeedController(const Type& i_type,
-				 float i_robotSpeed,
-				 int i_currentSequenceVectorPosition)
+				 const float& i_robotSpeed,
+				 const int& i_currentSequenceVectorPosition)
   : m_type(i_type),
     m_robotSpeed(i_robotSpeed),
     m_currentSequenceVectorPosition(i_currentSequenceVectorPosition)

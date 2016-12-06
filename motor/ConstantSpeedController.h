@@ -10,7 +10,7 @@ class Trace;
 class ConstantSpeedController : public SpeedController {
 public:
   /// This method will be called at the moment the robot needs to decied on some speed
-  virtual bool adviseSpeed(int* o_speed);
+  virtual bool adviseSpeed(int* o_speed) const;
 
   /**
    * This is call just before a algorithm determins movement of the robot
