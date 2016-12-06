@@ -20,13 +20,14 @@ SpeedControllerItem::SpeedControllerItem(BaseRobotItem* i_parent,
 bool SpeedControllerItem::setPropertyData(int i_row,
                                           int i_column,
                                           const QVariant& i_data){
+  LOG_DEBUG("Set property data!");
   if(i_column!=1)
     return false;
 
   bool isConverted=bool(false);
-  
+
   if(i_row==SpeedControllerItem::propertyList.indexOf("Type")) {
-    return false;
+    return true;
   } else if (i_row==SpeedControllerItem::propertyList.indexOf("RobotSpeed")) {
     m_speedController->setRobotSpeed(i_data.toDouble(&isConverted));
   }
@@ -94,17 +95,17 @@ void SpeedControllerItem::setElement(const int& i_row, const int& i_selectedItem
     return;
   case 1:
     raw_pointer = new ConstantSpeedController(m_speedController->getRobotSpeed(),
-					      m_speedController->getCurrentSequenceVectorPosition());
+                m_speedController->getCurrentSequenceVectorPosition());
     break;
   case 2:
     raw_pointer = new PrescribedSpeedController(m_speedController->getRobotSpeed(),
-						m_speedController->getCurrentSequenceVectorPosition());
+            m_speedController->getCurrentSequenceVectorPosition());
     break;
   case 3:
     raw_pointer = new RelativeSpeedController(m_speedController->getRobotSpeed(),
-					      m_speedController->getCurrentSequenceVectorPosition());
+                m_speedController->getCurrentSequenceVectorPosition());
   }
-  
+
   if (!raw_pointer) {
     return;
   }

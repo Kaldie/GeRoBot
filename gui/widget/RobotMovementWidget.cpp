@@ -18,7 +18,7 @@ RobotMovementWidget::RobotMovementWidget(Robot::RobotPointer i_robotPointer,
 
 
 RobotMovementWidget::RobotMovementWidget(QWidget* parent /* =0 */)
-    : QWidget(parent) {
+  : QWidget(parent) {
   initialise();
 }
 
@@ -42,69 +42,93 @@ void RobotMovementWidget::initialise() {
           this, SLOT(updateMovementType(bool)));
   connect(axisModeRadioButton, SIGNAL(toggled(bool)),
           this, SLOT(updateMovementType(bool)));
+  // Connections to handle movement of the robot
   connect(moveLeftButton, SIGNAL(clicked()), this, SLOT(movementLeft()));
   connect(moveLeftButton, SIGNAL(clicked()), this, SLOT(movementCounterClockWise()));
+
   connect(moveRightButton, SIGNAL(clicked()), this, SLOT(movementRight()));
   connect(moveRightButton, SIGNAL(clicked()), this, SLOT(movementClockWise()));
+
   connect(moveUpButton, SIGNAL(clicked()), this, SLOT(movementUp()));
   connect(moveUpButton, SIGNAL(clicked()), this, SLOT(movementExtent()));
+
   connect(moveDownButton, SIGNAL(clicked()), this, SLOT(movementRetract()));
   connect(moveDownButton, SIGNAL(clicked()), this, SLOT(movementDown()));
 
   robotCanvas->layout()->addWidget(new RobotPositionWidget(m_robotPointer, this));
 
-  if (m_robotPointer) {
-    updateMovementType(true);
-    connect(simulateRadioButton,
-            SIGNAL(toggled(bool)),
-            this,
-            SLOT(updateSimulateRadioButtons()));
-    connect(actuateRadioButton,
-            SIGNAL(toggled(bool)),
-            this,
-            SLOT(updateSimulateRadioButtons()));
-    updateSimulateRadioButtons();
-  } else {
-    LOG_DEBUG("m_RobotPointer is not a valid pointer!");
-  }
+  connect(simulateRadioButton,SIGNAL(toggled(bool)),
+          this, SLOT(updateSimulateRadioButtons()));
+  connect(actuateRadioButton, SIGNAL(toggled(bool)),
+          this, SLOT(updateSimulateRadioButtons()));
 
-  updateSpeedController();
+  connect(speedSlider, SIGNAL(sliderReleased()),
+          this, SLOT(setSpeedOnSpeedController()));
+
+  updateFromNewPosition();
+  updateMovementType(true);
+  updateFromConfiguration();
 }
 
 
-void RobotMovementWidget::updateSpeedController() {
-  bool hasRelativeSpeedController = !
-    m_robotPointer->getSpeedController()->getType() == SpeedController::Type::Relative;
+void RobotMovementWidget::updateFromConfiguration() {
+  LOG_DEBUG("Update from configuration");
+  updateSpeedSlider();
+  updateSimulateRadioButtons();
+}
+
+
+void RobotMovementWidget::updateFromNewPosition() {
+  updatePositionWidget();
+  updateTextEdit();
+}
+
+
+void RobotMovementWidget::updateSpeedSlider() {
+  bool hasRelativeSpeedController =
+      (m_robotPointer->getSpeedController()->getType() == SpeedController::Type::Relative);
   speedSlider->setEnabled(hasRelativeSpeedController);
+  if (hasRelativeSpeedController) {
+    std::ostringstream stringStream;
+    stringStream << "Speed controlling at " << m_robotPointer->getSpeedController()->getRobotSpeed() <<
+                    "% of the maximum!";
+    speedSlider->setToolTip(stringStream.str().c_str());
+  } else {
+    speedSlider->setToolTip("Speed controlling only valid with a relative speed controller!");
+  }
+}
+
+
+void RobotMovementWidget::setSpeedOnSpeedController() {
+  m_robotPointer->getSpeedController()->setRobotSpeed(speedSlider->value());
+  updateSpeedSlider();
 }
 
 
 void RobotMovementWidget::updatePositionWidget() {
-  QString textualRepresentation;
-
-  // Update grafical widget
-  QWidget* robotPositionWidget = robotCanvas->
+  RobotPositionWidget* widget = robotCanvas->
       findChild<RobotPositionWidget*>();
+  if (widget) {
+    widget->update();
+  } else {
+    LOG_ERROR("Could not find item!");
+  }
+}
 
-  if (robotPositionWidget)
-    robotPositionWidget->update();
-  else
-    LOG_ERROR("could not find robot position widget!");
+
+void RobotMovementWidget::updateTextEdit() {
   LOG_DEBUG("Update RobotPosition!");
   Point2D robotPosition = m_robotPointer->getPosition();
-  // update x position line edit
+  QString textualRepresentation;
   textualRepresentation.setNum(robotPosition.x);
   xPositionLineEdit->setText(textualRepresentation);
 
-  // update y position line edit
   textualRepresentation.setNum(robotPosition.y);
   yPositionLineEdit->setText(textualRepresentation);
 
-  // update extension line edit
   textualRepresentation.setNum(magnitude(robotPosition));
   extensionLineEdit->setText(textualRepresentation);
 
-  // update angle line edit
   textualRepresentation.setNum(robotPosition.getAlpha() * 180 / PI);
   angleLineEdit->setText(textualRepresentation);
 }
@@ -136,13 +160,6 @@ void RobotMovementWidget::updateMovementType(bool i_isChecked) {
 
   moveUpButton->setIcon(QIcon(":/icons/StraightUp.png"));
   moveDownButton->setIcon(QIcon(":/icons/StraightDown.png"));
-
-  RobotPositionWidget* widget = robotCanvas->
-      findChild<RobotPositionWidget*>();
-  if (widget)
-    widget->update();
-  else
-    LOG_ERROR("Could not find item!");
 }
 
 
@@ -152,13 +169,13 @@ bool RobotMovementWidget::hasValidRobot() {
     This is a slot for the hasNewRobotPointer signal.
     It will update the simulation/actuation radio buttons,
     based on the availability of the RobotPointer and
-    if a connection can be established to an arduino motor driver    
+    if a connection can be established to an arduino motor driver
   */
   if (m_robotPointer) {
     LOG_DEBUG("Found proper set robot pointer!");
     try {
       m_robotPointer->hasValidConnection();
-       LOG_DEBUG("Found a connection!!!");
+      LOG_DEBUG("Found a connection!!!");
       return true;
     } catch (std::runtime_error) {
       LOG_DEBUG("Dit not find a connection!");
@@ -261,7 +278,7 @@ void RobotMovementWidget::movementCounterClockWise() {
 
 
 void RobotMovementWidget::movementToolMode(const BaseJoint::MovementType& i_type,
-					   const std::string& i_direction) {
+                                           const std::string& i_direction) {
   if (m_mode != ToolMode)
     return;
   double stepSize = stepSizeLineEdit->text().toDouble();
@@ -276,7 +293,7 @@ void RobotMovementWidget::movementToolMode(const BaseJoint::MovementType& i_type
   }
   // Calculate the new position and prepare to actual take the steps
   m_robotPointer->getSpeedController()->prepareSpeedController
-    (m_robotPointer->getJointController()->resolveJoint(i_type));
+      (m_robotPointer->getJointController()->resolveJoint(i_type));
   m_robotPointer->prepareSteps(i_direction, numberOfSteps);
   if (hasValidRobot() && actuateRadioButton->isChecked()) {
     m_robotPointer->actuate();

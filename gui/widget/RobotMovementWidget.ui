@@ -287,6 +287,9 @@
          </item>
          <item row="9" column="0">
           <widget class="QLabel" name="label">
+           <property name="toolTip">
+            <string>Relative speed the robot will travel</string>
+           </property>
            <property name="text">
             <string>Speed</string>
            </property>
@@ -295,7 +298,7 @@
          <item row="9" column="1">
           <widget class="QSlider" name="speedSlider">
            <property name="toolTip">
-            <string>Relative speed the robot will travel</string>
+            <string/>
            </property>
            <property name="value">
             <number>25</number>

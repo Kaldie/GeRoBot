@@ -28,13 +28,13 @@ class RobotMovementWidget: public QWidget, private Ui::RobotMovementWidget {
     void initialise();
     bool hasValidRobot();
     void movementToolMode(const BaseJoint::MovementType& i_type,
-			  const std::string& i_direction);
-    void updateSpeedController();
+        const std::string& i_direction);
+    void updateSpeedSlider();
+
 
   public slots:
-      void updateSimulateRadioButtons();
-      void updateMovementType(bool i_isSet);
-      void updatePositionWidget();
+      void updateFromConfiguration();
+      void updateFromNewPosition();
       void movementUp();
       void movementExtent();
       void movementDown();
@@ -43,6 +43,13 @@ class RobotMovementWidget: public QWidget, private Ui::RobotMovementWidget {
       void movementCounterClockWise();
       void movementRight();
       void movementClockWise();
+
+ private slots:
+      void updateSimulateRadioButtons();
+      void updateTextEdit();
+      void updatePositionWidget();
+      void updateMovementType(bool i_isSet);
+      void setSpeedOnSpeedController();
 
  signals:
      void hasNewPosition();
