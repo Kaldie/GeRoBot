@@ -29,7 +29,7 @@ bool RelativeSpeedController::adviseSpeed(int* o_speed) const {
   } else if (robotSpeed > 100) {
     robotSpeed = 100;
   }
-  *o_speed = (m_maxSpeed - m_minSpeed) / (robotSpeed / 100.0) + m_minSpeed;
+  *o_speed = (m_maxSpeed - m_minSpeed) * (robotSpeed / 100.0) + m_minSpeed;
   return false;
 }
 
