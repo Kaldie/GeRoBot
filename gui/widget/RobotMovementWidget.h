@@ -27,6 +27,9 @@ class RobotMovementWidget: public QWidget, private Ui::RobotMovementWidget {
  private:
     void initialise();
     bool hasValidRobot();
+    void movementToolMode(const BaseJoint::MovementType& i_type,
+			  const std::string& i_direction);
+    void updateSpeedController();
 
   public slots:
       void updateSimulateRadioButtons();
