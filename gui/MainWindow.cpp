@@ -6,6 +6,8 @@
 #include <QFileDialog>
 #include <RobotIO.h>
 #include <TraceListIO.h>
+#include <QtWidgets/QTreeView>
+#include <QAbstractItemModel>
 #include "./MainWindow.h"
 #include "./core/RobotTreeModel.h"
 #include "./core/RobotItem.h"
@@ -42,6 +44,13 @@ void MainWindow::resizeColumnsToContents(const QModelIndex& /*modelIndex*/) {
 
 
 bool MainWindow::initialise() {
+  // Make and set the Robot movement widget
+  RobotMovementWidget* robotMovementWidget =
+    new RobotMovementWidget(m_modelPointer->getRobotPointer(), this);
+  robotMovementTab->layout()->addWidget(robotMovementWidget);
+
+  // Make and set the trace design widget
+  traceDesignTab->layout()->addWidget(new TraceDesignWidget(this));
   // exit file action
   connect(exitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
   // Save robot action
@@ -57,13 +66,13 @@ bool MainWindow::initialise() {
           SIGNAL(expanded(const QModelIndex& /*modelIndex*/)),
           this,
           SLOT(resizeColumnsToContents(const QModelIndex& /*modelIndex*/)));
-  RobotMovementWidget* robotMovementWidget =
-    new RobotMovementWidget(m_modelPointer->getRobotPointer(), this);
-  robotMovementTab->layout()->addWidget(robotMovementWidget);
-  LOG_DEBUG("Connection centralWidget to robot movement!");
+  // on switch the tabes, update the positition widget
+  connect(m_modelPointer.get(), &QAbstractItemModel::dataChanged,
+          robotMovementWidget, &RobotMovementWidget::updateFromConfiguration);
   connect(tabWidget, SIGNAL(currentChanged(int)),
-	  robotMovementWidget, SLOT(updatePositionWidget()));
-  traceDesignTab->layout()->addWidget(new TraceDesignWidget(this));
+    robotMovementWidget, SLOT(updatePositionWidget()));
+
+
   return true;
 }
 
