@@ -7,6 +7,7 @@
  RESOURCES   = RobotTreeModel.qrc
 
  HEADERS = \
+    core/ComboBoxDelegate.h \
     core/BaseActuatorItem.h \
     core/BaseJointItem.h \
     core/BaseMotorItem.h \
@@ -31,6 +32,7 @@
 
 
  SOURCES = \
+    core/ComboBoxDelegate.cpp \
     core/BaseActuatorItem.cpp \
     core/BaseJointItem.cpp \
     core/BaseMotorItem.cpp \

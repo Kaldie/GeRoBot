@@ -52,12 +52,12 @@ class RobotTreeModel : public QAbstractItemModel {
   bool removeRows(int position, int rows,
                   const QModelIndex &parent = QModelIndex());
 
+  BaseRobotItem* getItem(const QModelIndex &index) const;
+
   Robot::RobotPointer getRobotPointer();
 
  private:
   void setupModelData(const QStringList &lines, BaseRobotItem *parent);
-
-  BaseRobotItem *getItem(const QModelIndex &index) const;
 
   BaseRobotItem *rootItem;
 

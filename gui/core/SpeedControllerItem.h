@@ -13,7 +13,6 @@ class SpeedControllerItem:public BaseRobotItem
 private:
         //No default contructor
         SpeedControllerItem();
-        bool createPinChildItems();
         static const QList<QString> propertyList;
 
 public:
@@ -22,7 +21,10 @@ public:
         virtual bool construct();
         virtual QVariant getPropertyData(int row,int column) const;
         virtual bool setPropertyData(int row,int column, const QVariant &value);
+	// Yes for the controller type row
+	virtual bool useComboBoxDelegate(const int& i_row) const;
+	virtual std::vector<std::string> getComboBoxElements(const int& i_row) const;
+	virtual void setElement(const int& i_row, const int& i_selectedItem);
 };
-
 
 #endif // SPEEDCONTROLLERITEM_H_

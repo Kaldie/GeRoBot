@@ -2,8 +2,12 @@
 #include <macroHeader.h>
 #include "SpeedControllerItem.h"
 #include "BasePropertyItem.h"
+#include "RobotItem.h"
+#include <ConstantSpeedController.h>
+#include <RelativeSpeedController.h>
+#include <PrescribedSpeedController.h>
 
-const QList<QString> SpeedControllerItem::propertyList{"Name", "RobotSpeed"};
+const QList<QString> SpeedControllerItem::propertyList{"Type", "RobotSpeed"};
 
 SpeedControllerItem::SpeedControllerItem(BaseRobotItem* i_parent,
                                          const SpeedController::SpeedControllerPointer& i_speedController)
@@ -20,12 +24,11 @@ bool SpeedControllerItem::setPropertyData(int i_row,
     return false;
 
   bool isConverted=bool(false);
-  bool* hasConverted = &isConverted;
-
-  if(i_row==SpeedControllerItem::propertyList.indexOf("Name")) {
+  
+  if(i_row==SpeedControllerItem::propertyList.indexOf("Type")) {
     return false;
   } else if (i_row==SpeedControllerItem::propertyList.indexOf("RobotSpeed")) {
-    m_speedController->setRobotSpeed(i_data.toDouble(hasConverted));
+    m_speedController->setRobotSpeed(i_data.toDouble(&isConverted));
   }
   return isConverted;
 }
@@ -33,9 +36,9 @@ bool SpeedControllerItem::setPropertyData(int i_row,
 
 QVariant SpeedControllerItem::getPropertyData(int i_row,
                                               int i_column)const {
-  if(i_row==SpeedControllerItem::propertyList.indexOf("Name")) {
+  if(i_row==SpeedControllerItem::propertyList.indexOf("Type")) {
     if(i_column==0) {
-      return QVariant("Name");
+      return QVariant("Type");
     } else {
         switch (m_speedController->getType()) {
         case SpeedController::Type::Constant:
@@ -62,3 +65,55 @@ QVariant SpeedControllerItem::getPropertyData(int i_row,
 bool SpeedControllerItem::construct(){
   return createChilderen(SpeedControllerItem::propertyList);
 }
+
+
+bool SpeedControllerItem::useComboBoxDelegate(const int& i_row) const {
+  if (i_row != 0) {
+    return false;
+  }
+  return true;
+}
+
+std::vector<std::string> SpeedControllerItem::getComboBoxElements(const int& i_row) const {
+  if (i_row != 0) {
+    return std::vector<std::string>();
+  }
+  return std::vector<std::string>{"None", "Constant", "Prescribed", "Relative"};
+}
+
+
+void SpeedControllerItem::setElement(const int& i_row, const int& i_selectedItem) {
+  if (i_row != 0) {
+    return;
+  }
+
+  SpeedController* raw_pointer;
+  switch (i_selectedItem) {
+  case 0:
+    LOG_DEBUG("Cannot select None as a speed controller!");
+    return;
+  case 1:
+    raw_pointer = new ConstantSpeedController(m_speedController->getRobotSpeed(),
+					      m_speedController->getCurrentSequenceVectorPosition());
+    break;
+  case 2:
+    raw_pointer = new PrescribedSpeedController(m_speedController->getRobotSpeed(),
+						m_speedController->getCurrentSequenceVectorPosition());
+    break;
+  case 3:
+    raw_pointer = new RelativeSpeedController(m_speedController->getRobotSpeed(),
+					      m_speedController->getCurrentSequenceVectorPosition());
+  }
+  
+  if (!raw_pointer) {
+    return;
+  }
+
+  std::shared_ptr<SpeedController> shrd_ptr;
+  shrd_ptr.reset(raw_pointer);
+  LOG_DEBUG("Pre use count: " << m_speedController.use_count());
+  static_cast<RobotItem*>(parent())->getRobotPointer()->setSpeedController(shrd_ptr);
+  LOG_DEBUG("Post use count: " << m_speedController.use_count());
+  m_speedController = static_cast<RobotItem*>(parent())->getRobotPointer()->getSpeedController();
+}
+

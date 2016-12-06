@@ -38,14 +38,10 @@ void RobotMovementWidget::initialise() {
      is linked to update position widget
   */
   connect(this, SIGNAL(hasNewPosition()), this, SLOT(updatePositionWidget()));
-  connect(toolModeRadioButton,
-          SIGNAL(toggled(bool)),
-          this,
-          SLOT(updateMovementType(bool)));
-  connect(axisModeRadioButton,
-          SIGNAL(toggled(bool)),
-          this,
-          SLOT(updateMovementType(bool)));
+  connect(toolModeRadioButton, SIGNAL(toggled(bool)),
+          this, SLOT(updateMovementType(bool)));
+  connect(axisModeRadioButton, SIGNAL(toggled(bool)),
+          this, SLOT(updateMovementType(bool)));
   connect(moveLeftButton, SIGNAL(clicked()), this, SLOT(movementLeft()));
   connect(moveLeftButton, SIGNAL(clicked()), this, SLOT(movementCounterClockWise()));
   connect(moveRightButton, SIGNAL(clicked()), this, SLOT(movementRight()));
@@ -71,6 +67,15 @@ void RobotMovementWidget::initialise() {
   } else {
     LOG_DEBUG("m_RobotPointer is not a valid pointer!");
   }
+
+  updateSpeedController();
+}
+
+
+void RobotMovementWidget::updateSpeedController() {
+  bool hasRelativeSpeedController = !
+    m_robotPointer->getSpeedController()->getType() == SpeedController::Type::Relative;
+  speedSlider->setEnabled(hasRelativeSpeedController);
 }
 
 
@@ -149,30 +154,21 @@ bool RobotMovementWidget::hasValidRobot() {
     based on the availability of the RobotPointer and
     if a connection can be established to an arduino motor driver    
   */
-  bool hasRobotPointer(false);
-  bool hasArduinoConnection(false);
-
   if (m_robotPointer) {
-    hasRobotPointer = true;
-    LOG_DEBUG("Found robot pointer!");
-  }
-
-  if (hasRobotPointer) {
+    LOG_DEBUG("Found proper set robot pointer!");
     try {
-      if (m_robotPointer->hasValidConnection()) {
-        LOG_DEBUG("Found a connection!!!");
-        hasArduinoConnection = true;
-      } else {
-        LOG_DEBUG("Has a robot pointer but no connection!!!");
-        hasArduinoConnection = false;
-      }
-    } catch(std::runtime_error) {
-      LOG_DEBUG("Did not find a connection!!!");
-      hasArduinoConnection = false;
+      m_robotPointer->hasValidConnection();
+       LOG_DEBUG("Found a connection!!!");
+      return true;
+    } catch (std::runtime_error) {
+      LOG_DEBUG("Dit not find a connection!");
     }
+  } else {
+    LOG_DEBUG("Dit not find a robot pointer");
   }
-  return hasRobotPointer && hasArduinoConnection;
+  return false;
 }
+
 
 void RobotMovementWidget::updateSimulateRadioButtons() {
   if (hasValidRobot()) {
@@ -228,6 +224,7 @@ void RobotMovementWidget::movementLeft() {
   emit hasNewPosition();
 }
 
+
 void RobotMovementWidget::movementRight() {
   if (m_mode != AxisMode)
     return;
@@ -244,85 +241,43 @@ void RobotMovementWidget::movementRight() {
 
 
 void RobotMovementWidget::movementExtent() {
-  if (m_mode != ToolMode)
-    return;
-  double stepSize = stepSizeLineEdit->text().toDouble();
-  double robotStepSize = m_robotPointer->getMovementPerStep(BaseJoint::MovementType::Translational);
-  int numberOfSteps = std::abs(stepSize / robotStepSize);
-  if (numberOfSteps == 0) {
-    numberOfSteps = 1;
-  }
-  // Calculate the new position and prepare to actual take the steps
-  m_robotPointer->getSpeedController()->prepareSpeedController
-    (m_robotPointer->getJointController()->resolveJoint(BaseJoint::Translational));
-  m_robotPointer->prepareSteps("OUT",numberOfSteps);
-  if (hasValidRobot() && actuateRadioButton->isChecked()) {
-    m_robotPointer->actuate();
-  } else {
-    m_robotPointer->setPosition(m_robotPointer->getVirtualPosition());
-  }
-  emit hasNewPosition();
+  movementToolMode(BaseJoint::MovementType::Translational, "OUT");
 }
 
 
 void RobotMovementWidget::movementRetract() {
-  if (m_mode != ToolMode)
-    return;
-  double stepSize = stepSizeLineEdit->text().toDouble();
-  double robotStepSize = m_robotPointer->getMovementPerStep(BaseJoint::MovementType::Translational);
-  int numberOfSteps = std::abs(stepSize / robotStepSize);
-  if (numberOfSteps == 0) {
-    numberOfSteps = 1;
-  }
-
-  m_robotPointer->getSpeedController()->prepareSpeedController
-    (m_robotPointer->getJointController()->resolveJoint(BaseJoint::Translational));
-  // Calculate the new position and prepare to actual take the steps
-  m_robotPointer->prepareSteps("IN",numberOfSteps);
-  if (hasValidRobot() && actuateRadioButton->isChecked()) {
-    m_robotPointer->actuate();
-  } else {
-    m_robotPointer->setPosition(m_robotPointer->getVirtualPosition());
-  }
-  emit hasNewPosition();
+  movementToolMode(BaseJoint::MovementType::Translational, "IN");
 }
 
 
 void RobotMovementWidget::movementClockWise() {
-  if (m_mode != ToolMode)
-    return;
-  double stepSizeInDegree = stepSizeLineEdit->text().toDouble();
-  double robotStepSize = m_robotPointer->getMovementPerStep(BaseJoint::MovementType::Rotational);
-  int numberOfSteps = (stepSizeInDegree * (PI/180.0)) / robotStepSize;
-  if (numberOfSteps == 0) {
-    numberOfSteps = 1;
-  }
-  // Calculate the new position and prepare to actual take the steps
-  m_robotPointer->getSpeedController()->prepareSpeedController
-    (m_robotPointer->getJointController()->resolveJoint(BaseJoint::Rotational));
-  m_robotPointer->prepareSteps("CW",numberOfSteps);
-  if (hasValidRobot() && actuateRadioButton->isChecked()) {
-    m_robotPointer->actuate();
-  } else {
-    m_robotPointer->setPosition(m_robotPointer->getVirtualPosition());
-  }
-  emit hasNewPosition();
+  movementToolMode(BaseJoint::MovementType::Rotational, "CW");
 }
 
 
 void RobotMovementWidget::movementCounterClockWise() {
+  movementToolMode(BaseJoint::MovementType::Rotational, "CCW");
+}
+
+
+void RobotMovementWidget::movementToolMode(const BaseJoint::MovementType& i_type,
+					   const std::string& i_direction) {
   if (m_mode != ToolMode)
     return;
-  double stepSizeInDegree = stepSizeLineEdit->text().toDouble();
-  double robotStepSize = m_robotPointer->getMovementPerStep(BaseJoint::MovementType::Rotational);
-  int numberOfSteps = (stepSizeInDegree * (PI/180.0)) / robotStepSize;
+  double stepSize = stepSizeLineEdit->text().toDouble();
+  // convert to radians
+  if (i_type == BaseJoint::MovementType::Rotational) {
+    stepSize *= (PI/180.0);
+  }
+  double robotStepSize = m_robotPointer->getMovementPerStep(i_type);
+  int numberOfSteps = (stepSize) / robotStepSize;
   if (numberOfSteps == 0) {
     numberOfSteps = 1;
   }
   // Calculate the new position and prepare to actual take the steps
   m_robotPointer->getSpeedController()->prepareSpeedController
-    (m_robotPointer->getJointController()->resolveJoint(BaseJoint::Rotational));
-  m_robotPointer->prepareSteps("CCW",numberOfSteps);
+    (m_robotPointer->getJointController()->resolveJoint(i_type));
+  m_robotPointer->prepareSteps(i_direction, numberOfSteps);
   if (hasValidRobot() && actuateRadioButton->isChecked()) {
     m_robotPointer->actuate();
   } else {

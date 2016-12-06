@@ -55,6 +55,26 @@ class BaseRobotItem {
   virtual bool construct() = 0;
   virtual QVariant getPropertyData(int row,int column) const =0;
   virtual bool setPropertyData(int row,int column, const QVariant &value) =0;
+
+  /**
+   * It is possible to use a costom delegate, in our case this is a combo box
+   * If an item can use it as a setter
+   * make the next method return true
+   */
+  virtual bool useComboBoxDelegate(const int& i_row) const {return false;};
+
+  /**
+   * Returns string which are called in order to populate the combo box
+   * The order is important. The set element method will return an index for one of the given items
+   */
+  virtual std::vector<std::string> getComboBoxElements(const int& i_row) const {return std::vector<std::string>();};
+
+  /**
+  * Will be called when the custom delegate is done editing
+  * i_selectedItem is the index selected in the combo box
+  * This method should make sure the info from the combo is set in the element
+  */
+  virtual void setElement(const int& i_row, const int& i_selectedItem) {};
 };
 
 #endif

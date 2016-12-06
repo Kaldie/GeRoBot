@@ -17,8 +17,10 @@
 
 
 MainWindow::MainWindow(const Robot::RobotPointer& i_robot,
-                        QWidget* parent/*=0*/):
-    QMainWindow(parent) {
+                        QWidget* parent/*=0*/)
+  : QMainWindow(parent),
+    m_comboBoxDelegate(parent)
+{
   setupUi(this);
 
 #ifdef Q_WS_MAEMO_5
@@ -28,7 +30,7 @@ MainWindow::MainWindow(const Robot::RobotPointer& i_robot,
 
   m_modelPointer.reset(new RobotTreeModel(i_robot));
   configurationView->setModel(m_modelPointer.get());
-
+  configurationView->setItemDelegateForColumn(1, &m_comboBoxDelegate);
   initialise();
 }
 

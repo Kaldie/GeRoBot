@@ -6,6 +6,7 @@
 #include <QModelIndex>
 #include <macroHeader.h>
 #include "./core/RobotTreeModel.h"
+#include "./core/ComboBoxDelegate.h"
 #include "./ui_MainWindow.h"
 #include "./widget/RobotMovementWidget.h"
 
@@ -15,9 +16,9 @@ class QTreeView;
 class MainWindow: public QMainWindow, private Ui::mainWindow {
   Q_OBJECT
   GETSET(RobotTreeModel::RobotTreeModelPointer, m_modelPointer, ModelPointer);
-
  private:
   bool initialise();
+  ComboBoxDelegate m_comboBoxDelegate;
 
  public:
   MainWindow(const Robot::RobotPointer&, QWidget *parent = 0);
