@@ -12,8 +12,8 @@ ComboBoxDelegate::ComboBoxDelegate(QObject* i_parent)
 
 
 QWidget* ComboBoxDelegate::createEditor(QWidget* i_parent,
-					const QStyleOptionViewItem& i_option,
-					const QModelIndex& i_index) const {
+          const QStyleOptionViewItem& i_option,
+          const QModelIndex& i_index) const {
   if (!useDelegate(i_index)) {
     return QItemDelegate::createEditor(i_parent, i_option, i_index);
   }
@@ -26,7 +26,7 @@ void ComboBoxDelegate::setEditorData(QWidget *i_editor, const QModelIndex& i_ind
     return QItemDelegate::setEditorData(i_editor, i_index);
   }
   LOG_DEBUG("Getting elements of column: " << i_index.column() <<
-	    "and row" << i_index.row());
+      "and row" << i_index.row());
   QComboBox* comboBox = static_cast<QComboBox*>(i_editor);
   for (const auto itemName : getItem(i_index)->getComboBoxElements(i_index.row())) {
     comboBox->addItem(QString(itemName.c_str()));
@@ -35,18 +35,19 @@ void ComboBoxDelegate::setEditorData(QWidget *i_editor, const QModelIndex& i_ind
 
 
 void ComboBoxDelegate::setModelData(QWidget* i_editor,
-				    QAbstractItemModel *i_model,
-				    const QModelIndex& i_index) const {
+            QAbstractItemModel *i_model,
+            const QModelIndex& i_index) const {
   if (!useDelegate(i_index)) {
     return QItemDelegate::setModelData(i_editor, i_model, i_index);
   }
   getItem(i_index)->setElement(i_index.row(), static_cast<QComboBox*>(i_editor)->currentIndex());
+  emit i_model->dataChanged(i_index,i_index);
 }
 
 
 void ComboBoxDelegate::updateEditorGeometry(QWidget* i_editor,
-					    const QStyleOptionViewItem& i_option,
-					    const QModelIndex& i_index) const {
+              const QStyleOptionViewItem& i_option,
+              const QModelIndex& i_index) const {
   if (!useDelegate(i_index)) {
     QItemDelegate::updateEditorGeometry(i_editor, i_option, i_index);
   }
