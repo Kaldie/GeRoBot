@@ -43,13 +43,12 @@ bool RobotItem::setPropertyData(int i_row,
   if (i_column != 1)
     return false;
 
+  Point2D point = m_robotPointer->getPosition();
   if (i_row == RobotItem::propertyList.indexOf("CurrentPositionX")) {
-    Point2D point = m_robotPointer->getPosition();
     point.x = i_data.toDouble();
     m_robotPointer->setPosition(point);
     return true;
   } else if (i_row == RobotItem::propertyList.indexOf("CurrentPositionY")) {
-    Point2D point = m_robotPointer->getPosition();
     point.y = i_data.toDouble();
     m_robotPointer->setPosition(point);
     return true;
