@@ -5,6 +5,7 @@
 #include <QPainter>
 #include <Robot.h>
 #include <BaseJoint.h>
+#include <RelativeSpeedController.h>
 #include "./RobotPositionWidget.h"
 #include "./RobotMovementWidget.h"
 
@@ -86,17 +87,49 @@ void RobotMovementWidget::updateFromNewPosition() {
 
 void RobotMovementWidget::updateSpeedSlider() {
   bool hasRelativeSpeedController =
-      (m_robotPointer->getSpeedController()->getType() == SpeedController::Type::Relative);
+    (m_robotPointer->getSpeedController()->getType() == SpeedController::Type::Relative);
   speedSlider->setEnabled(hasRelativeSpeedController);
+  QString qstring;
   if (hasRelativeSpeedController) {
-    std::ostringstream stringStream;
-    stringStream << "Speed controlling at " << m_robotPointer->getSpeedController()->getRobotSpeed() <<
-                    "% of the maximum!";
-    speedSlider->setToolTip(stringStream.str().c_str());
+    RelativeSpeedController* controller =
+      static_cast<RelativeSpeedController*>(m_robotPointer->getSpeedController().get());
+    speedSlider->setToolTip(getRelativeToolTip(controller));
+    speedSlider->setStatusTip(getRelativeStatusTip(controller));
   } else {
-    speedSlider->setToolTip("Speed controlling only valid with a relative speed controller!");
+    qstring = "Speed controlling only valid with a relative speed controller!";
+    speedSlider->setToolTip(qstring);
+    speedSlider->setStatusTip(qstring);
   }
 }
+
+
+QString RobotMovementWidget::getRelativeToolTip(RelativeSpeedController* i_controller) const {
+  QString string("");
+  QTextStream stringStream(&string);
+  stringStream << "Speed controlling at " << i_controller->getRobotSpeed() <<
+    "% of the maximum!";
+  return *stringStream.string();
+}
+
+
+QString RobotMovementWidget::getRelativeStatusTip(RelativeSpeedController* i_controller) const {
+  QString string("");
+  QString dimension;
+  QTextStream stringStream(&string);
+  int i = 1;
+  stringStream << "Estimate speed at this position is: ";
+  for (const auto& joint : m_robotPointer->getJointController()->getJointPointerVector()) {
+    if (joint->getMovementType() == BaseJoint::MovementType::Rotational) {
+      dimension = "deg/sec:";
+    } else if (joint->getMovementType() == BaseJoint::MovementType::Translational) {
+      dimension = "mm/sec:";
+    }
+    stringStream << i_controller->determineRobotSpeed(joint) << " " << dimension << " for joint " << i << ". ";
+    ++i;
+  }
+  return *stringStream.string();
+}
+     
 
 
 void RobotMovementWidget::setSpeedOnSpeedController() {
@@ -107,7 +140,7 @@ void RobotMovementWidget::setSpeedOnSpeedController() {
 
 void RobotMovementWidget::updatePositionWidget() {
   RobotPositionWidget* widget = robotCanvas->
-      findChild<RobotPositionWidget*>();
+    findChild<RobotPositionWidget*>();
   if (widget) {
     widget->update();
   } else {

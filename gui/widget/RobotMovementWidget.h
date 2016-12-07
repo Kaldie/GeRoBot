@@ -10,6 +10,7 @@ class Point2D;
 class QAction;
 class QTreeView;
 class QWidget;
+class RelativeSpeedController;
 
 class RobotMovementWidget: public QWidget, private Ui::RobotMovementWidget {
     Q_OBJECT
@@ -30,6 +31,8 @@ class RobotMovementWidget: public QWidget, private Ui::RobotMovementWidget {
     void movementToolMode(const BaseJoint::MovementType& i_type,
         const std::string& i_direction);
     void updateSpeedSlider();
+    QString getRelativeToolTip(RelativeSpeedController* i_controller) const;
+    QString getRelativeStatusTip(RelativeSpeedController* i_controller) const;
 
 
   public slots:
