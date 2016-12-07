@@ -112,9 +112,7 @@ void SpeedControllerItem::setElement(const int& i_row, const int& i_selectedItem
 
   std::shared_ptr<SpeedController> shrd_ptr;
   shrd_ptr.reset(raw_pointer);
-  LOG_DEBUG("Pre use count: " << m_speedController.use_count());
   static_cast<RobotItem*>(parent())->getRobotPointer()->setSpeedController(shrd_ptr);
-  LOG_DEBUG("Post use count: " << m_speedController.use_count());
   m_speedController = static_cast<RobotItem*>(parent())->getRobotPointer()->getSpeedController();
 }
 
