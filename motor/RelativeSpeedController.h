@@ -19,7 +19,9 @@ public:
                           const unsigned int& i_numberOfSteps);
 
   virtual void prepareSpeedController(const BaseJoint::JointPointer& i_joint);
-    
+
+  traceType determineRobotSpeed(const BaseJoint::JointPointer& i_joint) const;
+
   /// Default constructor
   RelativeSpeedController();
 
@@ -33,7 +35,21 @@ public:
  private:
   void calculateMinMaxSpeed(const JointController& i_controller,
 			    const Trace& i_trace);
+
+  traceType estimateRobotSpeed(const BaseJoint::JointPointer& i_joint,
+			       const int& i_motorSpeed) const;
+
+  bool adviseSpeed(int* i_speed, const int& i_minSpeed, const int& i_maxSpeed) const;
+  
+  traceType estimateRobotSpeed() const;
+  
+  void determineMotorSpeed(const BaseJoint::JointPointer&,
+			   int* i_minSpeed,
+			   int* i_maxSpeed) const;
+
   int m_minSpeed, m_maxSpeed;
+
+  
 };
 
 #endif  // MOTOR_RELATIVESPEEDCONTROLLER_H_
