@@ -19,6 +19,7 @@ class JointController {
 
   /// Vector where all the sequences will be stored in!
   GETSET(SequenceVector, m_sequenceVector, SequenceVector);
+
  public:
   JointController();
   ~JointController();
@@ -51,6 +52,16 @@ class JointController {
 
   /// function which will make the robot move!
   void actuate();
+
+
+  /**
+   * Method will resolve the end stop call
+   * It will tell the actuator to reset the driver
+   * From that call it will resolve 
+   *  the direction the actuator was going at that time
+   *  The endstop being actuated at the given time
+   */
+  int resolveEndStopHit(JointPointerVector o_joint, std::string* o_direction);
 
   /**
    * Reducing the size of the vector
@@ -102,6 +113,9 @@ private:
 
   /// Method to retrieve the joint of the type
   BaseJoint::JointPointer getJoint(const BaseJoint::MovementType&) const;
+
+  int resolveEndStopHit(JointPointerVector* o_jointVector,
+			std::vector<std::string>* o_direction);
 };
 
 #endif  // MOTOR_JOINTCONTROLLER_H_

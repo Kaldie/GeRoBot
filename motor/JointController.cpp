@@ -6,11 +6,14 @@
 #include <SequenceVector.h>
 #include <BaseJoint.h>
 #include <BaseMotor.h>
+#include <PinState.h>
 
 JointController::JointController()
   :m_jointPointerVector({}),
-   m_actuator(ArduinoMotorDriver("/dev/ttyUSB*")) {
+   m_actuator(ArduinoMotorDriver("/dev/ttyUSB*")),
+   m_sequenceVector() {
 }
+
 
 JointController::~JointController()
 {}
@@ -25,8 +28,9 @@ bool JointController::validateJoint(const BaseJoint::JointPointer& i_baseJoint) 
   for (PinVector::const_iterator itr = pins.begin();
       itr != pins.end();
       itr++) {
-    // Pin should be between 2 and 7...make sense for arduino only!
-    if (((*itr)>7) | ((*itr) <2)) {
+    
+    if (((*itr) > std::get<1>(m_actuator.getJointPinRange())) ||
+	((*itr) < std::get<0>(m_actuator.getJointPinRange()))) {
       LOG_INFO("Pin: " << (*itr) << " is not within range!!");
       return false;
     }
@@ -105,18 +109,13 @@ BaseJoint::JointPointer JointController::getJoint(const BaseJoint::MovementType 
   if (m_jointPointerVector.size() == 0)
     LOG_ERROR("No joints defined yet");
 
-  if (m_jointPointerVector.size() == 1)
-    if (m_jointPointerVector[0]->getMovementType() == i_movementType)
-      return m_jointPointerVector[0];
-
-  if (m_jointPointerVector.size() == 2)
-    for (JointController::JointPointerVector::const_iterator itr = m_jointPointerVector.begin();
-         itr != m_jointPointerVector.end();
-         itr++) {
-      if ((*itr)->getMovementType() == i_movementType) {
-        return *itr;
-      }
+  for (JointController::JointPointerVector::const_iterator itr = m_jointPointerVector.begin();
+       itr != m_jointPointerVector.end();
+       itr++) {
+    if ((*itr)->getMovementType() == i_movementType) {
+      return *itr;
     }
+  }
   LOG_ERROR("Could not find joint with the correct movement type!");
 }
 
@@ -189,6 +188,34 @@ void JointController::uploadSequence(const bool& i_condense) {
     }
   }
 }
+
+
+int JointController::resolveEndStopHit(JointPointerVector* o_jointVector,
+				       std::vector<std::string>* o_direction) {
+  o_jointVector->clear();
+  o_direction->clear();
+  int result = m_actuator.resolveEndStopHit();
+
+  PinState pinState;
+  std::tuple<int, int> pinRange(m_actuator.getJointPinRange());
+  for (int i= std::get<0>(pinRange);
+       i <= std::get<1>(pinRange); ++i) {
+      pinState.update(i, 0);
+  }
+  // if you mod with the max pin number + 1
+  // you get the integer value of the pins 0 to max pin number
+  pinState.setNumericValue(result % (1 << (std::get<1>(pinRange) + 1)));
+  
+  std::string jointDirection;
+  for (const auto& joint : m_jointPointerVector) {
+    if (joint->getJointStatus(pinState, &jointDirection)) {
+      o_jointVector->push_back(joint);
+      o_direction->push_back(jointDirection);
+    }
+  }
+  return result;
+}
+
 
 
 BaseJoint::JointPointer JointController::resolveJoint(const std::string& i_movementDirection) const {
