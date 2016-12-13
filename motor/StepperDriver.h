@@ -8,6 +8,9 @@ class StateSequence;
 class SequenceVector;
 
 class StepperDriver: public BaseMotor {
+ public:
+  typedef std::shared_ptr<StepperDriver> DriverPointer;
+
   /// Maximum frequency (in deca hertz) which the motor starts from
   GETSET(int, m_pullIn, PullIn);
 
@@ -69,6 +72,11 @@ class StepperDriver: public BaseMotor {
 
   /// Return the number of states needed per step
   virtual int numberOfStatesPerStep() const {return 2;}
+
+  /// from a pin state, determine the status of the motor at that point
+  virtual void getMotorStatus(const PinState& i_pinState,
+			      bool* i_isEnabled,
+			      std::string* i_rotationDirection) const;
 
   // Display pin state vector
   virtual void displayPinState(const PinState&) const;

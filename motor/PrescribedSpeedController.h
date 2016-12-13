@@ -9,7 +9,7 @@
 
 class JointController;
 class StateSequence;
-
+class BaseMotor;
 class PrescribedSpeedController : public SpeedController {
 
   struct JointInfo
@@ -125,13 +125,13 @@ class PrescribedSpeedController : public SpeedController {
   void boundsOfWorkingMotor(float* o_lowerBound,
                             float* o_upperBound,
                             const JointInfo& i_jointInfo,
-                            const BaseMotor* i_motor) const;
+                            const std::shared_ptr<BaseMotor> i_motor) const;
 
   /// calculate the frequency bounds of an idle motor
   void boundsOfIdleMotor(float* o_lowerBound,
                          float* o_upperBound,
                          const JointInfo& i_jointInfo,
-                         BaseMotor* i_motor) const;
+                         std::shared_ptr<BaseMotor> i_motor) const;
 
   /// Based on the current frequency, calculate the current speed
   float calculateCurrentSpeed() const;

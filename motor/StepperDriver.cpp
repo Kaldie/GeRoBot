@@ -203,3 +203,19 @@ void StepperDriver::displayPinState(const PinState& i_pinState) const {
 void StepperDriver::displayPinState() const {
   displayPinState(getCurrentPinState());
 }
+
+
+void StepperDriver::getMotorStatus(const PinState& i_pinState,
+				   bool* i_isEnabled,
+				   std::string* i_rotationDirection) const {
+  *i_isEnabled = (DEFAULT_STATE == i_pinState.getPinState(enablePin()));
+  if (DEFAULT_STATE == i_pinState.getPinState(directionPin())) {
+    *i_rotationDirection = getDefaultDirection();
+  } else {
+    if (getDefaultDirection().compare("CCW")) {
+      *i_rotationDirection = "CW";
+    } else {
+      *i_rotationDirection = "CCW";
+    }
+  }
+}

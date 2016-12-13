@@ -13,8 +13,6 @@ class TranslationalJoint: public BaseJoint {
                               const std::string&,
                               const int&) const;
 
-    virtual ActuatorType* getMotor();
-
     virtual traceType distancePerStep() const;
 
     std::shared_ptr<TranslationalJoint<ActuatorType>> clone() const {
@@ -29,6 +27,7 @@ class TranslationalJoint: public BaseJoint {
 
  protected:
   virtual TranslationalJoint<ActuatorType>* cloneImpl() const;
+
   /// return length of the Joint
   virtual traceType getLength() const;
 
@@ -44,19 +43,11 @@ class TranslationalJoint: public BaseJoint {
 // Constructors
 template <class ActuatorType>TranslationalJoint<ActuatorType>::
 TranslationalJoint()
- : BaseJoint() {
-  setDirectionConversionMap({{"IN", "CCW"}, {"OUT", "CW"}});
-  setMovementType(Translational);
+ : BaseJoint(std::shared_ptr<BaseMotor>(new ActuatorType())) {
+   setDirectionConversionMap({{"IN", "CCW"}, {"OUT", "CW"}});
+   setMovementType(Translational);
 }
 
-
-
-// Actual methods
-template <class ActuatorType>
-ActuatorType* TranslationalJoint<ActuatorType>::
-getMotor() {
-  return &m_actuator;
-}
 
 template <class ActuatorType>
 traceType TranslationalJoint<ActuatorType>::getLength() const {
@@ -115,15 +106,15 @@ template <class ActuatorType>
 TranslationalJoint<ActuatorType>* TranslationalJoint<ActuatorType>::
   cloneImpl() const {
   TranslationalJoint<ActuatorType>* joint= new TranslationalJoint<ActuatorType>;
-
   joint->setPosition(this->getPosition());
   joint->setMovementPerStep(this->getMovementPerStep());
   joint->setDirectionConversionMap(this->getDirectionConversionMap());
   //    joint->m_range=this->m_range;
   joint->setRange(this->getRange());
+  joint->m_motor = this->m_motor;
   joint->setMovementType(this->getMovementType());
-  joint->m_actuator = this->m_actuator;
   joint->m_child = this->m_child;
+  joint->m_parent = this->m_parent;
   return joint;
 }
 

@@ -3,7 +3,9 @@
 
 #include <XMLBuilder.h>
 #include <BaseJoint.h>
-#include <StepperDriver.h>
+//#include <StepperDriver.h>
+
+class StepperDriver;
 
 class JointIO: public XMLBuilder {
   GETSET(BaseJoint::JointPointer, m_jointPointer, JointPointer);
@@ -21,7 +23,7 @@ class JointIO: public XMLBuilder {
   // No default contructor!!
   JointIO();
   /// Constructor the stepper driver based on the child in the joint
-  StepperDriver parseStepperDriver(const pugi::xml_node&);
+  std::shared_ptr<StepperDriver> parseStepperDriver(const pugi::xml_node&);
   void makeSharedJoint();
   void handleConversionMap();
   bool isValidNode(const pugi::xml_node&) const;

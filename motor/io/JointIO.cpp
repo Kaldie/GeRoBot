@@ -34,20 +34,19 @@ void JointIO::build() {
     }
     m_jointPointer->setRange(convertedRangeVector);
   }
+
   //StepperDriver
   // cast it first to a proper stepperdriver pointer then set it
   // otherwise it get sliced
   // need to first pointer: the static_cast call is a rvalue not lvalue!
-  StepperDriver* stepperDriver = static_cast<StepperDriver*>(m_jointPointer->getMotor());
-  *stepperDriver = parseStepperDriver(getNodeFromPath(m_node, "./ACTUATOR"));
-
+  m_jointPointer->setMotor(parseStepperDriver(getNodeFromPath(m_node, "./ACTUATOR")));
   handleConversionMap();
   LOG_DEBUG("Construction of the pointer is finished!");
   LOG_DEBUG("Joint Build is finshed!");
 }
 
 
-StepperDriver JointIO::parseStepperDriver(const pugi::xml_node& i_node) {
+StepperDriver::DriverPointer JointIO::parseStepperDriver(const pugi::xml_node& i_node) {
   StepperDriverIO stepperDriverIO(i_node);
   stepperDriverIO.build();
   return stepperDriverIO.getStepperDriver();

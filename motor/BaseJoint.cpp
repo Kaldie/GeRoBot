@@ -2,8 +2,8 @@
 
 #include <macroHeader.h>
 #include "BaseJoint.h"
-#include "./BaseMotor.h"
-#include "./SequenceVector.h"
+#include <BaseMotor.h>
+#include <SequenceVector.h>
 #include <Point2D.h>
 
 void BaseJoint::setRange(const std::vector<double>& i_range) {
@@ -40,6 +40,22 @@ const std::string BaseJoint::convertDirection(
   }
   return itr->second;
 }
+
+
+bool BaseJoint::getJointStatus(const PinState& i_pinState,
+			       std::string* i_direction) const {
+  bool isEnabled;
+  std::string motorDirection;
+  getMotor()->getMotorStatus(i_pinState, &isEnabled, &motorDirection);
+  for (const auto element : m_directionConversion) {
+    if (motorDirection == element.second) {
+      *i_direction = element.first;
+      break;
+    }
+  }
+  return isEnabled;
+}
+
 
 
 const Point2D BaseJoint::childPosition() const {
@@ -90,15 +106,17 @@ void BaseJoint::moveSteps(const std::string& i_directionString,
 }
 
 
-BaseJoint::BaseJoint()
-  :BaseJoint(0, 0, {0, 1}, MovementType::None, {}, WeakJointPointer(), WeakJointPointer()) {
+BaseJoint::BaseJoint(const BaseMotor::MotorPointer& i_motor)
+  :BaseJoint(i_motor, 0, 0, {0, 1}, MovementType::None, {}, WeakJointPointer(), WeakJointPointer()) {
 }
 
-BaseJoint::BaseJoint(const traceType& i_currentPosition,
+BaseJoint::BaseJoint(const BaseMotor::MotorPointer& i_motor,
+		     const traceType& i_currentPosition,
 		     const traceType& i_movementPerStep,
 		     const MovementType i_type,
 		     const DirectionConversionMap& i_conversionMap)
-  : BaseJoint(i_currentPosition,
+  : BaseJoint(i_motor,
+	      i_currentPosition,
 	      i_movementPerStep,
 	      {0, 1},
 	      i_type,
@@ -107,7 +125,8 @@ BaseJoint::BaseJoint(const traceType& i_currentPosition,
 	      WeakJointPointer()) {
 }
 
-BaseJoint::BaseJoint(const traceType& i_currentPosition,
+BaseJoint::BaseJoint(const BaseMotor::MotorPointer& i_motor,
+		     const traceType& i_currentPosition,
 		     const traceType& i_movementPerStep,
 		     const std::vector<traceType>& i_rangeVector,
 		     const MovementType i_type,
@@ -120,5 +139,6 @@ BaseJoint::BaseJoint(const traceType& i_currentPosition,
    m_movementType(i_type),
    m_directionConversion(i_conversionMap),
    m_child(i_child),
-   m_parent(i_parent) {
+   m_parent(i_parent),
+   m_motor(i_motor) {
 }

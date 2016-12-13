@@ -78,7 +78,7 @@ traceType  RelativeSpeedController::determineRobotSpeed
 void RelativeSpeedController::determineMotorSpeed(const BaseJoint::JointPointer& i_joint,
 						  int* io_minSpeed,
 						  int* io_maxSpeed) const {
-  BaseMotor* motor = i_joint->getMotor();
+  BaseMotor::MotorPointer motor = i_joint->getMotor();
   if (*io_minSpeed < motor->getMinimumSpeed()) {
     *io_minSpeed = motor->getMinimumSpeed();
   }

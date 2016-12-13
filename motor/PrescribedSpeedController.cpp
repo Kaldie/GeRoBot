@@ -62,7 +62,7 @@ void PrescribedSpeedController::notifyStep(const BaseJoint::JointPointer& i_join
   // to ensure calculations works as expected
   auto element = m_jointMap.find(joint);
   if (element == m_jointMap.end()) {
-    BaseMotor* motor = i_joint->getMotor();
+    BaseMotor::MotorPointer motor = i_joint->getMotor();
     // Add this joint
     m_jointMap[joint] = JointInfo
       {0,                                            // number of steps
@@ -282,7 +282,7 @@ bool PrescribedSpeedController::getFrequencyBounds(int* o_lowerBound,
   *o_upperBound = std::numeric_limits<int>::max();
   float tmpLowerBound, tmpUpperBound;
   for (auto element : m_jointMap) {
-    BaseMotor* motor = element.first.lock()->getMotor();
+    BaseMotor::MotorPointer motor = element.first.lock()->getMotor();
     if (element.second.m_numberOfSteps <= 0) {
       LOG_DEBUG("Getting bounds of idle motor!");
       boundsOfIdleMotor(&tmpLowerBound, &tmpUpperBound,
@@ -308,9 +308,9 @@ bool PrescribedSpeedController::getFrequencyBounds(int* o_lowerBound,
 
 
 void PrescribedSpeedController::boundsOfWorkingMotor(float* o_lowerBound,
-                                           float* o_upperBound,
-                                           const JointInfo& i_jointInfo,
-                                           const BaseMotor* i_motor) const {
+						     float* o_upperBound,
+						     const JointInfo& i_jointInfo,
+						     const BaseMotor::MotorPointer i_motor) const {
   float averageMissedSteps;
   average(i_jointInfo.m_missedSteps, &averageMissedSteps);
   // ratio to which this motor works and the hardest working motor
@@ -329,7 +329,7 @@ void PrescribedSpeedController::boundsOfWorkingMotor(float* o_lowerBound,
 void PrescribedSpeedController::boundsOfIdleMotor(float* o_lowerBound,
                                         float* o_upperBound,
                                         const JointInfo& i_jointInfo,
-                                        BaseMotor* i_motor) const {
+                                        const BaseMotor::MotorPointer i_motor) const {
   int currentSpeedMotor = i_motor->getSpeed();
   i_motor->setSpeed(i_jointInfo.m_driverFrequency);
   float changeRatio =
@@ -342,7 +342,7 @@ void PrescribedSpeedController::boundsOfIdleMotor(float* o_lowerBound,
 
 
 void PrescribedSpeedController::initialiseMotorFrequency(const BaseJoint::JointPointer& i_joint) {
-  BaseMotor* motor = i_joint->getMotor();
+  BaseMotor::MotorPointer motor = i_joint->getMotor();
   if (motor) {
     m_motorFrequency = motor->getMaximumSpeed();
     LOG_DEBUG("Set motor frequency to pull in: "

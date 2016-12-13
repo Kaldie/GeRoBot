@@ -6,14 +6,17 @@
 class Point2D;
 class SequenceVector;
 class BaseMotor;
+class PinState;
 
 
 class BaseJoint {
  public:
     // shared pointer type def
     typedef std::shared_ptr<BaseJoint> JointPointer;
+
     // weak pointer type def
     typedef std::weak_ptr<BaseJoint> WeakJointPointer;
+
     // declaration of the movement type
     enum MovementType {None, Rotational, Translational};
 
@@ -29,10 +32,10 @@ class BaseJoint {
     // Type of the movement of the Joint
     GETSET(MovementType, m_movementType, MovementType);
 
-    // Direction conversion map of the joint
+    /// Direction conversion map of the joint
     GETSET(DirectionConversionMap,
-           m_directionConversion,
-           DirectionConversionMap);
+	   m_directionConversion,
+	   DirectionConversionMap);
 
     // Pointer to the child of this joint
     GETSETPROTECTED(WeakJointPointer, m_child, Child);
@@ -40,23 +43,15 @@ class BaseJoint {
     // Pointer to the parent of this Joint
     GETSETPROTECTED(WeakJointPointer, m_parent, Parent);
 
+    /// shared pointer to motor
+    GETSETPROTECTED(std::shared_ptr<BaseMotor>, m_motor, Motor);
+
  public:
     /**
      * Set the range of the joint
      * @param[in] i_rangeVector Vector<traceType> 2 entries, start and end of the range of the joint
      */
     void setRange(const std::vector<traceType>& i_rangeVector);
-
-    /**
-     * Method to give acces to the motor of the joint.
-     * Can be used as a left and right argument
-     */
-    virtual BaseMotor* getMotor() = 0;
-    /*
-      This doesnt work becaus the basemotor pointer is not in the heap so will be lost.
-      Using a normal variable doesnt work either, because it cannot be cast to other motors
-      virtual void setMotor(const BaseMotor*) = 0;
-    */
 
     /**
      * Set actual steps
@@ -90,17 +85,21 @@ class BaseJoint {
     /// from this joint, walk down the tree and get the extension of the farthest child
     const Point2D childPosition() const;
 
-    /// default constructor
-    BaseJoint();
+    bool getJointStatus(const PinState& i_pinState,
+			std::string* i_direction) const;
 
+    BaseJoint(const std::shared_ptr<BaseMotor>& i_motor);
+    
     /// Constructor which is kind of nice
-    BaseJoint(const traceType& i_currentPosition,
+    BaseJoint(const std::shared_ptr<BaseMotor>& i_motor,
+	      const traceType& i_currentPosition,
 	      const traceType& i_movementPerStep,
 	      const MovementType i_type,
 	      const DirectionConversionMap& i_conversionMap);
 
     /// Full fledged constructor
-    BaseJoint(const traceType& i_currentPosition,
+    BaseJoint(const std::shared_ptr<BaseMotor>& i_motor,
+	      const traceType& i_currentPosition,
 	      const traceType& i_movementPerStep,
 	      const std::vector<traceType>& i_rangeVector,
 	      const MovementType i_type,
@@ -137,7 +136,11 @@ class BaseJoint {
      */
     const std::string convertDirection(const std::string i_direction)const;
 
-
     void childPosition(Point2D* o_position, traceType* o_angle) const;
+    
+    /// no default constructor
+    BaseJoint();
+
+
 };
 #endif  // MOTOR_BASEJOINT_H_

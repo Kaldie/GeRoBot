@@ -10,9 +10,6 @@ template <class ActuatorType>
 class RotationalJoint: public BaseJoint {
   GETSET(traceType, m_length, FixedLength);
  public:
-  // Can also be used as a setter: (*joint.getMotor())=exampleMotor;
-  virtual ActuatorType* getMotor();
-
   // Actual methods!
   void predictSteps(Point2D*, const std::string&, const int&) const;
 
@@ -37,9 +34,8 @@ class RotationalJoint: public BaseJoint {
 
   /// return the angle of the Joint
   virtual traceType getAngle() const;
-
+  
  private:
-  ActuatorType m_actuator;
   virtual int getPositionModifier(const std::string&) const;
 };
 
@@ -47,16 +43,8 @@ class RotationalJoint: public BaseJoint {
 // Constructors
 template <class ActuatorType>
 RotationalJoint<ActuatorType>::RotationalJoint()
-:BaseJoint(), m_length(0) {
+:BaseJoint(std::shared_ptr<BaseMotor>(new ActuatorType())), m_length(0) {
   setMovementType(Rotational);
-}
-
-
-
-// Actual methods
-template <class ActuatorType>
-ActuatorType* RotationalJoint<ActuatorType>::getMotor() {
-  return &m_actuator;
 }
 
 
@@ -125,8 +113,9 @@ RotationalJoint<ActuatorType>::cloneImpl() const {
   //    joint->m_range=this->m_range;
   joint->setRange(this->getRange());
   joint->setMovementType(this->getMovementType());
-  joint->m_actuator = this->m_actuator;
+  joint->m_motor = this->m_motor;
   joint->m_child = this->m_child;
+  joint->m_parent = this->m_parent;
   return joint;
 }
 #endif  // MOTOR_ROTATIONALJOINT_H_

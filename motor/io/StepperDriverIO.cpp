@@ -1,6 +1,7 @@
 // Copyright [2015] Ruud Cools
 #include <macroHeader.h>
 #include "./StepperDriverIO.h"
+#include <StepperDriver.h>
 
 void StepperDriverIO::build() {
   LOG_DEBUG("Buildiing a stepperdriver!");
@@ -9,28 +10,29 @@ void StepperDriverIO::build() {
     LOG_ERROR("Actuator type is only stepper driver!!!!");
   }
   std::vector<int> pinVector = getIntList(m_node, "./PINS", 3);
-  StepperDriver stepperDriver(pinVector);
-  stepperDriver.setDefaultDirection(
+  m_stepperDriver.reset(new StepperDriver(pinVector));
+  m_stepperDriver->setDefaultDirection(
       getNodeFromPath("./DEFAULT_DIRECTION").text().as_string());
-  LOG_DEBUG("Default direction is: " << stepperDriver.getDefaultDirection());
-  stepperDriver.setHoldMotor(getNodeFromPath("./HOLD_MOTOR").text().as_bool());
-  LOG_DEBUG("Hold motor: " << stepperDriver.getHoldMotor());
-  stepperDriver.setMaxSpeed(getNodeFromPath("./MAX_SPEED").text().as_int());
-  LOG_DEBUG("Max speed is: " << stepperDriver.getMaxSpeed());
-  stepperDriver.setPullIn(getNodeFromPath("./PULL_IN").text().as_int());
-  stepperDriver.setPullOut(getNodeFromPath("./PULL_OUT").text().as_int());
-  setStepperDriver(stepperDriver);
+  LOG_DEBUG("Default direction is: " << m_stepperDriver->getDefaultDirection());
+  m_stepperDriver->setHoldMotor(getNodeFromPath("./HOLD_MOTOR").text().as_bool());
+  LOG_DEBUG("Hold motor: " << m_stepperDriver->getHoldMotor());
+  m_stepperDriver->setMaxSpeed(getNodeFromPath("./MAX_SPEED").text().as_int());
+  LOG_DEBUG("Max speed is: " << m_stepperDriver->getMaxSpeed());
+  m_stepperDriver->setPullIn(getNodeFromPath("./PULL_IN").text().as_int());
+  m_stepperDriver->setPullOut(getNodeFromPath("./PULL_OUT").text().as_int());
 }
 
 
-bool StepperDriverIO::update(const BaseMotor* i_stepperDriver) {
+bool StepperDriverIO::update(const BaseMotor::MotorPointer i_motor) {
   bool hasSucceded(true);
-  hasSucceded&=updatePins(i_stepperDriver->getCurrentPinState().getPinVector());
+  hasSucceded&=updatePins(i_motor->getCurrentPinState().getPinVector());
   getNodeFromPath("./DEFAULT_DIRECTION").text().set
-    (i_stepperDriver->getDefaultDirection().c_str());
-  getNodeFromPath("./HOLD_MOTOR").text().set(i_stepperDriver->getHoldMotor());
+    (i_motor->getDefaultDirection().c_str());
+  getNodeFromPath("./HOLD_MOTOR").text().set(i_motor->getHoldMotor());
   // update stepperdriver specific stuff
-  const StepperDriver* driver = static_cast<const StepperDriver*>(i_stepperDriver);
+  const StepperDriver::DriverPointer driver =
+    std::static_pointer_cast<StepperDriver>(i_motor);
+  
   getNodeFromPath("./MAX_SPEED").text().set(driver->getMaxSpeed());
   getNodeFromPath("./PULL_IN").text().set(driver->getPullIn());
   getNodeFromPath("./PULL_OUT").text().set(driver->getPullOut());

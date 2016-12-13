@@ -11,6 +11,8 @@ class StateSequence;
 
 class BaseMotor {
  public:
+  typedef std::shared_ptr<BaseMotor> MotorPointer;
+  
   enum MotorType {StepperDriver, StepperMotor, None};
   // Motor type
   GETSET(MotorType, m_motorType, Type);
@@ -42,6 +44,13 @@ class BaseMotor {
                          const int& i_numberOfSteps,
                          SequenceVector* i_vector) =0;
 
+  /// from a pin state, determine the status of the motor at that point
+  virtual void getMotorStatus(const PinState& i_pinState,
+			      bool* i_isEnabled,
+			      std::string* i_rotationDirection) const = 0;
+
+
+  /// return the number of states needed for 1 step
   virtual int numberOfStatesPerStep() const = 0;
 
   /// return the maximum speed the motor could achive right now
@@ -56,6 +65,7 @@ class BaseMotor {
   virtual void displayPinState() const;
   virtual void displayPinState(const PinState&) const;
 
+  /// Print debug messages to std out
   void displayPinStateSequence(const StateSequence&) const;
 
   // Base Constructor
