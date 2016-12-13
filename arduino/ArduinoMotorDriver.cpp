@@ -13,7 +13,9 @@ const int ArduinoMotorDriver::HAND_SHAKE_VALUE = 200;
 
 
 ArduinoMotorDriver::ArduinoMotorDriver()
-  : m_serialRegularExpresion("") {
+  : m_serialRegularExpresion(""),
+    m_jointPinRange{2,7},
+    m_stopPinRange{0,0} {
 }
 
 
