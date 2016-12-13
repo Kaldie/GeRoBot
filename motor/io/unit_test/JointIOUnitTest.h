@@ -1,6 +1,6 @@
 // Copyright [2015] Ruud Cools
-#ifndef MOTOR_UNIT_TEST_JOINTIOUNITTEST_H_
-#define MOTOR_UNIT_TEST_JOINTCONTROLLERIOUNITTEST_H_
+#ifndef MOTOR_IO_UNITTEST_JOINTCONTROLLERIOUNITTEST_H_
+#define MOTOR_IO_UNITTEST_JOINTCONTROLLERIOUNITTEST_H_
 
 #include <macroHeader.h>
 #include <cxxtest/TestSuite.h>
@@ -23,14 +23,16 @@ class JointIOUnitTest : public CxxTest::TestSuite {
     JointIO jointIO(robotIO.getNodeFromPath("ROBOT/JOINTCONTROLLER/JOINT"));
     jointIO.build();
     BaseJoint::JointPointer jointpointer(jointIO.getJointPointer());
-    // test StepperDriver
-    StepperDriver* driver = static_cast<StepperDriver*>(jointpointer->getMotor());
+
+    StepperDriver::DriverPointer driver = std::static_pointer_cast<StepperDriver>(jointpointer->getMotor());
+    
     TS_ASSERT_EQUALS(driver->getPullIn(),124);
     TS_ASSERT_EQUALS(driver->getPullOut(),123);
     TS_ASSERT_EQUALS(driver->getMaxSpeed(),12345);
     TS_ASSERT_EQUALS(driver->getCurrentPinState().getPinVector(),
 		     std::vector<int>({5,6,7}));
     TS_ASSERT(driver->getHoldMotor());
+      
     DirectionConversionMap map = {{"CCW","CCW"},{"CW","CW"}};
     TS_ASSERT_EQUALS(jointpointer->getDirectionConversionMap(),
 		     map);
@@ -49,4 +51,4 @@ class JointIOUnitTest : public CxxTest::TestSuite {
   
 };
 
-#endif  // MOTOR_UNIT_TEST_JOINTIOUNITTEST_H_
+#endif  // MOTOR_IO_UNITTEST_JOINTCONTROLLERIOUNITTEST_H_
