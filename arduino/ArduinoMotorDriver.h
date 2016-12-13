@@ -5,7 +5,7 @@
 #include <SequenceVector.h>
 #include "./ArduinoSerialConnection.h"
 
-
+\
 class ArduinoMotorDriver {
     GETSET(ArduinoSerialConnection, m_arduinoConnection, ArduinoConnection);
     GETSET(std::string, m_serialRegularExpresion, SerialRegularExpresion);
@@ -17,14 +17,15 @@ class ArduinoMotorDriver {
                        DELETE_FILE,
                        ERROR};
 
+ private:
     static const int HAND_SHAKE_VALUE;
+    static const int ENDSTOP_HIT_VALUE;
     static const int UPLOAD_MODE_VALUE;
     static const int ACTUATE_MODE_VALUE;
     static const int ECHO_MODE_VALUE;
     static const int ECHO_MODE_VERBOSE_VALUE;
     static const int DELETE_FILE_MODE_VALUE;
 
- private:
     void initialiseArduinoConnection();
     bool handShake(DriverStatus i_status);
     void createRandomMessages(const int& i_numberOfMessages,
@@ -33,6 +34,11 @@ class ArduinoMotorDriver {
 public:
     /// Upload the message to the arduino
     void upload(const std::vector<int> i_messageVector);
+    /**
+     * Send the command the arduino that it can unlock go in normal mode.
+     * It returns the pin settings at which it currently is
+     */
+    int resolveEndStopHit();
     /// Send an actuate command to the arduino
     void actuate();
     /// Send a test message to the arduino

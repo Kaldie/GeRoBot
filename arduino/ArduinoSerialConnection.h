@@ -11,8 +11,8 @@ class ArduinoSerialConnection {
   GETSET(bool, m_blockThread, BlockThread);
   GETSET(int, m_fileHandle, FileHandle);
   GETSET(std::string, m_portName, PortName);
+  GET(speed_t, m_baudRate, BaudRate);
 
-  speed_t m_baudRate;
   void openConnection();
   void closeConnection();
   std::string resolvePortName() const;

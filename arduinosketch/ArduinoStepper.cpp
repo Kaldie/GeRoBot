@@ -11,9 +11,12 @@
 #define ECHO_MODE_VERBOSE_VALUE 150
 #define ECHO_MODE_VALUE 149
 #define DELETE_FILE_MODE_VALUE 140
+#define ENDSTOP_MODE_VALUE 122
 #define ERROR_MODE 244
 #define CHIP_SELECT 10
 #define TOOL_PIN 14
+#define ENDSTOP_PIN 0
+#define ENDSTOP_VALUE 1
 
 // States for the machine
 enum Status {
@@ -32,7 +35,9 @@ enum Status {
   ACTUATE_POST_MODE,
   ECHO_MODE_VERBOSE,
   ECHO_MODE,
-  DELETE_FILE_MODE
+  DELETE_FILE_MODE,
+  ENDSTOP_PRESSED,
+  VERIFY_ENDSTOP_RESPONSE
 };
 
 
@@ -142,13 +147,22 @@ void setTimer1Interupt(int i_dekaHertz) {
 }
 
 
+void setPinChangeInterupt() {
+  PCICR |= 1 << PCIE1;
+  PCMSK1 |= 1 << PCINT9 | 1 << PCINT8;
+}
+
+
+
 void setPinOutputs() {
   // for SD card
   pinMode(CHIP_SELECT, OUTPUT);
   // Always hook up the 2 t/m 7 inputs!
   DDRD = DDRD | B11111100;
-  // Tools go on A0 t/m A5
-  DDRC = DDRC | B00000111;
+  // Tools go on A0 t/m A5 (using 28 pin package, so only PC0 - PC5
+  // PC0 is used for the end switchs, thus as input
+  // leaving PC 6 as read and 7 does not exists
+  DDRC = DDRC | B00111110;
 }
 
 
@@ -160,8 +174,10 @@ void setPinsD(byte i_byte) {
 
 
 void setPinsC(byte i_byte) {
+  i_byte &= B00111110;
   PORTC = i_byte;
 }
+
 
 ISR(TIMER1_COMPA_vect) {
   // get the read pointer
@@ -196,6 +212,20 @@ ISR(TIMER1_COMPA_vect) {
 }
 
 
+// this interupt is activated when a end stop button is set or released
+ISR(PCINT1_vect) {
+  // check if the end stop pin has the value indicating it has been pressed just recently
+  bool hasEndStoped = PINC && 1 << ENDSTOP_PIN;
+  if (hasEndStoped == ENDSTOP_VALUE) {
+    // STOP THE PRESSES!!!!
+    disableHeartBeat();
+    // clear the timer 1 com
+    TIFR1 |= 1 << ICF1 || 1 << OCF1B || 1 << OCF1A;
+    ARDUINO_STATUS = ENDSTOP_PRESSED;
+  }
+}
+
+
 void readIntegerFromSerial(int& i_value,
                            ReturnState* i_returnState) {
   if (Serial.available() < SIZE_OF_INT) {
@@ -219,6 +249,11 @@ void sendHandShake(ReturnState* i_returnState) {
   *i_returnState = SUCCES;
 }
 
+
+void sendEndStopHit(ReturnState* i_returnState) {
+  Serial.write(ENDSTOP_MODE_VALUE);
+  *i_returnState = SUCCES;
+}
 
 void handleModeSelect(ReturnState* i_returnState) {
   if (Serial.available() < 1) {
@@ -293,8 +328,7 @@ void verifyResponse(const unsigned char& i_requiredResponse,
     *i_returnState = NO_RESPONSE;
     return;
   } else {
-    Serial.readBytes(reinterpret_cast<char*>(&input),
-                     1);
+    Serial.readBytes(reinterpret_cast<char*>(&input), 1);
   }
 
   if (input == i_requiredResponse) {
@@ -307,7 +341,6 @@ void verifyResponse(const unsigned char& i_requiredResponse,
 
 
 bool writeMotorMessageBufferToSD() {
-
   /// Get the number of message which are in continues memory
   int numberOfMessageToRead = MOTOR_MESSAGE_BUFFER.inlineReadElements();
   /// If there are none, return false
@@ -434,6 +467,7 @@ void printMessageToSerial(MotorMessage* i_messagePointer,
   }
 }
 
+
 void handleStatus() {
   switch (ARDUINO_STATUS) {
   case SEND_HAND_SHAKE: {
@@ -457,7 +491,6 @@ void handleStatus() {
     ATTEMPTS++;
     break;
   }
-
   case MODE_SELECT: {
     handleModeSelect(&RETURN_STATE);
     if (RETURN_STATE == FAIL) {
@@ -646,12 +679,12 @@ void handleStatus() {
         MOTOR_MESSAGE_BUFFER.finishReadPointer();
        }
     */
-
     if (!IS_MOTOR_RUNNING and !MOTOR_MESSAGE_BUFFER.isEmpty()) {
       setTimer1Interupt(MOTOR_MESSAGE_BUFFER.getReadPointer()->speed);
     }
     break;
   }
+
   case ACTUATE_POST_MODE : {
     // "Reset" the SD card
     CURRENT_WRITE_MESSAGE_ON_SD = 0;
@@ -662,6 +695,39 @@ void handleStatus() {
     ARDUINO_STATUS = SEND_HAND_SHAKE;
     break;
   }
+
+  case ENDSTOP_PRESSED: {
+    sendEndStopHit(&RETURN_STATE);
+    if (RETURN_STATE == SUCCES) {
+      // the controller acknoldged we hit the end stop
+      // the rest is up to him
+      ARDUINO_STATUS = VERIFY_ENDSTOP_RESPONSE;
+    }
+    break;
+  }
+
+  case VERIFY_ENDSTOP_RESPONSE: {
+    verifyResponse(ENDSTOP_MODE_VALUE, &RETURN_STATE);
+    if (RETURN_STATE == SUCCES) {
+      // write the current settings of PIND bank back to the host
+      Serial.write(PIND);
+      Serial.write(PINC);
+      // being nice
+      ATTEMPTS = 0;
+      // Post mode will reset the arduino to handle coming input normaly
+      ARDUINO_STATUS = ACTUATE_POST_MODE;
+    } else if (RETURN_STATE == FAIL) {
+      ARDUINO_STATUS = ENDSTOP_PRESSED;
+    }
+
+    if (ATTEMPTS >= 10000) {
+      ATTEMPTS = 0;
+      ARDUINO_STATUS = ENDSTOP_PRESSED;
+    }
+    ATTEMPTS++;
+    break;
+  }
+	
   default: {
     break;
   }
@@ -675,6 +741,7 @@ void setup() {
   // Open the serial connections
   Serial.setTimeout(10);
   Serial.begin(BAUD_RATE);
+  setPinChangeInterupt();
   // see if the card is present and can be initialized:
   if (!SD.begin(CHIP_SELECT, SPI_FULL_SPEED)) {
     SD.initErrorHalt("Could not open the SD card!");

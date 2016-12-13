@@ -2,13 +2,14 @@
 #include <macroHeader.h>
 #include "./ArduinoMotorDriver.h"
 
-const int ArduinoMotorDriver::HAND_SHAKE_VALUE = 200;
-const int ArduinoMotorDriver::ACTUATE_MODE_VALUE = 100;
-const int ArduinoMotorDriver::ECHO_MODE_VERBOSE_VALUE = 150;
-const int ArduinoMotorDriver::ECHO_MODE_VALUE = 149;
-const int ArduinoMotorDriver::DELETE_FILE_MODE_VALUE = 140;
 const int ArduinoMotorDriver::UPLOAD_MODE_VALUE =
   sizeof(ArduinoMotorDriver::HAND_SHAKE_VALUE);
+const int ArduinoMotorDriver::ACTUATE_MODE_VALUE = 100;
+const int ArduinoMotorDriver::ENDSTOP_HIT_VALUE = 122;
+const int ArduinoMotorDriver::DELETE_FILE_MODE_VALUE = 140;
+const int ArduinoMotorDriver::ECHO_MODE_VALUE = 149;
+const int ArduinoMotorDriver::ECHO_MODE_VERBOSE_VALUE = 150;
+const int ArduinoMotorDriver::HAND_SHAKE_VALUE = 200;
 
 
 ArduinoMotorDriver::ArduinoMotorDriver()
@@ -38,6 +39,23 @@ void ArduinoMotorDriver::initialiseArduinoConnection() {
 }
 
 
+int ArduinoMotorDriver::resolveEndStopHit() {
+  if (!m_arduinoConnection.hasConnection()) {
+    initialiseArduinoConnection();
+  } else {
+    m_arduinoConnection.flushConnection();
+  }
+
+  /// receive the handshake value from the arduino
+  int receivedHandShake = m_arduinoConnection.serialRead(1);
+  if (ArduinoMotorDriver::ENDSTOP_HIT_VALUE != receivedHandShake) {
+    LOG_ERROR("Endstop has not been hit.");
+  }
+  m_arduinoConnection.serialWrite(ArduinoMotorDriver::ENDSTOP_HIT_VALUE);
+  return m_arduinoConnection.serialRead(2);
+}
+
+
 bool ArduinoMotorDriver::handShake(ArduinoMotorDriver::DriverStatus i_status) {
   if (!m_arduinoConnection.hasConnection()) {
     initialiseArduinoConnection();
@@ -48,7 +66,11 @@ bool ArduinoMotorDriver::handShake(ArduinoMotorDriver::DriverStatus i_status) {
   /// receive the handshake value from the arduino
   int receivedHandShake = m_arduinoConnection.serialRead(1);
   LOG_DEBUG("Hand shake value: " << ArduinoMotorDriver::HAND_SHAKE_VALUE <<
+	    "End stop hit value: " << ArduinoMotorDriver::ENDSTOP_HIT_VALUE << 
             ", received value: " << receivedHandShake);
+  if (ArduinoMotorDriver::ENDSTOP_HIT_VALUE == receivedHandShake) {
+    LOG_ERROR("Endstop has been hit.");
+  }
   /// If it is not the known value, return
   if (ArduinoMotorDriver::HAND_SHAKE_VALUE != receivedHandShake) {
     return false;
@@ -143,6 +165,7 @@ void ArduinoMotorDriver::actuate() {
   }
   while (!handShake(ArduinoMotorDriver::ACTUATE)) {}
 }
+
 
 bool ArduinoMotorDriver::sendTestBit() {
     if (!m_arduinoConnection.hasConnection()) {
