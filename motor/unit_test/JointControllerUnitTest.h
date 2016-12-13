@@ -22,7 +22,6 @@ class JointControllerUnitTest : public CxxTest::TestSuite {
   JointController jointController;
 
   void setUp() {
-    LOG_DEBUG("lalaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
     stepperDriver1.setPins({5, 6, 7});
     stepperDriver2.setPins({2, 3, 4});
     // Create rotational joint

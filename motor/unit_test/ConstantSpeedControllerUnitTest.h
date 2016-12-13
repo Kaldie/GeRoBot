@@ -64,7 +64,7 @@ class ConstantSpeedControllerUnitTest : public CxxTest::TestSuite {
     TS_ASSERT_EQUALS(speed, m_translationalJoint->getMotor()->getMaximumSpeed());
 
     // test that increasing the motor speed increase the constant speed
-    StepperDriver* driver = static_cast<StepperDriver*>(m_translationalJoint->getMotor());
+    StepperDriver::DriverPointer driver = std::static_pointer_cast<StepperDriver>(m_translationalJoint->getMotor());
     driver->setPullIn(300);
     b.prepareSpeedController(trace, controller);
     b.adviseSpeed(&speed);
@@ -72,7 +72,7 @@ class ConstantSpeedControllerUnitTest : public CxxTest::TestSuite {
 
     /* test that increasing the motor which is not responsible for the most part of the movement
        is not responsible for setting the max speed */
-    driver = static_cast<StepperDriver*>(m_rotationalJoint->getMotor());
+    driver = std::static_pointer_cast<StepperDriver>(m_rotationalJoint->getMotor());
     driver->setPullIn(500);
     b.prepareSpeedController(trace, controller);
     b.adviseSpeed(&speed);
@@ -87,7 +87,7 @@ class ConstantSpeedControllerUnitTest : public CxxTest::TestSuite {
     Trace trace = Trace(Point2D(10,0), Point2D(10,10));
 
     // test speed when the robot speed/ linear joint is limiting
-    StepperDriver* driver = static_cast<StepperDriver*>(m_rotationalJoint->getMotor());
+    StepperDriver::DriverPointer driver = std::static_pointer_cast<StepperDriver>(m_rotationalJoint->getMotor());
     driver->setPullIn(400);
 
     ConstantSpeedController b = ConstantSpeedController(1000);
