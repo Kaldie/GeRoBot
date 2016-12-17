@@ -2,13 +2,14 @@
 #include <macroHeader.h>
 #include "JointControllerIO.h"
 #include "JointIO.h"
+#include <JointController.h>
 
 void JointControllerIO::build() {
   LOG_DEBUG("Building a Joint controller!");
   LOG_DEBUG("Joint controller node: " <<
             std::string(getNode().name()));
   addJoints();
-  m_jointController.setActuator(parseActuator(getNodeFromPath("./ACTUATOR")));
+  m_jointController->setActuator(parseActuator(getNodeFromPath("./ACTUATOR")));
   LOG_DEBUG("Joint controller node: " <<
             std::string(getNode().name()));
 }
@@ -23,7 +24,7 @@ void JointControllerIO::addJoints(){
   // And finaly add them to tje joint controller
   for (const auto& jointTuple : jointTupleVector) {
     if (auto jointPointer = std::get<1>(jointTuple)) {
-      m_jointController.addJoint(jointPointer);
+      m_jointController->addJoint(jointPointer);
     }
   }
 }
@@ -53,7 +54,7 @@ void JointControllerIO::resolveDependencies
   for (const auto& jointTuple : i_jointTupleVector) {
     parentJoint = std::get<1>(jointTuple);
     if (!parentJoint) {
-      LOG_ERROR("Fuck up!");
+      LOG_ERROR("Parent node is not available!");
     }
     childString = getNodeFromPath(std::get<0>(jointTuple), "CHILD")
       .text().as_string();
@@ -93,8 +94,8 @@ ArduinoMotorDriver JointControllerIO::parseActuator(
 }
 
 
-bool JointControllerIO::update(
-    const JointController& i_jointController) {
+bool JointControllerIO::update
+(const JointController::JointControllerPointer& i_jointController) {
   bool hasSucceeded(true);
   setJointController(i_jointController);
   hasSucceeded &= updateActuatorNode();
@@ -107,7 +108,7 @@ bool JointControllerIO::update(
 bool JointControllerIO::updateActuatorNode() {
   pugi::xml_node actuatorNode = getNodeFromPath("./ACTUATOR");
   getNodeFromPath(actuatorNode, "./REGULAR_EXPRESSION").text().
-      set(m_jointController.getActuator().
+      set(m_jointController->getActuator().
           getSerialRegularExpresion().c_str());
   return true;
 }
@@ -116,8 +117,9 @@ bool JointControllerIO::updateActuatorNode() {
 JointControllerIO::JointTupleVector JointControllerIO::updateJointNodes() {
   updateNumberOfJointNode();
   pugi::xml_node jointNode = getNodeFromPath("JOINT");
-  JointController::JointPointerVector vector 
-  =m_jointController.getJointPointerVector();
+  JointController::JointPointerVector vector
+    = m_jointController->getJointPointerVector();
+  
   JointTupleVector jointTupleVector;
   unsigned int jointNumber(1);
   for(auto jointItr = vector.begin();
@@ -143,7 +145,7 @@ JointControllerIO::JointTupleVector JointControllerIO::updateJointNodes() {
 
 void JointControllerIO::updateNumberOfJointNode() {
   unsigned int numberOfJoints = 
-    m_jointController.getJointPointerVector().size();
+    m_jointController->getJointPointerVector().size();
   unsigned int numberOfXMLJoints = 0;
   for (pugi::xml_node node = m_node.child("JOINT");
        node;
@@ -226,8 +228,10 @@ bool JointControllerIO::addJointNode() {
 
 
 JointControllerIO::JointControllerIO(const pugi::xml_node& i_node)
-    : XMLBuilder(i_node) {
+  : XMLBuilder(i_node),
+    m_jointController(std::make_shared<JointController>()) {
   LOG_DEBUG("Creating a JointControllerIO with node: " << i_node.name());
+  
 }
 
 

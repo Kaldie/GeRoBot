@@ -2,19 +2,21 @@
 #ifndef JointControllerIO_H
 #define JointControllerIO_H
 
-#include <JointController.h>
 #include <BaseJoint.h>
 #include <XMLBuilder.h>
+#include <ArduinoMotorDriver.h>
+
+class JointController;
 
 class JointControllerIO: public XMLBuilder {
-  GETSET_NO_CONST(JointController,
-                  m_jointController,
-                  JointController);
+  GETSET_NO_CONST(std::shared_ptr<JointController>,
+		  m_jointController,
+		  JointController);
 
  private:
   typedef std::tuple<pugi::xml_node,
-                     BaseJoint::JointPointer> JointTupple;
-  typedef std::vector<JointTupple> JointTupleVector;
+                     BaseJoint::JointPointer> JointTuple;
+  typedef std::vector<JointTuple> JointTupleVector;
 
   /// Build all the joints and store with the id and node
   JointTupleVector buildAllJoints() const;
@@ -45,10 +47,11 @@ class JointControllerIO: public XMLBuilder {
 
   void getNextJointNode(pugi::xml_node* i_node) const;
  public:
+
   explicit JointControllerIO(const pugi::xml_node&);
 
   virtual void build();
-  bool update(const JointController& i_newJointController);
+  bool update(const std::shared_ptr<JointController>& i_newJointController);
 
   virtual ~JointControllerIO(){};
 };
