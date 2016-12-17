@@ -2,11 +2,14 @@
 #ifndef ROBOT_ROBOT_H_
 #define ROBOT_ROBOT_H_
 
-#include <BaseJoint.h>
-#include <JointController.h>
+//#include <BaseJoint.h>
 #include <Point2D.h>
-#include <SpeedController.h>
-#include <Trace.h>
+#include <BaseJoint.h>
+
+class Trace;
+class JointController;
+class SpeedController;
+
 /**
  * Robot is the basis of the project.
  *  Robot is the root of a object which looks like: Robot->Joint->Actuator
@@ -16,7 +19,7 @@
  */
 class Robot {
   // Handles the joints and can update the position after a step
-  GETSET(JointController::JointControllerPointer, m_jointController, JointController);
+  GETSET(std::shared_ptr<JointController>, m_jointController, JointController);
 
   // The current position of the head of the robot
   GET(Point2D, m_position, Position);
@@ -25,14 +28,13 @@ class Robot {
   GETSET(std::vector<Point2D>, m_traveledPoints, TraveledPoints);
 
   /// Controller which is in charge of the speed of the robot
-  GETSET(SpeedController::SpeedControllerPointer, m_speedController, SpeedController);
+  GETSET(std::shared_ptr<SpeedController>, m_speedController, SpeedController);
 
  public:
   typedef std::shared_ptr<Robot> RobotPointer;
 
   /// Returns if there is a valid arduino connenction
   bool hasValidConnection();
-
 
   /// Based on the joints in the controller, calculated the current position
   const Point2D getVirtualPosition() const;
@@ -56,7 +58,7 @@ class Robot {
   traceType getMovementPerStep(const BaseJoint::MovementType&) const ;
 
 
-  void traceCalculation(const Trace::TracePointer& i_trace);
+  void traceCalculation(const std::shared_ptr<Trace>& i_trace);
 
   /**
    * prepares to take steps with the given movement type, direction and number
@@ -75,14 +77,14 @@ class Robot {
   Robot();
 
   /// defines controlle
-  Robot(const JointController::JointControllerPointer& i_pointer);
+  Robot(const std::shared_ptr<JointController>& i_pointer);
 
   /// fully fledged constructor
-  Robot(const JointController::JointControllerPointer& i_pointer,
+  Robot(const std::shared_ptr<JointController>& i_pointer,
         const Point2D& i_point);
 
  private:
-  int getNumberOfSequences(const JointController::JointControllerPointer&);
+  int getNumberOfSequences(const std::shared_ptr<JointController>&);
   int getNumberOfSequences(const bool&);
 };
 

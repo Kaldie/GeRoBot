@@ -3,6 +3,7 @@
 #include <macroHeader.h>
 #include <ConstantSpeedController.h>
 #include <JointController.h>
+#include <BaseJoint.h>
 #include <StepperDriver.h>
 #include <BaseMotor.h>
 #include <Trace.h>

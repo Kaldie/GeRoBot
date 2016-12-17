@@ -5,7 +5,7 @@
 #include <SpeedController.h>
 
 class Trace;
-
+class BaseJoint;
 // Controller which choses 1 speed for a whole trace
 class ConstantSpeedController : public SpeedController {
 public:
@@ -23,7 +23,7 @@ public:
    * it is unknown how many and in which direction
    * if a "Constant" type controller is used, use the current position as a base to calculate the speed
    */
-  virtual void prepareSpeedController(const BaseJoint::JointPointer& i_pointer);
+  virtual void prepareSpeedController(const std::shared_ptr<BaseJoint>& i_pointer);
 
   /// Default constructor
   ConstantSpeedController();
@@ -36,7 +36,7 @@ public:
   virtual ~ConstantSpeedController(){};
 private:
 
-  void updateJointSpeed(const BaseJoint::JointPointer& i_joint,
+  void updateJointSpeed(const std::shared_ptr<BaseJoint>& i_joint,
 			const traceType& i_movementPerStep);
 
   float m_frequency;

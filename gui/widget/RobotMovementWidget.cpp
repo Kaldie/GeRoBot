@@ -4,6 +4,7 @@
 #include <QtGui>
 #include <QPainter>
 #include <Robot.h>
+#include <JointController.h>
 #include <BaseJoint.h>
 #include <RelativeSpeedController.h>
 #include "./RobotPositionWidget.h"

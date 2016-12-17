@@ -3,11 +3,11 @@
 #ifndef MOTOR_PRESCRIBEDSPEEDCONTROLLER_H_
 #define MOTOR_PRESCRIBEDSPEEDCONTROLLER_H_
 
-#include "./BaseJoint.h"
 #include <forward_list>
 #include "./SpeedController.h"
 
 class JointController;
+class BaseJoint;
 class StateSequence;
 class BaseMotor;
 class PrescribedSpeedController : public SpeedController {
@@ -22,9 +22,9 @@ class PrescribedSpeedController : public SpeedController {
   };
 
   /// Current speed of the joints
-  typedef std::map<BaseJoint::WeakJointPointer,
+  typedef std::map<std::weak_ptr<BaseJoint>,
                    JointInfo,
-                   std::owner_less<BaseJoint::WeakJointPointer>> JointMap;
+                   std::owner_less<std::weak_ptr<BaseJoint>>> JointMap;
 
   /// Mapping the number of consecutive steps with the joint
   GETSET(JointMap, m_jointMap, StepMap);
@@ -51,7 +51,7 @@ class PrescribedSpeedController : public SpeedController {
    * @param [in] i_direction the direction it has been taken in
    * @param [in] i_numberOfSteps the number of steps
    */
-  void notifyStep(const BaseJoint::JointPointer& i_joint,
+  void notifyStep(const std::shared_ptr<BaseJoint>& i_joint,
                   const unsigned int& i_numberOfSteps);
 
   /// Request speed
@@ -137,7 +137,7 @@ class PrescribedSpeedController : public SpeedController {
   float calculateCurrentSpeed() const;
 
   /// initialise the motor frequence based on the first joint
-  void initialiseMotorFrequency(const BaseJoint::JointPointer& i_joint);
+  void initialiseMotorFrequency(const std::shared_ptr<BaseJoint>& i_joint);
 };
 
 #endif  // MOTOR_PRESCRIBEDSPEEDCONTROLLER_H_

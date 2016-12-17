@@ -4,6 +4,8 @@
 #include "./JointController.h"
 #include "./PrescribedSpeedController.h"
 #include "./BaseMotor.h"
+#include <BaseJoint.h>
+#include <EndStop.h>
 #include "./StepperDriver.h"
 #include <list>
 

@@ -15,12 +15,12 @@ public:
   virtual void acknowledgeSpeed(const unsigned int& i_speed,
                                 SequenceVector* i_sequenceVector);
 
-  virtual void notifyStep(const BaseJoint::JointPointer& i_joint,
+  virtual void notifyStep(const std::shared_ptr<BaseJoint>& i_joint,
                           const unsigned int& i_numberOfSteps);
 
-  virtual void prepareSpeedController(const BaseJoint::JointPointer& i_joint);
+  virtual void prepareSpeedController(const std::shared_ptr<BaseJoint>& i_joint);
 
-  traceType determineRobotSpeed(const BaseJoint::JointPointer& i_joint) const;
+  traceType determineRobotSpeed(const std::shared_ptr<BaseJoint>& i_joint) const;
 
   /// Default constructor
   RelativeSpeedController();
@@ -36,20 +36,18 @@ public:
   void calculateMinMaxSpeed(const JointController& i_controller,
 			    const Trace& i_trace);
 
-  traceType estimateRobotSpeed(const BaseJoint::JointPointer& i_joint,
+  traceType estimateRobotSpeed(const std::shared_ptr<BaseJoint>& i_joint,
 			       const int& i_motorSpeed) const;
 
   bool adviseSpeed(int* i_speed, const int& i_minSpeed, const int& i_maxSpeed) const;
   
   traceType estimateRobotSpeed() const;
   
-  void determineMotorSpeed(const BaseJoint::JointPointer&,
+  void determineMotorSpeed(const std::shared_ptr<BaseJoint>&,
 			   int* i_minSpeed,
 			   int* i_maxSpeed) const;
 
-  int m_minSpeed, m_maxSpeed;
-
-  
+  int m_minSpeed, m_maxSpeed; 
 };
 
 #endif  // MOTOR_RELATIVESPEEDCONTROLLER_H_
