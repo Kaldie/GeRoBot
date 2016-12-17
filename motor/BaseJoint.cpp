@@ -3,6 +3,7 @@
 #include <macroHeader.h>
 #include "BaseJoint.h"
 #include <BaseMotor.h>
+#include <EndStop.h>
 #include <SequenceVector.h>
 #include <Point2D.h>
 
@@ -56,6 +57,38 @@ bool BaseJoint::getJointStatus(const PinState& i_pinState,
   return isEnabled;
 }
 
+const std::shared_ptr<EndStop> BaseJoint::getEndStop(const PinState& i_pinState,
+			       const std::string& i_direction) const {
+  std::shared_ptr<EndStop> endStopPointer;
+  for (const auto& endStop : m_endStops) {
+    if (i_pinState.getPinState(endStop->getPinNumber()) !=
+	endStop->getActivationState()) {
+      continue;
+    }
+    if (i_direction.compare(endStop->getActivationDirection()) != 0) {
+      continue;
+    }
+    if (endStopPointer) {
+      LOG_ERROR("Found 2 end stops with matching values");
+    }
+    endStopPointer= endStop;
+  }
+  return endStopPointer;
+}
+
+
+void BaseJoint::updateJointOnEndStopHit(const std::shared_ptr<EndStop> i_endStop) {
+  bool found(false);
+  for (const auto& endStop : m_endStops) {
+    if (i_endStop == endStop) {
+      found = true;
+    }
+  }
+  if (!found) {
+    LOG_ERROR("Did not found an end stop!");
+  }
+  m_currentPosition = i_endStop->getPosition();
+}
 
 
 const Point2D BaseJoint::childPosition() const {

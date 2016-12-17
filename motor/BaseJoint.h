@@ -3,6 +3,8 @@
 #ifndef MOTOR_BASEJOINT_H_
 #define MOTOR_BASEJOINT_H_
 
+#include <EndStop.h>
+
 class Point2D;
 class SequenceVector;
 class BaseMotor;
@@ -17,8 +19,11 @@ class BaseJoint {
     // weak pointer type def
     typedef std::weak_ptr<BaseJoint> WeakJointPointer;
 
+    // vector of end stops
+    typedef std::vector<std::shared_ptr<EndStop>> EndStopVector;
+
     // declaration of the movement type
-    enum MovementType {None, Rotational, Translational};
+    enum MovementType : short {None, Rotational, Translational};
 
     /// Current position of the joint
     GETSETPROTECTED(traceType, m_currentPosition, Position);
@@ -45,6 +50,9 @@ class BaseJoint {
 
     /// shared pointer to motor
     GETSETPROTECTED(std::shared_ptr<BaseMotor>, m_motor, Motor);
+
+    //End points
+    GETSET(EndStopVector, m_endStops, EndStops);
 
  public:
     /**
@@ -87,6 +95,11 @@ class BaseJoint {
 
     bool getJointStatus(const PinState& i_pinState,
 			std::string* i_direction) const;
+
+    virtual const std::shared_ptr<EndStop> getEndStop
+      (const PinState& i_pinState, const std::string& i_direction) const;
+
+    virtual void updateJointOnEndStopHit(const std::shared_ptr<EndStop> i_endStop);
 
     BaseJoint(const std::shared_ptr<BaseMotor>& i_motor);
     
