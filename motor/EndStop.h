@@ -3,8 +3,6 @@
 #ifndef MOTOR_ENDSTOP_H_
 #define MOTOR_ENDSTOP_H_
 
-class Point2D;
-
 /**
  * Endstop represents stops we place on the robot to stop the robot for going further
  * The stop belong to a joint, and a position of that joint
@@ -16,19 +14,28 @@ class Point2D;
  */
 
 class EndStop {
-  GETSET(std::shared_ptr<BaseJoint>, m_joint, Joint);
   GETSET(traceType, m_position, Position);
   GETSET(int, m_pinNumber, PinNumber);
+  GETSET(bool, m_activationState, ActivationState);
+  GETSET(std::string, m_activationDirection, ActivationDirection);
 
  public:
+  typedef std::vector<EndStop> EndStopVector;
+
+  /// compare all the properties one by 1
+  bool operator==(const EndStop& i_rhs) const;
+
   EndStop();
 
-  EndStop(const std::shared_ptr<BaseJoint>& i_joint,
-	  const traceType& i_position);
+  EndStop(const traceType& i_position);
   
-  EndStop(const std::shared_ptr<BaseJoint>& i_joint,
-	  const traceType& i_position,
+  EndStop(const traceType& i_position,
 	  const int& i_pinNumber);
+
+  EndStop(const traceType& i_position,
+	  const int& i_pinNumber,
+	  const bool& i_activationState,
+	  const std::string& i_activationDirection);
 };
 
 #endif  // MOTOR_ENDSTOP_H_
