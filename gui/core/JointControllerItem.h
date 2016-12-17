@@ -6,14 +6,14 @@
 
 class JointControllerItem:public BaseRobotItem
 {
-	GETSET(JointController::JointControllerPointer, m_jointController, JointController);
+  GETSET(std::shared_ptr<JointController>, m_jointController, JointController);
  private:
 	//No default constructor!
 	JointControllerItem();
 	bool addArduinoActuator();
  public:
 	JointControllerItem(BaseRobotItem* i_parrentItem,
-			    const JointController::JointControllerPointer& motorPointer);
+			    const std::shared_ptr<JointController>& i_jointController);
 	virtual QVariant getPropertyData(int,int) const {return QVariant();};
 	virtual bool setPropertyData(int,int, const QVariant&) {return false;};
 	virtual bool construct();
