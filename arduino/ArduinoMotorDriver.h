@@ -47,7 +47,8 @@ class ArduinoMotorDriver {
    * Send the command the arduino that it can unlock go in normal mode.
    * It returns the pin settings at which it currently is
    */
-  int resolveEndStopHit();
+  void resolveEndStopHit(int* o_jointValue,
+			 int* o_stopValue);
   /// Send an actuate command to the arduino
   void actuate();
   /// Send a test message to the arduino

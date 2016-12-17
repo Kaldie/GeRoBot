@@ -13,14 +13,14 @@ const int ArduinoMotorDriver::HAND_SHAKE_VALUE = 200;
 
 
 ArduinoMotorDriver::ArduinoMotorDriver()
-  : m_serialRegularExpresion(""),
-    m_jointPinRange{2,7},
-    m_stopPinRange{0,0} {
+  : ArduinoMotorDriver("") {
 }
 
 
 ArduinoMotorDriver::ArduinoMotorDriver(std::string i_serialRegularExpression)
-  : m_serialRegularExpresion(i_serialRegularExpression) {
+  : m_serialRegularExpresion(i_serialRegularExpression),
+    m_jointPinRange{2,7},
+    m_stopPinRange{0,8} {
 }
 
 
@@ -41,7 +41,8 @@ void ArduinoMotorDriver::initialiseArduinoConnection() {
 }
 
 
-int ArduinoMotorDriver::resolveEndStopHit() {
+void ArduinoMotorDriver::resolveEndStopHit(int* o_jointPinValue,
+					   int* o_endStopValue) {
   if (!m_arduinoConnection.hasConnection()) {
     initialiseArduinoConnection();
   } else {
@@ -54,7 +55,9 @@ int ArduinoMotorDriver::resolveEndStopHit() {
     LOG_ERROR("Endstop has not been hit.");
   }
   m_arduinoConnection.serialWrite(ArduinoMotorDriver::ENDSTOP_HIT_VALUE);
-  return m_arduinoConnection.serialRead(2);
+  int value = m_arduinoConnection.serialRead(2);
+  *o_jointPinValue = value % (1 << (std::get<1>(m_jointPinRange) + 1));
+  *o_endStopValue = value >> (std::get<1>(m_jointPinRange) + 1);
 }
 
 
