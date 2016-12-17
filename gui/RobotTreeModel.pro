@@ -17,6 +17,7 @@
     core/PinStateItem.h \
     core/RobotItem.h \
     core/SpeedControllerItem.h \
+    core/EndStopItem.h \
     core/RobotTreeModel.h \
     widget/Point2DWidget.h \
     widget/RobotMovementWidget.h \
@@ -42,6 +43,7 @@
     core/PinStateItem.cpp \
     core/RobotItem.cpp \
     core/SpeedControllerItem.cpp \
+    core/EndStopItem.cpp \
     core/RobotTreeModel.cpp \
     widget/Point2DWidget.cpp \
     widget/RobotMovementWidget.cpp \
