@@ -3,7 +3,6 @@
 #ifndef MOTOR_SPEEDCONTROLLER_H_
 #define MOTOR_SPEEDCONTROLLER_H_
 
-#include <BaseJoint.h>
 #include <SequenceVector.h>
 class Trace;
 class JointController;
@@ -23,7 +22,7 @@ public:
   GETSET(int, m_currentSequenceVectorPosition, CurrentSequenceVectorPosition);
 
   /// The controller is notified that steps will be taken
-  virtual void notifyStep(const BaseJoint::JointPointer& i_joint,
+  virtual void notifyStep(const std::shared_ptr<BaseJoint>& i_joint,
                           const unsigned int& i_numberOfSteps);
 
   /// This method will be called at the moment the robot needs to decied on some speed
@@ -47,7 +46,7 @@ public:
    * it is unknown how many and in which direction
    * if a "Constant" type controller is used, use the current position as a base to calculate the speed
    */
-  virtual void prepareSpeedController(const BaseJoint::JointPointer& i_pointer);
+  virtual void prepareSpeedController(const std::shared_ptr<BaseJoint>& i_pointer);
 
   SpeedController();
 
@@ -60,7 +59,7 @@ public:
 		  const float& i_robotSpeed,
 		  const int& i_currentSequenceVectorPosition);
  protected:  
-  typedef std::vector<std::tuple<BaseJoint::JointPointer,int>> JointStepVector;
+  typedef std::vector<std::tuple<std::shared_ptr<BaseJoint>,int>> JointStepVector;
   /**
    * Brief: estimate the number of steps for each joint has to set during to complete the trace
    */
