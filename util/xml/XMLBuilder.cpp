@@ -3,22 +3,28 @@
 #include "./XMLBuilder.h"
 
 XMLBuilder::XMLBuilder()
-    :  m_fileName(""),
-       m_hasLoaded(false)
+  :  XMLBuilder("", false, pugi::xml_node())
 {}
 
 
 XMLBuilder::XMLBuilder(const std::string& i_fileName)
-    :  m_fileName(i_fileName),
-       m_hasLoaded(false)
+  :  XMLBuilder(i_fileName, false, pugi::xml_node())
 {}
 
 
 XMLBuilder::XMLBuilder(const pugi::xml_node& i_node)
-    : m_fileName(""),
-      m_hasLoaded(false),
-      m_node(i_node)
+  : XMLBuilder("", false, i_node)
 {}
+
+XMLBuilder::XMLBuilder(const std::string& i_fileName,
+		       const bool& i_isLoaded,
+		       const pugi::xml_node& i_node)
+  : m_fileName(i_fileName),
+    m_hasLoaded(i_isLoaded),
+    m_node(i_node)
+{}
+		       
+
 
 XMLBuilder::~XMLBuilder() {
   if (m_hasLoaded) {
@@ -59,7 +65,7 @@ pugi::xml_node XMLBuilder::loadXMLFile() {
 
 
 pugi::xml_node XMLBuilder::getNodeFromPath(const pugi::xml_node& i_parrentNode,
-                                           const std::string& i_path) const {
+                                           const std::string& i_path) {
   pugi::xml_node childNode =
       i_parrentNode.first_element_by_path(i_path.c_str());
   if (childNode) {
@@ -69,6 +75,7 @@ pugi::xml_node XMLBuilder::getNodeFromPath(const pugi::xml_node& i_parrentNode,
               << i_path << " starting at node: " << i_parrentNode.name());
   }
 }
+
 
 pugi::xml_node XMLBuilder::getNodeFromPath(const std::string& i_path) const {
   return getNodeFromPath(m_node, i_path);

@@ -3,7 +3,6 @@
 #ifndef UTIL_XML_XMLBUILDER_H_
 #define UTIL_XML_XMLBUILDER_H_
 #include <pugixml.hpp>
-#include <macroHeader.h>
 #include <memory>
 
 class XMLBuilder {
@@ -11,7 +10,7 @@ class XMLBuilder {
   GETSET(std::string, m_fileName, FileName);
   GETSET(bool, m_hasLoaded, HasLoaded);
   GETSETPROTECTED(pugi::xml_node, m_node, Node);
-
+  
   std::shared_ptr<pugi::xml_document> m_documentPointer;
 
   template<class T>
@@ -28,7 +27,7 @@ class XMLBuilder {
   static bool as_bool(const pugi::xml_text& i_text) {return i_text.as_bool();};
 
   XMLBuilder();
-
+  XMLBuilder(const std::string&, const bool&, const pugi::xml_node&);
  public:
   // Build they objects
   virtual void build();
@@ -57,8 +56,8 @@ class XMLBuilder {
 
   pugi::xml_node loadXMLFile();
 
-  pugi::xml_node getNodeFromPath(const pugi::xml_node&,
-                                 const std::string&) const;
+  static pugi::xml_node getNodeFromPath(const pugi::xml_node&,
+					const std::string&);
 
   pugi::xml_node getNodeFromPath(const std::string&) const;
 
