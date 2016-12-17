@@ -1,11 +1,11 @@
 // Copyright [2015] Ruud Cools
 #include <macroHeader.h>
+#include <JointIO.h>
 #include <TranslationalJoint.h>
 #include <RotationalJoint.h>
 #include <StepperDriver.h>
-#include "./JointIO.h"
-#include "./StepperDriverIO.h"
-
+#include <StepperDriverIO.h>
+#include <EndStopIO.h>
 
 void JointIO::build() {
   LOG_DEBUG("Building a joint");
@@ -13,6 +13,52 @@ void JointIO::build() {
     LOG_ERROR("Not a valid joint node!");
   }
   makeSharedJoint();
+  setBaseJointProperties();
+  addEndStops();
+  m_jointPointer->setMotor(parseStepperDriver(getNodeFromPath(m_node, "./ACTUATOR")));
+  if (m_jointPointer->getMovementType() == BaseJoint::Rotational) {
+    convertToRadians();
+  }
+  LOG_DEBUG("Joint Build is finshed!");
+}
+
+
+void JointIO::convertToRadians() {  
+  m_jointPointer->setMovementPerStep
+    (m_jointPointer->getMovementPerStep() * PI / 180);
+  m_jointPointer->setPosition
+    (m_jointPointer->getPosition() * PI / 180);
+  std::vector<traceType> convertedRangeVector;
+  for (const auto& point : m_jointPointer->getRange()) {
+    convertedRangeVector.push_back(point * PI / 180 );
+  }
+  m_jointPointer->setRange(convertedRangeVector);
+}
+
+
+void JointIO::addEndStops() {
+  /*
+    TODO if the stuff below works, remove this and go on
+    try {
+    pugi::xml_node endStopNode = getNodeFromPath("./ENDSTOP");
+    } catch (runtime_error) {
+    LOG_DEBUG("Did not find any end stop belonging to this joint!");
+    }
+  */
+  EndStopIO endStopIO(m_node);
+  BaseJoint::EndStopVector vector;
+  for (auto node = m_node.first_element_by_path("./ENDSTOP");
+       node;
+       node = node.next_sibling("ENDSTOP")){
+      endStopIO.setNode(node);
+      endStopIO.build();
+      vector.push_back(endStopIO.getEndStop());
+    }
+  m_jointPointer->setEndStops(vector);
+}
+
+
+void JointIO::setBaseJointProperties() {
   //Movement per step
   m_jointPointer->setMovementPerStep
     (getNodeFromPath(m_node, "./MOVEMENT_PER_STEP").text().as_double());
@@ -22,27 +68,9 @@ void JointIO::build() {
   LOG_DEBUG("Default position: " << m_jointPointer->getPosition());
   //Range
   m_jointPointer->setRange(getDoubleList(m_node, "./RANGE", 2));
-  // Correct gradians to radians
-  if (m_jointPointer->getMovementType() == BaseJoint::Rotational) {
-    m_jointPointer->setMovementPerStep
-      (m_jointPointer->getMovementPerStep() * PI / 180);
-    m_jointPointer->setPosition
-      (m_jointPointer->getPosition() * PI / 180);
-    std::vector<traceType> convertedRangeVector;
-    for (const auto& point : m_jointPointer->getRange()) {
-      convertedRangeVector.push_back(point * PI / 180 );
-    }
-    m_jointPointer->setRange(convertedRangeVector);
-  }
-
-  //StepperDriver
-  // cast it first to a proper stepperdriver pointer then set it
-  // otherwise it get sliced
-  // need to first pointer: the static_cast call is a rvalue not lvalue!
-  m_jointPointer->setMotor(parseStepperDriver(getNodeFromPath(m_node, "./ACTUATOR")));
   handleConversionMap();
-  LOG_DEBUG("Construction of the pointer is finished!");
-  LOG_DEBUG("Joint Build is finshed!");
+  //TODO!!
+  //  m_jointPointer->setEndStops(parseEndStops(getNodeFromPath(  
 }
 
 
@@ -50,11 +78,6 @@ StepperDriver::DriverPointer JointIO::parseStepperDriver(const pugi::xml_node& i
   StepperDriverIO stepperDriverIO(i_node);
   stepperDriverIO.build();
   return stepperDriverIO.getStepperDriver();
-}
-
-
-JointIO::JointIO(const pugi::xml_node& i_node) {
-  setNode(i_node);
 }
 
 
@@ -91,10 +114,23 @@ bool JointIO::update(const BaseJoint::JointPointer& i_jointPointer) {
     directionConversionNode.text().set((itr->first+","+itr->second).c_str());
   }
 
-  StepperDriverIO stepperDriverIO(getNodeFromPath("./ACTUATOR"));
+  //Actuator
   bool hasSucceeded(true);
+  StepperDriverIO stepperDriverIO(getNodeFromPath("./ACTUATOR"));
   hasSucceeded&=stepperDriverIO.update(i_jointPointer->getMotor());
 
+  //EndStops
+  // TODO: make it so that the number of end stops are update 2
+  BaseJoint::EndStopVector endStopVector = i_jointPointer->getEndStops();
+  pugi::xml_node endStopNode = m_node.first_element_by_path("./ENDSTOP");
+  EndStopIO endStopIO(endStopNode);
+  for (auto endStop = endStopVector.begin();
+       endStop != endStopVector.end() && endStopNode;
+       ++endStop, endStopNode = endStopNode.next_sibling("ENDSTOP")) {
+    LOG_DEBUG("Updating end stop");
+    endStopIO.setNode(endStopNode);
+    endStopIO.update(*endStop);
+  }
   return hasSucceeded;
 }
 
@@ -129,6 +165,7 @@ void JointIO::makeSharedJoint() {
     LOG_ERROR("Movement type: " << movementType << " is not correct!");
   }
   LOG_DEBUG("Joint type: " << m_jointPointer->getMovementType());
+  LOG_DEBUG("Construction of the pointer is finished!");
 }
 
 
@@ -175,4 +212,9 @@ bool JointIO::createNode(pugi::xml_node* i_parent) {
     .append_child(pugi::node_pcdata).set_value("CW,CW");
   StepperDriverIO::createNode(&jointNode);
   return true;
+}
+
+
+JointIO::JointIO(const pugi::xml_node& i_node) {
+  setNode(i_node);
 }
