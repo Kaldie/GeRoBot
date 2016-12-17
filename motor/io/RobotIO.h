@@ -2,7 +2,6 @@
 #ifndef MOTOR_IO_ROBOTIO_H_
 #define MOTOR_IO_ROBOTIO_H_
 
-#include <JointController.h>
 #include <XMLBuilder.h>
 #include <Robot.h>
 
@@ -16,16 +15,25 @@ class RobotIO: public XMLBuilder {
 
  private:
   RobotIO();
-  JointController parseJointController(const pugi::xml_node&);
-  bool updateJointController(const JointController::JointControllerPointer& i_jointController);
 
+  std::shared_ptr<JointController> parseJointController(const pugi::xml_node&);
+  std::shared_ptr<SpeedController> parseSpeedController(const pugi::xml_node&);
+
+  bool updateJointController(const std::shared_ptr<JointController>& i_jointController);
+  bool updateSpeedController(const std::shared_ptr<SpeedController>& i_speedController);
  public:
   explicit RobotIO(const std::string&);
+
   virtual void build();
+
   Robot::RobotPointer buildRobot();
+
   virtual void displayTree();
-  void setRobotPointer(Robot* i_robotPointer);
+
+  void setRobotPointer(Robot::RobotPointer* i_robotPointer);
+
   bool update(const Robot::RobotPointer& i_newRobotPointer);
+
   bool store(const std::string& i_fileName);
 };
 
