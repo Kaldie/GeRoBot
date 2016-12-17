@@ -9,7 +9,8 @@ DEPENDENCY := $(DEPENDENCY) ArduinoSerialConnection.o ArduinoMotorDriver.o Point
 DEPENDENCY := $(DEPENDENCY) BaseTraceCalculator.o Line2D.o Robot.o XMLBuilder.o pugixml.o SequenceVector.o
 DEPENDENCY := $(DEPENDENCY) JointController.o BaseJoint.o StateSequence.o PinState.o Condensor.o
 DEPENDENCY := $(DEPENDENCY) StepperDriver.o BaseMotor.o SpeedController.o ConstantSpeedController.o
-DEPENDENCY := $(DEPENDENCY) LineTraceCalculator.o RotationTraceCalculator.o RotationTrace.o Circle2D.o Arc2D.o
+DEPENDENCY := $(DEPENDENCY) LineTraceCalculator.o RotationTraceCalculator.o RotationTrace.o Circle2D.o Arc2D.o EndStop.o
+DEPENDENCY := $(DEPENDENCY) PrescribedSpeedController.o RelativeSpeedController.o
 #LIBS=-lMathInterface -lArduinoInterface
 #LIBS = -lArduinoInterface -lMathInterface
 include $(TOROOT)/Makefile.config

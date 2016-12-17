@@ -1,3 +1,4 @@
+
 // Copyright [2015] Ruud Cools
 
 #ifndef MOTOR_UNIT_TEST_JOINTCONTROLLERUNITTEST_H_
@@ -9,9 +10,6 @@
 #include <RotationalJoint.h>
 #include <TranslationalJoint.h>
 #include <JointController.h>
-#include <vector>
-#include <string>
-
 
 class JointControllerUnitTest : public CxxTest::TestSuite {
  public:

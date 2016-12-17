@@ -40,6 +40,7 @@ class JointIOUnitTest : public CxxTest::TestSuite {
     TS_ASSERT_EQUALS(jointpointer->getPosition(), PI/2);
     TS_ASSERT_EQUALS(jointpointer->getMovementType(), BaseJoint::Rotational);
     TS_ASSERT_DELTA(jointpointer->getMovementPerStep(),0.0016,0.01);
+    TS_ASSERT_EQUALS(jointpointer->getEndStops().size(), 1);
   }
 
   void testUpdate() {
@@ -47,6 +48,9 @@ class JointIOUnitTest : public CxxTest::TestSuite {
     JointIO jointIO(robotIO.getNodeFromPath("ROBOT/JOINTCONTROLLER/JOINT"));
     jointIO.build();
     BaseJoint::JointPointer jointpointer(jointIO.getJointPointer());
+    std::vector<EndStop> endStopVector({EndStop(3.14,0,true,"OUT")});
+    jointpointer->setEndStops(endStopVector);
+    jointIO.update(jointpointer);
   }
   
 };
