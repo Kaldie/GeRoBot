@@ -1,15 +1,15 @@
 #ifndef BaseMotorItem_H
 #define BaseMotorItem_H
 
-#include <BaseMotor.h>
 #include "BaseRobotItem.h"
+class BaseMotor;
 
 class BaseMotorItem:
 public BaseRobotItem {
-  GETSETPOINTER(BaseMotor, m_baseMotor, BaseMotor)
+  GETSET(std::shared_ptr<BaseMotor>, m_baseMotor, BaseMotor)
  public:
   BaseMotorItem(BaseRobotItem* i_parrentItem,
-		BaseMotor* motorPointer);
+		const std::shared_ptr<BaseMotor>& motorPointer);
   virtual QVariant getPropertyData(int row,int column) const;
   virtual bool setPropertyData(int row,int column, const QVariant& value);
   virtual bool construct();

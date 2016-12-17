@@ -1,11 +1,12 @@
 #include <macroHeader.h>
+#include <BaseMotor.h>
 #include "BaseMotorItem.h"
 #include "PinStateItem.h"
 
 const QList<QString> BaseMotorItem::propertyList({"DefaultDirection","HoldMotor"});
 
 BaseMotorItem::BaseMotorItem(BaseRobotItem* i_parent,
-			     BaseMotor* i_baseMotor)
+			     const BaseMotor::MotorPointer& i_baseMotor)
   : BaseRobotItem("BaseMotor",i_parent),
     m_baseMotor(i_baseMotor) {
       LOG_DEBUG(getElementName().toStdString());
