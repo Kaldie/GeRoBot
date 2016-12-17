@@ -7,6 +7,7 @@
 #include <BaseJoint.h>
 #include <BaseMotor.h>
 #include <PinState.h>
+#include <EndStop.h>
 
 JointController::JointController()
   :m_jointPointerVector({}),
@@ -31,7 +32,9 @@ bool JointController::validateJoint(const BaseJoint::JointPointer& i_baseJoint) 
     
     if (((*itr) > std::get<1>(m_actuator.getJointPinRange())) ||
 	((*itr) < std::get<0>(m_actuator.getJointPinRange()))) {
-      LOG_INFO("Pin: " << (*itr) << " is not within range!!");
+      LOG_INFO("Pin: " << (*itr) << " is not within range: " <<
+	       std::get<0>(m_actuator.getJointPinRange()) <<
+	       ", " << std::get<1>(m_actuator.getJointPinRange())) ;
       return false;
     }
   }
@@ -190,32 +193,33 @@ void JointController::uploadSequence(const bool& i_condense) {
 }
 
 
-int JointController::resolveEndStopHit(JointPointerVector* o_jointVector,
-				       std::vector<std::string>* o_direction) {
-  o_jointVector->clear();
-  o_direction->clear();
-  int result = m_actuator.resolveEndStopHit();
-
-  PinState pinState;
+void JointController::resolveEndStopHit() {
+  int jointValue, endStopValue;
+  m_actuator.resolveEndStopHit(&jointValue, &endStopValue);
+  PinState jointPinState, stopPinState;
   std::tuple<int, int> pinRange(m_actuator.getJointPinRange());
   for (int i= std::get<0>(pinRange);
        i <= std::get<1>(pinRange); ++i) {
-      pinState.update(i, 0);
+    jointPinState.update(i, ((jointValue >> i) && 1));
   }
-  // if you mod with the max pin number + 1
-  // you get the integer value of the pins 0 to max pin number
-  pinState.setNumericValue(result % (1 << (std::get<1>(pinRange) + 1)));
   
+  pinRange = m_actuator.getStopPinRange();
+  for (int i = std::get<0>(pinRange);
+       i <= std::get<1>(pinRange); ++i) {
+    stopPinState.update(i, ((endStopValue >> i) && 1));
+  }
+
   std::string jointDirection;
+  std::shared_ptr<EndStop> endStop;
   for (const auto& joint : m_jointPointerVector) {
-    if (joint->getJointStatus(pinState, &jointDirection)) {
-      o_jointVector->push_back(joint);
-      o_direction->push_back(jointDirection);
+    if (joint->getJointStatus(jointPinState, &jointDirection)) {
+      endStop = joint->getEndStop(stopPinState, jointDirection);
+      if (endStop) {
+	joint->updateJointOnEndStopHit(endStop);
+      }
     }
   }
-  return result;
 }
-
 
 
 BaseJoint::JointPointer JointController::resolveJoint(const std::string& i_movementDirection) const {

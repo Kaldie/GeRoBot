@@ -53,15 +53,14 @@ class JointController {
   /// function which will make the robot move!
   void actuate();
 
-
   /**
    * Method will resolve the end stop call
    * It will tell the actuator to reset the driver
-   * From that call it will resolve 
-   *  the direction the actuator was going at that time
-   *  The endstop being actuated at the given time
+   * From that call it will receive the pin state of the joints and end stops
+   * Base from these it will find the end stop triggered 
+   * and set the position of the corrisponding joint.
    */
-  int resolveEndStopHit(JointPointerVector o_joint, std::string* o_direction);
+  void resolveEndStopHit();
 
   /**
    * Reducing the size of the vector
