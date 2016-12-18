@@ -4,7 +4,9 @@
 #define MOTOR_IO_STEPPERDRIVERIO_H_
 
 #include <XMLBuilder.h>
+
 class StepperDriver;
+class BaseMotor;
 
 class StepperDriverIO: public XMLBuilder {
   GETSET(std::shared_ptr<StepperDriver>, m_stepperDriver, StepperDriver);

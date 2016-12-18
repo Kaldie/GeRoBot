@@ -37,13 +37,13 @@ bool SpeedControllerIO::update(const SpeedController::SpeedControllerPointer& i_
   if (type == SpeedController::Prescribed) {
     getNodeFromPath("./TYPE").text().set("Prescribed");
   } else if (type == SpeedController::Relative) {
-    getNodeFromPath("./MOVEMENT_TYPE").text().set("Relative");
+    getNodeFromPath("./TYPE").text().set("Relative");
   } else if (type ==SpeedController::Constant) {
-    getNodeFromPath("./MOVEMENT_TYPE").text().set("Constant");
+    getNodeFromPath("./TYPE").text().set("Constant");
   } else {
     LOG_ERROR("Unknown Speed controller type!");
   }
-  getNodeFromPath("/Speed").text().set(m_speedController->getRobotSpeed());
+  getNodeFromPath("./SPEED").text().set(i_pointer->getRobotSpeed());
   return true;
 }
 

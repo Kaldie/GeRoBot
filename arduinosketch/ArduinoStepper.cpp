@@ -16,7 +16,7 @@
 #define CHIP_SELECT 10
 #define TOOL_PIN 14
 #define ENDSTOP_PIN 0
-#define ENDSTOP_VALUE 1
+#define ENDSTOP_VALUE 0
 
 // States for the machine
 enum Status {
