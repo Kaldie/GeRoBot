@@ -5,7 +5,9 @@
 #include "./Point2DIO.h"
 #include "./TraceListIO.h"
 #include "./RotationTraceIO.h"
-
+#ifdef QT
+#include <QtCore/QFile>
+#endif
 
 void TraceListIO::build() {
   pugi::xml_node traceListNode = getNodeFromPath("./TraceList");
@@ -39,6 +41,12 @@ Trace::TracePointer TraceListIO::handleTrace(const pugi::xml_node& i_node) const
 
 TraceListIO::TraceListIO(const std::string& i_fileName)
   : XMLBuilder(i_fileName) {
+  XMLBuilder::build();
+}
+
+
+TraceListIO::TraceListIO(QFile* i_file)
+  : XMLBuilder(i_file) {
   XMLBuilder::build();
 }
 

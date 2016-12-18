@@ -81,7 +81,8 @@ bool MainWindow::saveRobot() {
   QString fileName =
     QFileDialog::getSaveFileName(this,
                                  tr("Save Robot to XML"));
-  RobotIO robotBuilder("defaultRobot.xml");
+  QFile qFile(":/defaultRobot.xml");
+  RobotIO robotBuilder(&qFile);
   //  m_modelPointer->getRobotPointer()
   robotBuilder.update(m_modelPointer->getRobotPointer());
   robotBuilder.store(fileName.toUtf8().constData());
@@ -93,7 +94,8 @@ bool MainWindow::saveTraceDesign() {
  QString fileName =
    QFileDialog::getSaveFileName(this,
                                 tr("Save Trace Design to XML"));
-  TraceListIO traceListIO("/home/ruud/project/gerobot/gui/defaultTraceDesign.xml");
+  QFile qFile(":/defaultTraceDesign.xml");
+  TraceListIO traceListIO(&qFile);
   LOG_DEBUG("Storing trace design at: " << fileName.toStdString());
   if (TraceDesignWidget* traceWidget = findChild<TraceDesignWidget*>()) {
     LOG_DEBUG("Updating and saving!");

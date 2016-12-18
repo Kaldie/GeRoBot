@@ -1,13 +1,14 @@
 // Copyright [2014] Ruud Cools
 #include <macroHeader.h>
 #include <QtGui>
+#include <QFile>
 #include <RobotIO.h>
 #include "./MainWindow.h"
 
 int main(int argc, char *argv[]) {
   Q_INIT_RESOURCE(RobotTreeModel);
-
-  RobotIO robotBuilder("/home/ruud/projects/gerobot/gui/defaultRobot.xml");
+  QFile xmlFile(":/defaultRobot.xml");
+  RobotIO robotBuilder(&xmlFile);
   robotBuilder.build();
   LOG_DEBUG("Robot build finished!");
   QApplication app(argc, argv);

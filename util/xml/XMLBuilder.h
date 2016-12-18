@@ -5,12 +5,21 @@
 #include <pugixml.hpp>
 #include <memory>
 
+// if QT is available we want to build from QFile
+#ifdef QT
+#include <QtCore/QFile>
+#endif
+
+
 class XMLBuilder {
  private:
   GETSET(std::string, m_fileName, FileName);
   GETSET(bool, m_hasLoaded, HasLoaded);
   GETSETPROTECTED(pugi::xml_node, m_node, Node);
-  
+#ifdef QT
+  GETSETPOINTER(QFile, m_QFile, QFile);
+#endif
+
   std::shared_ptr<pugi::xml_document> m_documentPointer;
 
   template<class T>
@@ -28,6 +37,11 @@ class XMLBuilder {
 
   XMLBuilder();
   XMLBuilder(const std::string&, const bool&, const pugi::xml_node&);
+  void loadFromFile(pugi::xml_parse_result* o_result);
+#ifdef QT
+  void loadFromQFile(pugi::xml_parse_result* o_result);
+#endif
+  
  public:
   // Build they objects
   virtual void build();
@@ -63,8 +77,12 @@ class XMLBuilder {
 
   virtual bool store(const std::string& i_fileName);
 
-  XMLBuilder(const std::string&);
+  explicit XMLBuilder(const std::string&);
   explicit XMLBuilder(const pugi::xml_node&);
+#ifdef QT
+  explicit XMLBuilder(QFile* i_QFile);
+#endif
+  
   virtual ~XMLBuilder();
 };
 

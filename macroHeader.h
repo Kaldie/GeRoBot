@@ -24,6 +24,8 @@
 
 #ifdef QT
 #include <QtCore/QPointF>
+#include <QtCore/QFile>
+#include <QtCore/QByteArray>
 #endif
 
 
@@ -43,27 +45,25 @@
 
 // Create getter and setter for properties of a class
 #define GETSET(type, varName, property)                                 \
-  private:                                                              \
+ private:                                                               \
   type varName;                                                         \
-public:                                                                 \
-const type& get##property() const {                                     \
+ public:                                                                \
+  const type& get##property() const {					\
   return varName;                                                       \
 };                                                                      \
-                                                                        \
 void set##property(const type& val) {                                   \
   varName = val;                                                        \
 };
 
-#define GETSETPROTECTED(type, varName, property)      \
- protected:                                           \
-  type varName;                                       \
- public:                                              \
-  const type& get##property() const {                 \
-    return varName;                                   \
-  };                                                  \
-                                                      \
-  void set##property(const type& val) {               \
-    varName = val;                                    \
+#define GETSETPROTECTED(type, varName, property)	\
+ protected:						\
+  type varName;						\
+ public:						\
+  const type& get##property() const {			\
+    return varName;					\
+  };							\
+  void set##property(const type& val) {			\
+    varName = val;					\
   };
 
 
@@ -139,15 +139,6 @@ const type& get##property() const {                                     \
 #define LOG_INFO(message)                                               \
   do {DEBUG_MSG("[INFO] ("<<                                            \
                 __FILE__ << ":" << __LINE__ << "): " << message);} while (false)
-
-
-// Forward declared classes
-class PinState;
-class StateSequence;
-class BaseMotor;
-class BaseJoint;
-class Robot;
-class RobotTreeModel;
 
 enum GUIMovementMode {ToolMode, AxisMode};
 

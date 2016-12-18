@@ -9,7 +9,7 @@
 class Trace;
 class JointController;
 class SpeedController;
-
+class StateSequence;
 /**
  * Robot is the basis of the project.
  *  Robot is the root of a object which looks like: Robot->Joint->Actuator

@@ -7,5 +7,6 @@
         <file>icons/StraightLeft.png</file>
         <file>icons/StraightRight.png</file>
         <file>icons/StraightUp.png</file>
+        <file>defaultTraceDesign.xml</file>
     </qresource>
 </RCC>

@@ -1,6 +1,7 @@
 // Copyright [2015] Ruud Cools
 #include <macroHeader.h>
 #include "Robot.h"
+#include <JointController.h>
 #include <SpeedController.h>
 #include <ConstantSpeedController.h>
 #include <BaseTraceCalculator.h>
@@ -9,7 +10,6 @@
 #include <Trace.h>
 #include <RotationTraceCalculator.h>
 #include <RotationTrace.h>
-#include <Point2D.h>
 
 int stepsMissed = 0;
 
@@ -147,3 +147,10 @@ void Robot::addToSequence(const StateSequence& i_sequence) {
   if (!sequenceVector->addToSequence(i_sequence))
     sequenceVector->appendStateSequence(i_sequence, false);
 }
+
+
+/*void Robot::resolveEndStop() {
+
+
+}
+*/			   

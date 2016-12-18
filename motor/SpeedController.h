@@ -7,7 +7,7 @@
 class Trace;
 class JointController;
 class SequenceVector;
-
+class BaseJoint;
 // Interface of speed controllers, there will be some
 class SpeedController {
 public:

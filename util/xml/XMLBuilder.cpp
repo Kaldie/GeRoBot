@@ -2,6 +2,11 @@
 #include <macroHeader.h>
 #include "./XMLBuilder.h"
 
+#ifdef QT
+#include <QtCore/QByteArray>
+#include <QtCore/QIODevice>
+#endif
+
 XMLBuilder::XMLBuilder()
   :  XMLBuilder("", false, pugi::xml_node())
 {}
@@ -16,14 +21,23 @@ XMLBuilder::XMLBuilder(const pugi::xml_node& i_node)
   : XMLBuilder("", false, i_node)
 {}
 
+#ifdef QT
+XMLBuilder::XMLBuilder(QFile* i_QFile)
+  :m_fileName(""),
+   m_hasLoaded(false),
+   m_node(pugi::xml_node()),
+   m_QFile(i_QFile)
+{}
+#endif
+
+
 XMLBuilder::XMLBuilder(const std::string& i_fileName,
 		       const bool& i_isLoaded,
 		       const pugi::xml_node& i_node)
   : m_fileName(i_fileName),
     m_hasLoaded(i_isLoaded),
     m_node(i_node)
-{}
-		       
+{}   
 
 
 XMLBuilder::~XMLBuilder() {
@@ -35,6 +49,7 @@ XMLBuilder::~XMLBuilder() {
   }
 }
 
+
 void XMLBuilder::build() {
   // set the node to document pointer by the file name.
   setNode(loadXMLFile());
@@ -42,27 +57,47 @@ void XMLBuilder::build() {
 
 
 pugi::xml_node XMLBuilder::loadXMLFile() {
-  if (m_fileName == "")
-    LOG_ERROR("File name is not yet set!!");
+  pugi::xml_parse_result result;
+  if (m_fileName != "") {
+    loadFromFile(&result);
+  }
+#ifdef QT
+  if (m_QFile->exists()) {
+    loadFromQFile(&result);
+  }
+#endif
 
-  m_documentPointer = std::make_shared<pugi::xml_document>();
-
-  pugi::xml_parse_result result =
-      m_documentPointer->load_file(m_fileName.c_str());
-  if (!result)
+  if (!result) {
     LOG_ERROR("Load result: " << result.description());
-
-  if (!m_documentPointer->first_child())
+  }
+  if (!m_documentPointer->first_child()) {
     LOG_ERROR("No first child found!!");
-
+  }
   if (std::string(m_documentPointer->first_child().name()) != "ROBOTBUILDER") {
     LOG_ERROR("Not a Robot builder xml file!");
   }
-
   m_hasLoaded = true;
   return m_documentPointer->first_child();
 }
+  
 
+void XMLBuilder::loadFromFile(pugi::xml_parse_result* o_result) {
+  m_documentPointer = std::make_shared<pugi::xml_document>();
+  *o_result =
+      m_documentPointer->load_file(m_fileName.c_str());
+}
+
+
+#ifdef QT
+void XMLBuilder::loadFromQFile(pugi::xml_parse_result* o_result) {
+  m_documentPointer = std::make_shared<pugi::xml_document>();
+  m_QFile->open(QIODevice::ReadOnly);
+  QByteArray buffer = m_QFile->readAll();
+  *o_result =
+    m_documentPointer->load_buffer(static_cast<const void*>(buffer.constData()),
+				  buffer.size());
+}
+#endif
 
 pugi::xml_node XMLBuilder::getNodeFromPath(const pugi::xml_node& i_parrentNode,
                                            const std::string& i_path) {

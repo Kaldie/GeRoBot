@@ -23,6 +23,9 @@ class RobotIO: public XMLBuilder {
   bool updateSpeedController(const std::shared_ptr<SpeedController>& i_speedController);
  public:
   explicit RobotIO(const std::string&);
+#ifdef QT
+  explicit RobotIO(QFile* i_QFile);
+#endif
 
   virtual void build();
 

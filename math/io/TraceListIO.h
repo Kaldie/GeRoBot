@@ -6,10 +6,18 @@
 #include <XMLBuilder.h>
 #include <Trace.h>
 
+#ifdef QT
+class QFile;
+#endif
+
 
 class TraceListIO: public XMLBuilder {
  public:
   TraceListIO(const std::string&);
+
+#ifdef QT
+  TraceListIO(QFile* i_file);
+#endif
   /**
    * Remove the xml node from the document
    * This function is used to remove unwanted nodes after update

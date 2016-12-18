@@ -6,7 +6,9 @@
 #include <JointController.h>
 #include <SpeedControllerIO.h>
 #include <SpeedController.h>
-
+#ifdef QT
+#include <QtCore/QFile>
+#endif
 
 RobotIO::RobotIO(const std::string& i_fileName)
     : XMLBuilder(i_fileName) {
@@ -14,6 +16,13 @@ RobotIO::RobotIO(const std::string& i_fileName)
   XMLBuilder::build();
 }
 
+#ifdef QT
+RobotIO::RobotIO(QFile* i_QFile)
+    : XMLBuilder(i_QFile) {
+  m_robotPointer.reset(new Robot);
+  XMLBuilder::build();
+}
+#endif
 
 void RobotIO::build() {
   // need to call the xml builder build function to load the root node of the document given by the file name.
@@ -76,8 +85,8 @@ void RobotIO::setRobotPointer(Robot::RobotPointer* i_robotPointer) {
 bool RobotIO::update(const Robot::RobotPointer& i_robotPointer) {
   bool hasUpdated(true);
   m_robotPointer = i_robotPointer;
-  hasUpdated &= updateJointController(m_robotPointer->getJointController());
-  hasUpdated &= updateSpeedController(m_robotPointer->getSpeedController());
+  hasUpdated &= updateJointController(i_robotPointer->getJointController());
+  hasUpdated &= updateSpeedController(i_robotPointer->getSpeedController());
   return hasUpdated;
 }
 
@@ -86,15 +95,15 @@ bool RobotIO::updateJointController
 (const JointController::JointControllerPointer& i_jointController) {
   JointControllerIO jointControllerIO
     (getNodeFromPath("./ROBOT/JOINTCONTROLLER"));
-  return jointControllerIO.update(m_robotPointer->getJointController());
+  return jointControllerIO.update(i_jointController);
 }
 
 
 bool RobotIO::updateSpeedController
-(const SpeedController::SpeedControllerPointer& i_jointController) {
+(const SpeedController::SpeedControllerPointer& i_speedController) {
   SpeedControllerIO speedControllerIO
     (getNodeFromPath("./ROBOT/SPEEDCONTROLLER"));
-  return speedControllerIO.update(m_robotPointer->getSpeedController());
+  return speedControllerIO.update(i_speedController);
 }
 
 
