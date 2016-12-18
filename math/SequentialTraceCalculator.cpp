@@ -11,19 +11,25 @@
 
 
 SequentialTraceCalculator::SequentialTraceCalculator()
-  : SequentialTraceCalculator(nullptr, tsa::TraceSection()) {
+  : SequentialTraceCalculator(nullptr, tsa::TraceSection(), true) {
 }
 
 
 SequentialTraceCalculator::SequentialTraceCalculator(const Robot::RobotPointer& i_robot)
-  : SequentialTraceCalculator(i_robot, tsa::TraceSection()) {
+  : SequentialTraceCalculator(i_robot, tsa::TraceSection(), true) {
 }
 
 
 /// Full Fledged Constructor
 SequentialTraceCalculator::SequentialTraceCalculator(const Robot::RobotPointer& i_robot,
                                                      const tsa::TraceSection& i_section)
-  : m_robot(i_robot), m_traceSection(i_section), m_stopAfterSection(true) {
+  : SequentialTraceCalculator(i_robot, tsa::TraceSection(), true) {
+}
+
+SequentialTraceCalculator::SequentialTraceCalculator(const Robot::RobotPointer& i_robot,
+                                                     const tsa::TraceSection& i_section,
+                                                     const bool& i_stopAfterSection)
+  : m_robot(i_robot), m_traceSection(i_section), m_stopAfterSection(i_stopAfterSection) {
 }
 
 
@@ -43,7 +49,7 @@ void SequentialTraceCalculator::calculatedTraces() {
   LineTraceCalculator lineTraceCalculator(m_robot.get());
 
   tsa::otsa::orderVector(&m_traceSection,
-			 m_robot->getVirtualPosition());
+                         m_robot->getPosition());
   for (const auto& trace : m_traceSection) {
     traceType distance  =
       magnitude(trace->getStartPoint() - m_robot->getVirtualPosition());
@@ -51,7 +57,7 @@ void SequentialTraceCalculator::calculatedTraces() {
       Trace movementTrace(m_robot->getVirtualPosition(),
                           trace->getStartPoint());
       m_robot->switchTool(false);
-      baseTraceCalculator.calculateTrace(&movementTrace);
+      baseTraceCalculator.calculateTrace(movementTrace);
       m_robot->switchTool(true);
     }
 
@@ -60,7 +66,7 @@ void SequentialTraceCalculator::calculatedTraces() {
     } else if (trace->getTraceType() == Trace::Curve) {
       RotationTrace::RotationTracePointer rotationTrace =
         std::static_pointer_cast<RotationTrace>(trace);
-      rotationTraceCalculator.calculateTrace(rotationTrace.get());
+      rotationTraceCalculator.calculateTrace(*rotationTrace);
     }
   }
 }

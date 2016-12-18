@@ -11,7 +11,6 @@
 #include <RotationTraceCalculator.h>
 #include <RotationTrace.h>
 
-int stepsMissed = 0;
 
 Robot::Robot()
   : Robot( nullptr,  Point2D(0, 50))
@@ -51,7 +50,7 @@ void Robot::goToPosition(const Point2D &i_position) {
   BaseTraceCalculator baseTraceCalculator(this);
   Trace thisTrace(m_position, i_position);
   m_speedController->prepareSpeedController(thisTrace, *m_jointController);
-  baseTraceCalculator.calculateTrace(&thisTrace);
+  baseTraceCalculator.calculateTrace(thisTrace);
   LOG_DEBUG("new position: " << getVirtualPosition().x << getVirtualPosition().y);
   actuate();
 }
@@ -85,7 +84,7 @@ void Robot::traceCalculation(const Trace::TracePointer& i_trace) {
     LOG_ERROR("Could not resolve trace type!");
   }
   m_speedController->prepareSpeedController(*i_trace, *m_jointController);
-  traceCalculator->calculateTrace(i_trace.get());
+  traceCalculator->calculateTrace(*i_trace);
 }
 
 
@@ -111,7 +110,6 @@ void Robot::prepareSteps(const std::string& i_direction,
 
 
 void Robot::actuate() {
-  LOG_DEBUG("Steps missed: " << stepsMissed);
   LOG_DEBUG("Regular expression: " << m_jointController->getActuator().getSerialRegularExpresion());
   // upload the current sequence
   m_jointController->uploadSequence(false);
@@ -147,10 +145,3 @@ void Robot::addToSequence(const StateSequence& i_sequence) {
   if (!sequenceVector->addToSequence(i_sequence))
     sequenceVector->appendStateSequence(i_sequence, false);
 }
-
-
-/*void Robot::resolveEndStop() {
-
-
-}
-*/			   

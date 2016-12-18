@@ -43,7 +43,7 @@ class Robot {
   void setPosition(const Point2D& i_position);
 
   /// Creates a state which will switch the tool to a active or inactive state
-  void switchTool(const bool& i_shouldBeActive) {}; // no yet implemented!
+  //void switchTool(const bool& i_shouldBeActive) {}; // no yet implemented!
 
   /// move to a position, independend on maner
   void goToPosition(const Point2D&);

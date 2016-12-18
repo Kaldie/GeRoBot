@@ -16,7 +16,8 @@ class RotationTraceCalculator: public LineTraceCalculator {
    * Calculate the trace
    * @param[in] i_trace i_trace trace that needs to be evaluated
    */
-  virtual void calculateTrace(const Trace* i_trace);
+  virtual void calculateTrace(const Trace& i_trace);
+
   /// Default constructor
   RotationTraceCalculator();
 
@@ -40,12 +41,15 @@ class RotationTraceCalculator: public LineTraceCalculator {
   void ensureProperMovement(const std::vector<RotationTrace>& i_traces,
                             const std::vector<RotationTrace>::const_iterator& i_traceIterator,
                             const Point2D& i_startPosition);
+
   /// Prepare rotation movement based on the actual position and necessity to move
   bool ensureRotationMovement(const std::vector<RotationTrace>& i_traces,
                               const std::vector<RotationTrace>::const_iterator& i_trace);
-  /// prepare translation movement to ensure the robot is behind the endpoint of the intermediate trace
+
+/// prepare translation movement to ensure the robot is behind the endpoint of the intermediate trace
   void ensureTranslationMovement(const std::vector<RotationTrace>::const_iterator& i_trace,
                                  const std::string& i_requiredDirection);
+
   /// Returns if during this trace the robot needs to rotate
   bool shouldRotateAtAll(const std::vector<RotationTrace>& i_traces,
                     const std::vector<RotationTrace>::const_iterator& i_currentTrace,

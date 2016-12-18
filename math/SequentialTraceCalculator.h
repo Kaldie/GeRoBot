@@ -2,15 +2,15 @@
 #ifndef MATH_SEQUENTIALTRACECALCULATOR_H_
 #define MATH_SEQUENTIALTRACECALCULATOR_H_
 
-#include <Robot.h>
-#include "./TSA.h"
+class Robot;
+class Trace;
 
 class SequentialTraceCalculator {
   /// Robot which will be operated on
-  GETSET(Robot::RobotPointer, m_robot, Robot);
+  GETSET(std::shared_ptr<Robot>, m_robot, Robot);
 
   /// Trace section which will be calculated
-  GETSET(tsa::TraceSection, m_traceSection, TraceSection);
+  GETSET(std::vector<std::shared_ptr<Trace>>, m_traceSection, TraceSection);
 
   /// Let the robot come to an halt after each section
   GETSET(bool, m_stopAfterSection, StopAfterSection);
@@ -22,10 +22,14 @@ class SequentialTraceCalculator {
   /// Full Fledged Constructor
   SequentialTraceCalculator(const Robot::RobotPointer& i_robot,
                             const tsa::TraceSection&);
+  /// Full Fledged Constructor
+  SequentialTraceCalculator(const Robot::RobotPointer& i_robot,
+                            const tsa::TraceSection&,
+                            const bool& i_stopAfterSegment);
   /// Calculated Traces
   void calculatedTraces();
   /// return the ordered traces
-  tsa::TraceSection getOrdedSections();
+  std::vector<std::shared_ptr<Trace>> getOrdedSections();
  private:
   void AddMovementTrace(const Point2D& i_startPoint,
                         const Point2D& i_endPoint);
