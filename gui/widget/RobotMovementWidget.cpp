@@ -29,7 +29,6 @@ void RobotMovementWidget::setRobotPointer(Robot::RobotPointer i_robotPointer) {
   if (i_robotPointer)
     return;
   m_robotPointer = i_robotPointer;
-
 }
 
 
@@ -96,6 +95,7 @@ void RobotMovementWidget::updateSpeedSlider() {
       static_cast<RelativeSpeedController*>(m_robotPointer->getSpeedController().get());
     speedSlider->setToolTip(getRelativeToolTip(controller));
     speedSlider->setStatusTip(getRelativeStatusTip(controller));
+    speedSlider->setValue(controller->getRobotSpeed());
   } else {
     qstring = "Speed controlling only valid with a relative speed controller!";
     speedSlider->setToolTip(qstring);
