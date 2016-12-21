@@ -112,7 +112,7 @@
     <addaction name="loadTraceAction"/>
     <addaction name="saveTraceAction"/>
     <addaction name="separator"/>
-    <addaction name="actionCalculate_Trace"/>
+    <addaction name="calculateTraceAction"/>
     <addaction name="actionUpload"/>
     <addaction name="separator"/>
     <addaction name="actionActuate"/>
@@ -155,7 +155,7 @@
     <string>Save Trace</string>
    </property>
   </action>
-  <action name="actionCalculate_Trace">
+  <action name="calculateTraceAction">
    <property name="text">
     <string>Calculate Trace</string>
    </property>
