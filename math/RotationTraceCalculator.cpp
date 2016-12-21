@@ -59,7 +59,7 @@ void RotationTraceCalculator::ensureProperMovement(const std::vector<RotationTra
      i_traceIterator->getTranslationDirectionToEndPoint(i_startPosition);
   LOG_DEBUG("Current Translation direction " << translationDirection);
   // Set a rotation step if appropate and let us know if we need to continue
-  if(!ensureRotationMovement(i_traces, nextTrace))
+  if(ensureRotationMovement(i_traces, nextTrace))
     return;
   // Now ensure translation steps are set to put it at an appropate position
   ensureTranslationMovement(nextTrace, translationDirection);
@@ -125,7 +125,7 @@ shouldRotateAtAll(const std::vector<RotationTrace>& i_traces,
                   const std::vector<RotationTrace>::const_iterator& i_currentTrace,
                   const Point2D& i_currentPosition) {
   bool willRotate = false;
-  auto iterator = i_currentTrace;
+  std::vector<RotationTrace>::const_iterator iterator = i_currentTrace;
   while (iterator != i_traces.end() && !willRotate) {
     willRotate |= shouldRotate(*iterator, m_robot->getVirtualPosition());
     ++iterator;

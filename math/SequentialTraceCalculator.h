@@ -3,6 +3,7 @@
 #define MATH_SEQUENTIALTRACECALCULATOR_H_
 
 class Robot;
+#include <TSA.h>
 class Trace;
 
 class SequentialTraceCalculator {
@@ -14,24 +15,29 @@ class SequentialTraceCalculator {
 
   /// Let the robot come to an halt after each section
   GETSET(bool, m_stopAfterSection, StopAfterSection);
+
+  /// Determine if the traces should be orded before calculation
+  GETSET(bool, m_orderTraces, OrderTraces);
+
  public:
   /// Easy Constructor
   SequentialTraceCalculator();
   /// Construction with robot
-  SequentialTraceCalculator(const Robot::RobotPointer& i_robot);
+  SequentialTraceCalculator(const std::shared_ptr<Robot>& i_robot);
   /// Full Fledged Constructor
-  SequentialTraceCalculator(const Robot::RobotPointer& i_robot,
+  SequentialTraceCalculator(const std::shared_ptr<Robot>& i_robot,
                             const tsa::TraceSection&);
   /// Full Fledged Constructor
-  SequentialTraceCalculator(const Robot::RobotPointer& i_robot,
+  SequentialTraceCalculator(const std::shared_ptr<Robot>& i_robot,
                             const tsa::TraceSection&,
-                            const bool& i_stopAfterSegment);
+                            const bool& i_stopAfterSegment,
+                            const bool& i_orderTraces);
   /// Calculated Traces
   void calculatedTraces();
   /// return the ordered traces
   std::vector<std::shared_ptr<Trace>> getOrdedSections();
  private:
-  void AddMovementTrace(const Point2D& i_startPoint,
+  void addMovementTrace(const Point2D& i_startPoint,
                         const Point2D& i_endPoint);
 };
 

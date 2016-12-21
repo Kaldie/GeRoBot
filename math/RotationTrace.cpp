@@ -123,10 +123,12 @@ std::vector<Point2D*> RotationTrace::getPointPointers() {
   return pointers;
 }
 
+
 Point2D RotationTrace::getPointBetweenStartAndStopPosition() const {
   return RotationTrace::suggestCentralPoint(m_startPoint,
                                             m_endPoint);
 }
+
 
 Point2D RotationTrace::suggestCentralPoint(const Point2D& i_startPoint,
                                            const Point2D& i_endPoint) {
@@ -183,9 +185,8 @@ void RotationTrace::getExtremePoints(std::vector<Point2D>* i_list,
 }
 
 
-void RotationTrace::getPointAtExtremeAngle
-(Point2D* i_firstPoint,
- Point2D* i_secondPoint) const {
+void RotationTrace::getPointAtExtremeAngle(Point2D* i_firstPoint,
+                                           Point2D* i_secondPoint) const {
   /**
    * Given a circle
    * gives the two points for which the angle to the origin is
@@ -194,12 +195,13 @@ void RotationTrace::getPointAtExtremeAngle
   traceType centreMagnitude = magnitude(m_centrePoint);
   traceType radius = getArc().radius();
   if (centreMagnitude > radius) {
+    // determin the angle between the origin and the extreme pointers
     traceType rotationAngle = asin(radius/centreMagnitude);
-    LOG_DEBUG("Rotation angle: " << rotationAngle*180/PI);
-
-    *i_firstPoint = m_centrePoint*cos(rotationAngle);
-    *i_secondPoint = m_centrePoint*cos(rotationAngle);
-
+    // Update the length of the extreme points
+    // (they are still on the line of the centre of the cirlce)
+    *i_firstPoint = m_centrePoint * cos(rotationAngle);
+    *i_secondPoint = m_centrePoint * cos(rotationAngle);
+    // Rotate the point to the extreme points
     i_secondPoint->rotate(rotationAngle);
     i_firstPoint->rotate(-rotationAngle);
   } else {
