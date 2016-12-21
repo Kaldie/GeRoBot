@@ -15,6 +15,7 @@ class QTreeView;
 
 class MainWindow: public QMainWindow, private Ui::mainWindow {
   Q_OBJECT
+  GETSET(std::shared_ptr<Robot>, m_robotPointer, RobotPointer);
   GETSET(RobotTreeModel::RobotTreeModelPointer, m_modelPointer, ModelPointer);
  private:
   bool initialise();
@@ -22,12 +23,13 @@ class MainWindow: public QMainWindow, private Ui::mainWindow {
 
  public:
   MainWindow(const Robot::RobotPointer&, QWidget *parent = 0);
-  public slots:
-      bool saveRobot();
+ public slots:
+  bool saveRobot();
   void resizeColumnsToContents(const QModelIndex& /*modelIndex*/);
   bool saveTraceDesign();
   bool loadTraceDesign();
   bool clearTraceDesign();
+  bool calculateTraces();
 };
 
 #endif  // GUI_MAINWINDOW_H_

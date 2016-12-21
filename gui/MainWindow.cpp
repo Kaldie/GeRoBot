@@ -21,8 +21,8 @@
 MainWindow::MainWindow(const Robot::RobotPointer& i_robot,
                         QWidget* parent/*=0*/)
   : QMainWindow(parent),
-    m_comboBoxDelegate(parent)
-{
+    m_robotPointer(i_robot),
+    m_comboBoxDelegate(parent) {
   setupUi(this);
 
 #ifdef Q_WS_MAEMO_5
@@ -30,7 +30,7 @@ MainWindow::MainWindow(const Robot::RobotPointer& i_robot,
   configurationView->setAlternatingRowColors(false);
 #endif
 
-  m_modelPointer.reset(new RobotTreeModel(i_robot));
+  m_modelPointer.reset(new RobotTreeModel(m_robotPointer));
   configurationView->setModel(m_modelPointer.get());
   configurationView->setItemDelegateForColumn(1, &m_comboBoxDelegate);
   initialise();
@@ -46,7 +46,7 @@ void MainWindow::resizeColumnsToContents(const QModelIndex& /*modelIndex*/) {
 bool MainWindow::initialise() {
   // Make and set the Robot movement widget
   RobotMovementWidget* robotMovementWidget =
-    new RobotMovementWidget(m_modelPointer->getRobotPointer(), this);
+    new RobotMovementWidget(m_robotPointer, this);
   robotMovementTab->layout()->addWidget(robotMovementWidget);
 
   // Make and set the trace design widget
@@ -62,6 +62,8 @@ bool MainWindow::initialise() {
   // Clear trace design action
   connect(clearTraceAction, SIGNAL(triggered()), this , SLOT(clearTraceDesign()));
   // On expand addapt size of the columns
+  connect(calculateTraceAction, SIGNAL(triggered()), this, SLOT(calculateTraces()));
+
   connect(configurationView,
           SIGNAL(expanded(const QModelIndex& /*modelIndex*/)),
           this,
@@ -139,5 +141,16 @@ bool MainWindow::clearTraceDesign() {
   } else {
    LOG_DEBUG(traceWidget);
    return false;
+  }
+}
+
+
+bool MainWindow::calculateTraces() {
+  if (TraceDesignWidget* traceWidget = findChild<TraceDesignWidget*>()) {
+    traceWidget->calculateTraces(m_robotPointer);
+    return true;
+  } else {
+    LOG_DEBUG("Trace widget is not found!");
+    return false;
   }
 }
