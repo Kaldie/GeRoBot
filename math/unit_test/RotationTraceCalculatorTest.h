@@ -67,7 +67,7 @@ class RotationTraceCalculatorTest : public CxxTest::TestSuite {
 
     RotationTraceCalculator rotationTraceCalculator(&robot);
     rotationTraceCalculator.setWriteLog(true);
-    rotationTraceCalculator.calculateTrace(&trace);
+    rotationTraceCalculator.calculateTrace(trace);
 
     SequenceVector sequenceVector = robot.getJointController()->getSequenceVector();
     /*
