@@ -57,8 +57,7 @@ class Trace {
    * Translation direction towards the end poin
    * @param[in] i_currentPosition Point2D current position of the robot
    */
-  std::string getTranslationDirectionToEndPoint(
-      const Point2D& i_currentPosition) const;
+  std::string getTranslationDirectionToEndPoint( const Point2D& i_currentPosition) const;
 
   /**
    * Return the direction which the joint needs to move

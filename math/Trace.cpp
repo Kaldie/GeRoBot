@@ -52,16 +52,34 @@ std::string Trace::
 
 std::string Trace::getRotationDirection(Point2D const &i_currentPoint,
                                         Point2D const &i_desiredPoint) const {
-  traceType currentPointAngle = i_currentPoint.getAlpha()*180./PI;
-  traceType endPointAngle = m_endPoint.getAlpha()*180./PI;
-  LOG_INFO(currentPointAngle << ", " << endPointAngle);
-
-  if (currentPointAngle > endPointAngle)
-    return "CW";
-  else if (currentPointAngle < endPointAngle)
-    return "CCW";
-  else
+  // Determine the angles of the pointers
+  traceType currentPointAngle = i_currentPoint.getAlpha();
+  traceType desiredPointAngle = m_endPoint.getAlpha();
+  LOG_INFO("Current and desired angle:" << currentPointAngle * 180./PI << ", " << desiredPointAngle * 180./PI);
+// if they are the same then the movmement is stable
+  if (desiredPointAngle == currentPointAngle) {
     return "STABLE";
+  }
+  // Determine the quardrants in whihc the points lay
+  int currentQuardrant = i_currentPoint.quardrant();
+  int desiredQuardrant  = i_desiredPoint.quardrant();
+  if (currentQuardrant == desiredQuardrant) {
+    if (currentPointAngle > desiredPointAngle) {
+      return "CW";
+    } else {
+      return "CCW";
+    }
+  }
+  if (currentQuardrant > desiredQuardrant) {
+    desiredPointAngle += 2.0 * PI;
+  }
+
+  if (desiredPointAngle - currentPointAngle > PI) {
+    return "CW";
+  } else {
+    return "CCW";
+  }
+
 }
 
 std::string Trace::
