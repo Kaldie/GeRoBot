@@ -9,7 +9,6 @@
 class BaseRobotItem;
 
 class RobotTreeModel : public QAbstractItemModel {
-  //  Q_OBJECT
 
  public:
   typedef std::shared_ptr<RobotTreeModel> RobotTreeModelPointer;

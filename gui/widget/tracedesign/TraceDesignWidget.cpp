@@ -4,12 +4,13 @@
 #include <QtWidgets>
 #include <QVBoxLayout>
 #include <macroHeader.h>
+#include <SequentialTraceCalculator.h>
 #include "../Point2DWidget.h"
 #include "./TraceDesignWidget.h"
 #include "./TraceGraphItem.h"
 #include "./TraceGraphView.h"
 #include "./RotationTraceGraphItem.h"
-
+#include "../../MainWindow.h"
 
 TraceDesignWidget::TraceDesignWidget(QWidget *parent)
     : QWidget(parent),
@@ -263,6 +264,15 @@ void TraceDesignWidget::clearWidget() {
     LOG_DEBUG("Removed a trace");
     removeTrace(*m_vector.begin());
   }
+}
+
+
+void TraceDesignWidget::calculateTraces(const Robot::RobotPointer& i_robot) {
+  LOG_INFO("Calculating traces!");
+  LOG_DEBUG("Calculating " << m_vector.size() << " traces");
+  SequentialTraceCalculator sequentialTraceCalculator(i_robot, m_vector);
+  sequentialTraceCalculator.setWriteLog(true);
+  sequentialTraceCalculator.calculatedTraces();
 }
 
 

@@ -18,13 +18,16 @@ RobotTreeModel::RobotTreeModel(const Robot::RobotPointer& i_robotPointer,
   LOG_DEBUG(rootItem->parent());
 }
 
+
 RobotTreeModel::~RobotTreeModel() {
   delete rootItem;
 }
 
+
 int RobotTreeModel::columnCount(const QModelIndex & /* parent */) const {
   return rootItem->columnCount();
 }
+
 
 QVariant RobotTreeModel::data(const QModelIndex &index, int role) const {
   if (!index.isValid())
@@ -38,18 +41,20 @@ QVariant RobotTreeModel::data(const QModelIndex &index, int role) const {
   return item->data(index.row(), index.column());
 }
 
+
 Qt::ItemFlags RobotTreeModel::flags(const QModelIndex &index) const {
   if (!index.isValid())
     return 0;
 
   if(index.column() == 0)
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
-	
+
   if(index.column() == 1)
     return Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable;
-	
+
   return 0;
 }
+
 
 BaseRobotItem* RobotTreeModel::getItem(const QModelIndex &index) const {
   if (index.isValid()) {
@@ -59,6 +64,7 @@ BaseRobotItem* RobotTreeModel::getItem(const QModelIndex &index) const {
   return rootItem;
 }
 
+
 QVariant RobotTreeModel::headerData(int section, Qt::Orientation orientation,
                                     int role) const {
   if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
@@ -66,6 +72,7 @@ QVariant RobotTreeModel::headerData(int section, Qt::Orientation orientation,
 
   return QVariant();
 }
+
 
 QModelIndex RobotTreeModel::index(int row, int column, const QModelIndex &parent) const {
   if (parent.isValid() && parent.column() != 0)
@@ -81,15 +88,17 @@ QModelIndex RobotTreeModel::index(int row, int column, const QModelIndex &parent
     return QModelIndex();
 }
 
+
 bool RobotTreeModel::insertColumns(int, int, const QModelIndex&) {
   /*	bool success;
 
-	beginInsertColumns(parent, position, position + columns - 1);
-	success = rootItem->insertColumns(position, columns);
-	endInsertColumns();
+  beginInsertColumns(parent, position, position + columns - 1);
+  success = rootItem->insertColumns(position, columns);
+  endInsertColumns();
   */
   return false;
 }
+
 
 bool RobotTreeModel::insertRows(int, int,
                                 const QModelIndex&) {
@@ -107,6 +116,7 @@ bool RobotTreeModel::insertRows(int, int,
   */
 }
 
+
 QModelIndex RobotTreeModel::parent(const QModelIndex &index) const {
   if (!index.isValid())
     return QModelIndex();
@@ -119,6 +129,7 @@ QModelIndex RobotTreeModel::parent(const QModelIndex &index) const {
 
   return createIndex(parentItem->childNumber(), 0, parentItem);
 }
+
 
 bool RobotTreeModel::removeColumns(int, int, const QModelIndex&) {
   /*
@@ -134,6 +145,7 @@ bool RobotTreeModel::removeColumns(int, int, const QModelIndex&) {
   return false;
 }
 
+
 bool RobotTreeModel::removeRows(int, int, const QModelIndex&) {
   return false;
   /*
@@ -148,11 +160,13 @@ bool RobotTreeModel::removeRows(int, int, const QModelIndex&) {
   */
 }
 
+
 int RobotTreeModel::rowCount(const QModelIndex &parent) const {
   BaseRobotItem *parentItem = getItem(parent);
 
   return parentItem->rowCount();
 }
+
 
 bool RobotTreeModel::setData(const QModelIndex &index, const QVariant &value,
                              int role) {
@@ -162,9 +176,10 @@ bool RobotTreeModel::setData(const QModelIndex &index, const QVariant &value,
   BaseRobotItem *item = getItem(index);
   bool result = item->setData(index.row(), index.column(), value);
 
-  if (result)
+  if (result) {
+    LOG_DEBUG("Emit data changed");
     emit dataChanged(index, index);
-
+  }
   return result;
 }
 

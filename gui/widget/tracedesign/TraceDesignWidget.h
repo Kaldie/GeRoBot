@@ -10,10 +10,12 @@
 
 class Point2DWidget;
 class TraceGraphView;
+class Robot;
 
 class TraceDesignWidget: public QWidget, private Ui::TraceDesignWidget {
   Q_OBJECT
-  GETSET(Trace::TracePointerVector, m_vector, Vector);  // Vector which hold the traces
+  // Vector which hold the traces
+  GETSET(Trace::TracePointerVector, m_vector, Vector);
  public:
     /// Constructor
     explicit TraceDesignWidget(QWidget* parent = 0);
@@ -25,34 +27,45 @@ class TraceDesignWidget: public QWidget, private Ui::TraceDesignWidget {
     * clear the widget if all its Traces
     */
    void clearWidget();
+
+   /**
+    * Calcuate the trace as they are defined in the designer
+    */
+   void calculateTraces(const std::shared_ptr<Robot>& i_robotPointer);
  public slots:
    void addTrace(Trace::TracePointer);
    void removeTrace(Trace::TracePointer);
+
    /**
      * Replace the currently selected trace with a new trace of type i_type
      * @param[in] i_type Trace::TraceType the new trace type
      */
    void replaceTrace(Trace::TraceType);
+
    /**
      * Replace the trace with a new trace of type i_type
      * @param[in] i_pointer Trace::TracePointer the new trace type
      * @param[in] i_type Trace::TraceType the new trace type
      */
     void replaceTrace(Trace::TracePointer i_pointer,
-		      Trace::TraceType i_type);
+          Trace::TraceType i_type);
+
     /**
      * Given the a pointer, change the direction of the trace.
      */
     void reverse(Trace::TracePointer i_pointer);
  private:
-   /**
+
+    /**
     * Set up the gui and creat an example trace for show and debugging purposes
     */
    void initialise();
+
    /**
     * The infowidget
     */
    TraceInfoWidget* m_traceInfoWidget;
+
    /**
     * The view widget
     */
@@ -78,7 +91,7 @@ class TraceDesignWidget: public QWidget, private Ui::TraceDesignWidget {
     * use getSelectedIndex or getIndex(const Trace::TracePointer&) to get the index
     */
    void replaceTrace(const unsigned int& i_index,
-		     const Trace::TraceType& i_type);
+         const Trace::TraceType& i_type);
 
    /**
     * Create a replacement based of the trace in the vector at i_index.
@@ -87,7 +100,7 @@ class TraceDesignWidget: public QWidget, private Ui::TraceDesignWidget {
     * Otherwise use the suggestion from RotationTrace::suggestcentralpoint
     */
    void setupReplacementPointer(Trace::TracePointer i_replacement,
-				const int& i_index);
+        const int& i_index);
 
  private slots:
    void setSelectedTrace();
