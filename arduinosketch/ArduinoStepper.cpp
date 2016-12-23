@@ -67,7 +67,7 @@ int SIZE_OF_INT(4);
 unsigned char INTEGER_BUFFER[4];
 
 // buffer for motor messages
-ByteBuffer<MotorMessage> MOTOR_MESSAGE_BUFFER(25);
+ByteBuffer<MotorMessage, 23> MOTOR_MESSAGE_BUFFER;
 
 // return state of the handle functions
 ReturnState RETURN_STATE;
