@@ -61,9 +61,11 @@ bool MainWindow::initialise() {
   connect(loadTraceAction, SIGNAL(triggered()), this, SLOT(loadTraceDesign()));
   // Clear trace design action
   connect(clearTraceAction, SIGNAL(triggered()), this , SLOT(clearTraceDesign()));
-  // On expand addapt size of the columns
+  // Calculate traces
   connect(calculateTraceAction, SIGNAL(triggered()), this, SLOT(calculateTraces()));
-
+  // Make the calculated shizzle shizzle
+  connect(actuateAction, SIGNAL(triggered()), this, SLOT(actuateRobot()));
+  // On expand addapt size of the columns
   connect(configurationView,
           SIGNAL(expanded(const QModelIndex& /*modelIndex*/)),
           this,
@@ -153,4 +155,9 @@ bool MainWindow::calculateTraces() {
     LOG_DEBUG("Trace widget is not found!");
     return false;
   }
+}
+
+
+bool MainWindow::actuateRobot() {
+  m_robotPointer->actuate();
 }

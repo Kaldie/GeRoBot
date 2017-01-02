@@ -115,7 +115,7 @@
     <addaction name="calculateTraceAction"/>
     <addaction name="actionUpload"/>
     <addaction name="separator"/>
-    <addaction name="actionActuate"/>
+    <addaction name="actuateAction"/>
    </widget>
    <addaction name="fileMenu"/>
    <addaction name="menuTraceDesign"/>
@@ -165,7 +165,7 @@
     <string>Upload</string>
    </property>
   </action>
-  <action name="actionActuate">
+  <action name="actuateAction">
    <property name="text">
     <string>Actuate</string>
    </property>
