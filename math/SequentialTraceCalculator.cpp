@@ -12,19 +12,19 @@
 
 
 SequentialTraceCalculator::SequentialTraceCalculator()
-  : SequentialTraceCalculator(nullptr, tsa::TraceSection(), true, true) {
+  : SequentialTraceCalculator(nullptr, tsa::TraceSection(), true, false) {
 }
 
 
 SequentialTraceCalculator::SequentialTraceCalculator(const Robot::RobotPointer& i_robot)
-  : SequentialTraceCalculator(i_robot, tsa::TraceSection(), true, true) {
+  : SequentialTraceCalculator(i_robot, tsa::TraceSection(), true, false) {
 }
 
 
 /// Full Fledged Constructor
 SequentialTraceCalculator::SequentialTraceCalculator(const Robot::RobotPointer& i_robot,
                                                      const tsa::TraceSection& i_section)
-  : SequentialTraceCalculator(i_robot, i_section, true, true) {
+  : SequentialTraceCalculator(i_robot, i_section, true, false) {
 }
 
 SequentialTraceCalculator::SequentialTraceCalculator(const Robot::RobotPointer& i_robot,
