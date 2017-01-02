@@ -12,6 +12,8 @@ class QFile;
 
 
 class TraceListIO: public XMLBuilder {
+  GETSET(Trace::TracePointerVector, m_vector, Vector);
+
  public:
   TraceListIO(const std::string&);
 
@@ -51,12 +53,11 @@ class TraceListIO: public XMLBuilder {
   virtual bool store(std::string i_fileName);
 
  private:
-  GETSET(Trace::TracePointerVector, m_vector, Vector);
-
   /// No default contructor!!
   TraceListIO(){};
   Trace::TracePointer handleTrace(const pugi::xml_node&) const;
   bool updateNode(pugi::xml_node* i_node,
                   const Trace::TracePointer i_pointer);
+  bool clear();
 };
 #endif  // MATH_IO_TRACELISTIO_H_

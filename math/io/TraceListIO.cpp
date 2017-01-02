@@ -52,29 +52,14 @@ TraceListIO::TraceListIO(QFile* i_file)
 
 
 bool TraceListIO::update(const Trace::TracePointerVector& i_traceVector) {
-  bool hasSucceded = true;
-  pugi::xml_node traceNode = getNodeFromPath("./TraceList").first_child();
+  clear();
+  pugi::xml_node traceNode;
   for (auto trace : i_traceVector) {
-    if (!traceNode) {
-      LOG_DEBUG("Add trace node to the document!");
-      traceNode = addTraceNode(trace);
-    }
     LOG_DEBUG("Update a trace from TraceListIO");
+    traceNode = addTraceNode(trace);
     updateNode(&traceNode, trace);
-    traceNode = traceNode.next_sibling();
   }
-
-  pugi::xpath_query query("./Trace");
-  pugi::xpath_node_set traces = query.evaluate_node_set(getNodeFromPath("./TraceList"));
-  while (traces.size() > i_traceVector.size()) {
-    LOG_DEBUG("Current number of Traces: " << traces.size() <<
-              "Number of new Traces: " << i_traceVector.size());
-    LOG_DEBUG("Found an unwanted trace!");
-    pugi::xpath_node badNode = traces[i_traceVector.size()];
-    getNodeFromPath("./TraceList").remove_child(badNode.node());
-    traces = query.evaluate_node_set(getNodeFromPath("./TraceList"));
-  }
-  return hasSucceded;
+  return true;;
 }
 
 
@@ -97,6 +82,8 @@ pugi::xml_node TraceListIO::addTraceNode(const Trace::TracePointer& i_pointer) {
   point2DIO.addPointNode("EndPoint");
   if (i_pointer->getTraceType() == Trace::Curve) {
     point2DIO.addPointNode("CenterPoint");
+    traceNode.append_child("RotationDirection").append_child(pugi::node_pcdata);
+    
   }
   return traceNode;
 }
@@ -116,6 +103,17 @@ bool TraceListIO::updateNode(pugi::xml_node* i_node,
 }
 
 
-bool TraceListIO::store (std::string i_fileName){
+bool TraceListIO::store(std::string i_fileName){
   return XMLBuilder::store(i_fileName.c_str());
+}
+
+
+bool TraceListIO::clear() {
+  pugi::xpath_query query("./Trace");
+  pugi::xpath_node_set traces = query.evaluate_node_set(getNodeFromPath("./TraceList"));
+  for (auto traceNode : traces) {
+    LOG_DEBUG("Found an unwanted trace!");
+    getNodeFromPath("./TraceList").remove_child(traceNode.node());
+  }
+  return true;
 }
