@@ -8,9 +8,6 @@
 #endif
 
 class Point2D:public Vector2D {
- private:
-  void correctNeighbour(int* io_quadrant) const;
-
  public:
   //construtor
   Point2D() {};
@@ -53,14 +50,14 @@ class Point2D:public Vector2D {
     return (Point2D(x + v.x, y + v.y));
   };
 
-  Point2D operator -(const Vector2D& v) const
+  Point2D operator-(const Vector2D& v) const
   {
     return (Point2D(x - v.x, y - v.y));
   };
 
-  Vector2D operator -(const Point2D& p) const
+  Point2D operator-(const Point2D& p) const
   {
-    return (Vector2D(x - p.x, y - p.y));
+    return (Point2D(x - p.x, y - p.y));
   };
 
   Point2D operator *(traceType t) const
@@ -85,11 +82,6 @@ class Point2D:public Vector2D {
   bool operator ==(const Point2D& i_other) const ;
   traceType getAngleBetweenPoints(const Point2D&) const;
   traceType getAngleToOrigin() const;
-  // determine the quardrant in whoich this point lay (0 to 3)
-  int quardrant() const;
-
-  // determine the neigbouring quardrants
-  void getQuardrantNeighbours(int* o_ccwQuardrant, int* o_cwQuardrant) const;
 };
 
 std::ostream& operator<<(std::ostream& os, const Point2D& i_point);
