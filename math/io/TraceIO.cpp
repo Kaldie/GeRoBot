@@ -7,17 +7,13 @@
 
 void TraceIO::build() {
   LOG_DEBUG("Building a Trace");
-  std::string traceType = getNode().first_child().text().as_string();
   if (isLineTrace()) {
     m_tracePointer = std::make_shared<Trace>();
-    m_tracePointer->setTraceType(Trace::Line);
-  } else if (traceType == "Curve") {
+  } else if (isCurveTrace()) {
     m_tracePointer = std::make_shared<RotationTrace>();
-    m_tracePointer->setTraceType(Trace::Curve);
   } else {
-    LOG_ERROR("Unknown trace type: " << traceType);
+    LOG_ERROR("Unknown trace type: " << getNodeFromPath("./Type").text().as_string());
   }
-
   Point2DIO point2DIO(getNodeFromPath("./StartPoint"));
   point2DIO.build();
   m_tracePointer->setStartPoint(point2DIO.getPoint2D());
@@ -27,8 +23,8 @@ void TraceIO::build() {
 }
 
 
-TraceIO::TraceIO(const pugi::xml_node& i_node) {
-  setNode(i_node);
+TraceIO::TraceIO(const pugi::xml_node& i_node)
+  : XMLBuilder(i_node) {
 }
 
 
@@ -60,12 +56,19 @@ bool TraceIO::update(const Trace::TracePointer& i_trace) {
 
 
 bool TraceIO::isLineTrace() const {
-  std::string traceType = getNode().first_child().text().as_string();
-  if (traceType == "Line") {
+  std::string traceType(getNodeFromPath("./Type").text().as_string());
+  if (traceType.compare("Line") == 0) {
     return true;
-  } else if (traceType == "Curve") {
-    return false;
-  } else {
-    LOG_ERROR("Unknown trace type: " << traceType);
   }
+  return false;
 }
+
+
+bool TraceIO::isCurveTrace() const {
+  std::string traceType(getNodeFromPath("./Type").text().as_string());
+  if (traceType.compare("Curve") == 0) {
+    return true;
+  }
+  return false;
+}
+
