@@ -56,13 +56,14 @@ void RotationTraceCalculator::ensureProperMovement(const std::vector<RotationTra
   auto nextTrace = std::next(i_traceIterator);
   // what is the current translation direction
   std::string translationDirection =
-     i_traceIterator->getTranslationDirectionToEndPoint(i_startPosition);
+     nextTrace->getTranslationDirectionToEndPoint(i_startPosition);
   LOG_DEBUG("Current Translation direction " << translationDirection);
   // Set a rotation step if appropate and let us know if we need to continue
-  if(ensureRotationMovement(i_traces, nextTrace))
-    return;
+  ensureRotationMovement(i_traces, nextTrace);
   // Now ensure translation steps are set to put it at an appropate position
-  ensureTranslationMovement(nextTrace, translationDirection);
+  if (translationDirection != "STABLE") {
+    ensureTranslationMovement(nextTrace, translationDirection);
+  }
 }
 
 
