@@ -76,6 +76,7 @@ void RobotMovementWidget::updateFromConfiguration() {
   LOG_DEBUG("Update from configuration");
   updateSpeedSlider();
   updateSimulateRadioButtons();
+  updateTextEdit();
 }
 
 
