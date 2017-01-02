@@ -3,9 +3,10 @@
 #include <QPointF>
 #include <QVariant>
 #include <QtWidgets>
+#include <Quadrant2D.h>
+#include <Point2D.h>
 #include "./RotationTraceGraphItem.h"
 #include "./TraceGraphPoint.h"
-
 
 RotationTraceGraphItem::RotationTraceGraphItem(Trace::TracePointer i_trace /*= 0*/)
   : TraceGraphItem(i_trace) {
@@ -28,32 +29,33 @@ QRectF RotationTraceGraphItem::boundingRect() const {
    rotationTrace->getExtremePoints(&points);
    double x(0.0);
    double y(0.0);
-   QPointF minPoint, maxPoint;
-   minPoint = points[0];
-   maxPoint = points[1];
+   QPointF topLeft(0,0), bottemRight(0,0);
+   //   minPoint = points[0];
+   //   maxPoint = points[0];
    for (const Point2D& point : points) {
-      QPointF qPoint = Point2D(point - rotationTrace->getCentrePoint());
+      QPointF qPoint = Point2D(point - rotationTrace->getStartPoint());
       x = qPoint.x();
       y = qPoint.y();
       LOG_DEBUG("x : " << x << " y: " << y);
-      if (minPoint.x() > x) {
-         minPoint.setX(x);
+      if (topLeft.x() > x) {
+         topLeft.setX(x);
       }
-      if (maxPoint.x() < x) {
-         maxPoint.setX(x);
+      if (bottemRight.x() < x) {
+         bottemRight.setX(x);
       }
-      if (minPoint.y() > y) {
-         minPoint.setY(y);
+      if (topLeft.y() > y) {
+         topLeft.setY(y);
       }
-      if (maxPoint.y() < y) {
-         maxPoint.setY(y);
+      if (bottemRight.y() < y) {
+         bottemRight.setY(y);
       }
    }
 
    QPointF adjust(3,3);
-   minPoint -= adjust;
-   maxPoint += adjust;
-   return QRectF(minPoint, maxPoint);
+   topLeft -= adjust;
+   bottemRight += adjust;
+   LOG_DEBUG("topLeft: " << topLeft.x() << ", " << topLeft.y() << " bottemRight: " << bottemRight.x() << ", " << bottemRight.y());
+   return QRectF(topLeft, bottemRight);
 }
 
 
@@ -129,47 +131,4 @@ RotationTrace::RotationTracePointer RotationTraceGraphItem::getPointer() const{
   if (!rotationTrace)
      return nullptr;
   return rotationTrace;
-}
-
-
-void RotationTraceGraphItem::getExtremePoints(const double* i_angle,
-                                              const RotationTrace::RotationTracePointer& i_trace,
-                                              QList<QPointF>* i_list) const {
-   double startAngle, stopAngle, angle;
-   if (!i_angle) {
-      i_trace->getStartStopAngle(&startAngle, &stopAngle);
-      if (i_trace->getIsClockwise()) {
-         angle = startAngle;
-      } else {
-         angle = stopAngle;
-      }
-   } else {
-      angle = *i_angle;
-   }
-
-   double span = i_trace->getArc().spanAngle() * 180.0 / PI;
-   double radius = i_trace->getArc().radius();
-   Point2D centerPoint = Point2D(i_trace->getCentrePoint() -
-                                 i_trace->getStartPoint());
-   LOG_DEBUG("Angle: " << angle <<" , span: " << span);
-   if (angle < span) {
-      LOG_DEBUG("add 360 deg point");
-      // this means it goes through 0, the angle needs to be adjusted such that it will work
-      double alterAngle(angle + 360.0);
-      getExtremePoints(&alterAngle, i_trace, i_list);
-      i_list->append(QPointF(centerPoint.x + radius, -centerPoint.y));
-   }
-   // check if 90 is in the mix
-   if (angle > 90 && span > (angle - 90)) {
-      LOG_DEBUG("add 90 deg point");
-      i_list->append(QPointF(centerPoint.x, -centerPoint.y - radius));
-   }
-   if ( angle > 180 && span > angle - 180) {
-      LOG_DEBUG("add 180 deg point");
-      i_list->append(QPointF(centerPoint.x - radius,  -centerPoint.y));
-   }
-   if ( angle > 270 && span > angle - 270) {
-      LOG_DEBUG("add 270 deg point");
-      i_list->append(QPointF(centerPoint.x, -centerPoint.y + radius));
-   }
 }

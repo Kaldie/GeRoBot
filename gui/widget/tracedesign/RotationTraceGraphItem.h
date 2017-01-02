@@ -1,7 +1,6 @@
 #ifndef GUI_WIDGET_TRACE_ROTATIONTRACEGRAPHITEM_H_
 #define GUI_WIDGET_TRACE_ROTATIONTRACEGRAPHITEM_H_
 
-
 #include "./TraceGraphItem.h"
 #include <RotationTrace.h>
 
@@ -36,22 +35,8 @@ class RotationTraceGraphItem : public TraceGraphItem {
                           double* i_stopAngle) const;
    RotationTrace::RotationTracePointer getPointer() const;
 
-   /**
-    * Get the extreme points on the curve
-    * Which are points at 90, 180, 270 and 360 which lay still on the curve
-    * @param[in] i_angle The angle to start the calculations with.
-    * this parameter is used to cover the corner situations
-    * These can be solved easily be recurvion with angle + 360
-    * To start the calculation use nullptr for this parameter
-    * @param[in] i_trace RotationTracePointer for which this has to be calculated
-    * @param[in] i_list list of extreme points
-    */
-   void getExtremePoints(const double* i_angle,
-			 const RotationTrace::RotationTracePointer& i_trace,
-			 QList<QPointF>* i_list) const;
-   //   QList<Edge *> edgeList;
-   //   QPointF newPos;
-   //   GraphWidget *graph;
+   static const std::vector<std::tuple<int,int>>
+     unitPointAtQuadrant;
 };
 
 #endif // GUI_WIDGET_TRACE_ROTATIONTRACEGRAPHITEM_H_
