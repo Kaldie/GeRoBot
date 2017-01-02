@@ -126,18 +126,15 @@ void TraceDesignWidget::addTrace(Trace::TracePointer newTrace) {
   // make a new trace graph item and push it to the view
   TraceGraphItem* item = m_traceGraphView->addTraceItem(newTrace);
   setSelectedTrace();
-  LOG_DEBUG("Bad thingy: " << item);
   // connect the remove this trace signal to remove trace from this widget
   connect(item, SIGNAL(removeThisTrace(Trace::TracePointer)),
           this, SLOT(removeTrace(Trace::TracePointer)));
   // connect the convert to something signal to the replaceTrace slot
   connect(item, SIGNAL(convertThisTrace(Trace::TracePointer, Trace::TraceType)),
           this, SLOT(replaceTrace(Trace::TracePointer,Trace::TraceType)));
-
+  // connect the reverse signal
   connect(item, SIGNAL(reverse(Trace::TracePointer)),
           this, SLOT(reverse(Trace::TracePointer)));
-  //  connect(item, SIGNAL(removeThis(Trace::TracePointer),
-  //                   this, SLOT(removeTrace(Trace::TracePointer);
 }
 
 
@@ -271,7 +268,6 @@ void TraceDesignWidget::calculateTraces(const Robot::RobotPointer& i_robot) {
   LOG_INFO("Calculating traces!");
   LOG_DEBUG("Calculating " << m_vector.size() << " traces");
   SequentialTraceCalculator sequentialTraceCalculator(i_robot, m_vector);
-  sequentialTraceCalculator.setWriteLog(true);
   sequentialTraceCalculator.calculatedTraces();
 }
 
