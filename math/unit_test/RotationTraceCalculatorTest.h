@@ -40,20 +40,6 @@ class RotationTraceCalculatorTest : public CxxTest::TestSuite {
     Point2D endPoint(-0, 255);
     Point2D centrePoint(-0, 580);
     RotationTrace trace(startPoint, endPoint, centrePoint);
-    robot.setPosition(startPoint);
-    /*
-      robot.getJointController()->resolveJoint(Translational)->setMovementPerStep(0.01);
-    robot.getJointController()->resolveJoint(Rotational)->setMovementPerStep(0.01);
-
-    trace.setRotationTolerance(
-        robot.getJointController()->resolveJoint(Rotational)->getMovementPerStep()*0.5);
-
-    trace.setTranslationTolerance(
-        robot.getJointController()->resolveJoint(Translational)->getMovementPerStep()*0.5);
-    trace.setIsClockwise(true);
-    robot.getJointController()->resolveJoint(Translational)->getMotor()->setHoldMotor(true);
-    robot.getJointController()->resolveJoint(Rotational)->getMotor()->setHoldMotor(true);
-    */
     RobotIO robotBuilder("defaultRobot.xml");
     robotBuilder.build();
 
