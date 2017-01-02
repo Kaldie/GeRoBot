@@ -136,6 +136,11 @@ void BaseJoint::moveSteps(const std::string& i_directionString,
                        i_vector);
   m_currentPosition +=
     getMovementPerStep() * getPositionModifier(i_directionString) * i_numberOfSteps;
+  if (m_currentPosition < m_range[0] || m_currentPosition > m_range[1]) {
+    LOG_INFO("Current joint position: " << m_currentPosition);
+    LOG_INFO("Ranges of this joint: " << m_range[0] << ", " << m_range[1]);
+    LOG_ERROR("Current Joint position is out of bounds");
+  }				       
 }
 
 
