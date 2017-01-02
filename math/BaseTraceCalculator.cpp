@@ -135,24 +135,30 @@ void BaseTraceCalculator::calculateTrace(const Trace& i_trace) {
     LOG_ERROR("Does not have a joint controller!");
   }
   Point2D currentVirtualPosition = m_robot->getVirtualPosition();
-  LOG_INFO("Current robot position: " << currentVirtualPosition.x <<
+  LOG_INFO("Current Virtual Position: " << currentVirtualPosition.x <<
            ", " << currentVirtualPosition.y);
   LOG_INFO("Going to position: " << i_trace.getEndPoint().x <<
            ", " << i_trace.getEndPoint().y);
   // Get rotation direction
   std::string rotationDirection = i_trace.
-      getRotationDirectionToEndPoint(currentVirtualPosition);
+    getRotationDirectionToEndPoint(currentVirtualPosition);
   // Get translation direction
   std::string translationDirection = i_trace.
-      getTranslationDirectionToEndPoint(currentVirtualPosition);
+    getTranslationDirectionToEndPoint(currentVirtualPosition);
   // get number of steps
   std::vector<int> numberOfSteps =
     getNumberOfSteps(i_trace, currentVirtualPosition);
   // set steps
   if (numberOfSteps[0] > 0) {
     m_robot->prepareSteps(rotationDirection, numberOfSteps[0]);
+    if (m_writeLog) {
+      writeToStepLog(rotationDirection, numberOfSteps[0],m_robot->getVirtualPosition());
+    }
   }
   if (numberOfSteps[1] > 0) {
     m_robot->prepareSteps(translationDirection, numberOfSteps[1]);
+    if (m_writeLog) {
+      writeToStepLog(translationDirection, numberOfSteps[1],m_robot->getVirtualPosition());
+    }
   }
 }
