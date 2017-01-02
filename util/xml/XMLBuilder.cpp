@@ -36,7 +36,8 @@ XMLBuilder::XMLBuilder(const std::string& i_fileName,
 		       const pugi::xml_node& i_node)
   : m_fileName(i_fileName),
     m_hasLoaded(i_isLoaded),
-    m_node(i_node)
+    m_node(i_node),
+    m_QFile(NULL)
 {}   
 
 
@@ -62,8 +63,10 @@ pugi::xml_node XMLBuilder::loadXMLFile() {
     loadFromFile(&result);
   }
 #ifdef QT
-  if (m_QFile->exists()) {
-    loadFromQFile(&result);
+  if (m_QFile) {
+    if (m_QFile->exists()) {
+      loadFromQFile(&result);
+    }
   }
 #endif
 
