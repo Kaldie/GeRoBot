@@ -3,6 +3,7 @@
 #include <macroHeader.h>
 #include <Point2D.h>
 #include <Line2D.h>
+#include <Quadrant2D.h>
 #include "./Trace.h"
 
 Trace::Trace()
@@ -61,8 +62,8 @@ std::string Trace::getRotationDirection(Point2D const &i_currentPoint,
     return "STABLE";
   }
   // Determine the quardrants in whihc the points lay
-  int currentQuardrant = i_currentPoint.quardrant();
-  int desiredQuardrant  = i_desiredPoint.quardrant();
+  Quadrant2D currentQuardrant(i_currentPoint);
+  Quadrant2D desiredQuardrant(i_desiredPoint);
   if (currentQuardrant == desiredQuardrant) {
     if (currentPointAngle > desiredPointAngle) {
       return "CW";
