@@ -4,13 +4,13 @@
 #include <Circle2D.h>
 #include <Arc2D.h>
 #include "./RotationTrace.h"
+#include <Quadrant2D.h>
 
 RotationTrace::RotationTrace()
   : Trace(Point2D(-1, 0), Point2D(1,0)) {
   m_traceType = Trace::Curve;
-    Arc2D arc(m_startPoint, m_endPoint, Point2D(0,0));
-  m_centrePoint = arc.getCentrePoint();
-  m_isClockwise = arc.getIsClockwise();
+  m_centrePoint = Point2D(0,0);
+  m_isClockwise = true;
 }
 
 
@@ -19,17 +19,7 @@ RotationTrace::RotationTrace(const Point2D& i_startPoint,
                              const Point2D& i_centrePoint)
   : Trace(i_startPoint, i_endPoint), m_centrePoint(i_centrePoint) {
   m_traceType = Trace::Curve;
-  Arc2D arc(i_startPoint, i_endPoint, i_centrePoint);
-  m_isClockwise = arc.getIsClockwise();
-}
-
-
-RotationTrace::RotationTrace(const Point2D& i_startPoint,
-                             const Point2D& i_endPoint,
-                             const traceType& i_radius,
-                             const bool& i_isClockwise /*=true*/)
-  : Trace(i_startPoint, i_endPoint), m_isClockwise(i_isClockwise) {
-  m_traceType = Trace::Curve;
+  m_isClockwise = true;
 }
 
 
@@ -146,42 +136,28 @@ void RotationTrace::getStartStopAngle(double* i_startAngle,
 }
 
 
-void RotationTrace::getExtremePoints(std::vector<Point2D>* i_list,
-                                     const double* i_angle /* = nullptr*/) const {
-   double startAngle, stopAngle, angle;
-   if (!i_angle) {
-      getStartStopAngle(&startAngle, &stopAngle);
-      if (getIsClockwise()) {
-         angle = startAngle;
-      } else {
-         angle = stopAngle;
-      }
-   } else {
-      angle = *i_angle;
-   }
-   double span = getArc().spanAngle() * 180.0 / PI;
-   double radius = getArc().radius();
-   if (angle < span) {
-      LOG_DEBUG("add 360 deg point");
-      i_list->push_back(m_centrePoint + Point2D(radius, 0));
-      // this means it goes through 0, the angle needs to be adjusted such that it will work
-      // check an angle with +360 degree
-      double alterAngle(angle + 360.0);
-      getExtremePoints(i_list, &alterAngle);
-
-   }
-   if (angle > 90 && span > (angle - 90)) {
-      LOG_DEBUG("add 90 deg point");
-      i_list->push_back(m_centrePoint + Point2D(0, radius));
-   }
-   if ( angle > 180 && span > angle - 180) {
-      LOG_DEBUG("add 180 deg point");
-      i_list->push_back(m_centrePoint + Point2D(-radius, 0));
-   }
-   if ( angle > 270 && span > angle - 270) {
-      LOG_DEBUG("add 270 deg point");
-      i_list->push_back(m_centrePoint + Point2D(0, -radius));
-   }
+void RotationTrace::getExtremePoints(std::vector<Point2D>* i_list) const {
+  Quadrant2D quadrant(m_startPoint - m_centrePoint);
+  Quadrant2D stopQuadrant(m_endPoint - m_centrePoint);
+  Arc2D arc(getArc());
+  bool spansQuadrants(arc.spanAngle() >= PI);
+  double radius = arc.radius();
+  Point2D quardrantPoint;
+  /* 
+     As long as the current quadrant is not equal to the stop quadrant we can add extreme points
+     If the quadrant is equal to stop quadrant, we can stop if and only if the spaned angled is bigger or equal then 270 degree
+     thus span angle has to be bigger then 90 = PI
+     which saves computation time
+  */
+  while (quadrant != stopQuadrant || spansQuadrants) {
+    // stuff we need to do when the start and stop are in the same quadrant
+    quardrantPoint = quadrant.getBorderPoint(m_isClockwise) * radius;
+    quardrantPoint += m_centrePoint;
+    LOG_DEBUG("Adding extreme point: " << quardrantPoint);
+    i_list->push_back(quardrantPoint);
+    quadrant.increment(m_isClockwise);
+    spansQuadrants = false;
+  } 
 }
 
 

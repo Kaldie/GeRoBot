@@ -69,8 +69,7 @@ class RotationTrace: public Trace {
     void getStartStopAngle(double* i_startAngle,
                            double* i_stopAngle) const;
 
-    void getExtremePoints(std::vector<Point2D>* i_list,
-                          const double* i_angle = nullptr) const;
+    void getExtremePoints(std::vector<Point2D>* i_list) const;
 
     /// Estimate the trace with a std::vector<Point2D> with size of i_numberOfPoints
     virtual std::vector<Point2D> estimateTrace(const int& i_numberOfPoints) const;
@@ -83,18 +82,6 @@ class RotationTrace: public Trace {
 
     ///  Reverses the trace: endpoint become beginning and startpoint becomes end
     virtual void reverse();
-
-    /**
-     * constructor
-     * @param[in] i_startPoint Start point
-     * @param[in] i_endPoint end point
-     * @param[in] i_radius Radius of the circle
-     * @param[in] i_isClockwise Is the circle clockwise or ccw
-     */
-    RotationTrace(const Point2D& i_startPoint,
-                  const Point2D& i_endPoint,
-                  const traceType& i_radius,
-                  const bool& i_isClockwise = true);
 
     /**
      * Default constructor
