@@ -69,8 +69,7 @@ QRectF TraceGraphItem::boundingRect() const {
    }
 
    QPointF start(0,0);
-   QPointF end(trace->getEndPoint().x - trace->getStartPoint().x,
-               -1 * (trace->getEndPoint().y - trace->getStartPoint().y));
+   QPointF end(trace->getEndPoint() - trace->getStartPoint());
    QPointF minPoint;
    QPointF maxPoint;
    minPoint.setX(std::min(start.x(), end.x()));
@@ -92,8 +91,7 @@ QPainterPath TraceGraphItem::shape() const {
    QPainterPath path;
    LOG_DEBUG("Paint trace line!");
    QPointF start(0, 0);
-   QPointF end(trace->getEndPoint().x - trace->getStartPoint().x,
-               -trace->getEndPoint().y - -trace->getStartPoint().y);
+   QPointF end(trace->getEndPoint() - trace->getStartPoint());
    path.moveTo(start);
    path.lineTo(end);
    return path;

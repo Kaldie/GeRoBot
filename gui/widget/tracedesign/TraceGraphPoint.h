@@ -13,13 +13,16 @@ class TraceGraphPoint : public QGraphicsItem {
  public:
   /// Enum defining if this object belongs to the start or the stop of the trace
   enum PointPosition {StartPoint, EndPoint, CenterPoint};
+
   /// Constructor
   explicit TraceGraphPoint(TraceGraphItem* parent,
-		  TraceGraphPoint::PointPosition i_position);
+			   TraceGraphPoint::PointPosition i_position);
+
   /// Paint the item to the scene
   virtual void paint(QPainter *painter,
 		     const QStyleOptionGraphicsItem *option,
 		     QWidget *widget) Q_DECL_OVERRIDE;
+
   /// Define the bounding box
   virtual QRectF boundingRect() const Q_DECL_OVERRIDE;
 
@@ -28,6 +31,7 @@ class TraceGraphPoint : public QGraphicsItem {
    * on the scene and notify peeps if needed
    */
   void updatePositionOnScene();
+
   /**
    * Sometimes an invalid position of one of the points is set,
    * this function corrects it and returns if it has been corrected
