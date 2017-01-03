@@ -175,7 +175,7 @@ void TraceInfoWidget::shouldSignalHasNewPosition() {
     try {
       Arc2D arc(trace->getStartPoint(),
                 trace->getEndPoint(),
-                rotationPointer->getCentrePoint());
+                rotationPointer->getCentrePoint(), true);
       if (!traceTypeComboBox->isEnabled()) {
           traceTypeComboBox->setEnabled(true);
       }

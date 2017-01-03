@@ -230,7 +230,7 @@ bool TraceGraphPoint::curveNeedsCorrection
     try {
       Arc2D(i_rotationTrace->getStartPoint(),
                i_rotationTrace->getEndPoint(),
-               i_newPoint);
+	    i_newPoint, true);
       return false;
     } catch (std::runtime_error) {}
     return true;
@@ -240,7 +240,7 @@ bool TraceGraphPoint::curveNeedsCorrection
     try {
       Arc2D(i_newPoint,
                i_rotationTrace->getEndPoint(),
-               i_rotationTrace->getCentrePoint());
+	    i_rotationTrace->getCentrePoint(), true);
       return false;
     } catch (std::runtime_error) {}
     return true;
@@ -250,7 +250,7 @@ bool TraceGraphPoint::curveNeedsCorrection
     try {
       Arc2D(i_rotationTrace->getStartPoint(),
                i_newPoint,
-               i_rotationTrace->getCentrePoint());
+	    i_rotationTrace->getCentrePoint(), true);
       return false;
     } catch (std::runtime_error) {}
     return true;
