@@ -17,6 +17,7 @@ class Quadrant2D {
 			      int* o_cwQuardrant) const;
 
   Point2D getBorderPoint(const bool& i_clockwise = false) const;
+  float getBorderAngle(const bool& i_clockwise = false) const;
 
   /// increment this quadrant to represent the next quadrant
   void increment(const bool& i_isClockwise) {i_isClockwise?--*this:++*this;};

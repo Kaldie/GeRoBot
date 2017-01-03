@@ -96,7 +96,8 @@ class RotationTrace: public Trace {
      */
     RotationTrace(const Point2D& i_startPoint,
                   const Point2D& i_endPoint,
-                  const Point2D& i_centrePoint);
+                  const Point2D& i_centrePoint,
+		  const bool& i_isClockwise);
 
     /**
      * constructor
@@ -109,9 +110,7 @@ class RotationTrace: public Trace {
     virtual bool isValidStartAndEndPosition(const Point2D&,
                                             const Point2D&) {return true;}
 
-    bool shouldAddExtremePoint(const traceType& i_startAngle,
-                               const traceType& i_stopAngle,
-                               const traceType& i_extremePoint) const;
+    bool shouldAddExtremePoint(const Point2D& i_extremePoint) const;
 
     Point2D* getCentralPointFromArc() const;
 

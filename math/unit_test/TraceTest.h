@@ -7,8 +7,6 @@
 #include <cxxtest/TestSuite.h>
 #include "../Polygon2D.h"
 
-
-
 class TraceTest : public CxxTest::TestSuite {
  public:
   Point2D startPoint;

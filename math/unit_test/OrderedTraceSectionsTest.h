@@ -14,7 +14,7 @@ class OrderedTraceSectionsTest : public CxxTest::TestSuite {
   void testCircle() {
     RotationTrace fullCircle(Point2D(-40.0,0),
                              Point2D(-40.0,0),
-                             Point2D(0,0));
+                             Point2D(0,0), true);
     tsa::TraceSection section;
     section.push_back(std::make_shared<RotationTrace>(fullCircle));
     tsa::otsa::orderVector(&section, Point2D(-40,0));
@@ -26,10 +26,10 @@ class OrderedTraceSectionsTest : public CxxTest::TestSuite {
   void testTwoCircles() {
     RotationTrace fullCircle(Point2D(-40.0,0),
                              Point2D(-40.0,0),
-                             Point2D(0,0));
+                             Point2D(0,0), true);
     RotationTrace smallCircle(Point2D(-20.0,0),
                               Point2D(-20.0,0),
-                              Point2D(0,0));
+                              Point2D(0,0), true);
     tsa::TraceSection section;
     section.push_back(std::make_shared<RotationTrace>(fullCircle));
     section.push_back(std::make_shared<RotationTrace>(smallCircle));
@@ -43,10 +43,10 @@ class OrderedTraceSectionsTest : public CxxTest::TestSuite {
   void testTwoCirclesAndLine() {
     RotationTrace fullCircle(Point2D(-40.0,0),
                              Point2D(-40.0,0),
-                             Point2D(0,0));
+                             Point2D(0,0), true);
     RotationTrace smallCircle(Point2D(-20.0,0),
                               Point2D(-20.0,0),
-                              Point2D(0,0));
+                              Point2D(0,0), true);
     Trace line(Point2D(-35, -5),
                Point2D(-35, 5));
 
@@ -75,13 +75,13 @@ class OrderedTraceSectionsTest : public CxxTest::TestSuite {
   void testThreeCircles() {
     RotationTrace fullCircle(Point2D(-40.0,0),
                              Point2D(-40.0,0),
-                             Point2D(0,0));
+                             Point2D(0,0), true);
     RotationTrace smallCircle(Point2D(-20.0,0),
                               Point2D(-20.0,0),
-                              Point2D(0,0));
+                              Point2D(0,0), true);
     RotationTrace smallestCircle(Point2D(-20.0,0),
                                  Point2D(-20.0,0),
-                                 Point2D(0,0));
+                                 Point2D(0,0), true);
     tsa::TraceSection section;
     section.push_back(std::make_shared<RotationTrace>(smallestCircle));
     section.push_back(std::make_shared<RotationTrace>(fullCircle));
@@ -135,13 +135,13 @@ class OrderedTraceSectionsTest : public CxxTest::TestSuite {
   void testTwoIndependendSections() {
     RotationTrace fullCircle(Point2D(-40.0,0),
                              Point2D(-40.0,0),
-                             Point2D(0,0));
+                             Point2D(0,0), true);
     RotationTrace smallCircle(Point2D(-20.0,0),
                               Point2D(-20.0,0),
-                              Point2D(0,0));
+                              Point2D(0,0), true);
     RotationTrace smallestCircle(Point2D(-12.0,0),
                                  Point2D(-12.0,0),
-                                 Point2D(0,0));
+                                 Point2D(0,0), true);
 
     Trace a(Point2D(50, 10),
             Point2D(50, 30));

@@ -79,7 +79,7 @@ class Point2D:public Vector2D {
   operator QPointF() const {return QPointF(x,-y);};
 #endif
 
-  bool operator ==(const Point2D& i_other) const ;
+  bool operator ==(const Point2D& i_other) const;
   traceType getAngleBetweenPoints(const Point2D&) const;
   traceType getAngleToOrigin() const;
 };

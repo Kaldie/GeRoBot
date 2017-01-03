@@ -3,7 +3,7 @@
 #include <Point2D.h>
 #include <Circle2D.h>
 #include <Arc2D.h>
-#include "./RotationTrace.h"
+#include <RotationTrace.h>
 #include <Quadrant2D.h>
 
 RotationTrace::RotationTrace()
@@ -16,18 +16,18 @@ RotationTrace::RotationTrace()
 
 RotationTrace::RotationTrace(const Point2D& i_startPoint,
                              const Point2D& i_endPoint,
-                             const Point2D& i_centrePoint)
-  : Trace(i_startPoint, i_endPoint), m_centrePoint(i_centrePoint) {
+                             const Point2D& i_centrePoint,
+			     const bool& i_isClockwise)
+  : Trace(i_startPoint, i_endPoint), m_centrePoint(i_centrePoint), m_isClockwise(i_isClockwise) {
   m_traceType = Trace::Curve;
-  m_isClockwise = true;
 }
 
 
 RotationTrace::RotationTrace(const Arc2D& i_arc)
-    : Trace(i_arc.getFirstPoint(), i_arc.getSecondPoint()) {
+  : Trace(i_arc.getFirstPoint(), i_arc.getSecondPoint()) ,
+    m_centrePoint(i_arc.getCentrePoint()),
+    m_isClockwise(i_arc.getIsClockwise()) {
   m_traceType = Trace::Curve;
-  m_centrePoint = i_arc.getCentrePoint();
-  m_isClockwise = i_arc.getIsClockwise();
 }
 
 
@@ -47,63 +47,33 @@ Point2D RotationTrace::intersectingPoint(
 
 
 std::vector<RotationTrace> RotationTrace::getNecessaryTraces() const {
-  Point2D firstExtreme, secondExtreme;
-  getPointAtExtremeAngle(&firstExtreme, &secondExtreme);
-  traceType firstExtremeAngle=(firstExtreme - m_centrePoint).getAlpha();
-  traceType secondExtremeAngle=(secondExtreme - m_centrePoint).getAlpha();
-  traceType startAngle=(m_startPoint - m_centrePoint).getAlpha();
-  traceType endAngle=(m_endPoint - m_centrePoint).getAlpha();
-
-  Point2D startPoint = m_startPoint;
-
+  std::vector<Point2D> pointsOnTrace({m_startPoint, m_endPoint, Point2D(), Point2D()});
   std::vector<RotationTrace> itermediateTraces;
-  if (shouldAddExtremePoint(startAngle, endAngle, firstExtremeAngle)) {
-    itermediateTraces.push_back(
-        RotationTrace(startPoint,
-                      firstExtreme,
-                      m_centrePoint));
-
-    startPoint = firstExtreme;
+  getPointAtExtremeAngle(&(*(pointsOnTrace.begin()+2)),
+			 &(*(pointsOnTrace.begin()+3)));
+  getArc().sortPoints(pointsOnTrace.begin(),pointsOnTrace.end());
+  if (getArc().spanAngle() == 2 * PI) {
+    pointsOnTrace.push_back(m_endPoint);
+    pointsOnTrace.erase(pointsOnTrace.begin());
   }
-  if (shouldAddExtremePoint(startAngle, endAngle, secondExtremeAngle)) {
-    itermediateTraces.push_back(
-        RotationTrace(startPoint,
-                      secondExtreme,
-                      m_centrePoint));
-    startPoint = secondExtreme;
-  }
-
-  itermediateTraces.push_back(
-      RotationTrace(startPoint,
-                    m_endPoint,
-                    m_centrePoint));
+  auto end = pointsOnTrace.end() - 1;
+  for (auto startPointItr = pointsOnTrace.begin();
+       startPointItr != end;
+       ++startPointItr) {
+    // push back the itermediate trace
+    itermediateTraces.push_back
+      (RotationTrace(*startPointItr, *(startPointItr+1), m_centrePoint, m_isClockwise));
+    // check if the end point is reached
+    if (*(startPointItr+1) == m_endPoint) {
+      break;
+    }    
+  }  
   return itermediateTraces;
 }
 
 
-bool RotationTrace::shouldAddExtremePoint(const traceType& i_startAngle,
-                                          const traceType& i_stopAngle,
-                                          const traceType& i_extremeAngle) const {
-  bool shouldAddPoint = false;
-  traceType span = getArc().spanAngle();
-  traceType angle;
-  if (m_isClockwise) {
-    angle = i_startAngle;
-  } else {
-    angle = i_stopAngle;
-  }
-
-  if (angle > i_extremeAngle && span > (angle - i_extremeAngle)) {
-    shouldAddPoint = true;
-  }
-
-  if (angle < span) {
-    // this means it goes through 0, the angle needs to be adjusted such that it will work
-    shouldAddPoint |= shouldAddExtremePoint(i_startAngle + 2 * PI,
-                                            i_stopAngle + 2 * PI,
-                                            i_extremeAngle);
-  }
-  return shouldAddPoint;
+bool RotationTrace::shouldAddExtremePoint(const Point2D& i_point) const {
+  return getArc().isPointOnArc(i_point, false /*ignore radius*/);
 }
 
 
@@ -149,7 +119,7 @@ void RotationTrace::getExtremePoints(std::vector<Point2D>* i_list) const {
      thus span angle has to be bigger then 90 = PI
      which saves computation time
   */
-  while (quadrant != stopQuadrant || spansQuadrants) {
+  while ((quadrant != stopQuadrant) || spansQuadrants) {
     // stuff we need to do when the start and stop are in the same quadrant
     quardrantPoint = quadrant.getBorderPoint(m_isClockwise) * radius;
     quardrantPoint += m_centrePoint;
@@ -228,7 +198,6 @@ void RotationTrace::reverse() {
 }
 
 
-traceType RotationTrace::getPerpendicularDistance
-(const Point2D& i_position) const {
+traceType RotationTrace::getPerpendicularDistance(const Point2D& i_position) const {
   return abs(magnitude(i_position - m_centrePoint) - getArc().radius());
 }

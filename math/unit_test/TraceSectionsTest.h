@@ -13,7 +13,7 @@ class TraceSectionsTest : public CxxTest::TestSuite {
   void testCircle() {
     RotationTrace fullCircle(Point2D(-40.0,0),
                              Point2D(-40.0,0),
-                             Point2D(0,0));
+                             Point2D(0,0), true);
     tsa::TraceSection section;
     section.push_back(std::make_shared<RotationTrace>(fullCircle));
     TS_ASSERT(tsa::isClosedSection(section));
@@ -32,10 +32,10 @@ class TraceSectionsTest : public CxxTest::TestSuite {
   void testCircle2() {
     RotationTrace fullCircle(Point2D(-30,50),
                              Point2D(-30,50),
-                             Point2D(0,50));
+                             Point2D(0,50), true);
     RotationTrace innerCircle(Point2D(-20,50),
                               Point2D(-20,50),
-                              Point2D(0,50));
+                              Point2D(0,50), true);
     tsa::TraceSection section;
     section.push_back(std::make_shared<Trace>(fullCircle));
     section.push_back(std::make_shared<Trace>(innerCircle));
@@ -84,7 +84,7 @@ class TraceSectionsTest : public CxxTest::TestSuite {
             Point2D(-10, 10));
     RotationTrace fullCircle(Point2D(-15, 10),
                              Point2D(-15, 10),
-                             Point2D(10, 20));
+                             Point2D(10, 20), true);
     tsa::TraceSection vector;
     vector.push_back(std::make_shared<Trace>(a));
     vector.push_back(std::make_shared<Trace>(b));
@@ -138,17 +138,17 @@ class TraceSectionsTest : public CxxTest::TestSuite {
 
     RotationTrace e(Point2D(-8, 10),
                     Point2D(-10, 12),
-                    Point2D(-8, 12));  // linker onder straal 2
+                    Point2D(-8, 12), true);  // linker onder straal 2
     RotationTrace f(Point2D(-10, 28),
                     Point2D(-8, 30),
-                    Point2D(-8, 28));  // linker boven straal 2
+                    Point2D(-8, 28), true);  // linker boven straal 2
     RotationTrace g(Point2D(28, 30),
                     Point2D(30, 28),
-                    Point2D(28, 28));  // rechts boven straal 2
+                    Point2D(28, 28), true);  // rechts boven straal 2
     RotationTrace h(Point2D(30, 12),
                     Point2D(28, 10),
-                    Point2D(28, 12));  // rechts onder straal 2
-    h.setIsClockwise(true);
+                    Point2D(28, 12), true);  // rechts onder straal 2
+
     tsa::TraceSection vector;
     vector.push_back(std::make_shared<RotationTrace>(e));
     vector.push_back(std::make_shared<Trace>(a));
@@ -161,6 +161,7 @@ class TraceSectionsTest : public CxxTest::TestSuite {
     TS_ASSERT(tsa::isClosedSection(vector));
     tsa::TraceSections sections =  tsa::getSections(vector);
     Polygon2D poly = tsa::createPolygon(sections[0]);
+    poly.exportToFile();
     TS_ASSERT_DELTA(poly.getSurface(), 20 * 40 - ((4.0 * 4.0) - (2.0 * 2.0 * PI)) , 0.001);
     TS_ASSERT_EQUALS(sections.size(), 1);
     TS_ASSERT_EQUALS(sections[0].size(), 8);
@@ -189,7 +190,7 @@ class TraceSectionsTest : public CxxTest::TestSuite {
 
     vector.push_back(std::make_shared<RotationTrace>(RotationTrace(Point2D(-15, 0),
                                                                    Point2D(-15, 0),
-                                                                   Point2D(0, 0))));  // linker onder straal 2
+                                                                   Point2D(0, 0), true)));  // linker onder straal 2
     tsa::TraceSections sections = tsa::getSections(vector);
     TS_ASSERT_EQUALS(sections.size(), 3);
     sort(sections.begin(), sections.end(), tsa::sortSmallToBig);

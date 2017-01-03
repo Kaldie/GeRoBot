@@ -37,10 +37,32 @@ class Quadrant2DTest : public CxxTest::TestSuite {
     Quadrant2D quadrant2(Point2D(-1,1));
     borderPoint = quadrant2.getBorderPoint(/*clockwise*/ false);
     TS_ASSERT_EQUALS(borderPoint, Point2D(-1,0));
-    borderPoint = quadrant.getBorderPoint(/*clockwise*/ true);
-    TS_ASSERT_EQUALS(borderPoint, Point2D(1,0));
+    borderPoint = quadrant2.getBorderPoint(/*clockwise*/ true);
+    TS_ASSERT_EQUALS(borderPoint, Point2D(0,1));
   }
 
+  
+  void testBorderAngle() {
+    Quadrant2D quadrant(Point2D(1,1));
+    float angle(quadrant.getBorderAngle(/*clockwise*/ false));
+    TS_ASSERT_DELTA(angle, PI/2.0, 0.001);
+    angle = quadrant.getBorderAngle(/*clockwise*/ true);
+    TS_ASSERT_DELTA(angle, 0, 0.001);
+    
+    Quadrant2D quadrant2(Point2D(-1,1));
+    angle = quadrant2.getBorderAngle(/*clockwise*/ false);
+    TS_ASSERT_DELTA(angle, PI, 0.001);
+    angle = quadrant2.getBorderAngle(/*clockwise*/ true);
+    TS_ASSERT_DELTA(angle, PI/2.0, 0.001);
+
+    Quadrant2D quadrant3(Point2D(1,-1));
+    angle = quadrant3.getBorderAngle(/*clockwise*/ false);
+    TS_ASSERT_DELTA(angle, 0, 0.001);
+    angle = quadrant3.getBorderAngle(/*clockwise*/ true);
+    TS_ASSERT_DELTA(angle, PI * 1.5, 0.001);
+  }
+
+  
   void testIncrement() {
     Quadrant2D quadrant(0);
     quadrant.increment(/*clockwise*/ false);

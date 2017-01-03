@@ -33,13 +33,10 @@ Point2D Quadrant2D::getBorderPoint(const bool& i_clockwise /*= false*/) const {
 
   int border = m_quadrant;
   if (!i_clockwise) {
-    if (border < 3) {
-      ++border;
-    } else {
-      border = 0;
-    }
+    ++border;
+    correctQuadrant(&border);
   }
-  /* the following list is made. Therefor if i_clockwise ++m_quadrant
+  /* the following list is made. Therefor if !i_clockwise ++m_quadrant
      0 : 1, 0; even
      1 : 0, 1; uneven
      2 : -1, 0; even
@@ -51,6 +48,22 @@ Point2D Quadrant2D::getBorderPoint(const bool& i_clockwise /*= false*/) const {
   }
   LOG_DEBUG("Quadrant: " << m_quadrant << ". Border point: " << boundry);
   return boundry;
+}
+
+
+float Quadrant2D::getBorderAngle(const bool& i_clockwise /*=false*/) const {
+  int border = m_quadrant;
+  if (!i_clockwise) {
+    ++border;
+    correctQuadrant(&border);
+  }
+  /* the following list is made. Therefor if !i_clockwise ++m_quadrant
+     0 : 1, 0; even
+     1 : 0, 1; uneven
+     2 : -1, 0; even
+     3 : 0, -1; uneven
+  */
+  return PI*border/2.0;  
 }
 
 
