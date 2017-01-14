@@ -36,7 +36,7 @@ class Trace (object) :
        "Robot settings"
        self.__rotStep = 0.001654411764706 * (numpy.pi / 180.0) # rotation per step in radians
        print self.__rotStep
-       self.__transStep = 0.005 #translation in mm
+       self.__transStep = 0.01 #translation in mm
 
        self.__minArm = 50.0# length of the minimum arm
        self.__maxArm = 500.0#length of the arm in mm
