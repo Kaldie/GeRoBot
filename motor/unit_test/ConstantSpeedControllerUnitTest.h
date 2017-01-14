@@ -14,107 +14,77 @@
 #include <Trace.h>
 #include <Robot.h>
 #include <RobotIO.h>
+#include <BaseTraceCalculator.h>
 
 class ConstantSpeedControllerUnitTest : public CxxTest::TestSuite {
  public:
-  BaseJoint::JointPointer m_rotationalJoint;
-  BaseJoint::JointPointer m_translationalJoint;
-
-  void setUp() {
-    m_rotationalJoint = std::make_shared<RotationalJoint<StepperDriver>>();
-    m_rotationalJoint->setPosition(90.0 * PI/180);
-    m_rotationalJoint->setMovementPerStep(0.001);
-    m_rotationalJoint->setRange(std::vector<traceType>({0, PI}));
-    m_rotationalJoint->setDirectionConversionMap
-      (DirectionConversionMap({{"CCW","CCW"},{"CW","CW"}}));
-
-    m_translationalJoint = std::make_shared<TranslationalJoint<StepperDriver>>();
-    m_translationalJoint->setPosition(50);
-    m_translationalJoint->setMovementPerStep(0.25);
-    m_translationalJoint->setRange(std::vector<traceType>({40, 1800}));
-    m_translationalJoint->setDirectionConversionMap
-      (DirectionConversionMap({{"IN","CCW"},{"OUT","CW"}}));
-    m_rotationalJoint->setChild(m_translationalJoint);
-    m_translationalJoint->setParent(m_rotationalJoint);
-  }
 
   void testConstructor() {
     ConstantSpeedController a = ConstantSpeedController();
     ConstantSpeedController b = ConstantSpeedController(10);
     TS_ASSERT(a.getRobotSpeed() == 0);
     TS_ASSERT(b.getRobotSpeed() == 10);
+    TS_ASSERT(b.getMovementRegistrator());
   }
 
-  void testPrepareSpeedController() {
-    JointController controller = JointController();
-    controller.addJoint(m_rotationalJoint);
-    controller.addJoint(m_translationalJoint);
-    Trace trace = Trace(Point2D(1,1), Point2D(10,10));
-    ConstantSpeedController b = ConstantSpeedController(40);
-    b.prepareSpeedController(trace, controller);
-    int speed;
-    // test speed when the robot speed/ linear joint is limiting
-    b.adviseSpeed(&speed);
-    TS_ASSERT_EQUALS(speed, 160);
-
-    // test speed when the max motor speed is limiting
-    b.setRobotSpeed(1000);
-    b.prepareSpeedController(trace, controller);
-    b.adviseSpeed(&speed);
-    TS_ASSERT_EQUALS(speed, m_translationalJoint->getMotor()->getMaximumSpeed());
-
-    // test that increasing the motor speed increase the constant speed
-    StepperDriver::DriverPointer driver = std::static_pointer_cast<StepperDriver>(m_translationalJoint->getMotor());
-    driver->setPullIn(300);
-    b.prepareSpeedController(trace, controller);
-    b.adviseSpeed(&speed);
-    TS_ASSERT_EQUALS(speed, 300);
-
-    /* test that increasing the motor which is not responsible for the most part of the movement
-       is not responsible for setting the max speed */
-    driver = std::static_pointer_cast<StepperDriver>(m_rotationalJoint->getMotor());
-    driver->setPullIn(500);
-    b.prepareSpeedController(trace, controller);
-    b.adviseSpeed(&speed);
-    TS_ASSERT_EQUALS(speed, 300);
-  }
-
-
-  void testPrepareSpeedControllerForRotation() {
-    JointController controller = JointController();
-    controller.addJoint(m_rotationalJoint);
-    controller.addJoint(m_translationalJoint);
-    Trace trace = Trace(Point2D(10,0), Point2D(10,10));
-
-    // test speed when the robot speed/ linear joint is limiting
-    StepperDriver::DriverPointer driver = std::static_pointer_cast<StepperDriver>(m_rotationalJoint->getMotor());
-    driver->setPullIn(400);
-
-    ConstantSpeedController b = ConstantSpeedController(1000);
-    b.prepareSpeedController(trace, controller);
-    int speed;
-    // test speed when the robot speed is limiting
-    b.adviseSpeed(&speed);
-    TS_ASSERT_EQUALS(speed, 400);
-  }
 
   void testActualSpeedControlling() {
       // In this test we actually will check the speed of the robot at the state sequence level
-
       Robot::RobotPointer robot = RobotIO("defaultRobot.xml").buildRobot();
+      robot->setPosition(Point2D(50,0));
+      // creation of the speedcontroller
       SpeedController::SpeedControllerPointer speedController =
           std::make_shared<ConstantSpeedController>(0.1);
-
       robot->setSpeedController(speedController);
-      robot->setPosition(Point2D(50,0));
-      robot->traceCalculation(std::make_shared<Trace>(Point2D(50,0), Point2D(50,10)));
 
-      robot->getJointController()->getSequenceVector();
+      // check if the new registrator is the first registrator on the robot
+      TS_ASSERT_EQUALS(speedController->getMovementRegistrator(),
+		       robot->getMovementRegistrators().begin()->lock());
+
+      // calculate a simple trace
+      BaseTraceCalculator traceCalculator(robot.get());
+      traceCalculator.calculateTrace(Trace(Point2D(50,0), Point2D(50,10)));
+
+      /// check if the sequence vector is the expected lenght
+      TS_ASSERT_EQUALS(robot->getJointController()->getSequenceVector().numberOfSequences(),
+		       5);
+      // known speeds
+      std::vector<int> speeds({69,69,69,10,10});
+      // compare speeds to known speeds
+      int i = 0;
       for (const auto x : robot->getJointController()->getSequenceVector()) {
-          LOG_DEBUG(x.getSpeed());
+	TS_ASSERT_EQUALS(speeds[i], x.getSpeed());
+	++i;
       }
-
   }
 
+
+  void testMaxSpeed() {
+    // the idea of this test is to test if the controller does not over power the motors
+      Robot::RobotPointer robot = RobotIO("defaultRobot.xml").buildRobot();
+      robot->setPosition(Point2D(50,0));
+      // creation of the speedcontroller
+      SpeedController::SpeedControllerPointer speedController =
+          std::make_shared<ConstantSpeedController>(100);
+      robot->setSpeedController(speedController);
+      robot->prepareSteps("OUT", 1);
+      std::shared_ptr<StepperDriver> driver = std::static_pointer_cast<StepperDriver>
+	(robot->getJointController()->resolveJoint(BaseJoint::Translational)->getMotor());
+      int speed;
+      speedController->adviseSpeed(&speed);
+      TS_ASSERT_EQUALS(speed,driver->getPullIn());
+
+      driver->setPullIn(600);
+      speedController->adviseSpeed(&speed);
+      TS_ASSERT_EQUALS(speed,driver->getPullIn());
+      
+      speedController->setRobotSpeed(2.9);
+      speedController->adviseSpeed(&speed);
+      TS_ASSERT_EQUALS(speed,290);
+
+      robot->prepareSteps("CCW", 2);
+      speedController->adviseSpeed(&speed);
+      TS_ASSERT_EQUALS(speed, 300);
+  }
 };
 #endif  // MOTOR_UNITTEST_CONSTANTSPEEDCONTROLLERUNITTEST_H_
