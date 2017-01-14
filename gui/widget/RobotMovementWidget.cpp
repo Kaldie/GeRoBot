@@ -322,13 +322,11 @@ void RobotMovementWidget::movementToolMode(const BaseJoint::MovementType& i_type
     stepSize *= (PI/180.0);
   }
   double robotStepSize = m_robotPointer->getMovementPerStep(i_type);
-  int numberOfSteps = (stepSize) / robotStepSize;
+  int numberOfSteps = stepSize / robotStepSize;
   if (numberOfSteps == 0) {
     numberOfSteps = 1;
   }
   // Calculate the new position and prepare to actual take the steps
-  m_robotPointer->getSpeedController()->prepareSpeedController
-      (m_robotPointer->getJointController()->resolveJoint(i_type));
   m_robotPointer->prepareSteps(i_direction, numberOfSteps);
   if (hasValidRobot() && actuateRadioButton->isChecked()) {
     m_robotPointer->actuate();

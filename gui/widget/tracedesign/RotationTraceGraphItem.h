@@ -20,7 +20,7 @@ class RotationTraceGraphItem : public TraceGraphItem {
     */
    //void addEditPoint(Edge* i_editPoint);
 
-   enum { Type = UserType + 2};
+   enum {Type = UserType + 2};
    virtual int type() const Q_DECL_OVERRIDE { return Type; }
 
    virtual QRectF boundingRect() const Q_DECL_OVERRIDE;

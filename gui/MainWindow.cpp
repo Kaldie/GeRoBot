@@ -50,7 +50,8 @@ bool MainWindow::initialise() {
   robotMovementTab->layout()->addWidget(robotMovementWidget);
 
   // Make and set the trace design widget
-  traceDesignTab->layout()->addWidget(new TraceDesignWidget(this));
+  TraceDesignWidget* traceDesignWidget = new TraceDesignWidget(m_robotPointer, this);
+  traceDesignTab->layout()->addWidget(traceDesignWidget);
   // exit file action
   connect(exitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
   // Save robot action
@@ -62,7 +63,7 @@ bool MainWindow::initialise() {
   // Clear trace design action
   connect(clearTraceAction, SIGNAL(triggered()), this , SLOT(clearTraceDesign()));
   // Calculate traces
-  connect(calculateTraceAction, SIGNAL(triggered()), this, SLOT(calculateTraces()));
+  connect(calculateTraceAction, SIGNAL(triggered()), traceDesignWidget, SLOT(calculateTraces()));
   // Make the calculated shizzle shizzle
   connect(actuateAction, SIGNAL(triggered()), this, SLOT(actuateRobot()));
   // On expand addapt size of the columns
@@ -75,8 +76,6 @@ bool MainWindow::initialise() {
           robotMovementWidget, &RobotMovementWidget::updateFromConfiguration);
   connect(tabWidget, SIGNAL(currentChanged(int)),
     robotMovementWidget, SLOT(updatePositionWidget()));
-
-
   return true;
 }
 
@@ -143,17 +142,6 @@ bool MainWindow::clearTraceDesign() {
   } else {
    LOG_DEBUG(traceWidget);
    return false;
-  }
-}
-
-
-bool MainWindow::calculateTraces() {
-  if (TraceDesignWidget* traceWidget = findChild<TraceDesignWidget*>()) {
-    traceWidget->calculateTraces(m_robotPointer);
-    return true;
-  } else {
-    LOG_DEBUG("Trace widget is not found!");
-    return false;
   }
 }
 

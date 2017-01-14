@@ -28,6 +28,7 @@
     widget/tracedesign/TraceGraphView.h \
     widget/tracedesign/TraceDesignWidget.h \
     widget/tracedesign/TraceInfoWidget.h \
+    widget/tracedesign/RobotLocator.h \
     MainWindow.h
 
 
@@ -54,6 +55,7 @@
     widget/tracedesign/TraceGraphView.cpp \
     widget/tracedesign/TraceInfoWidget.cpp \
     widget/tracedesign/TraceDesignWidget.cpp \
+    widget/tracedesign/RobotLocator.cpp \
     MainWindow.cpp \
     main.cpp
 

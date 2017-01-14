@@ -56,7 +56,6 @@ class TraceGraphItem : public QGraphicsObject {
     static const QString ConvertToLineActionText;
     static const QString ConvertToCurveActionText;
     static const QString ConvertDirection;
-
 };
 
 #endif // GUI_WIDGET_TRACE_TRACEGRAPHITEM

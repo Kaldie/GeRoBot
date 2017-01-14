@@ -5,20 +5,31 @@
 #include <QWidget>
 #include <macroHeader.h>
 #include <Trace.h>
-#include "./TraceInfoWidget.h"
 #include "./ui_TraceDesignWidget.h"
 
 class Point2DWidget;
 class TraceGraphView;
+class TraceInfoWidget;
 class Robot;
+class RobotLocator;
+class SequentialTraceCalculator;
+
 
 class TraceDesignWidget: public QWidget, private Ui::TraceDesignWidget {
   Q_OBJECT
   // Vector which hold the traces
   GETSET(Trace::TracePointerVector, m_vector, Vector);
+  GETSET(std::shared_ptr<Robot>, m_robot, Robot);
+  GETSETPOINTER(TraceInfoWidget, m_traceInfoWidget, TraceInfoWidget);
+  GETSETPOINTER(TraceGraphView, m_traceGraphView, TraceGraphView);
+  GETSET(std::shared_ptr<RobotLocator>, m_robotLocator, RobotLocator);
+  GETSET(std::shared_ptr<QTimer>, m_timer, Timer);
+  GETSET(std::shared_ptr<SequentialTraceCalculator>, m_calculator, Calculator);
+
  public:
     /// Constructor
-    explicit TraceDesignWidget(QWidget* parent = 0);
+  explicit TraceDesignWidget(const std::shared_ptr<Robot>& i_robot = nullptr,
+			     QWidget* parent = 0);
     /**
      * Clearing the widget of the old stuff and showing the new stuff
      */
@@ -28,14 +39,13 @@ class TraceDesignWidget: public QWidget, private Ui::TraceDesignWidget {
     */
    void clearWidget();
 
-   /**
-    * Calcuate the trace as they are defined in the designer
-    */
-   void calculateTraces(const std::shared_ptr<Robot>& i_robotPointer);
  public slots:
    void addTrace(Trace::TracePointer);
    void removeTrace(Trace::TracePointer);
-
+   /**
+    * Calcuate the trace as they are defined in the designer
+    */
+   void calculateTraces();
    /**
      * Replace the currently selected trace with a new trace of type i_type
      * @param[in] i_type Trace::TraceType the new trace type
@@ -48,28 +58,19 @@ class TraceDesignWidget: public QWidget, private Ui::TraceDesignWidget {
      * @param[in] i_type Trace::TraceType the new trace type
      */
     void replaceTrace(Trace::TracePointer i_pointer,
-          Trace::TraceType i_type);
+		      Trace::TraceType i_type);
 
     /**
      * Given the a pointer, change the direction of the trace.
      */
     void reverse(Trace::TracePointer i_pointer);
+    
  private:
 
     /**
     * Set up the gui and creat an example trace for show and debugging purposes
     */
    void initialise();
-
-   /**
-    * The infowidget
-    */
-   TraceInfoWidget* m_traceInfoWidget;
-
-   /**
-    * The view widget
-    */
-   TraceGraphView* m_traceGraphView;
 
    /**
     * Get the index of the currently selected TraceGraphitem,
@@ -105,6 +106,11 @@ class TraceDesignWidget: public QWidget, private Ui::TraceDesignWidget {
  private slots:
    void setSelectedTrace();
    void addTraceFromButton();
+   /**
+   * update the robot locator
+   */
+   void updateRobotLocator();
+
 };
 
 #endif  // GUI_TRACEDESIGNWIDGET_H_

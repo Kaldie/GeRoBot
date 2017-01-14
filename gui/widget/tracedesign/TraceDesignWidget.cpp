@@ -4,19 +4,29 @@
 #include <QtWidgets>
 #include <QVBoxLayout>
 #include <macroHeader.h>
+#include <Robot.h>
+#include <thread>
 #include <SequentialTraceCalculator.h>
 #include "../Point2DWidget.h"
 #include "./TraceDesignWidget.h"
+#include "./TraceInfoWidget.h"
 #include "./TraceGraphItem.h"
 #include "./TraceGraphView.h"
 #include "./RotationTraceGraphItem.h"
 #include "../../MainWindow.h"
+#include "./RobotLocator.h"
 
-TraceDesignWidget::TraceDesignWidget(QWidget *parent)
+
+TraceDesignWidget::TraceDesignWidget(const Robot::RobotPointer& i_robot /*=0*/,
+				     QWidget *parent /*=0*/)
     : QWidget(parent),
       m_vector(),
+      m_robot(i_robot),
       m_traceInfoWidget(nullptr),
-      m_traceGraphView(nullptr) {
+      m_traceGraphView(nullptr),
+      m_robotLocator(std::make_shared<RobotLocator>(i_robot)),
+      m_timer(std::make_shared<QTimer>()),
+      m_calculator(nullptr) {
     initialise();
 }
 
@@ -55,10 +65,11 @@ void TraceDesignWidget::initialise() {
   connect(m_traceInfoWidget, SIGNAL(tracePositionChanged()),
           m_traceGraphView, SLOT(updateSelectedItem()));
   // connect the add trace button to the add trace slots
-  connect(addCurveButton,SIGNAL(clicked()),
-          this, SLOT(addTraceFromButton()));
+  connect(addCurveButton,SIGNAL(clicked()), this, SLOT(addTraceFromButton()));
   connect(addLineButton,SIGNAL(clicked()),
           this, SLOT(addTraceFromButton()));
+  connect(calculateButton, SIGNAL(clicked()), this, SLOT(calculateTraces()));
+  
 }
 
 
@@ -112,7 +123,7 @@ void TraceDesignWidget::addTraceFromButton() {
   } else if (sender() == addCurveButton) {
     newTrace = std::make_shared<RotationTrace>(Point2D(-10,0),
                                                Point2D(10,0),
-                                               Point2D(0,0));
+                                               Point2D(0,0), true);
   } else {
     LOG_DEBUG("Sender did not return a known button!");
   }
@@ -187,7 +198,7 @@ void TraceDesignWidget::replaceTrace(Trace::TracePointer i_pointer,
 void TraceDesignWidget::replaceTrace(const unsigned int& i_index,
                                      const Trace::TraceType& i_type) {
   LOG_DEBUG("Replacing the trace");
-  if (i_index == m_vector.size()) {
+  if (i_index >= m_vector.size()) {
     LOG_ERROR("did not find a selected item!");
   }
   // this will be the new trace pointer
@@ -264,11 +275,20 @@ void TraceDesignWidget::clearWidget() {
 }
 
 
-void TraceDesignWidget::calculateTraces(const Robot::RobotPointer& i_robot) {
+void TraceDesignWidget::calculateTraces() {
   LOG_INFO("Calculating traces!");
+  LOG_INFO("Restarting trace calculation");
+  m_robot->restartTraceCalculation();
   LOG_DEBUG("Calculating " << m_vector.size() << " traces");
-  SequentialTraceCalculator sequentialTraceCalculator(i_robot, m_vector);
-  sequentialTraceCalculator.calculatedTraces();
+  m_calculator.reset(new SequentialTraceCalculator(m_robot, m_vector));
+  // spawn a dot on the current location of the robot, and follow it during calculation
+  connect(m_timer.get(), SIGNAL(timeout()),this, SLOT(updateRobotLocator()));
+  m_robotLocator->updatePosition();
+  m_traceGraphView->scene()->addItem(m_robotLocator.get());
+  std::thread calculationThread(&SequentialTraceCalculator::calculatedTraces, m_calculator);
+  calculationThread.detach();
+  m_timer->start(200);
+  calculateButton->setEnabled(false);
 }
 
 
@@ -276,5 +296,21 @@ void TraceDesignWidget::resetWidget(const Trace::TracePointerVector& i_vector) {
   clearWidget();
   for (const auto& trace : i_vector) {
     addTrace(trace);
+  }
+}
+
+
+void TraceDesignWidget::updateRobotLocator() {
+  if (m_calculator) {
+    if (m_calculator->getIsRunning()) {
+      m_robotLocator->updatePosition();
+    } else {
+      LOG_DEBUG("RESET THE SHIT!");
+      m_calculator.reset();
+      m_traceGraphView->scene()->removeItem(m_robotLocator.get());
+      m_timer->stop();
+      disconnect(m_timer.get(),SIGNAL(timeout()), this, SLOT(updateRobotLocator()));
+      calculateButton->setEnabled(true);
+    }
   }
 }

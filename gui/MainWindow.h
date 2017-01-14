@@ -29,7 +29,6 @@ class MainWindow: public QMainWindow, private Ui::mainWindow {
   bool saveTraceDesign();
   bool loadTraceDesign();
   bool clearTraceDesign();
-  bool calculateTraces();
   bool actuateRobot();
 };
 
