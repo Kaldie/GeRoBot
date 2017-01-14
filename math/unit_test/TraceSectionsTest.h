@@ -161,7 +161,6 @@ class TraceSectionsTest : public CxxTest::TestSuite {
     TS_ASSERT(tsa::isClosedSection(vector));
     tsa::TraceSections sections =  tsa::getSections(vector);
     Polygon2D poly = tsa::createPolygon(sections[0]);
-    poly.exportToFile();
     TS_ASSERT_DELTA(poly.getSurface(), 20 * 40 - ((4.0 * 4.0) - (2.0 * 2.0 * PI)) , 0.001);
     TS_ASSERT_EQUALS(sections.size(), 1);
     TS_ASSERT_EQUALS(sections[0].size(), 8);
