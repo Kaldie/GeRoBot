@@ -5,20 +5,20 @@
 #include <SpeedController.h>
 
 class Trace;
+class MovementRegistrator;
 
 // Controller which choses 1 speed for a whole trace
 class RelativeSpeedController : public SpeedController {
-public:
+
+ public:
   /// This method will be called at the moment the robot needs to decied on some speed
   virtual bool adviseSpeed(int* o_speed) const;
 
   virtual void acknowledgeSpeed(const unsigned int& i_speed,
                                 SequenceVector* i_sequenceVector);
 
-  virtual void notifyStep(const std::shared_ptr<BaseJoint>& i_joint,
-                          const unsigned int& i_numberOfSteps);
-
-  virtual void prepareSpeedController(const std::shared_ptr<BaseJoint>& i_joint);
+  void determineMotorSpeed(int* o_minSpeed,
+			   int* o_maxSpeed) const;
 
   traceType determineRobotSpeed(const std::shared_ptr<BaseJoint>& i_joint) const;
 
@@ -46,8 +46,6 @@ public:
   void determineMotorSpeed(const std::shared_ptr<BaseJoint>&,
 			   int* i_minSpeed,
 			   int* i_maxSpeed) const;
-
-  int m_minSpeed, m_maxSpeed; 
 };
 
 #endif  // MOTOR_RELATIVESPEEDCONTROLLER_H_

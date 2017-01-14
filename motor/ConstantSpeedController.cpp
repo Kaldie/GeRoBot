@@ -7,6 +7,7 @@
 #include <StepperDriver.h>
 #include <BaseMotor.h>
 #include <Trace.h>
+#include <MovementRegistrator.h>
 
 ConstantSpeedController::ConstantSpeedController()
   : ConstantSpeedController(0,0) {
@@ -20,30 +21,28 @@ ConstantSpeedController::ConstantSpeedController(const float& i_robotSpeed)
 
 ConstantSpeedController::ConstantSpeedController(const float& i_robotSpeed,
 						 const int& i_vectorPosition)
-  : SpeedController(SpeedController::Type::Constant, i_robotSpeed, i_vectorPosition),
-    m_frequency(0) {
+  : SpeedController(SpeedController::Type::Constant,
+		    i_robotSpeed,
+		    i_vectorPosition) {
 }
 
 
 /// This method will be called at the moment the robot needs to decied on some speed
 bool ConstantSpeedController::adviseSpeed(int* o_speed) const {
-  *o_speed = m_frequency;
+  *o_speed = determineJointSpeed();
   return false;
 }
 
 
-/**
- * This is call just before a algorithm determins movement of the robot
- */
-void ConstantSpeedController::prepareSpeedController(
-  const Trace& i_trace,  const JointController& i_controller) {
-  SpeedController::JointStepVector jointStepVector = estimateSteps(i_trace, i_controller);
+int ConstantSpeedController::determineJointSpeed() const {
   BaseJoint::JointPointer joint;
   int currentMax = 0;
-  for (const auto jointAndSteps : jointStepVector) {
-    if (currentMax < std::get<1>(jointAndSteps)) {
-      joint = std::get<0>(jointAndSteps);
-      currentMax = std::get<1>(jointAndSteps);
+  for (const auto jointAndSteps : m_movementRegistrator->getLocalMap()) {
+    if (joint = jointAndSteps.first.lock()) {
+      if (currentMax < jointAndSteps.second) {
+	joint = jointAndSteps.first.lock();
+	currentMax = jointAndSteps.second;
+      }
     }
   }
   if (joint->getMovementType() == BaseJoint::Rotational) { 
@@ -51,20 +50,11 @@ void ConstantSpeedController::prepareSpeedController(
   } else if (joint->getMovementType() == BaseJoint::Translational) {
     LOG_DEBUG("Number of translation steps: " << currentMax);
   }
-
-  traceType movementPerStep;
-  if (joint->getMovementType() == BaseJoint::Rotational) {
-     float averageMagnitude =
-       (magnitude(i_trace.getEndPoint()) + magnitude(i_trace.getStartPoint())) / 2;
-     movementPerStep = averageMagnitude * joint->getMovementPerStep();
-  } else {
-    movementPerStep = joint->getMovementPerStep();
-  }
-  updateJointSpeed(joint, movementPerStep);
+  return determineJointSpeed(joint);
 }
 
 
-void ConstantSpeedController::prepareSpeedController(const BaseJoint::JointPointer& i_joint) {
+int ConstantSpeedController::determineJointSpeed(const BaseJoint::JointPointer& i_joint) const {
   float movementPerStep;
   if (i_joint->getMovementType() == BaseJoint::Rotational) {
     traceType childLength = magnitude(i_joint->childPosition());
@@ -72,20 +62,20 @@ void ConstantSpeedController::prepareSpeedController(const BaseJoint::JointPoint
   } else {
     movementPerStep = i_joint->getMovementPerStep();
   }
-  updateJointSpeed(i_joint, movementPerStep);
+  return determineJointSpeed(i_joint, movementPerStep);
 }
 
 
-void ConstantSpeedController::updateJointSpeed(const BaseJoint::JointPointer& i_joint,
-					       const traceType& i_movementPerStep) {
- int requiredFrequency = m_robotSpeed / i_movementPerStep;
+int ConstantSpeedController::determineJointSpeed(const BaseJoint::JointPointer& i_joint,
+						 const traceType& i_movementPerStep) const {
+  int driverSpeed;
+  int requiredFrequency = m_robotSpeed / i_movementPerStep;
   int pullInFrequency = i_joint->getMotor()->getMaximumSpeed();
   if (requiredFrequency <= pullInFrequency) {
-    m_frequency = requiredFrequency;
+    driverSpeed = requiredFrequency;
   } else {
-    m_frequency = pullInFrequency;
+    driverSpeed = pullInFrequency;
   }
-  LOG_DEBUG("Joint speed will be: " << m_frequency);
+  LOG_DEBUG("Joint speed will be: " << driverSpeed);
+  return driverSpeed;
 }
-
-

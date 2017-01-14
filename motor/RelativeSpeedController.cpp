@@ -3,7 +3,7 @@
 #include <RelativeSpeedController.h>
 #include <BaseJoint.h>
 #include <BaseMotor.h>
-
+#include <MovementRegistrator.h>
 
 RelativeSpeedController::RelativeSpeedController()
   :RelativeSpeedController(0, 0) {
@@ -17,25 +17,20 @@ RelativeSpeedController::RelativeSpeedController(const float& speed )
 
 /// Constructor with a speed defined
 RelativeSpeedController::RelativeSpeedController(const float& speed, const int& i_vectorPosition )
-  : SpeedController(SpeedController::Type::Relative, speed, i_vectorPosition),
-    m_minSpeed(0),
-    m_maxSpeed(std::numeric_limits<int>::max()) {
+  : SpeedController(SpeedController::Type::Relative, speed, i_vectorPosition) {
 }
 
 
 bool RelativeSpeedController::adviseSpeed(int* o_speed) const {
-  int robotSpeed = m_robotSpeed;
-  if (robotSpeed < 1) {
-    robotSpeed = 1;
-  } else if (robotSpeed > 100) {
-    robotSpeed = 100;
-  }
-  *o_speed = (m_maxSpeed - m_minSpeed) * (robotSpeed / 100.0) + m_minSpeed;
-  return false;
+  int minSpeed(0), maxSpeed(std::numeric_limits<int>::max());
+  determineMotorSpeed(&minSpeed, &maxSpeed);
+  return adviseSpeed(o_speed, minSpeed, maxSpeed);
 }
 
 
-bool RelativeSpeedController::adviseSpeed(int* o_speed, const int& i_minSteed, const int& i_maxSpeed) const {
+bool RelativeSpeedController::adviseSpeed(int* o_speed,
+					  const int& i_minSteed,
+					  const int& i_maxSpeed) const {
   int robotSpeed = m_robotSpeed;
   if (robotSpeed < 1) {
     robotSpeed = 1;
@@ -43,6 +38,7 @@ bool RelativeSpeedController::adviseSpeed(int* o_speed, const int& i_minSteed, c
     robotSpeed = 100;
   }
   *o_speed = (i_maxSpeed - i_minSteed) * (robotSpeed / 100.0) + i_minSteed;
+  LOG_DEBUG("Advertised speed is: " << *o_speed);
   return false;
 }
 
@@ -50,19 +46,6 @@ bool RelativeSpeedController::adviseSpeed(int* o_speed, const int& i_minSteed, c
 void RelativeSpeedController::acknowledgeSpeed(const unsigned int& i_speed,
 					       SequenceVector* i_sequenceVector) {
   SpeedController::acknowledgeSpeed(i_speed, i_sequenceVector);
-  m_minSpeed = 0;
-  m_maxSpeed = std::numeric_limits<int>::max();
-}
-
-
-void RelativeSpeedController::notifyStep(const BaseJoint::JointPointer& i_joint,
-					 const unsigned int& i_numberOfSteps) {
-  determineMotorSpeed(i_joint, &m_minSpeed, &m_maxSpeed);
-}
-
-
-void RelativeSpeedController::prepareSpeedController(const BaseJoint::JointPointer& i_joint) {
-  notifyStep(i_joint, 0);
 }
 
 
@@ -80,10 +63,25 @@ void RelativeSpeedController::determineMotorSpeed(const BaseJoint::JointPointer&
 						  int* io_maxSpeed) const {
   BaseMotor::MotorPointer motor = i_joint->getMotor();
   if (*io_minSpeed < motor->getMinimumSpeed()) {
+    LOG_DEBUG("Min speed is now: " << motor->getMinimumSpeed());
     *io_minSpeed = motor->getMinimumSpeed();
   }
   if (*io_maxSpeed > motor->getMaximumSpeed()) {
+    LOG_DEBUG("Max speed is now: " << motor->getMaximumSpeed());
     *io_maxSpeed = motor->getMaximumSpeed();
+  }
+}
+
+
+void RelativeSpeedController::determineMotorSpeed(int* o_minSpeed,
+						  int* o_maxSpeed) const {
+  LOG_DEBUG("determineMotorSpeed(int* o_minSpeed, int* o_maxSpeed)");
+  for (const auto& element : m_movementRegistrator->getLocalMap()) {
+    LOG_DEBUG("For a element in the movement registrator");
+    if (const auto& joint = element.first.lock()) {
+      LOG_DEBUG("Determine the speed");
+      determineMotorSpeed(joint, o_minSpeed, o_maxSpeed);
+    }
   }
 }
 
@@ -95,10 +93,10 @@ traceType RelativeSpeedController::estimateRobotSpeed(const BaseJoint::JointPoin
     movementPerStep = i_joint->getMovementPerStep();
   } else if (i_joint->getMovementType() == BaseJoint::MovementType::Rotational) {
     movementPerStep = i_joint->getMovementPerStep() * 180/ PI;
-    LOG_DEBUG("Rotational speed is: " << movementPerStep);
-    LOG_DEBUG("Motor speed is: " << i_motorSpeed);
   }
-   return movementPerStep * i_motorSpeed * 10.0;    
+  LOG_DEBUG("Rotational speed is: " << movementPerStep);
+  LOG_DEBUG("Motor speed is: " << i_motorSpeed);
+  return movementPerStep * i_motorSpeed * 10.0;    
 }
 
 

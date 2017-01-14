@@ -12,19 +12,6 @@ public:
   /// This method will be called at the moment the robot needs to decied on some speed
   virtual bool adviseSpeed(int* o_speed) const;
 
-  /**
-   * This is call just before a algorithm determins movement of the robot
-   */
-  virtual void prepareSpeedController(const Trace& i_trace,
-                                      const JointController& i_controller);
-
-  /**
-   * Prepare the controller that steps with this joint will be set
-   * it is unknown how many and in which direction
-   * if a "Constant" type controller is used, use the current position as a base to calculate the speed
-   */
-  virtual void prepareSpeedController(const std::shared_ptr<BaseJoint>& i_pointer);
-
   /// Default constructor
   ConstantSpeedController();
 
@@ -35,11 +22,12 @@ public:
 
   virtual ~ConstantSpeedController(){};
 private:
+  int determineJointSpeed() const;
 
-  void updateJointSpeed(const std::shared_ptr<BaseJoint>& i_joint,
-			const traceType& i_movementPerStep);
-
-  float m_frequency;
+  int determineJointSpeed(const std::shared_ptr<BaseJoint>& i_joint) const;
+  
+  int determineJointSpeed(const std::shared_ptr<BaseJoint>& i_joint,
+			   const traceType& i_movementPerStep) const;
 };
 
 #endif  // MOTOR_CONSTANTSPEEDCONTROLLER_H_
