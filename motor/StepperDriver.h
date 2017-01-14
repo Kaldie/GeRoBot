@@ -20,7 +20,7 @@ class StepperDriver: public BaseMotor {
   /// Maximum frequency (in deca hertz)
   GETSET(int, m_maxSpeed, MaxSpeed);
 
-  /// How manny step between pullIn and maxSpeed
+  /// Possible increment of the speed after pull in
   GETSET(int, m_incremental, Incremental);
  private:
   // Private methods to have easy acces to certain pins, such as enable pin

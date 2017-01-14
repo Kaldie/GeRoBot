@@ -156,7 +156,7 @@ int StepperDriver::getMaximumSpeed() const {
     return m_pullIn;
   }
   // Suggest 1/m_incremental of the diff between minimum and max + current
-  int suggestion = m_speed + (m_maxSpeed - m_pullIn) / m_incremental;
+  int suggestion = m_speed + m_incremental;
   if (suggestion < m_pullIn) {
     return m_pullIn;
   }
@@ -173,7 +173,7 @@ int StepperDriver::getMinimumSpeed() const {
     return 0;
   }
   // Suggest the current speed minus a bit
-  int suggestion = m_speed - (m_maxSpeed - m_pullOut) / m_incremental;
+  int suggestion = m_speed -  m_incremental;
   if (suggestion < m_pullOut) {
     return m_pullOut;
   } else {
