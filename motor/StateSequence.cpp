@@ -218,8 +218,9 @@ bool StateSequence::addToSequence(const StateSequence& i_sequence) {
   }
 
   if (isEmpty()) {
-    LOG_DEBUG("Addig a sequence to an empty sequence");
-    *this = i_sequence;
+    LOG_DEBUG("Adding a sequence to an empty sequence");
+    m_numberOfRepetitions = i_sequence.m_numberOfRepetitions;
+    m_pinStateVector = i_sequence.m_pinStateVector;
     return true;
   }
 
