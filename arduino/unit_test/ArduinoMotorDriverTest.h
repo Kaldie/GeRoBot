@@ -10,18 +10,18 @@
 
 
 class ArduinoMotorDriverTest : public CxxTest::TestSuite {
-public:
-   void testCreation() {
-     ArduinoMotorDriver driver = ArduinoMotorDriver();
-     ArduinoMotorDriver driver2 = ArduinoMotorDriver("Port");
-     TS_ASSERT_EQUALS(driver.getSerialRegularExpresion(), "");
-     TS_ASSERT_EQUALS(driver2.getSerialRegularExpresion(), "Port");
-   }
+ public:
+  void testCreation() {
+    ArduinoMotorDriver driver = ArduinoMotorDriver();
+    ArduinoMotorDriver driver2 = ArduinoMotorDriver("Port");
+    TS_ASSERT_EQUALS(driver.getSerialRegularExpresion(), "");
+    TS_ASSERT_EQUALS(driver2.getSerialRegularExpresion(), "Port");
+  }
 
-   void testBenchmark() {
-           ArduinoMotorDriver driver = ArduinoMotorDriver("/dev/ttyUSB*");
-           driver.benchmarkSD(1000);
-   }
+  void testBenchmark() {
+    ArduinoMotorDriver driver = ArduinoMotorDriver("/dev/ttyUSB*");
+    driver.benchmarkSD(3000);
+  }
 
 };
 
