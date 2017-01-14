@@ -24,8 +24,8 @@ class JointControllerUnitTest : public CxxTest::TestSuite {
     stepperDriver2.setPins({2, 3, 4});
     // Create rotational joint
     rotationalJoint = std::make_shared<RotationalJoint<StepperDriver>>();
-    rotationalJoint->setMovementPerStep(1);
-    rotationalJoint->setPosition(90);
+    rotationalJoint->setMovementPerStep(1 * PI / 180);
+    rotationalJoint->setPosition(PI / 2);
     rotationalJoint->setRange(std::vector<traceType>({0, 2* PI}));
     rotationalJoint->setDirectionConversionMap({{"CCW", "CCW"}, {"CW","CW"}});
 
