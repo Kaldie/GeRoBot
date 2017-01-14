@@ -9,6 +9,7 @@
 #include <glob.h>
 #include <iostream>
 #include <map>
+#include <set>
 #include <memory>
 #include <tuple>
 #include <string>
