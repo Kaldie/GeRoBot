@@ -1,15 +1,13 @@
-// copyright [2015] Ruud Cools
+// Copyright [2015] Ruud Cools
 
 #ifndef MOTOR_BASEJOINT_H_
 #define MOTOR_BASEJOINT_H_
-
-#include <EndStop.h>
 
 class Point2D;
 class SequenceVector;
 class BaseMotor;
 class PinState;
-
+class EndStop;
 
 class BaseJoint {
  public:
@@ -153,7 +151,5 @@ class BaseJoint {
     
     /// no default constructor
     BaseJoint();
-
-
 };
 #endif  // MOTOR_BASEJOINT_H_

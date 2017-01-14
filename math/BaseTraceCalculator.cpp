@@ -51,16 +51,15 @@ bool BaseTraceCalculator::hasRobot() const {
 
 void BaseTraceCalculator::setTolerances() {
   if (hasRobot()) {
-    m_rotationTolerance = m_robot->getMovementPerStep(BaseJoint::Rotational) * 2.0;
-    m_translationTolerance = m_robot->getMovementPerStep(BaseJoint::Translational) * 2.0;
+    m_rotationTolerance = m_robot->getMovementPerStep(BaseJoint::Rotational) * 0.6;
+    m_translationTolerance = m_robot->getMovementPerStep(BaseJoint::Translational) * 0.6;
   }
   m_tolerance = std::min(m_rotationTolerance, m_translationTolerance);
 }
 
 
-std::vector<int> BaseTraceCalculator::getNumberOfSteps
-(const Trace& i_trace,
- const Point2D& i_position) const {
+std::vector<int> BaseTraceCalculator::getNumberOfSteps(const Trace& i_trace,
+						       const Point2D& i_position) const {
   if (!hasRobot()) {
     LOG_ERROR("Does not have a joint controller!");
   }
@@ -140,11 +139,11 @@ void BaseTraceCalculator::calculateTrace(const Trace& i_trace) {
   LOG_INFO("Going to position: " << i_trace.getEndPoint().x <<
            ", " << i_trace.getEndPoint().y);
   // Get rotation direction
-  std::string rotationDirection = i_trace.
-    getRotationDirectionToEndPoint(currentVirtualPosition);
+  std::string rotationDirection =
+    i_trace.getRotationDirectionToEndPoint(currentVirtualPosition);
   // Get translation direction
-  std::string translationDirection = i_trace.
-    getTranslationDirectionToEndPoint(currentVirtualPosition);
+  std::string translationDirection =
+    i_trace.getTranslationDirectionToEndPoint(currentVirtualPosition);
   // get number of steps
   std::vector<int> numberOfSteps =
     getNumberOfSteps(i_trace, currentVirtualPosition);

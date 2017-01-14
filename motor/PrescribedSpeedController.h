@@ -10,6 +10,7 @@ class JointController;
 class BaseJoint;
 class StateSequence;
 class BaseMotor;
+
 class PrescribedSpeedController : public SpeedController {
 
   struct JointInfo

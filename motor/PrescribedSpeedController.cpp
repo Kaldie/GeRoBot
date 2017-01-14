@@ -57,6 +57,7 @@ bool PrescribedSpeedController::adviseSpeed(int* o_speed) const {
 }
 
 
+/*
 void PrescribedSpeedController::notifyStep(const BaseJoint::JointPointer& i_joint,
                                  const unsigned int& i_numberOfSteps) {
   BaseJoint::WeakJointPointer joint(i_joint);
@@ -69,7 +70,7 @@ void PrescribedSpeedController::notifyStep(const BaseJoint::JointPointer& i_join
     m_jointMap[joint] = JointInfo
       {0,                                            // number of steps
        {static_cast<float>(motor->getSpeed())},      // front_list frequency
-       std::forward_list<float>(),                                           // front list missed steps
+       std::forward_list<float>(),                   // front list missed steps
        0,                                            // number of steps taken
        false};                                       // updated the missed step list
     // check if the motor frequency is initialised
@@ -79,6 +80,7 @@ void PrescribedSpeedController::notifyStep(const BaseJoint::JointPointer& i_join
   }
   updateJointMapElement(&m_jointMap[joint], i_numberOfSteps);
 }
+*/
 
 void PrescribedSpeedController::acknowledgeSpeed(const unsigned int& i_frequency,
                                                  SequenceVector* i_sequenceVector) {

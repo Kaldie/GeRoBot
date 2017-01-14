@@ -29,7 +29,7 @@ class BaseTraceCalculator {
     too much memory use
   */
   virtual std::vector<int> getNumberOfSteps(const Trace&,
-                                            const Point2D&) const ;
+                                            const Point2D&) const;
 
   /*
     Calculate the necessary steps to conduct the trace.
