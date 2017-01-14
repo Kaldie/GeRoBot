@@ -5,6 +5,7 @@
 
 #include <macroHeader.h>
 #include <RobotIO.h>
+#include <JointController.h>
 #include "../ArduinoTool.h"
 
 
