@@ -10,10 +10,11 @@
 #include <Trace.h>
 #include <RotationTraceCalculator.h>
 #include <RotationTrace.h>
-
+#include <MovementRegistrator.h>
 
 Robot::Robot()
-  : Robot( nullptr,  Point2D(0, 50))
+  : Robot(std::make_shared<JointController>(),
+	  Point2D(0, 50))
 {}
 
 
@@ -27,6 +28,18 @@ Robot::Robot(const JointController::JointControllerPointer& i_pointer,
   : m_jointController(i_pointer),
     m_position(i_currentPosition),
     m_speedController(std::make_shared<ConstantSpeedController>()) {
+  setSpeedController(m_speedController);
+}
+
+
+void Robot::setSpeedController(const std::shared_ptr<SpeedController>& i_speedController) {
+  LOG_DEBUG("setSpeedController");
+  /// unload the old movement registrator
+  deregisterMovementRegistrator(m_speedController->getMovementRegistrator());
+  /// set the class member
+  m_speedController = i_speedController;
+  /// load the new movement registrator
+  registerMovementRegistrator(i_speedController->getMovementRegistrator());
 }
 
 
@@ -49,7 +62,6 @@ void Robot::goToPosition(const Point2D &i_position) {
   LOG_DEBUG("current position: " << m_position.x << m_position.y);
   BaseTraceCalculator baseTraceCalculator(this);
   Trace thisTrace(m_position, i_position);
-  m_speedController->prepareSpeedController(thisTrace, *m_jointController);
   baseTraceCalculator.calculateTrace(thisTrace);
   LOG_DEBUG("new position: " << getVirtualPosition().x << getVirtualPosition().y);
   actuate();
@@ -73,37 +85,20 @@ const Point2D Robot::getVirtualPosition() const {
 }
 
 
-
-void Robot::traceCalculation(const Trace::TracePointer& i_trace) {
-  std::unique_ptr<BaseTraceCalculator> traceCalculator;
-  if (i_trace->getTraceType() == Trace::TraceType::Curve) {
-    traceCalculator = std::unique_ptr<BaseTraceCalculator>(new RotationTraceCalculator(this));
-  } else if (i_trace->getTraceType() == Trace::TraceType::Line) {
-    traceCalculator = std::unique_ptr<BaseTraceCalculator>(new LineTraceCalculator(this));
-  } else {
-    LOG_ERROR("Could not resolve trace type!");
-  }
-  m_speedController->prepareSpeedController(*i_trace, *m_jointController);
-  traceCalculator->calculateTrace(*i_trace);
-}
-
-
 void Robot::prepareSteps(const std::string& i_direction,
                          const int& i_numberOfSteps) {
   BaseJoint::JointPointer joint = m_jointController->resolveJoint(i_direction);
+  // notify all the motion registrators that steps have been taken
+  notifySteps(joint, i_numberOfSteps);
+
   // add the step to the sequence
-  m_speedController->notifyStep(joint, i_numberOfSteps);
   m_jointController->moveSteps(i_direction, i_numberOfSteps);
-#ifdef DEBUG
-  m_traveledPoints.push_back(getVirtualPosition());
-#endif
   int motorSpeed;
   if (m_speedController->adviseSpeed(&motorSpeed)) {
     LOG_DEBUG("Speed controler has a mandatory speed change.");
     // add a clean sequence to force the speed to be nice
     m_jointController->getSequenceVectorPointer()->addEmptySequence();
   }
-  ///TODO: check if this can be helped
   m_speedController->acknowledgeSpeed
     (motorSpeed,m_jointController->getSequenceVectorPointer());
 }
@@ -111,15 +106,24 @@ void Robot::prepareSteps(const std::string& i_direction,
 
 void Robot::actuate() {
   LOG_DEBUG("Regular expression: " << m_jointController->getActuator().getSerialRegularExpresion());
+  notifyActuation();
   // upload the current sequence
   m_jointController->uploadSequence(false);
   // Send the command to actuate the sequence
   m_jointController->actuate();
-  // reset the traveledPoints vector
-  m_speedController->setCurrentSequenceVectorPosition(0);
-  std::vector<Point2D> empty;
-  m_traveledPoints.swap(empty);
+  // Update the robot position to the position previously calculated
   m_position = getVirtualPosition();
+}
+
+
+void Robot::restartTraceCalculation() {
+  // reset the calculated pins
+  m_jointController->resetPinStateSequence();
+  // notify the other components that a pseudo actuation has taken place
+  notifyActuation();
+  // update the joint positions
+  setPosition(m_position);
+
 }
 
 
@@ -140,8 +144,44 @@ void Robot::setIdle(const bool& i_setIdle) {
 }
 
 
-void Robot::addToSequence(const StateSequence& i_sequence) {
-  SequenceVector* sequenceVector = m_jointController->getSequenceVectorPointer();
-  if (!sequenceVector->addToSequence(i_sequence))
-    sequenceVector->appendStateSequence(i_sequence, false);
+bool Robot::registerMovementRegistrator(std::shared_ptr<MovementRegistrator> i_registrator) {
+  LOG_DEBUG("RegisterMovementRegistrator");
+  if (m_movementRegistrators.find(i_registrator) != m_movementRegistrators.end()) {
+    LOG_DEBUG("Registrator is allready known");
+    return false;
+  }
+  m_movementRegistrators.insert(i_registrator);
+  return true;
+}
+
+
+bool Robot::deregisterMovementRegistrator(std::shared_ptr<MovementRegistrator> i_registrator) {
+  LOG_DEBUG("DeregisterMovementRegistrator");
+  std::weak_ptr<MovementRegistrator> newRegistrator(i_registrator);
+  if (m_movementRegistrators.find(newRegistrator) == m_movementRegistrators.end()) {
+    LOG_DEBUG("Registrator is not known");
+    return false;
+  }
+  m_movementRegistrators.erase(newRegistrator);
+  return true;
+}
+
+
+void Robot::notifySteps(std::shared_ptr<BaseJoint> i_joint,
+					    const int& i_numberOfSteps) const {
+  for (const auto& registor: m_movementRegistrators) {
+    if (auto shared_registrator = registor.lock()) {
+      shared_registrator->notifySteps(i_joint, i_numberOfSteps);
+    }
+  }
+}
+
+
+void Robot::notifyActuation() const {
+  for (const auto& registor: m_movementRegistrators) {
+    if (auto shared_registrator = registor.lock()) {
+      shared_registrator->notifyActuation();
+    }
+  }
+  m_speedController->setCurrentSequenceVectorPosition(0);
 }

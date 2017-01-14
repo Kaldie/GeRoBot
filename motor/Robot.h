@@ -10,6 +10,7 @@ class Trace;
 class JointController;
 class SpeedController;
 class StateSequence;
+class MovementRegistrator;
 /**
  * Robot is the basis of the project.
  *  Robot is the root of a object which looks like: Robot->Joint->Actuator
@@ -24,14 +25,26 @@ class Robot {
   // The current position of the head of the robot
   GET(Point2D, m_position, Position);
 
-  // Positions which has been seen during stepping
-  GETSET(std::vector<Point2D>, m_traveledPoints, TraveledPoints);
-
   /// Controller which is in charge of the speed of the robot
-  GETSET(std::shared_ptr<SpeedController>, m_speedController, SpeedController);
+  GET(std::shared_ptr<SpeedController>, m_speedController, SpeedController);
 
+ private:
+  typedef std::set<std::weak_ptr<MovementRegistrator>, std::owner_less<std::weak_ptr<MovementRegistrator>>>
+    MovementRegistorSet; // typedef otherwise it does not fit the macro
+  /// Retrieve the set of movement registrators. Use registrer/deregister to update it
+  GET(MovementRegistorSet, m_movementRegistrators, MovementRegistrators);
+
+  // notify the movement registrators steps have been taken
+  void notifySteps(std::shared_ptr<BaseJoint>,
+		   const int& i_numberOfSteps) const;
+
+  // notify the movement registrators actuation has been done
+  void notifyActuation() const;
  public:
   typedef std::shared_ptr<Robot> RobotPointer;
+
+  /// Set the speed controller, register its movement registrator en deregister the old 1.
+  void setSpeedController(const std::shared_ptr<SpeedController>& i_speedController);
 
   /// Returns if there is a valid arduino connenction
   bool hasValidConnection();
@@ -39,11 +52,9 @@ class Robot {
   /// Based on the joints in the controller, calculated the current position
   const Point2D getVirtualPosition() const;
 
-  /// sets the robot to a position updates its joints to go there 2!
+  ///Sets the position of the robot and joints without actuating.
+  ///Can be used after calibration or something
   void setPosition(const Point2D& i_position);
-
-  /// Creates a state which will switch the tool to a active or inactive state
-  //void switchTool(const bool& i_shouldBeActive) {}; // no yet implemented!
 
   /// move to a position, independend on maner
   void goToPosition(const Point2D&);
@@ -51,15 +62,20 @@ class Robot {
   /// Given the pre-calculated steps, prefrom them
   void actuate();
 
+  /// Reset trace calculation. Remove all previous calculations and start over!
+  void restartTraceCalculation();
+
   /// set a step and set the hold motor function to the boolean value
   void setIdle(const bool& i_setIdle);
 
   /// Get the amount of movement per step given a direction
   traceType getMovementPerStep(const BaseJoint::MovementType&) const ;
 
+  // Register a movement registrator
+  bool registerMovementRegistrator(std::shared_ptr<MovementRegistrator> i_registrator);
 
-  void traceCalculation(const std::shared_ptr<Trace>& i_trace);
-
+  // Remove a movement registrator
+  bool deregisterMovementRegistrator(std::shared_ptr<MovementRegistrator> i_registrator);
   /**
    * prepares to take steps with the given movement type, direction and number
    * This function pepares the joint controller to take steps when actuate is called
@@ -70,22 +86,15 @@ class Robot {
   void prepareSteps(const std::string& i_direction,
                     const int& i_numberOfSteps);
 
-  /// Add an StateSequence to the vector. Use this for instance when a wait is required
-  void addToSequence(const StateSequence& i_sequence);
-
   /// easy to do
   Robot();
 
-  /// defines controlle
+  /// defines controller
   Robot(const std::shared_ptr<JointController>& i_pointer);
 
   /// fully fledged constructor
   Robot(const std::shared_ptr<JointController>& i_pointer,
         const Point2D& i_point);
-
- private:
-  int getNumberOfSequences(const std::shared_ptr<JointController>&);
-  int getNumberOfSequences(const bool&);
 };
 
 #endif  // ROBOT_ROBOT_H_
