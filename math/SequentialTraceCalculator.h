@@ -19,6 +19,9 @@ class SequentialTraceCalculator {
   /// Determine if the traces should be orded before calculation
   GETSET(bool, m_orderTraces, OrderTraces);
 
+  /// Shows if a calculation is running with this calculator
+  GETSET(bool, m_isRunning, IsRunning);
+
  public:
   /// Easy Constructor
   SequentialTraceCalculator();

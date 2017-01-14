@@ -34,7 +34,8 @@ SequentialTraceCalculator::SequentialTraceCalculator(const Robot::RobotPointer& 
   : m_robot(i_robot),
     m_traceSection(i_section),
     m_stopAfterSection(i_stopAfterSection),
-    m_orderTraces(i_orderTraces) {
+    m_orderTraces(i_orderTraces),
+    m_isRunning(false) {
 }
 
 
@@ -49,6 +50,8 @@ void SequentialTraceCalculator::calculatedTraces() {
     return;
   }
 
+  m_isRunning = true;
+  
   BaseTraceCalculator baseTraceCalculator(m_robot.get());
   RotationTraceCalculator rotationTraceCalculator(m_robot.get());
   LineTraceCalculator lineTraceCalculator(m_robot.get());
@@ -84,4 +87,5 @@ void SequentialTraceCalculator::calculatedTraces() {
       rotationTraceCalculator.calculateTrace(*rotationTrace);
     }
   }
+  m_isRunning = false;
 }
