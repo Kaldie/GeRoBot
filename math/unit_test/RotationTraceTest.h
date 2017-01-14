@@ -95,6 +95,21 @@ class RotationTraceTest : public CxxTest::TestSuite {
     TS_ASSERT_EQUALS(vector[0].getEndPoint() , Point2D(-41.574, 62.2222));
   }
 
+  
+  void testNecessaryTraces4() {
+    LOG_DEBUG("testNecessaryTraces4");
+    RotationTrace trace(Point2D(-55, 0),
+			Point2D(45, 0),
+			Point2D(-5,0), false);
+    std::vector<RotationTrace> vector = trace.getNecessaryTraces();
+    TS_ASSERT_EQUALS(2, vector.size());
+    LOG_DEBUG("Start [0]: " << vector[0].getStartPoint().x << ", " << vector[0].getStartPoint().y);
+    LOG_DEBUG("End [0]: " << vector[0].getEndPoint().x << ", " << vector[0].getEndPoint().y);
+    LOG_DEBUG("Start [1]: " << vector[1].getStartPoint().x << ", " << vector[1].getStartPoint().y);
+    LOG_DEBUG("End [1]: " << vector[1].getEndPoint().x << ", " << vector[1].getEndPoint().y);
+    TS_ASSERT_EQUALS(vector[0].getEndPoint() , Point2D(-5, -50));
+  }
+
   void testCircleHasOrigin() {
     // The necessary traces need a different calculation of the circle is within the origin of the axis
     // As this seem to be posible on the hardware side we need to do it 2
