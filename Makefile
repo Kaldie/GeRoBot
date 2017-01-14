@@ -1,7 +1,7 @@
 # Main makefile
 TOROOT= $(patsubst %/,%,$(abspath $(dir $(lastword $(MAKEFILE_LIST)))))
 PUGISRC = pugixml/src
-SHAREDFOLDERS = $(TOROOT)/math $(TOROOT)/math/io $(TOROOT)/arduino $(TOROOT)/motor $(TOROOT)/motor/io $(TOROOT)/util/xml
+SHAREDFOLDERS = $(TOROOT)/math $(TOROOT)/math/io $(TOROOT)/arduino $(TOROOT)/motor $(TOROOT)/motor/io $(TOROOT)/motor/calibration $(TOROOT)/util/xml
 UPLOADEDFOLDERS = ./arduinosketch
 MAIN = GeRobot
 include Makefile.config
