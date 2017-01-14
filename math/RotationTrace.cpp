@@ -201,3 +201,10 @@ void RotationTrace::reverse() {
 traceType RotationTrace::getPerpendicularDistance(const Point2D& i_position) const {
   return abs(magnitude(i_position - m_centrePoint) - getArc().radius());
 }
+
+
+bool RotationTrace::isOriginWithinCircle() const {
+  traceType centreMagnitude = magnitude(m_centrePoint);
+  traceType radius = getArc().radius();
+  return centreMagnitude <= radius;
+}

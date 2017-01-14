@@ -54,6 +54,9 @@ void RotationTraceCalculator::ensureProperMovement(const std::vector<RotationTra
                                                    const std::vector<RotationTrace>::const_iterator& i_traceIterator,
                                                    const Point2D& i_startPosition) {
   auto nextTrace = std::next(i_traceIterator);
+  if (nextTrace->isOriginWithinCircle()) {
+    return;
+  }
   // what is the current translation direction
   std::string translationDirection =
      nextTrace->getTranslationDirectionToEndPoint(i_startPosition);

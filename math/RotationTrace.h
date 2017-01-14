@@ -83,6 +83,8 @@ class RotationTrace: public Trace {
     ///  Reverses the trace: endpoint become beginning and startpoint becomes end
     virtual void reverse();
 
+    bool isOriginWithinCircle() const;
+    
     /**
      * Default constructor
      */
