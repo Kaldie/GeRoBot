@@ -6,6 +6,8 @@
 #include <SequenceVector.h>
 #include <BaseJoint.h>
 
+class EndStop;
+
 class JointController {
  public:
   typedef std::vector<BaseJoint::JointPointer> JointPointerVector;
@@ -60,7 +62,7 @@ class JointController {
    * Base from these it will find the end stop triggered 
    * and set the position of the corrisponding joint.
    */
-  void resolveEndStopHit();
+  std::shared_ptr<EndStop> resolveEndStopHit();
 
   /**
    * Reducing the size of the vector
@@ -93,7 +95,8 @@ class JointController {
     * Get the root joint, this joint is therefor the base of the robot
     */
    const BaseJoint::JointPointer getRootJoint() const;
-private:
+
+ private:
 
    /**
    * returns if the joint is ready to be added to the robot

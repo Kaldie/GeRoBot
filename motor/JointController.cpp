@@ -193,7 +193,7 @@ void JointController::uploadSequence(const bool& i_condense) {
 }
 
 
-void JointController::resolveEndStopHit() {
+std::shared_ptr<EndStop> JointController::resolveEndStopHit() {
   int jointValue, endStopValue;
   m_actuator.resolveEndStopHit(&jointValue, &endStopValue);
   PinState jointPinState, stopPinState;
@@ -219,6 +219,7 @@ void JointController::resolveEndStopHit() {
       }
     }
   }
+  return endStop;
 }
 
 
