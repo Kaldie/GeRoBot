@@ -21,6 +21,7 @@ void JointCalibrationWidget::initialisation() {
   setupUi(this);
   // create button group
   m_calibrationButtonGroup = new QButtonGroup(this);
+  m_calibrationButtonGroup->setExclusive(false);
 
   initialiseJointMap();
   populateTypeListbox();
