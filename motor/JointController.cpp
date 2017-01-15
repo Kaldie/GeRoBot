@@ -237,3 +237,25 @@ BaseJoint::JointPointer JointController::resolveJoint(const std::string& i_movem
 BaseJoint::JointPointer JointController::resolveJoint(const BaseJoint::MovementType& i_movementType) const {
   return getJoint(i_movementType);
 }
+
+JointController::JointPointerVector JointController::resolveJoints
+(const BaseJoint::MovementType& i_type) const {
+  JointPointerVector vector;
+  for (const auto& joint : m_jointPointerVector) {
+    if (joint->getMovementType() == i_type) {
+      vector.push_back(joint);
+    }
+  }
+  return vector;
+}
+
+
+int JointController::getNumberOfJoints(const BaseJoint::MovementType& i_type) const {
+  int number(0);
+  for (const auto& joint : m_jointPointerVector) {
+    if (joint->getMovementType() == i_type) {
+      ++number;
+    }
+  }
+  return number;
+}

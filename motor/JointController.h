@@ -10,7 +10,7 @@ class EndStop;
 
 class JointController {
  public:
-  typedef std::vector<BaseJoint::JointPointer> JointPointerVector;
+  typedef std::vector<std::shared_ptr<BaseJoint>> JointPointerVector;
   typedef std::shared_ptr<JointController> JointControllerPointer;
 
   /// vector with the shared pointers to joints
@@ -30,7 +30,7 @@ class JointController {
   void resetPinStateSequence();
 
   /// Register a joint so it will be controled by the controller
-  bool addJoint(const BaseJoint::JointPointer&);
+  bool addJoint(const std::shared_ptr<BaseJoint>&);
 
   /**
    * Prepare to move steps
@@ -86,10 +86,19 @@ class JointController {
   BaseJoint::JointPointer resolveJoint(const BaseJoint::MovementType& i_movementType) const;
 
   /**
+   * Returns all the joints which have the specific movment type
+   */
+  JointController::JointPointerVector resolveJoints(const BaseJoint::MovementType& i_type) const;
+
+  /**
    * returns the number of joints currently registed
    */
    int getNumberOfJoints() const {return m_jointPointerVector.size();}
 
+   /**
+    * returns the number of joints with the specific movementType
+    */
+   int getNumberOfJoints(const BaseJoint::MovementType& i_type) const;
 
    /**
     * Get the root joint, this joint is therefor the base of the robot
@@ -97,7 +106,6 @@ class JointController {
    const BaseJoint::JointPointer getRootJoint() const;
 
  private:
-
    /**
    * returns if the joint is ready to be added to the robot
    */
