@@ -3,6 +3,8 @@
    widget/tracedesign/TraceDesignWidget.ui \
    MainWindow.ui \
    widget/RobotMovementWidget.ui \
+   widget/calibrations/JointCalibrationWidget.ui \
+   widget/calibrations/CalibrationWidget.ui
 
  RESOURCES   = RobotTreeModel.qrc
 
@@ -29,6 +31,7 @@
     widget/tracedesign/TraceDesignWidget.h \
     widget/tracedesign/TraceInfoWidget.h \
     widget/tracedesign/RobotLocator.h \
+    widget/calibrations/JointCalibrationWidget.h \
     MainWindow.h
 
 
@@ -55,6 +58,7 @@
     widget/tracedesign/TraceGraphView.cpp \
     widget/tracedesign/TraceInfoWidget.cpp \
     widget/tracedesign/TraceDesignWidget.cpp \
+    widget/calibrations/JointCalibrationWidget.cpp \
     widget/tracedesign/RobotLocator.cpp \
     MainWindow.cpp \
     main.cpp
@@ -67,10 +71,7 @@
 
  QT += widgets
  INCLUDEPATH += /home/ruud/projects/gerobot/include/
- #QMAKE_MOC_OPTIONS = -f $$INCLUDEPATH/macroHeader.h
  LIBS += /home/ruud/projects/gerobot/bin/lib/libGeRobot.so
-
- #QMAKE_RPATHDIR += /home/ruud/project/gerobot/bin/lib/
 
  # install
  target.path = /home/ruud/projects/gerobot/GUI/output

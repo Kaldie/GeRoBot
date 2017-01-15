@@ -16,6 +16,7 @@
 #include "./widget/Point2DWidget.h"
 #include "./widget/tracedesign/TraceDesignWidget.h"
 #include "./widget/tracedesign/TraceInfoWidget.h"
+#include "./widget/calibrations/JointCalibrationWidget.h"
 
 
 MainWindow::MainWindow(const Robot::RobotPointer& i_robot,
@@ -47,8 +48,11 @@ bool MainWindow::initialise() {
   // Make and set the Robot movement widget
   RobotMovementWidget* robotMovementWidget =
     new RobotMovementWidget(m_robotPointer, this);
-  robotMovementTab->layout()->addWidget(robotMovementWidget);
-
+  movementTab->layout()->addWidget(robotMovementWidget);
+  // Create and add the joint calibration widget
+  JointCalibrationWidget* jointCalibrationWidget = 
+    new JointCalibrationWidget(m_robotPointer,this);
+  calibrationTab->layout()->addWidget(jointCalibrationWidget);
   // Make and set the trace design widget
   TraceDesignWidget* traceDesignWidget = new TraceDesignWidget(m_robotPointer, this);
   traceDesignTab->layout()->addWidget(traceDesignWidget);

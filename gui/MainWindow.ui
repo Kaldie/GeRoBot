@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>573</width>
-    <height>468</height>
+    <width>639</width>
+    <height>555</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -39,7 +39,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>1</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -70,9 +70,15 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="robotMovementTab">
+      <widget class="QWidget" name="calibrationTab">
        <attribute name="title">
-        <string>Robot Calibration</string>
+        <string>Calibration</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_3"/>
+      </widget>
+      <widget class="QWidget" name="movementTab">
+       <attribute name="title">
+        <string>Manual Movement</string>
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout_2"/>
       </widget>
@@ -92,7 +98,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>573</width>
+     <width>639</width>
      <height>25</height>
     </rect>
    </property>
