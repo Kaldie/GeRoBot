@@ -11,6 +11,7 @@ class JointController;
 class SpeedController;
 class StateSequence;
 class MovementRegistrator;
+
 /**
  * Robot is the basis of the project.
  *  Robot is the root of a object which looks like: Robot->Joint->Actuator

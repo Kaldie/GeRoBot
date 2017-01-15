@@ -3,8 +3,8 @@
 #define MOTOR_CALIBRATION_POINTCALIBRATION_H_
 
 #include <BaseCalibration.h>
+#include <Point2D.h>
 
-class Point2D;
 class MovementRegistrator;
 class BaseJoint;
 class Robot;
@@ -33,6 +33,8 @@ class PointCalibration : public BaseCalibration {
 
   /// add a point that will be used in the calibration.
   void addPoint2D(const Point2D& i_point);
+
+  virtual std::string name() const override {return "Point Calibration";};
 
  private:
   typedef std::map<std::shared_ptr<BaseJoint>, traceType,

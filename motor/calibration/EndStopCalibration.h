@@ -51,6 +51,7 @@ class EndStopCalibration : public BaseCalibration {
   /// apply the values retrieved during the calibration to the joint
   virtual void apply() override;
 
+  virtual std::string name() const override {return "EndStop Calibration";};
   
  private:
   EndStopCalibration();

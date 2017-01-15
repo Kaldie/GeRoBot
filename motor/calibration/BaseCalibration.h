@@ -10,7 +10,8 @@ class Robot;
 class BaseCalibration {
  public:
   enum Type {Base, PointPoisition,
-	     EndStopPosition, MotorSpeed};
+	     EndStopPosition, PullIn,
+	     Maximum, Acceleration};
   
   GETSETPROTECTED(bool, m_finished, Finished);
   GETSETPROTECTED(std::shared_ptr<BaseJoint>, m_joint, Joint);
@@ -27,6 +28,9 @@ class BaseCalibration {
 
   /// apply the values retrieved during the calibration to the joint
   virtual void apply() = 0;
+
+  /// return a string with the name of the calibration
+  virtual std::string name() const = 0;
 
   /// Constructors
   BaseCalibration(const std::shared_ptr<BaseJoint>& i_joint,
