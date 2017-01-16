@@ -5,6 +5,8 @@
 #include <Robot.h>
 #include <BaseMotor.h>
 #include <CalibrationDirector.h>
+#include "./CalibrationWidget.h"
+#include "./CalibrationWidgetFactory.h"
 
 
 JointCalibrationWidget::JointCalibrationWidget(const std::shared_ptr<Robot>& i_robot,
@@ -12,7 +14,9 @@ JointCalibrationWidget::JointCalibrationWidget(const std::shared_ptr<Robot>& i_r
   QWidget(i_parent),
   m_robot(i_robot),
   m_jointMap(),
-  m_director(std::make_shared<CalibrationDirector>(i_robot)) {
+  m_director(std::make_shared<CalibrationDirector>(i_robot)),
+  m_calibrationVector(),
+  m_calibrationButtonGroup(this) {
   initialisation();
 }
 
@@ -20,8 +24,7 @@ JointCalibrationWidget::JointCalibrationWidget(const std::shared_ptr<Robot>& i_r
 void JointCalibrationWidget::initialisation() {
   setupUi(this);
   // create button group
-  m_calibrationButtonGroup = new QButtonGroup(this);
-  m_calibrationButtonGroup->setExclusive(false);
+  m_calibrationButtonGroup.setExclusive(false);
 
   initialiseJointMap();
   populateTypeListbox();
@@ -37,16 +40,20 @@ void JointCalibrationWidget::initialisation() {
   connect(includeCheckBox,SIGNAL(toggled(bool)), this, SLOT(updateJointMap(bool)));
   // connect all the signals which effect the number of calibrations that will have to be done
   connect(includeCheckBox,SIGNAL(toggled(bool)), this, SLOT(updateNumberOfCalibrations()));
+
   // connect the checkboxes so the director gets updated at change
-  connect(m_calibrationButtonGroup,SIGNAL(buttonClicked(int)), this, SLOT(updateCalibrationSelection()));
+  connect(&m_calibrationButtonGroup,SIGNAL(buttonClicked(int)), this, SLOT(updateCalibrationSelection()));
+
+  // connect the start button click to the clear/create calibrations slot
+  connect(startCalibrationButton, SIGNAL(clicked()), this, SLOT(toggleCalibration()));
 }
 
 
 void JointCalibrationWidget::populateButtonGroup() {
-  m_calibrationButtonGroup->addButton(endMovementCheckBox);
-  m_calibrationButtonGroup->addButton(endPositionCheckBox);
-  m_calibrationButtonGroup->addButton(motorCalibrationCheckBox);
-  m_calibrationButtonGroup->addButton(pointCalibrationCheckBox);
+  m_calibrationButtonGroup.addButton(endMovementCheckBox);
+  m_calibrationButtonGroup.addButton(endPositionCheckBox);
+  m_calibrationButtonGroup.addButton(motorCalibrationCheckBox);
+  m_calibrationButtonGroup.addButton(pointCalibrationCheckBox);
 }
 
 
@@ -120,13 +127,43 @@ void JointCalibrationWidget::updateJointInforamtion() {
 }
 
 
-void JointCalibrationWidget::createCalibrations() {
-  //TODO: magic()
+void JointCalibrationWidget::toggleCalibration() {
+  LOG_DEBUG("toggleCalibration");
+  
+  if (startCalibrationButton->text().compare("Start") == 0) {
+    startCalibrationButton->setText("Stop");
+    enableSelection(false);
+    addCalibrationWidget();
+  } else if (startCalibrationButton->text().compare("Stop") == 0) {
+    startCalibrationButton->setText("Start");
+    enableSelection(true);
+    //    clearCalibrationWidget();
+  }
+}
+
+
+void JointCalibrationWidget::addCalibrationWidget() {
+  std::shared_ptr<BaseCalibration> calibration = m_director->next();
+  CalibrationWidgetFactory::getWidget(calibration, this);
+  calibrationWidget->layout()->addWidget(CalibrationWidgetFactory::getWidget(calibration, this));
+  
+    
 }
 
 
 void JointCalibrationWidget::clearCalibrations() {
+
+
+  // clear the calibration vector
+  m_calibrationVector.clear();
   //TODO: magic()
+}
+
+
+void JointCalibrationWidget::enableSelection(const bool& i_enable) {
+  LOG_DEBUG("enableSelection: " << i_enable);
+  includeCheckBox->setEnabled(i_enable);
+  calibrationSelectionBox->setEnabled(i_enable);  
 }
 
 

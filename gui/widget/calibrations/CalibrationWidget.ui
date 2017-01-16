@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Form</class>
- <widget class="QWidget" name="Form">
+ <class>CalibrationWidget</class>
+ <widget class="QWidget" name="CalibrationWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -28,6 +28,9 @@
        <property name="text">
         <string>Ready</string>
        </property>
+       <property name="checkable">
+        <bool>false</bool>
+       </property>
       </widget>
      </item>
     </layout>
@@ -47,7 +50,7 @@
      <item>
       <widget class="QPushButton" name="applyButton">
        <property name="text">
-        <string>Applay</string>
+        <string>Apply</string>
        </property>
       </widget>
      </item>
