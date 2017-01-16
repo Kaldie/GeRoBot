@@ -31,9 +31,10 @@
     widget/tracedesign/TraceDesignWidget.h \
     widget/tracedesign/TraceInfoWidget.h \
     widget/tracedesign/RobotLocator.h \
+    widget/calibrations/CalibrationWidgetFactory.h \
     widget/calibrations/JointCalibrationWidget.h \
+    widget/calibrations/CalibrationWidget.h \
     MainWindow.h
-
 
 
  SOURCES = \
@@ -58,12 +59,14 @@
     widget/tracedesign/TraceGraphView.cpp \
     widget/tracedesign/TraceInfoWidget.cpp \
     widget/tracedesign/TraceDesignWidget.cpp \
-    widget/calibrations/JointCalibrationWidget.cpp \
     widget/tracedesign/RobotLocator.cpp \
+    widget/calibrations/CalibrationWidget.cpp \
+    widget/calibrations/CalibrationWidgetFactory.cpp \
+    widget/calibrations/JointCalibrationWidget.cpp \
     MainWindow.cpp \
     main.cpp
 
- CONFIG  += qt#
+ CONFIG  += qt
  CONFIG += c++11
 
  QMAKE_CXXFLAGS += -Wfatal-errors -DQT
