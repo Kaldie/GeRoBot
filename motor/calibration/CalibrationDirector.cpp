@@ -119,10 +119,11 @@ void CalibrationDirector::getNumberOfCalibrations(const std::shared_ptr<BaseJoin
   if (m_endstopPositionCalibration) {
     if (i_joint->getEndStops().size() > 0) {
       *io_count += 1;
-	hasEndStopPosition = true;
+      hasEndStopPosition = true;
       if (m_endstopMovementCalibration) {
 	if (i_joint->getEndStops().size() > 1) {
 	  *io_count += 1;
+	  hasEndStopMovement = true;
 	}
       }
     }

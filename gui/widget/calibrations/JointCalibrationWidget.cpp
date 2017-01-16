@@ -169,16 +169,16 @@ void JointCalibrationWidget::updateJointMap(const bool& i_checked) {
 
 
 void JointCalibrationWidget::updateNumberOfCalibrations() {
-  LOG_DEBUG("updateNumberOfCalibrations");
   numberOfCalibrationEdit->setText(QString::number(m_director->getNumberOfCalibrations()));
 }
 
 
 void JointCalibrationWidget::updateCalibrationSelection() {
-  LOG_DEBUG("updateCalibrationSelection");
   m_director->setPointCalibration(pointCalibrationCheckBox->isChecked());
   m_director->setMotorCalibration(motorCalibrationCheckBox->isChecked());
   m_director->setEndStopPositionCalibration(endPositionCheckBox->isChecked());
-  m_director->setEndStopMovementCalibration(endMovementCheckBox->isChecked());
+  endMovementCheckBox->setEnabled(endPositionCheckBox->isChecked());
+  m_director->setEndStopMovementCalibration
+    (endMovementCheckBox->isChecked() && endMovementCheckBox->isEnabled());
   updateNumberOfCalibrations();
 }
