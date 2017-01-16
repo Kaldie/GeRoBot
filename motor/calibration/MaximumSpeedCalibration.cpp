@@ -10,7 +10,7 @@
 
 MaximumSpeedCalibration::MaximumSpeedCalibration(const std::shared_ptr<BaseJoint>& i_joint,
 						 const std::shared_ptr<Robot>& i_robot) 
-  : MotorSpeedCalibration(i_joint, i_robot, BaseCalibration::Maximum),
+  : MotorSpeedCalibration(i_joint, i_robot, BaseCalibration::MaximumCalibration),
     m_maximumSpeed(0) {
 }
 

@@ -9,7 +9,7 @@
 
 AccelerationCalibration::AccelerationCalibration(const std::shared_ptr<BaseJoint>& i_joint,
 						 const std::shared_ptr<Robot>& i_robot) 
-  : MotorSpeedCalibration(i_joint, i_robot, BaseCalibration::Acceleration),
+  : MotorSpeedCalibration(i_joint, i_robot, BaseCalibration::AccelerationCalibration),
     m_acceleration(0.0) {
 }
 

@@ -10,7 +10,7 @@
 
 EndStopCalibration::EndStopCalibration(const std::shared_ptr<BaseJoint>& i_joint,
 				       const std::shared_ptr<Robot>& i_robot)
-  : BaseCalibration(i_joint, i_robot, EndStopPosition),
+  : BaseCalibration(i_joint, i_robot, BaseCalibration::EndStopCalibration),
     m_registrator(),
     m_hasRegistrator(false),
     m_doStepMovementCalibration(false),
@@ -131,7 +131,7 @@ bool EndStopCalibration::executePositionUpdateOnEndStop
 
 
 std::string EndStopCalibration::getJointMovementToEndStop
-(const std::shared_ptr<EndStop> i_endStop) const{
+(const std::shared_ptr<EndStop>& i_endStop) const{
   bool isLess = i_endStop->getPosition() < m_joint->getPosition();
   return getJointDirection(isLess);
 }

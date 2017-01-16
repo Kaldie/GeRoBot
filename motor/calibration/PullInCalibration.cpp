@@ -9,7 +9,7 @@
 
 PullInCalibration::PullInCalibration(const std::shared_ptr<BaseJoint>& i_joint,
 				     const std::shared_ptr<Robot>& i_robot) 
-  : MotorSpeedCalibration(i_joint, i_robot, BaseCalibration::PullIn),
+  : MotorSpeedCalibration(i_joint, i_robot, BaseCalibration::PullInCalibration),
     m_pullIn(0),
     m_pullInLength(10) {
 }

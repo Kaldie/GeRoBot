@@ -9,9 +9,9 @@ class Robot;
 // Class represents the base calibration unit, which defines the basic functionality
 class BaseCalibration {
  public:
-  enum Type {Base, PointPoisition,
-	     EndStopPosition, PullIn,
-	     Maximum, Acceleration};
+  enum Type {Base, PointCalibration,
+	     EndStopCalibration, PullInCalibration,
+	     MaximumCalibration, AccelerationCalibration};
   
   GETSETPROTECTED(bool, m_finished, Finished);
   GETSETPROTECTED(std::shared_ptr<BaseJoint>, m_joint, Joint);

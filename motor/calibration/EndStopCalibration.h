@@ -8,6 +8,7 @@ class Robot;
 class MovementRegistrator;
 class EndStop;
 
+
 class EndStopCalibration : public BaseCalibration {
   /// Registrator which looks at the movement of the robot between the end stops
   GETSET(std::shared_ptr<MovementRegistrator>, m_registrator, Registrator);
@@ -55,12 +56,10 @@ class EndStopCalibration : public BaseCalibration {
   
  private:
   EndStopCalibration();
-
   bool canDoMovementPerStepCalibration() const;
-
   bool executePositionUpdateOnEndStop(const std::shared_ptr<EndStop>& i_endStop);
   void executeMovementPerStep();
-  std::string getJointMovementToEndStop(const std::shared_ptr<EndStop> i_endStop) const;
+  std::string getJointMovementToEndStop(const std::shared_ptr<EndStop> & i_endStop) const;
   int estimateSteps(const std::shared_ptr<EndStop>& i_endStop) const;
   void createOutputForMovementPerStep(const std::vector<traceType>& i_movementPerStep);
 };

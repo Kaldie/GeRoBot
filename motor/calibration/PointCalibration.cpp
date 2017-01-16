@@ -13,7 +13,7 @@
 
 PointCalibration::PointCalibration(const std::shared_ptr<BaseJoint>& i_joint,
 				   const std::shared_ptr<Robot>& i_robot)
-  :  BaseCalibration(i_joint, i_robot, BaseCalibration::PointPoisition),
+  :  BaseCalibration(i_joint, i_robot, BaseCalibration::PointCalibration),
      m_registrator(std::make_shared<MovementRegistrator>()) {
   m_robot->registerMovementRegistrator(m_registrator);
 }
