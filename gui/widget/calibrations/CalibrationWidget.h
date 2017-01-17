@@ -8,13 +8,24 @@
 
 class BaseCalibration;
 
-class CalibrationWidget: public QWidget, private Ui::CalibrationWidget {
+class CalibrationWidget: public QWidget, protected Ui::CalibrationWidget {
   Q_OBJECT
+
  private:
-  GETSET(std::shared_ptr<BaseCalibration>, m_calibration, Calibration);
+  GETSETPROTECTED(std::shared_ptr<BaseCalibration>, m_calibration, Calibration);
+  void initialise();
+
+ private slots:
+  virtual void executeCalibration();
+  void skipCalibration();
+  void updateOutputText();
+
  public:
   CalibrationWidget(const std::shared_ptr<BaseCalibration>& i_calibration,
 		    QWidget* i_parent = 0);
+ signals:
+  void calibrationFinished(const bool&);
+  void updateCalibrationOutText();
 };
 
 #endif  // GUI_WIDGET_CALIBRATION_CALIBRATIONWIDGET_H_

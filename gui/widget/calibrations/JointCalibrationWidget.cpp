@@ -7,7 +7,7 @@
 #include <CalibrationDirector.h>
 #include "./CalibrationWidget.h"
 #include "./CalibrationWidgetFactory.h"
-
+#include "../../MainWindow.h"
 
 JointCalibrationWidget::JointCalibrationWidget(const std::shared_ptr<Robot>& i_robot,
                  QWidget* i_parent /*= 0*/) :
@@ -15,7 +15,6 @@ JointCalibrationWidget::JointCalibrationWidget(const std::shared_ptr<Robot>& i_r
   m_robot(i_robot),
   m_jointMap(),
   m_director(std::make_shared<CalibrationDirector>(i_robot)),
-  m_calibrationVector(),
   m_calibrationButtonGroup(this) {
   initialisation();
 }
@@ -29,8 +28,7 @@ void JointCalibrationWidget::initialisation() {
   initialiseJointMap();
   populateTypeListbox();
   populateNumberListbox();
-  populateButtonGroup();
-  updateNumberOfCalibrations();
+  activateButtonGroup();
 
   // connect the change signal to populate number list box 
   connect(typeComboBox,SIGNAL(currentIndexChanged(int)), this, SLOT(populateNumberListbox()));
@@ -49,11 +47,12 @@ void JointCalibrationWidget::initialisation() {
 }
 
 
-void JointCalibrationWidget::populateButtonGroup() {
+void JointCalibrationWidget::activateButtonGroup() {
   m_calibrationButtonGroup.addButton(endMovementCheckBox);
   m_calibrationButtonGroup.addButton(endPositionCheckBox);
   m_calibrationButtonGroup.addButton(motorCalibrationCheckBox);
   m_calibrationButtonGroup.addButton(pointCalibrationCheckBox);
+  updateCalibrationSelection();
 }
 
 
@@ -121,7 +120,7 @@ void JointCalibrationWidget::updateJointInforamtion() {
   } else if( joint->getMotor()->getType() == BaseMotor::StepperMotor) {
     actuatorTypeEdit->setText("StepperMotor");
   } else {
-    LOG_ERROR("Unknown type!");
+    emit hasMessage("Unknown motor type!!");
   }
   includeCheckBox->setChecked(m_jointMap[joint]);
 }
@@ -129,34 +128,48 @@ void JointCalibrationWidget::updateJointInforamtion() {
 
 void JointCalibrationWidget::toggleCalibration() {
   LOG_DEBUG("toggleCalibration");
-  
   if (startCalibrationButton->text().compare("Start") == 0) {
     startCalibrationButton->setText("Stop");
     enableSelection(false);
     addCalibrationWidget();
   } else if (startCalibrationButton->text().compare("Stop") == 0) {
+    clearCalibrations();
     startCalibrationButton->setText("Start");
     enableSelection(true);
-    //    clearCalibrationWidget();
   }
 }
 
 
 void JointCalibrationWidget::addCalibrationWidget() {
-  std::shared_ptr<BaseCalibration> calibration = m_director->next();
-  CalibrationWidgetFactory::getWidget(calibration, this);
-  calibrationWidget->layout()->addWidget(CalibrationWidgetFactory::getWidget(calibration, this));
-  
-    
+  clearCurrentCalibrations();
+  CalibrationWidget* widget = CalibrationWidgetFactory::getWidget(m_director->next(), this);
+  if (widget) {
+    connect(widget, &CalibrationWidget::calibrationFinished,
+	    this, &JointCalibrationWidget::addCalibrationWidget);
+    calibrationWidget->layout()->addWidget(widget);
+  } else {
+    emit hasMessage("Did not find a calibration!");
+  }
 }
 
 
 void JointCalibrationWidget::clearCalibrations() {
-
-
-  // clear the calibration vector
-  m_calibrationVector.clear();
   //TODO: magic()
+  // clear the director
+  LOG_DEBUG("clearCalibrations");
+  m_director->restart();
+  clearCurrentCalibrations();
+}
+
+
+void JointCalibrationWidget::clearCurrentCalibrations() {
+  QList<CalibrationWidget*> widgets = 
+    findChildren<CalibrationWidget*>();
+  for (const auto& aWidget : widgets) {
+    LOG_DEBUG("Found a calibration widget");
+    calibrationWidget->layout()->removeWidget(aWidget);
+    aWidget->deleteLater();
+  }
 }
 
 

@@ -12,6 +12,7 @@
 #include "./core/RobotTreeModel.h"
 #include "./core/RobotItem.h"
 #include "./core/BasePropertyItem.h"
+#include "./widget/ManualMovementWidget.h"
 #include "./widget/RobotMovementWidget.h"
 #include "./widget/Point2DWidget.h"
 #include "./widget/tracedesign/TraceDesignWidget.h"
@@ -46,16 +47,28 @@ void MainWindow::resizeColumnsToContents(const QModelIndex& /*modelIndex*/) {
 
 bool MainWindow::initialise() {
   // Make and set the Robot movement widget
+  ManualMovementWidget* manualMovementWidget =
+    new ManualMovementWidget(m_robotPointer,this);
+  movementTab->layout()->addWidget(manualMovementWidget);
+  // get the robot movement widget to connect the model::dataChanged with updateFromConfig
   RobotMovementWidget* robotMovementWidget =
-    new RobotMovementWidget(m_robotPointer, this);
-  movementTab->layout()->addWidget(robotMovementWidget);
+      manualMovementWidget->findChild<RobotMovementWidget*>();
+  if (robotMovementWidget == nullptr) {
+    LOG_ERROR("Bad");
+  }
+  connect(m_modelPointer.get(), &QAbstractItemModel::dataChanged,
+          robotMovementWidget, &RobotMovementWidget::updateFromConfiguration);
+
+
   // Create and add the joint calibration widget
-  JointCalibrationWidget* jointCalibrationWidget = 
+  JointCalibrationWidget* jointCalibrationWidget =
     new JointCalibrationWidget(m_robotPointer,this);
   calibrationTab->layout()->addWidget(jointCalibrationWidget);
+
   // Make and set the trace design widget
   TraceDesignWidget* traceDesignWidget = new TraceDesignWidget(m_robotPointer, this);
   traceDesignTab->layout()->addWidget(traceDesignWidget);
+
   // exit file action
   connect(exitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
   // Save robot action
@@ -75,12 +88,15 @@ bool MainWindow::initialise() {
           SIGNAL(expanded(const QModelIndex& /*modelIndex*/)),
           this,
           SLOT(resizeColumnsToContents(const QModelIndex& /*modelIndex*/)));
-  // on switch the tabes, update the positition widget
-  connect(m_modelPointer.get(), &QAbstractItemModel::dataChanged,
-          robotMovementWidget, &RobotMovementWidget::updateFromConfiguration);
-  connect(tabWidget, SIGNAL(currentChanged(int)),
-    robotMovementWidget, SLOT(updatePositionWidget()));
+
+  // connect the has message from the calibration widget to the update status bar
+  connect(jointCalibrationWidget, SIGNAL(hasMessage(const QString&)), this, SLOT(UpdateStatusBar(const QString&)));
   return true;
+}
+
+
+void MainWindow::UpdateStatusBar(const QString& i_message) {
+  statusbar->showMessage(i_message);
 }
 
 

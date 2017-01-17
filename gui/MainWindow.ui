@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>RobotGUI</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="RobotTreeModel.qrc">
+    <normaloff>:/icons/RobotArm.png</normaloff>:/icons/RobotArm.png</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout">
     <property name="spacing">
@@ -187,6 +191,8 @@
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="RobotTreeModel.qrc"/>
+ </resources>
  <connections/>
 </ui>

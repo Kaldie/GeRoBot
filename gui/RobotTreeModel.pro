@@ -4,7 +4,8 @@
    MainWindow.ui \
    widget/RobotMovementWidget.ui \
    widget/calibrations/JointCalibrationWidget.ui \
-   widget/calibrations/CalibrationWidget.ui
+   widget/calibrations/CalibrationWidget.ui \
+   widget/ManualMovementWidget.ui
 
  RESOURCES   = RobotTreeModel.qrc
 
@@ -24,6 +25,7 @@
     widget/Point2DWidget.h \
     widget/RobotMovementWidget.h \
     widget/RobotPositionWidget.h \
+    widget/ManualMovementWidget.h \
     widget/tracedesign/TraceGraphPoint.h \
     widget/tracedesign/TraceGraphItem.h \
     widget/tracedesign/RotationTraceGraphItem.h \
@@ -34,6 +36,7 @@
     widget/calibrations/CalibrationWidgetFactory.h \
     widget/calibrations/JointCalibrationWidget.h \
     widget/calibrations/CalibrationWidget.h \
+    widget/calibrations/EndStopCalibrationWidget.h \
     MainWindow.h
 
 
@@ -53,6 +56,7 @@
     widget/Point2DWidget.cpp \
     widget/RobotMovementWidget.cpp \
     widget/RobotPositionWidget.cpp \
+    widget/ManualMovementWidget.cpp \
     widget/tracedesign/TraceGraphPoint.cpp \
     widget/tracedesign/TraceGraphItem.cpp \
     widget/tracedesign/RotationTraceGraphItem.cpp \
@@ -63,6 +67,7 @@
     widget/calibrations/CalibrationWidget.cpp \
     widget/calibrations/CalibrationWidgetFactory.cpp \
     widget/calibrations/JointCalibrationWidget.cpp \
+    widget/calibrations/EndStopCalibrationWidget.cpp \
     MainWindow.cpp \
     main.cpp
 

@@ -10,6 +10,7 @@ class Robot;
 class BaseJoint;
 class CalibrationDirector;
 class BaseCalibration;
+class QString;
 
 class JointCalibrationWidget: public QWidget, private Ui::JointCalibrationWidget {
   Q_OBJECT
@@ -25,6 +26,8 @@ class JointCalibrationWidget: public QWidget, private Ui::JointCalibrationWidget
   // constructor
   JointCalibrationWidget(const std::shared_ptr<Robot>& i_robot,
 			 QWidget* i_parent = 0);
+ signals:
+  void hasMessage(const QString& i_message);
 
  private:
   // no default constructor
@@ -36,13 +39,20 @@ class JointCalibrationWidget: public QWidget, private Ui::JointCalibrationWidget
   // initialise all the connections etc.
   void initialisation();
 
+  // get the currently selected joint
   std::shared_ptr<BaseJoint> resolveJoint() const;
 
+  // create a joint map and set all jonits on active
   void initialiseJointMap();
-
-  void populateButtonGroup();
-
+  
+  // add the different calibration types to a button group and update the director
+  void activateButtonGroup();
+  
+  // enable the selection of different calibrations and new joints
   void enableSelection(const bool& i_enable);
+  
+  // clear the calibration widget currently displayed, but leave the director
+  void clearCurrentCalibrations();
 
  private slots:
   // populate the list box where the joint number is displayed
@@ -51,9 +61,11 @@ class JointCalibrationWidget: public QWidget, private Ui::JointCalibrationWidget
   // update the inforamtion of the joint displayed in the widget
   void updateJointInforamtion();
 
-  // remove all the calibration childeren
+  // remove all the calibration childeren and reset the director
   void clearCalibrations();
 
+  // update the gui to start/stop the calibrations, 
+  // remove attention seekers from the gui
   void toggleCalibration();
 
   // create calibration childer suitable for the selected widget

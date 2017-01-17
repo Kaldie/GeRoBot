@@ -49,7 +49,8 @@ bool BaseJoint::getJointStatus(const PinState& i_pinState,
   std::string motorDirection;
   getMotor()->getMotorStatus(i_pinState, &isEnabled, &motorDirection);
   for (const auto element : m_directionConversion) {
-    if (motorDirection == element.second) {
+    if (element.second.compare(motorDirection) == 0) {
+      LOG_DEBUG("Joint is moving: " << element.first);
       *i_direction = element.first;
       break;
     }

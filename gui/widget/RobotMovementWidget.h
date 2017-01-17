@@ -37,7 +37,6 @@ class RobotMovementWidget: public QWidget, private Ui::RobotMovementWidget {
 
   public slots:
       void updateFromConfiguration();
-      void updateFromNewPosition();
       void movementUp();
       void movementExtent();
       void movementDown();
@@ -50,7 +49,6 @@ class RobotMovementWidget: public QWidget, private Ui::RobotMovementWidget {
  private slots:
       void updateSimulateRadioButtons();
       void updateTextEdit();
-      void updatePositionWidget();
       void updateMovementType(bool i_isSet);
       void setSpeedOnSpeedController();
 

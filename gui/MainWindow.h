@@ -12,6 +12,7 @@
 
 class QAction;
 class QTreeView;
+class QString;
 
 class MainWindow: public QMainWindow, private Ui::mainWindow {
   Q_OBJECT
@@ -20,6 +21,9 @@ class MainWindow: public QMainWindow, private Ui::mainWindow {
  private:
   bool initialise();
   ComboBoxDelegate m_comboBoxDelegate;
+
+ private slots:
+   void UpdateStatusBar(const QString& i_message);
 
  public:
   MainWindow(const Robot::RobotPointer&, QWidget *parent = 0);

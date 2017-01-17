@@ -36,20 +36,13 @@ QGroupBox::title {
       <string>Select the wanted calibrations</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="5" column="1">
-       <widget class="QLabel" name="numberOfCalibrationLabel">
+      <item row="2" column="2">
+       <widget class="QCheckBox" name="motorCalibrationCheckBox">
         <property name="text">
-         <string>Current number of calibrations</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="2">
-       <widget class="QCheckBox" name="endPositionCheckBox">
-        <property name="text">
-         <string>End Stop Position Calibration</string>
+         <string>Motor Calibration</string>
         </property>
         <property name="checked">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
        </widget>
       </item>
@@ -63,13 +56,20 @@ QGroupBox::title {
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="QCheckBox" name="pointCalibrationCheckBox">
+      <item row="3" column="2">
+       <widget class="QCheckBox" name="endPositionCheckBox">
         <property name="text">
-         <string>Point Calibration</string>
+         <string>End Stop Position Calibration</string>
         </property>
         <property name="checked">
          <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QLabel" name="numberOfCalibrationLabel">
+        <property name="text">
+         <string>Current number of calibrations</string>
         </property>
        </widget>
       </item>
@@ -83,13 +83,13 @@ QGroupBox::title {
         </property>
        </widget>
       </item>
-      <item row="2" column="2">
-       <widget class="QCheckBox" name="motorCalibrationCheckBox">
+      <item row="2" column="1">
+       <widget class="QCheckBox" name="pointCalibrationCheckBox">
         <property name="text">
-         <string>Motor Calibration</string>
+         <string>Point Calibration</string>
         </property>
         <property name="checked">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
        </widget>
       </item>

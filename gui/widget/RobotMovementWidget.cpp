@@ -38,7 +38,8 @@ void RobotMovementWidget::initialise() {
   /* custom signal to indicate the position is change
      is linked to update position widget
   */
-  connect(this, SIGNAL(hasNewPosition()), this, SLOT(updatePositionWidget()));
+  connect(this,&RobotMovementWidget::hasNewPosition,
+      &RobotMovementWidget::updateFromConfiguration);
   connect(toolModeRadioButton, SIGNAL(toggled(bool)),
           this, SLOT(updateMovementType(bool)));
   connect(axisModeRadioButton, SIGNAL(toggled(bool)),
@@ -56,8 +57,6 @@ void RobotMovementWidget::initialise() {
   connect(moveDownButton, SIGNAL(clicked()), this, SLOT(movementRetract()));
   connect(moveDownButton, SIGNAL(clicked()), this, SLOT(movementDown()));
 
-  robotCanvas->layout()->addWidget(new RobotPositionWidget(m_robotPointer, this));
-
   connect(simulateRadioButton,SIGNAL(toggled(bool)),
           this, SLOT(updateSimulateRadioButtons()));
   connect(actuateRadioButton, SIGNAL(toggled(bool)),
@@ -66,7 +65,6 @@ void RobotMovementWidget::initialise() {
   connect(speedSlider, SIGNAL(sliderReleased()),
           this, SLOT(setSpeedOnSpeedController()));
 
-  updateFromNewPosition();
   updateMovementType(true);
   updateFromConfiguration();
 }
@@ -76,12 +74,6 @@ void RobotMovementWidget::updateFromConfiguration() {
   LOG_DEBUG("Update from configuration");
   updateSpeedSlider();
   updateSimulateRadioButtons();
-  updateTextEdit();
-}
-
-
-void RobotMovementWidget::updateFromNewPosition() {
-  updatePositionWidget();
   updateTextEdit();
 }
 
@@ -131,23 +123,12 @@ QString RobotMovementWidget::getRelativeStatusTip(RelativeSpeedController* i_con
   }
   return *stringStream.string();
 }
-     
+
 
 
 void RobotMovementWidget::setSpeedOnSpeedController() {
   m_robotPointer->getSpeedController()->setRobotSpeed(speedSlider->value());
   updateSpeedSlider();
-}
-
-
-void RobotMovementWidget::updatePositionWidget() {
-  RobotPositionWidget* widget = robotCanvas->
-    findChild<RobotPositionWidget*>();
-  if (widget) {
-    widget->update();
-  } else {
-    LOG_ERROR("Could not find item!");
-  }
 }
 
 

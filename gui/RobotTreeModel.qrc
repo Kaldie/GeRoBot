@@ -8,5 +8,7 @@
         <file>icons/StraightRight.png</file>
         <file>icons/StraightUp.png</file>
         <file>defaultTraceDesign.xml</file>
+        <file>icons/Ready.png</file>
+        <file>icons/RobotArm.png</file>
     </qresource>
 </RCC>
