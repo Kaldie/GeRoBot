@@ -35,6 +35,9 @@ class CalibrationDirector {
 
   std::shared_ptr<BaseCalibration> next();
 
+  /// Restart the calibrations, clean out the vector and reset the iterator
+  void restart();
+
   /// get all the calibrations for all the joints of the joint controller
   void getCalibrations(CalibrationVector* o_vector) const;
   

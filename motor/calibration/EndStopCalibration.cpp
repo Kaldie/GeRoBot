@@ -7,6 +7,9 @@
 #include <MovementRegistrator.h>
 #include <JointController.h>
 #include <CalibrationOutput.h>
+#include <thread>
+#include <chrono>
+
 
 EndStopCalibration::EndStopCalibration(const std::shared_ptr<BaseJoint>& i_joint,
 				       const std::shared_ptr<Robot>& i_robot)
@@ -36,8 +39,7 @@ bool EndStopCalibration::setDoStepMovementCalibration(const bool& i_value) {
   if (!i_value) {
     m_doStepMovementCalibration = i_value;
     return true;
-  }
-  
+  }  
   if (canDoMovementPerStepCalibration()) {
     m_doStepMovementCalibration = i_value;
     m_registrator = std::make_shared<MovementRegistrator>();
@@ -91,7 +93,8 @@ bool EndStopCalibration::executePositionUpdateOnEndStop
   // set steps until we hit the the end stop
   while (true) {
     // the steps will be the final rate of the estimate steps
-    steps *= m_finalStepRate;
+    distance = std::abs(i_endStop->getPosition() - m_joint->getPosition());
+    steps = m_finalStepRate * (distance / m_joint->getMovementPerStep());
     if (steps == 0) {
       steps = 1;
     }
@@ -99,31 +102,42 @@ bool EndStopCalibration::executePositionUpdateOnEndStop
     m_robot->prepareSteps(movement,steps);
     try {
       m_robot->actuate();
+      std::this_thread::sleep_for(std::chrono::milliseconds(1500));
     } catch (std::runtime_error error) {
-      if (strcmp(error.what(),"Endstop has been hit.") == 0) {
+      if (strstr(error.what(),"Endstop has been hit.") != NULL) {
+	LOG_DEBUG("Detected end stop hit!!!");
 	/// endstop has been hit
 	break;
+      } else {
+	LOG_DEBUG("'" << error.what() << "'");
+	throw;
       }
     }    
   }
   
-  // update the joint
+  // update the joint, among others it sets the correct position and frees the actuator
   std::shared_ptr<EndStop> endStop = m_robot->getJointController()->resolveEndStopHit();
+  LOG_DEBUG("End stop shared pointer is valid: " << static_cast<bool>(endStop));
   std::string output;
   bool result;
   if (endStop == i_endStop) {
+    LOG_DEBUG("Succesfull ended this!");
+    m_robot->setPosition(m_robot->getVirtualPosition());
     output.append("Updated joint position to: ");
     output.append(std::to_string(i_endStop->getPosition()));
     output.append(".\n Succesfully!\n");
     m_output->addAsChapter(output);
     result = true;
   } else {
+    LOG_DEBUG("UnSuccesfull ended this!");
     output.append("Not succesfully updated the joint position.\n")
       .append("Current position is: ")
       .append(std::to_string(m_joint->getPosition()))
       .append("./n Endpoint position is: ")
       .append(std::to_string(i_endStop->getPosition()));
+    LOG_DEBUG("add as chapter!");
     m_output->addAsChapter(output);
+    LOG_DEBUG("done add!");
     result = false;
   }
   return result;
@@ -139,8 +153,10 @@ std::string EndStopCalibration::getJointMovementToEndStop
 
 bool EndStopCalibration::isReady() const {
   bool isReady(m_joint->getEndStops().size() > 0);
+  LOG_DEBUG("Has enough end stops for position: " << isReady);
   if (m_doStepMovementCalibration) {
     isReady &= canDoMovementPerStepCalibration();
+    LOG_DEBUG("Has enough end stops for movement per step: " << isReady);
   }
   return isReady;
 }
@@ -165,10 +181,10 @@ void EndStopCalibration::createOutputForMovementPerStep
 (const std::vector<traceType>& i_movementPerStep) {
   std::string output("The movement per step is estimated by driving it from one end stop to the other\n");
   traceType average(0.0);
-  for (const int& movement : i_movementPerStep) {
+  for (const traceType& movement : i_movementPerStep) {
     output.append("Movement per step was calculated as: ")
       .append(std::to_string(movement))
-      .append(" mm/step./n");
+      .append(" mm/step.\n");
     average += movement;
   }
   average /= i_movementPerStep.size();

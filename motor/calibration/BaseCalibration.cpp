@@ -3,6 +3,8 @@
 #include <macroHeader.h>
 #include <BaseCalibration.h>
 #include <BaseJoint.h>
+#include <CalibrationOutput.h>
+
 
 BaseCalibration::BaseCalibration(const std::shared_ptr<BaseJoint>& i_joint,
 				 const std::shared_ptr<Robot>& i_robot,
@@ -10,7 +12,7 @@ BaseCalibration::BaseCalibration(const std::shared_ptr<BaseJoint>& i_joint,
   : m_finished(false),
     m_joint(i_joint),
     m_robot(i_robot),
-    m_output(),
+    m_output(std::make_shared<CalibrationOutput>()),
     m_type(i_type) {
 }
   

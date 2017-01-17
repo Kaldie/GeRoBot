@@ -30,7 +30,7 @@ std::shared_ptr<BaseCalibration> CalibrationDirector::next() {
     } else {
       getCalibrations(&m_calibrations);
     }
-    m_currentCalibration = m_calibrations.begin();
+    m_currentCalibration = m_calibrations.begin() - 1;
   }
   ++m_currentCalibration;
   if (m_currentCalibration == m_calibrations.end()) {
@@ -41,6 +41,11 @@ std::shared_ptr<BaseCalibration> CalibrationDirector::next() {
   }
 }
   
+
+void CalibrationDirector::restart() {
+  m_calibrations.clear();
+}
+
 
 void CalibrationDirector::getCalibrations(const std::shared_ptr<BaseJoint>& i_joint,
 					  CalibrationDirector::CalibrationVector* o_vector) const {

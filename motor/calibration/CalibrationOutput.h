@@ -7,7 +7,7 @@
 class CalibrationOutput {
   GETSET(bool, m_finished, Finished);
   GETSET(std::vector<std::string>, m_output, Output);
-  GETSET(int, m_numberOfChapters, NumberOfChapters);
+  GETSET(unsigned int, m_numberOfChapters, NumberOfChapters);
   
  public:
   CalibrationOutput();
@@ -16,9 +16,10 @@ class CalibrationOutput {
 
   /// add a string to an existing chapter
   void addToChapter(const std::string& i_string,
-		   const int& i_chapterNumber);
+		   const unsigned int& i_chapterNumber);
   
-  
+  std::string getChapter(const unsigned int& i_chapter);
+  std::vector<std::string> getAllChapters();
 };
 
 
