@@ -196,17 +196,20 @@ void JointController::uploadSequence(const bool& i_condense) {
 std::shared_ptr<EndStop> JointController::resolveEndStopHit() {
   int jointValue, endStopValue;
   m_actuator.resolveEndStopHit(&jointValue, &endStopValue);
+  LOG_DEBUG("Actuator resolved end stop");
+  LOG_DEBUG("Recieved joint value: " << jointValue);
+  LOG_DEBUG("Received end stop value: " << endStopValue);
   PinState jointPinState, stopPinState;
   std::tuple<int, int> pinRange(m_actuator.getJointPinRange());
   for (int i= std::get<0>(pinRange);
        i <= std::get<1>(pinRange); ++i) {
-    jointPinState.update(i, ((jointValue >> i) && 1));
+    jointPinState.update(i, (jointValue & (1<<i))>>i);
   }
   
   pinRange = m_actuator.getStopPinRange();
   for (int i = std::get<0>(pinRange);
        i <= std::get<1>(pinRange); ++i) {
-    stopPinState.update(i, ((endStopValue >> i) && 1));
+    stopPinState.update(i, (endStopValue & 1<<i)>>i);
   }
 
   std::string jointDirection;
