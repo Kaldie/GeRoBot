@@ -208,13 +208,21 @@ void StepperDriver::displayPinState() const {
 void StepperDriver::getMotorStatus(const PinState& i_pinState,
 				   bool* i_isEnabled,
 				   std::string* i_rotationDirection) const {
-  *i_isEnabled = (DEFAULT_STATE == i_pinState.getPinState(enablePin()));
+  *i_isEnabled = (DEFAULT_STATE != i_pinState.getPinState(enablePin()));
+  LOG_DEBUG("Numeric value of state is: " << i_pinState.getNumericValue());
+  LOG_DEBUG("Stepper is active?" << *i_isEnabled);
+  LOG_DEBUG("State of the direction pin is: " << i_pinState.getPinState(directionPin()));
   if (DEFAULT_STATE == i_pinState.getPinState(directionPin())) {
+    LOG_DEBUG("Resolved direction is default direction");
     *i_rotationDirection = getDefaultDirection();
   } else {
-    if (getDefaultDirection().compare("CCW")) {
+    LOG_DEBUG("Resolved direction is not default direction");
+    LOG_DEBUG("getDefaultDirection() is: " << getDefaultDirection());
+    if (getDefaultDirection().compare("CCW") == 0) {
+      LOG_DEBUG("Current rotation direction is thus: CW");
       *i_rotationDirection = "CW";
     } else {
+      LOG_DEBUG("Current rotation direction is thus: CCW");
       *i_rotationDirection = "CCW";
     }
   }
