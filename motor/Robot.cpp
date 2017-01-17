@@ -105,7 +105,8 @@ void Robot::prepareSteps(const std::string& i_direction,
 
 
 void Robot::actuate() {
-  LOG_DEBUG("Regular expression: " << m_jointController->getActuator().getSerialRegularExpresion());
+  LOG_DEBUG("Regular expression: " << 
+	    m_jointController->getActuator().getSerialRegularExpresion());
   notifyActuation();
   // upload the current sequence
   m_jointController->uploadSequence(false);
