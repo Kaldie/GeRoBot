@@ -10,7 +10,7 @@ const int ArduinoMotorDriver::DELETE_FILE_MODE_VALUE = 140;
 const int ArduinoMotorDriver::ECHO_MODE_VALUE = 149;
 const int ArduinoMotorDriver::ECHO_MODE_VERBOSE_VALUE = 150;
 const int ArduinoMotorDriver::HAND_SHAKE_VALUE = 200;
-
+const char* ArduinoMotorDriver::EndStopHasBeenHitMessage = "Endstop has been hit.";
 
 ArduinoMotorDriver::ArduinoMotorDriver()
   : ArduinoMotorDriver("") {
@@ -52,7 +52,7 @@ void ArduinoMotorDriver::resolveEndStopHit(int* o_jointPinValue,
   /// receive the handshake value from the arduino
   int receivedHandShake = m_arduinoConnection.serialRead(1);
   if (ArduinoMotorDriver::ENDSTOP_HIT_VALUE != receivedHandShake) {
-    LOG_ERROR("Endstop has not been hit.");
+    LOG_ERROR(ArduinoMotorDriver::EndStopHasBeenHitMessage);
   }
   m_arduinoConnection.serialWrite(ArduinoMotorDriver::ENDSTOP_HIT_VALUE);
   int value = m_arduinoConnection.serialRead(2);
@@ -319,6 +319,37 @@ void ArduinoMotorDriver::createRandomMessages
     i_totalMessagePointer->push_back(messageVector);
   }
 }
+
+
+bool ArduinoMotorDriver::sendsHandShake(const bool& i_blocks) {
+  m_arduinoConnection.flushConnection();
+  //set it at propperly blocking
+  m_arduinoConnection.setBlockThread(i_blocks);
+  int receivedHandShake;
+  /// receive the handshake value from the arduino
+  try {
+    receivedHandShake = m_arduinoConnection.serialRead(1);
+  } catch (std::runtime_error e) {
+    if (strstr(e.what(),"Failed to read out the bit")) {
+      LOG_DEBUG("Was not able to read out a serial bit!");
+      return false;
+    } else {
+      throw;
+    }
+  }
+
+  // handle hand shake value
+  if (ArduinoMotorDriver::ENDSTOP_HIT_VALUE == receivedHandShake) {
+    LOG_DEBUG("Endsop has been hit!");
+    return true;
+  } else if (ArduinoMotorDriver::HAND_SHAKE_VALUE == receivedHandShake) {
+    LOG_DEBUG("ArduinoMotorDriver is ready");
+    return true;
+  } else {
+    LOG_ERROR("Unknown hand shake value!");
+  }
+}
+
 
 
 bool ArduinoMotorDriver::benchmarkCurrentRobot(const SequenceVector& i_sequenceVector) {

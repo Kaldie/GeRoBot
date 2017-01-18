@@ -35,12 +35,14 @@ class ArduinoMotorDriver {
   static const int ECHO_MODE_VERBOSE_VALUE;
   static const int DELETE_FILE_MODE_VALUE;
 
+
   void initialiseArduinoConnection();
   bool handShake(DriverStatus i_status);
   void createRandomMessages(const int& i_numberOfMessages,
 			    std::vector< std::vector<int> > *i_totalVector);
 
  public:
+  static const char* EndStopHasBeenHitMessage;
   /// Upload the message to the arduino
   void upload(const std::vector<int> i_messageVector);
   /**
@@ -49,6 +51,8 @@ class ArduinoMotorDriver {
    */
   void resolveEndStopHit(int* o_jointValue,
 			 int* o_stopValue);
+  /// Determine if the motor is ready for more
+  bool sendsHandShake(const bool& i_blocks);
   /// Send an actuate command to the arduino
   void actuate();
   /// Send a test message to the arduino
