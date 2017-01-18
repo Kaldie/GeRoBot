@@ -67,7 +67,7 @@ bool ArduinoMotorDriver::handShake(ArduinoMotorDriver::DriverStatus i_status) {
   } else {
     m_arduinoConnection.flushConnection();
   }
-
+  LOG_DEBUG("Read handshake");
   /// receive the handshake value from the arduino
   int receivedHandShake = m_arduinoConnection.serialRead(1);
   LOG_DEBUG("Hand shake value: " << ArduinoMotorDriver::HAND_SHAKE_VALUE <<
