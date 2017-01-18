@@ -215,7 +215,7 @@ ISR(TIMER1_COMPA_vect) {
 // this interupt is activated when a end stop button is set or released
 ISR(PCINT1_vect) {
   // check if the end stop pin has the value indicating it has been pressed just recently
-  bool hasEndStoped = PINC && 1 << ENDSTOP_PIN;
+  bool hasEndStoped = PINC && (1 << ENDSTOP_PIN);
   if (hasEndStoped == ENDSTOP_VALUE) {
     // STOP THE PRESSES!!!!
     disableHeartBeat();
