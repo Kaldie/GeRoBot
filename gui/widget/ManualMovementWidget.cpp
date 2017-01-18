@@ -17,8 +17,8 @@ void ManualMovementWidget::initialise() {
   setupUi(this);
   RobotMovementWidget* robotMovementWidget = new RobotMovementWidget(m_robotPointer, this);
   RobotPositionWidget* robotPositionWidget = new RobotPositionWidget(m_robotPointer, this);
-  layout()->addWidget(robotMovementWidget);
   layout()->addWidget(robotPositionWidget);
+  layout()->addWidget(robotMovementWidget);
 
   connect(robotMovementWidget, SIGNAL(hasNewPosition()),
     robotPositionWidget, SLOT(update()));

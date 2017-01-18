@@ -73,7 +73,5 @@ void EndStopCalibrationWidget::executeCalibration() {
   m_calibration->execute();
   LOG_DEBUG("Done execute calibration");
   updateJointInfo();
-  
   emit updateCalibrationOutText();
-
 }
