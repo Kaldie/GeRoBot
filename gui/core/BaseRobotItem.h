@@ -53,7 +53,7 @@ class BaseRobotItem {
    *  Including making child elements
    */
   virtual bool construct() = 0;
-  virtual QVariant getPropertyData(int row,int column) const =0;
+  virtual QVariant getPropertyData(int row,int column) const = 0;
   virtual bool setPropertyData(int row,int column, const QVariant &value) =0;
 
   /**
@@ -61,7 +61,7 @@ class BaseRobotItem {
    * If an item can use it as a setter
    * make the next method return true
    */
-  virtual bool useComboBoxDelegate(const int& i_row) const {return false;};
+  virtual bool useComboBoxDelegate(const int& i_row) const;
 
   /**
    * Returns string which are called in order to populate the combo box
