@@ -691,6 +691,11 @@ void handleStatus() {
     CURRENT_READ_MESSAGE_ON_SD = 0;
     // the stepFile is still opened, close it
     stepFile.close();
+    // if this state was reached via end stop, the buffer can have elements stol
+    // which fucks up alot
+    while (!MOTOR_MESSAGE_BUFFER.isEmpty()) {
+      MOTOR_MESSAGE_BUFFER.finishReadPointer();
+    }
     // Reset the state machine
     ARDUINO_STATUS = SEND_HAND_SHAKE;
     break;
@@ -719,7 +724,7 @@ void handleStatus() {
     } else if (RETURN_STATE == FAIL) {
       ARDUINO_STATUS = ENDSTOP_PRESSED;
     }
-
+    
     if (ATTEMPTS >= 10000) {
       ATTEMPTS = 0;
       ARDUINO_STATUS = ENDSTOP_PRESSED;
