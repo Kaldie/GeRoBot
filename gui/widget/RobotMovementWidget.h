@@ -45,7 +45,8 @@ class RobotMovementWidget: public QWidget, private Ui::RobotMovementWidget {
       void movementCounterClockWise();
       void movementRight();
       void movementClockWise();
-
+      void hideMostFrames(const bool&);
+      
  private slots:
       void updateSimulateRadioButtons();
       void updateTextEdit();
