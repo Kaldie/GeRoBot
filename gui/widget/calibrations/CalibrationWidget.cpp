@@ -20,6 +20,8 @@ void CalibrationWidget::initialise() {
   connect(skipButton, SIGNAL(clicked()), this, SLOT(skipCalibration()));
   connect(this,&CalibrationWidget::updateCalibrationOutText,
           this,&CalibrationWidget::updateOutputText);
+  connect(applyButton, &QPushButton::clicked,
+	  this, &CalibrationWidget::applyCalibrationOutput);
 }
 
 void CalibrationWidget::executeCalibration() {
@@ -44,3 +46,18 @@ void CalibrationWidget::updateOutputText() {
   }
   outputEdit->setPlainText(output);
 }
+
+
+void CalibrationWidget::applyCalibrationOutput() {
+  LOG_DEBUG("applyCalibrationOutput");
+  m_calibration->apply();
+  emit calibrationFinished(true);
+}
+
+
+void CalibrationWidget::setEnabled(const bool& i_enable) {
+  executeButton->setEnabled(i_enable);
+  skipButton->setEnabled(i_enable);
+  applyButton->setEnabled(i_enable);
+}
+

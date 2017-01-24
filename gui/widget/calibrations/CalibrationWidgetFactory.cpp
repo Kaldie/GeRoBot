@@ -5,8 +5,7 @@
 #include "./CalibrationWidgetFactory.h"
 #include "./CalibrationWidget.h"
 #include "./EndStopCalibrationWidget.h" 
-
-typedef CalibrationWidget PointCalibrationWidget;
+#include "./PointCalibrationWidget.h"
 
 typedef CalibrationWidget PullInCalibrationWidgtet;
 typedef CalibrationWidget MaximumSpeedCalibrationWidget;

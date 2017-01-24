@@ -62,7 +62,10 @@ QGroupBox::title {
          <string>End Stop Position Calibration</string>
         </property>
         <property name="checked">
-         <bool>true</bool>
+         <bool>false</bool>
+        </property>
+        <property name="autoRepeat">
+         <bool>false</bool>
         </property>
        </widget>
       </item>
@@ -79,7 +82,10 @@ QGroupBox::title {
          <string>End Stop Movement per Step Calibration</string>
         </property>
         <property name="checked">
-         <bool>true</bool>
+         <bool>false</bool>
+        </property>
+        <property name="autoRepeat">
+         <bool>false</bool>
         </property>
        </widget>
       </item>
@@ -89,7 +95,7 @@ QGroupBox::title {
          <string>Point Calibration</string>
         </property>
         <property name="checked">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
       </item>
