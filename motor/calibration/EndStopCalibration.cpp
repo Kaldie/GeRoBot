@@ -4,12 +4,12 @@
 #include <EndStopCalibration.h>
 #include <Robot.h>
 #include <EndStop.h>
+#include <ArduinoMotorDriver.h>
 #include <MovementRegistrator.h>
 #include <JointController.h>
 #include <CalibrationOutput.h>
 #include <thread>
 #include <chrono>
-
 
 EndStopCalibration::EndStopCalibration(const std::shared_ptr<BaseJoint>& i_joint,
 				       const std::shared_ptr<Robot>& i_robot)
@@ -19,7 +19,8 @@ EndStopCalibration::EndStopCalibration(const std::shared_ptr<BaseJoint>& i_joint
     m_doStepMovementCalibration(false),
     m_movementPerStep(0.0),
     m_jointPosition(0.0),
-    m_finalStepRate(0.3) {
+    m_finalStepRate(0.3),
+    m_state(EndStopCalibration::Idle) {
 }
 
 
@@ -58,6 +59,7 @@ void EndStopCalibration::execute() {
   if (m_doStepMovementCalibration) {
     executeMovementPerStep();
   }
+  m_state = Finished;
 }
 
 
@@ -73,13 +75,18 @@ void EndStopCalibration::executeMovementPerStep() {
     }
     estimatedSteps.push_back(estimateSteps(*itr));
     executePositionUpdateOnEndStop(*itr);
-    setSteps.push_back(m_registrator->getLocalMap().at(m_joint));
+    try {
+    setSteps.push_back(m_registrator->getGlobalMap().at(m_joint));
+    } catch (std::runtime_error) {
+      LOG_DEBUG("Did not find steps here!");
+      throw;
+    }
   }
   
   for (auto estimatedItr = estimatedSteps.begin(),setItr = setSteps.begin();
        estimatedItr != estimatedSteps.end() && setItr != setSteps.end();
        ++estimatedItr, ++setItr) {
-    movementPerStep.push_back(*setItr / *estimatedItr * m_joint->getMovementPerStep());
+    movementPerStep.push_back(static_cast<traceType>(*setItr) / *estimatedItr * m_joint->getMovementPerStep());
   }
   createOutputForMovementPerStep(movementPerStep);
 }
@@ -87,6 +94,7 @@ void EndStopCalibration::executeMovementPerStep() {
 
 bool EndStopCalibration::executePositionUpdateOnEndStop
 (const std::shared_ptr<EndStop>& i_endStop) {
+  m_state = EndStopCalibration::Calculating;
   std::string movement(getJointMovementToEndStop(i_endStop));
   traceType distance = std::abs(i_endStop->getPosition() - m_joint->getPosition());
   int steps = distance / m_joint->getMovementPerStep();
@@ -99,17 +107,34 @@ bool EndStopCalibration::executePositionUpdateOnEndStop
       steps = 1;
     }
     // make the robot set steps
-    m_robot->prepareSteps(movement,steps);
     try {
+      m_robot->prepareSteps(movement,steps);
+    } catch (std::runtime_error e) {
+      if (strstr(e.what(), "Current Joint position is out of bounds")) {
+	LOG_DEBUG("Joint was at the joint boundy," <<
+		  "however thats currently not possible as "<<
+		  "we are waiting for the end stop. " <<
+		  "Setting the joint position in the middle of the range and still wait for the endstop");
+	m_joint->setPosition(std::accumulate(m_joint->getRange().begin(),
+					     m_joint->getRange().end(), 0.0) / 2);
+	continue;
+      } else {
+	throw;
+      }
+    }
+    try {
+      m_state = EndStopCalibration::Sending;
       m_robot->actuate();
-      std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+      m_state = EndStopCalibration::Moving;
+      while (!m_robot->getJointController()->getActuatorPointer()->sendsHandShake(false)) {
+	std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+      }
     } catch (std::runtime_error error) {
-      if (strstr(error.what(),"Endstop has been hit.") != NULL) {
+      if (strstr(error.what(),ArduinoMotorDriver::EndStopHasBeenHitMessage)) {
 	LOG_DEBUG("Detected end stop hit!!!");
 	/// endstop has been hit
 	break;
       } else {
-	LOG_DEBUG("'" << error.what() << "'");
 	throw;
       }
     }    
@@ -145,7 +170,7 @@ bool EndStopCalibration::executePositionUpdateOnEndStop
 
 
 std::string EndStopCalibration::getJointMovementToEndStop
-(const std::shared_ptr<EndStop>& i_endStop) const{
+(const std::shared_ptr<EndStop>& i_endStop) const {
   bool isLess = i_endStop->getPosition() < m_joint->getPosition();
   return getJointDirection(isLess);
 }
