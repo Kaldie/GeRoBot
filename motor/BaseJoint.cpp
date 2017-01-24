@@ -58,6 +58,7 @@ bool BaseJoint::getJointStatus(const PinState& i_pinState,
   return isEnabled;
 }
 
+
 const std::shared_ptr<EndStop> BaseJoint::getEndStop(const PinState& i_pinState,
 			       const std::string& i_direction) const {
   std::shared_ptr<EndStop> endStopPointer;

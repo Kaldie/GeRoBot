@@ -41,6 +41,7 @@ class Robot {
 
   // notify the movement registrators actuation has been done
   void notifyActuation() const;
+
  public:
   typedef std::shared_ptr<Robot> RobotPointer;
 
