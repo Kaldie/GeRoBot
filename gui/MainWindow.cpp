@@ -168,4 +168,5 @@ bool MainWindow::clearTraceDesign() {
 
 bool MainWindow::actuateRobot() {
   m_robotPointer->actuate();
+  return true;
 }

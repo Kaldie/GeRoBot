@@ -10,5 +10,8 @@
         <file>defaultTraceDesign.xml</file>
         <file>icons/Ready.png</file>
         <file>icons/RobotArm.png</file>
+        <file>icons/green_circle.png</file>
+        <file>icons/orange_circle.png</file>
+        <file>icons/red_circle.png</file>
     </qresource>
 </RCC>
