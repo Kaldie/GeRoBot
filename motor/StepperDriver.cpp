@@ -120,9 +120,7 @@ void StepperDriver::moveSteps(
   // set the motor
   setHoldMotor(true);
 
-  for (int i = 0;
-       i< i_numberOfSteps;
-       ++i) {
+  for (int i = 0; i< i_numberOfSteps; ++i) {
     LOG_DEBUG("Setting step: " << i);
     StateSequence stateSequence;
     moveStep(i_direction, &stateSequence);
