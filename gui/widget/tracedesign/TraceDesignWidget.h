@@ -25,7 +25,7 @@ class TraceDesignWidget: public QWidget, private Ui::TraceDesignWidget {
   GETSET(std::shared_ptr<RobotLocator>, m_robotLocator, RobotLocator);
   GETSET(std::shared_ptr<QTimer>, m_timer, Timer);
   GETSET(std::shared_ptr<SequentialTraceCalculator>, m_calculator, Calculator);
-
+  GETSET(bool, m_startAtPrevious, StartAtPrevious);
  public:
     /// Constructor
   explicit TraceDesignWidget(const std::shared_ptr<Robot>& i_robot = nullptr,
@@ -64,6 +64,12 @@ class TraceDesignWidget: public QWidget, private Ui::TraceDesignWidget {
      * Given the a pointer, change the direction of the trace.
      */
     void reverse(Trace::TracePointer i_pointer);
+
+
+    /**
+     * Update the start at previous setting of this widget
+     */
+    void updateStartAtPrevious(const bool&);
     
  private:
 
@@ -110,7 +116,6 @@ class TraceDesignWidget: public QWidget, private Ui::TraceDesignWidget {
    * update the robot locator
    */
    void updateRobotLocator();
-
 };
 
 #endif  // GUI_TRACEDESIGNWIDGET_H_
