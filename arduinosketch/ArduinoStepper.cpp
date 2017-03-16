@@ -521,9 +521,9 @@ void handleStatus() {
     break;
   }
   case RECEIVING_REPITITIONS: {
-    readIntegerFromSerial(
-                          MOTOR_MESSAGE_BUFFER.getWritePointer()->numberOfRepetitions,
-                          &RETURN_STATE);
+    readIntegerFromSerial
+      (MOTOR_MESSAGE_BUFFER.getWritePointer()->numberOfRepetitions,
+       &RETURN_STATE);
     if (RETURN_STATE == SUCCES) {
       MOTOR_MESSAGE_BUFFER.getWritePointer()->currentCRC +=
         MOTOR_MESSAGE_BUFFER.getWritePointer()->numberOfRepetitions;
@@ -659,7 +659,7 @@ void handleStatus() {
 
   case ACTUATE_MODE : {
     if (MOTOR_MESSAGE_BUFFER.emptyElements() >= 15) {
-      bool hasFoundMessageOnSD = readMotorMessagesFromSD();
+      bool hasFoundMessageOnSD(readMotorMessagesFromSD());
       /*
         if there are now new message read from SD
         and the motor is not running
@@ -684,7 +684,6 @@ void handleStatus() {
     }
     break;
   }
-
   case ACTUATE_POST_MODE : {
     // "Reset" the SD card
     CURRENT_WRITE_MESSAGE_ON_SD = 0;
@@ -700,7 +699,6 @@ void handleStatus() {
     ARDUINO_STATUS = SEND_HAND_SHAKE;
     break;
   }
-
   case ENDSTOP_PRESSED: {
     sendEndStopHit(&RETURN_STATE);
     if (RETURN_STATE == SUCCES) {
@@ -710,7 +708,6 @@ void handleStatus() {
     }
     break;
   }
-
   case VERIFY_ENDSTOP_RESPONSE: {
     verifyResponse(ENDSTOP_MODE_VALUE, &RETURN_STATE);
     if (RETURN_STATE == SUCCES) {
@@ -731,8 +728,7 @@ void handleStatus() {
     }
     ATTEMPTS++;
     break;
-  }
-	
+  }	
   default: {
     break;
   }
