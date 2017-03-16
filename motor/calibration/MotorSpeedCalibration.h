@@ -20,6 +20,12 @@ class MotorSpeedCalibration : public BaseCalibration {
 
   /// Previous speed controller
   GET(std::shared_ptr<SpeedController>, m_prevController, PrevController);
+
+  /// hasSucceded
+  GETSETPROTECTED(bool, m_hasSucceded, HasSucceded);
+
+  /// Vector with the numbers that will be tested
+  GETSETPROTECTED(std::vector<int>, m_testVector, TestVector);
  public:
   /// constructor
   MotorSpeedCalibration(const std::shared_ptr<BaseJoint>& i_joint,
@@ -32,6 +38,10 @@ class MotorSpeedCalibration : public BaseCalibration {
   /// indicate if execution is possible -> all requirements are met
   virtual bool isReady() const override;
 
+  /// return the value from the calibration
+  virtual int getCalibratedParameter() = 0 ;
+
+  virtual void createOutput();
 
  private:
   /// return the direction for which the joint should move
@@ -49,9 +59,7 @@ class MotorSpeedCalibration : public BaseCalibration {
    bool testSpeed(const std::vector<int>& i_speedVector,	
 	  const int& i_stepsPerSpeed);
 
-   void prepareParameterVector(std::vector<int>::const_iterator* o_begin,
-			       std::vector<int>::const_iterator* o_end,
-			       const int&(StepperDriver::*)()const);
+   void prepareParameterVector(const int&(StepperDriver::*)()const);
 };
 
 #endif  // MOTOR_CALIBRATION_MOTORSPEEDCALIBRATION_H_

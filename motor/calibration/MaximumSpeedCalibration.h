@@ -20,6 +20,8 @@ class MaximumSpeedCalibration : public MotorSpeedCalibration {
   virtual void apply() override;
 
   virtual std::string name() const override {return "Maximum Speed Callibration";};
+  virtual int getCalibratedParameter() override {return m_maximumSpeed;}; 
+  virtual void createOutput() override;
 };
 
 

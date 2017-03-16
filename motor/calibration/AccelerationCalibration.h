@@ -8,7 +8,7 @@ class BaseJoint;
 class Robot;
 
 class AccelerationCalibration : public MotorSpeedCalibration {
-  GETSET(traceType, m_acceleration, Acceleration);
+  GETSET(int, m_acceleration, Acceleration);
 
  public:
   AccelerationCalibration(const std::shared_ptr<BaseJoint>& i_joint,
@@ -20,6 +20,9 @@ class AccelerationCalibration : public MotorSpeedCalibration {
 
   virtual std::string name() const override {return "Acceleration Callibration";};
 
+  virtual int getCalibratedParameter() override {return m_acceleration;};
+
+  virtual void createOutput() override;
 };
 
 #endif  // MOTOR_CALIBRATION_ACCELERATIONCALIBRATION_H_
