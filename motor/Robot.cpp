@@ -44,12 +44,22 @@ void Robot::setSpeedController(const std::shared_ptr<SpeedController>& i_speedCo
 
 
 bool Robot::hasValidConnection() {
-  if (m_jointController) {
-    return m_jointController->getActuatorPointer()->hasConnection(true);
+  if (!m_jointController) {
+    return false;
   }
-  return false;
+  try {
+    return m_jointController->getActuatorPointer()->hasConnection(true);
+  }catch (std::runtime_error error) {
+    if (strstr(error.what(), "Could not find any devices using: ") != nullptr) {
+      LOG_DEBUG("Strstr said: " << strstr(error.what(), "Could not find any devices using: "));
+      return false;
+    } else {
+      LOG_DEBUG("Going in the re-trow thingy");
+      LOG_DEBUG("strstr said: " << strstr(error.what(), "Could not find any devices using: "));
+      throw;
+    }
+  }
 }
-
 
 traceType Robot::getMovementPerStep(const BaseJoint::MovementType& i_movementType) const {
   return m_jointController->resolveJoint(i_movementType)->getMovementPerStep();

@@ -78,6 +78,7 @@ class Robot {
 
   // Remove a movement registrator
   bool deregisterMovementRegistrator(std::shared_ptr<MovementRegistrator> i_registrator);
+
   /**
    * prepares to take steps with the given movement type, direction and number
    * This function pepares the joint controller to take steps when actuate is called
