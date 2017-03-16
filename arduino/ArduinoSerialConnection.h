@@ -25,7 +25,6 @@ class ArduinoSerialConnection {
   bool hasConnection() const;
 
   int serialRead(const int& i_numberOfBytes);
-  //  std::string serialRead(const int& i_numberOfBytes);
   std::string serialReadString();
   void serialWrite(std::string);
   void serialWrite(const int&);
