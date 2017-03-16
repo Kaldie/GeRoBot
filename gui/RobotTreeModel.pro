@@ -38,6 +38,7 @@
     widget/calibrations/CalibrationWidget.h \
     widget/calibrations/EndStopCalibrationWidget.h \
     widget/calibrations/PointCalibrationWidget.h \
+    widget/calibrations/MotorSpeedCalibrationWidget.h \
     MainWindow.h
 
 
@@ -70,10 +71,10 @@
     widget/calibrations/JointCalibrationWidget.cpp \
     widget/calibrations/EndStopCalibrationWidget.cpp \
     widget/calibrations/PointCalibrationWidget.cpp \
+    widget/calibrations/MotorSpeedCalibrationWidget.cpp \
     MainWindow.cpp \
     main.cpp
 
-    
  CONFIG  += qt
  CONFIG += c++11
 
