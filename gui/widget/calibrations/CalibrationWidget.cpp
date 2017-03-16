@@ -1,6 +1,7 @@
 // Copyright Ruud Cools [2017]
 #include <macroHeader.h>
 #include <BaseCalibration.h>
+#include <BaseJoint.h>
 #include "./CalibrationWidget.h"
 #include <CalibrationOutput.h>
 
@@ -14,7 +15,14 @@ CalibrationWidget::CalibrationWidget(const std::shared_ptr<BaseCalibration>& i_c
 
 
 void CalibrationWidget::initialise() {
-  nameLabel->setText(QString::fromStdString(m_calibration->name()));
+  std::string jointName;
+  if (m_calibration->getJoint()->getMovementType() == BaseJoint::Rotational) {
+    jointName = "Rotational";
+  } else if ( m_calibration->getJoint()->getMovementType() == BaseJoint::Translational)  {
+    jointName = "Translational";
+  }
+  nameLabel->setText(QString("%1 for %2 joint").arg(QString::fromStdString(m_calibration->name()),
+						    QString::fromStdString(jointName)));
   isReadyBox->setChecked(m_calibration->isReady());
   connect(executeButton, SIGNAL(clicked()), this, SLOT(executeCalibration()));
   connect(skipButton, SIGNAL(clicked()), this, SLOT(skipCalibration()));
