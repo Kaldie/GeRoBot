@@ -5,12 +5,13 @@
 #include "./CalibrationWidgetFactory.h"
 #include "./CalibrationWidget.h"
 #include "./EndStopCalibrationWidget.h" 
+#include "./PointCalibrationWidget.h"
+#include "./MotorSpeedCalibrationWidget.h"
 
-typedef CalibrationWidget PointCalibrationWidget;
 
-typedef CalibrationWidget PullInCalibrationWidgtet;
-typedef CalibrationWidget MaximumSpeedCalibrationWidget;
-typedef CalibrationWidget AccelerationCalibrationWidget;
+typedef MotorSpeedCalibrationWidget MaximumSpeedCalibrationWidget;
+typedef MotorSpeedCalibrationWidget AccelerationCalibrationWidget;
+typedef MotorSpeedCalibrationWidget PullInCalibrationWidgtet;
 
 CalibrationWidget* CalibrationWidgetFactory::getWidget
 (const std::shared_ptr<BaseCalibration>& i_calibration,

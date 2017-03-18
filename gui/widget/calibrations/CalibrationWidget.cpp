@@ -1,6 +1,7 @@
 // Copyright Ruud Cools [2017]
 #include <macroHeader.h>
 #include <BaseCalibration.h>
+#include <BaseJoint.h>
 #include "./CalibrationWidget.h"
 #include <CalibrationOutput.h>
 
@@ -14,12 +15,21 @@ CalibrationWidget::CalibrationWidget(const std::shared_ptr<BaseCalibration>& i_c
 
 
 void CalibrationWidget::initialise() {
-  nameLabel->setText(QString::fromStdString(m_calibration->name()));
+  std::string jointName;
+  if (m_calibration->getJoint()->getMovementType() == BaseJoint::Rotational) {
+    jointName = "Rotational";
+  } else if ( m_calibration->getJoint()->getMovementType() == BaseJoint::Translational)  {
+    jointName = "Translational";
+  }
+  nameLabel->setText(QString("%1 for %2 joint").arg(QString::fromStdString(m_calibration->name()),
+						    QString::fromStdString(jointName)));
   isReadyBox->setChecked(m_calibration->isReady());
   connect(executeButton, SIGNAL(clicked()), this, SLOT(executeCalibration()));
   connect(skipButton, SIGNAL(clicked()), this, SLOT(skipCalibration()));
   connect(this,&CalibrationWidget::updateCalibrationOutText,
           this,&CalibrationWidget::updateOutputText);
+  connect(applyButton, &QPushButton::clicked,
+	  this, &CalibrationWidget::applyCalibrationOutput);
 }
 
 void CalibrationWidget::executeCalibration() {
@@ -44,3 +54,18 @@ void CalibrationWidget::updateOutputText() {
   }
   outputEdit->setPlainText(output);
 }
+
+
+void CalibrationWidget::applyCalibrationOutput() {
+  LOG_DEBUG("applyCalibrationOutput");
+  m_calibration->apply();
+  emit calibrationFinished(true);
+}
+
+
+void CalibrationWidget::setEnabled(const bool& i_enable) {
+  executeButton->setEnabled(i_enable);
+  skipButton->setEnabled(i_enable);
+  applyButton->setEnabled(i_enable);
+}
+

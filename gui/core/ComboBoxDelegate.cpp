@@ -67,6 +67,6 @@ bool ComboBoxDelegate::useDelegate(const QModelIndex& i_index) const {
   if (item) {
   return getItem(i_index)->useComboBoxDelegate(i_index.row());
   } else {
-    false;
+    return false;
   }
 }

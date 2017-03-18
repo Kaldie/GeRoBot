@@ -30,7 +30,7 @@ void PointCalibration::execute() {
   }
   traceType currentStepSize = m_joint->getMovementPerStep();
   for (unsigned int i = 0;
-       i <= m_stepsBetweenPoints.size();
+       i < m_stepsBetweenPoints.size();
        i++) {
     m_stepSizes.push_back
       (currentStepSize * (m_priorEstimateSteps[i]/ m_stepsBetweenPoints[i]));
@@ -68,6 +68,34 @@ void PointCalibration::addPoint2D(const Point2D& i_point) {
   if (m_priorEstimateSteps.size() < m_points.size() - 1) {
     m_priorEstimateSteps.push_back(0);
   }
+}
+
+
+bool PointCalibration::removePoint2D(const Point2D& i_point) {
+  auto iterator = std::find(m_points.begin(), m_points.end(), i_point);
+  if (iterator == m_points.end()) {
+    LOG_DEBUG("Could not find the point that needs to be removed.");
+    return false;
+  }
+  int distance = std::distance(m_points.begin(), iterator) -1;
+  if (distance >= (int)m_priorEstimateSteps.size()) {
+    LOG_DEBUG("Could not find the estimated step of the point");
+    return false;
+  }
+  if (distance >= (int)m_stepsBetweenPoints.size()) {
+    LOG_DEBUG("Could not find the steps between points for this point");
+    return false;
+  }
+  
+  m_points.erase(iterator);
+  // Want to delete the 
+  if (distance == -1) {
+    LOG_DEBUG("Want to delete the first point! No need to delete the other stuff!");
+    return true;
+  }
+  m_priorEstimateSteps.erase(m_priorEstimateSteps.begin() + distance);
+  m_stepsBetweenPoints.erase(m_stepsBetweenPoints.begin() + distance);
+  return true;  
 }
 
 
@@ -133,17 +161,14 @@ PointCalibration::JointMap PointCalibration::estimateErrorOtherJoints(const Poin
     positionMap[joint] = joint->getPosition();
   }
 
-  Point2D currentRobotPosition = m_robot->getPosition();
   m_robot->setPosition(i_point);
   JointMap errorMap;
   for (auto& joint : noneCalibratedJoints) {
     errorMap[joint] = positionMap[joint] - joint->getPosition();
   }
-  m_robot->setPosition(currentRobotPosition);
+  
   for (auto& joint : noneCalibratedJoints) {
-    if (joint->getPosition() != positionMap[joint]) {
-      LOG_ERROR("Joint position has unexpectely changed!");
-    }
+    joint->setPosition(positionMap[joint]);
   }
   return errorMap; 
 }

@@ -26,7 +26,8 @@ TraceDesignWidget::TraceDesignWidget(const Robot::RobotPointer& i_robot /*=0*/,
       m_traceGraphView(nullptr),
       m_robotLocator(std::make_shared<RobotLocator>(i_robot)),
       m_timer(std::make_shared<QTimer>()),
-      m_calculator(nullptr) {
+      m_calculator(nullptr),
+      m_startAtPrevious(false) {
     initialise();
 }
 
@@ -69,7 +70,6 @@ void TraceDesignWidget::initialise() {
   connect(addLineButton,SIGNAL(clicked()),
           this, SLOT(addTraceFromButton()));
   connect(calculateButton, SIGNAL(clicked()), this, SLOT(calculateTraces()));
-  
 }
 
 
@@ -115,15 +115,28 @@ int TraceDesignWidget::getIndex(const Trace::TracePointer& i_pointer) const {
 
 void TraceDesignWidget::addTraceFromButton() {
   Trace::TracePointer newTrace;
-
+  Point2D pointArray[] = {Point2D(0,0),
+			  Point2D(30,0),
+			  Point2D(15,0)};
+  TraceGraphItem* item = m_traceGraphView->getSelectedTraceGraphItem();
+  if (m_startAtPrevious && item) {
+    Trace::TracePointer trace(item->getTracePointer().lock());
+    if (trace) {
+      Point2D endPoint = trace->getEndPoint();
+      for (uint i = 0; i < 3; ++i) {
+	pointArray[i] += endPoint;
+      }
+    }
+  }
+    
   // use sender to check which button was pressed
   if (sender() == addLineButton) {
-    newTrace = std::make_shared<Trace>(Point2D(0,0),
-                                       Point2D(10,10));
+    newTrace = std::make_shared<Trace>(pointArray[0],
+				       pointArray[1]);
   } else if (sender() == addCurveButton) {
-    newTrace = std::make_shared<RotationTrace>(Point2D(-10,0),
-                                               Point2D(10,0),
-                                               Point2D(0,0), true);
+    newTrace = std::make_shared<RotationTrace>(pointArray[0],
+					       pointArray[1],
+					       pointArray[2], true);
   } else {
     LOG_DEBUG("Sender did not return a known button!");
   }
@@ -313,4 +326,10 @@ void TraceDesignWidget::updateRobotLocator() {
       calculateButton->setEnabled(true);
     }
   }
+}
+
+
+void TraceDesignWidget::updateStartAtPrevious(const bool& i_startAtPrevious) {
+  LOG_DEBUG("updateStartAtPrevious");
+  m_startAtPrevious = i_startAtPrevious;
 }

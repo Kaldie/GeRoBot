@@ -33,16 +33,19 @@ class PointCalibration : public BaseCalibration {
 
   /// add a point that will be used in the calibration.
   void addPoint2D(const Point2D& i_point);
+  /// remove a point that would have been used in the calibraiton
+  bool removePoint2D(const Point2D& i_point);
 
   virtual std::string name() const override {return "Point Calibration";};
 
  private:
   typedef std::map<std::shared_ptr<BaseJoint>, traceType,
     std::owner_less<std::shared_ptr<BaseJoint>>> JointMap;
-
+  
   PointCalibration();
   void recordPoint(const Point2D& i_point,
 		   const int& i_stepsSet);
+
   void createOutput();
   
   void addOtherJointErrorToOutput(const JointMap& i_map,

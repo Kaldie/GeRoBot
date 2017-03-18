@@ -46,6 +46,17 @@ bool BaseRobotItem::useComboBoxDelegate(const int& i_row) const {
   return false;
 }
 
+
+std::vector<std::string> BaseRobotItem::getComboBoxElements(const int& i_row) const {
+  return std::vector<std::string>();
+}
+
+
+
+void BaseRobotItem::setElement(const int& i_row, const int& i_selectedItem) {
+}
+
+
 QVariant BaseRobotItem::data(int row, int column) const{
   if(!m_parentItem){
     //if I'm root, I don't hold any data

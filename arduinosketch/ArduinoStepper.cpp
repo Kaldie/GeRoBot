@@ -521,9 +521,9 @@ void handleStatus() {
     break;
   }
   case RECEIVING_REPITITIONS: {
-    readIntegerFromSerial(
-                          MOTOR_MESSAGE_BUFFER.getWritePointer()->numberOfRepetitions,
-                          &RETURN_STATE);
+    readIntegerFromSerial
+      (MOTOR_MESSAGE_BUFFER.getWritePointer()->numberOfRepetitions,
+       &RETURN_STATE);
     if (RETURN_STATE == SUCCES) {
       MOTOR_MESSAGE_BUFFER.getWritePointer()->currentCRC +=
         MOTOR_MESSAGE_BUFFER.getWritePointer()->numberOfRepetitions;
@@ -659,7 +659,7 @@ void handleStatus() {
 
   case ACTUATE_MODE : {
     if (MOTOR_MESSAGE_BUFFER.emptyElements() >= 15) {
-      bool hasFoundMessageOnSD = readMotorMessagesFromSD();
+      bool hasFoundMessageOnSD(readMotorMessagesFromSD());
       /*
         if there are now new message read from SD
         and the motor is not running
@@ -684,18 +684,21 @@ void handleStatus() {
     }
     break;
   }
-
   case ACTUATE_POST_MODE : {
     // "Reset" the SD card
     CURRENT_WRITE_MESSAGE_ON_SD = 0;
     CURRENT_READ_MESSAGE_ON_SD = 0;
     // the stepFile is still opened, close it
     stepFile.close();
+    // if this state was reached via end stop, the buffer can have elements stol
+    // which fucks up alot
+    while (!MOTOR_MESSAGE_BUFFER.isEmpty()) {
+      MOTOR_MESSAGE_BUFFER.finishReadPointer();
+    }
     // Reset the state machine
     ARDUINO_STATUS = SEND_HAND_SHAKE;
     break;
   }
-
   case ENDSTOP_PRESSED: {
     sendEndStopHit(&RETURN_STATE);
     if (RETURN_STATE == SUCCES) {
@@ -705,7 +708,6 @@ void handleStatus() {
     }
     break;
   }
-
   case VERIFY_ENDSTOP_RESPONSE: {
     verifyResponse(ENDSTOP_MODE_VALUE, &RETURN_STATE);
     if (RETURN_STATE == SUCCES) {
@@ -719,15 +721,14 @@ void handleStatus() {
     } else if (RETURN_STATE == FAIL) {
       ARDUINO_STATUS = ENDSTOP_PRESSED;
     }
-
+    
     if (ATTEMPTS >= 10000) {
       ATTEMPTS = 0;
       ARDUINO_STATUS = ENDSTOP_PRESSED;
     }
     ATTEMPTS++;
     break;
-  }
-	
+  }	
   default: {
     break;
   }

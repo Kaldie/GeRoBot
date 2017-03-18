@@ -14,12 +14,8 @@ class ByteBuffer {
   int m_itemCount;
   void incrementPosition(T*& i_position);
 
-
-
  public:
   ByteBuffer();
-  // Deconstructor
-  ~ByteBuffer();
   /// Get the element that is currently available to be read
   T* getReadPointer();
   /// Let the buffer known that the current read element is ready to be re-written
@@ -62,11 +58,6 @@ template<typename T, int N>
   m_itemCount = 0;
 }
 
-// Deconstructor
-template<typename T, int N>
-ByteBuffer<T, N>::~ByteBuffer() {
-    free(m_buffer);
-}
 
 template<typename T, int N>
 void ByteBuffer<T, N>::incrementPosition(T*& i_position) {

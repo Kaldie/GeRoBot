@@ -19,7 +19,11 @@ class CalibrationWidget: public QWidget, protected Ui::CalibrationWidget {
   virtual void executeCalibration();
   void skipCalibration();
   void updateOutputText();
+  void applyCalibrationOutput();
 
+ protected slots:
+  void setEnabled(const bool&);
+  
  public:
   CalibrationWidget(const std::shared_ptr<BaseCalibration>& i_calibration,
 		    QWidget* i_parent = 0);

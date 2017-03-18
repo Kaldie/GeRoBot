@@ -39,7 +39,7 @@ void RobotMovementWidget::initialise() {
      is linked to update position widget
   */
   connect(this,&RobotMovementWidget::hasNewPosition,
-      &RobotMovementWidget::updateFromConfiguration);
+	  &RobotMovementWidget::updateFromConfiguration);
   connect(toolModeRadioButton, SIGNAL(toggled(bool)),
           this, SLOT(updateMovementType(bool)));
   connect(axisModeRadioButton, SIGNAL(toggled(bool)),
@@ -315,4 +315,26 @@ void RobotMovementWidget::movementToolMode(const BaseJoint::MovementType& i_type
     m_robotPointer->setPosition(m_robotPointer->getVirtualPosition());
   }
   emit hasNewPosition();
+}
+
+
+void RobotMovementWidget::hideMostFrames(const bool& i_hide) {
+  if (i_hide) {
+    // we need to show a couple of things in the position display frame for normal use
+    // speed and step size.....
+    angleLabel->setVisible(!i_hide);\
+    angleLineEdit->setVisible(!i_hide);
+    extensionLabel->setVisible(!i_hide);
+    extensionLineEdit->setVisible(!i_hide);
+    xPositionLabel->setVisible(!i_hide);
+    xPositionLineEdit->setVisible(!i_hide);
+    yPositionLabel->setVisible(!i_hide);
+    yPositionLineEdit->setVisible(!i_hide);    
+    ModeFrame->hide();
+    SimulationFrame->hide();
+  } else {
+    PostionDisplayFrame->show();
+    ModeFrame->show();
+    SimulationFrame->show();
+  }
 }

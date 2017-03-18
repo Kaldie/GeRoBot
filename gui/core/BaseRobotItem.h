@@ -67,14 +67,14 @@ class BaseRobotItem {
    * Returns string which are called in order to populate the combo box
    * The order is important. The set element method will return an index for one of the given items
    */
-  virtual std::vector<std::string> getComboBoxElements(const int& i_row) const {return std::vector<std::string>();};
+  virtual std::vector<std::string> getComboBoxElements(const int& i_row) const;
 
   /**
   * Will be called when the custom delegate is done editing
   * i_selectedItem is the index selected in the combo box
   * This method should make sure the info from the combo is set in the element
   */
-  virtual void setElement(const int& i_row, const int& i_selectedItem) {};
+  virtual void setElement(const int& i_row, const int& i_selectedItem);
 };
 
 #endif

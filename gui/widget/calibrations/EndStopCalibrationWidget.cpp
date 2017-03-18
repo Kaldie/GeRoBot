@@ -7,7 +7,8 @@
 #include <QLineEdit>
 #include <BaseJoint.h>
 #include <EndStop.h>
-
+#include <thread>
+#include <EndStopCalibration.h>
 
 EndStopCalibrationWidget::EndStopCalibrationWidget(const std::shared_ptr<BaseCalibration>& i_calibration,
 						   QWidget* i_parent) 
@@ -21,7 +22,8 @@ EndStopCalibrationWidget::EndStopCalibrationWidget(const std::shared_ptr<BaseCal
 
 
 void EndStopCalibrationWidget::initialise() {
-  connect(m_timer.get(), SIGNAL(timeout()), this, SLOT(updateJointInfo()));
+  connect(m_timer.get(), &QTimer::timeout,
+	  this, &EndStopCalibrationWidget::updateJointInfo);
   createAdditionalUIElements();
 }
 
@@ -70,8 +72,48 @@ void EndStopCalibrationWidget::updateJointInfo() {
 
 
 void EndStopCalibrationWidget::executeCalibration() {
-  m_calibration->execute();
+  setEnabled(false);
+  connect(m_timer.get(),&QTimer::timeout,
+	  this, &EndStopCalibrationWidget::evaluateCurrentCalibration);
+  std::thread endStopCalibrationThread(&EndStopCalibration::execute,
+				       std::static_pointer_cast<EndStopCalibration>(m_calibration));
+  endStopCalibrationThread.detach();
+  m_timer->start(300);
+}
+
+
+void EndStopCalibrationWidget::evaluateCurrentCalibration() {
+  notifyCurrentState();
+  if (std::static_pointer_cast<EndStopCalibration>(m_calibration)->getState() == 
+      EndStopCalibration::Finished) {
   LOG_DEBUG("Done execute calibration");
-  updateJointInfo();
+  m_timer->stop();
+  setEnabled(true);
   emit updateCalibrationOutText();
+  }
+}
+
+
+void EndStopCalibrationWidget::notifyCurrentState() {
+  std::string currentStateString;
+  switch (std::static_pointer_cast<EndStopCalibration>(m_calibration)->getState()) {
+  case EndStopCalibration::Idle:
+    currentStateString = "Idle";
+    break;
+  case EndStopCalibration::Moving:
+    currentStateString = "Moving";
+    break;
+  case EndStopCalibration::Sending:
+    currentStateString = "Sending";
+    break;
+  case EndStopCalibration::Calculating:
+    currentStateString = "Calculating";
+    break;
+  case EndStopCalibration::Finished:
+    currentStateString = "Finished";
+  default:
+    currentStateString = "Unknown";\
+  }
+  
+  outputEdit->setPlainText(QString::fromStdString("Current state is: " + currentStateString));
 }

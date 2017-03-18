@@ -45,7 +45,11 @@ void SequenceVector::normalise(const bool i_condenseVector /* = false*/) {
       if(currentSequence->getPinStateVector().size() > 0) {
 	thisPinState = *currentSequence->getPinStateVector().begin();
       } else {
-	LOG_ERROR("BooBoo!");
+	if (currentSequence->isEmpty()) {
+	  currentSequence->addToSequence(thisPinState);
+	} else {
+	  LOG_ERROR("BooBoo!");
+	}
       }
     } else {
       break;

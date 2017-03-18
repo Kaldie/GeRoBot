@@ -22,6 +22,9 @@ class PullInCalibration : public MotorSpeedCalibration {
 
   virtual std::string name() const override {return "PullIn Callibration";};
 
+  virtual int getCalibratedParameter() override {return m_calibratePullIn;};
+
+  virtual void createOutput() override;
 };
 
 

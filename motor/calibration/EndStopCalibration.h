@@ -10,6 +10,10 @@ class EndStop;
 
 
 class EndStopCalibration : public BaseCalibration {
+ public:
+  /// states of the calibrator
+  enum State {Calculating, Sending, Moving, Idle, Finished};
+
   /// Registrator which looks at the movement of the robot between the end stops
   GETSET(std::shared_ptr<MovementRegistrator>, m_registrator, Registrator);
 
@@ -30,7 +34,9 @@ class EndStopCalibration : public BaseCalibration {
   /// The goal is to decrease the distance slowly, so we hit the end stop when doing 1 step
   GETSET(traceType, m_finalStepRate, FinalStepRate);
 
- public:
+  GETSET(State, m_state, State);
+  
+ public:  
   EndStopCalibration(const std::shared_ptr<BaseJoint>& i_joint,
 		     const std::shared_ptr<Robot>& i_robot);
 

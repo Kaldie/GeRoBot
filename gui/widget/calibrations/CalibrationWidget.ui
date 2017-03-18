@@ -36,11 +36,7 @@
     </layout>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="calibrationLayout">
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout"/>
-     </item>
-    </layout>
+    <layout class="QVBoxLayout" name="calibrationLayout"/>
    </item>
    <item>
     <layout class="QHBoxLayout" name="buttonLayout">

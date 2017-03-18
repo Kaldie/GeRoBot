@@ -20,6 +20,7 @@ void StepperDriverIO::build() {
   LOG_DEBUG("Max speed is: " << m_stepperDriver->getMaxSpeed());
   m_stepperDriver->setPullIn(getNodeFromPath("./PULL_IN").text().as_int());
   m_stepperDriver->setPullOut(getNodeFromPath("./PULL_OUT").text().as_int());
+  m_stepperDriver->setIncremental(getNodeFromPath("./INCREMENT").text().as_int());
 }
 
 
@@ -36,6 +37,7 @@ bool StepperDriverIO::update(const BaseMotor::MotorPointer i_motor) {
   getNodeFromPath("./MAX_SPEED").text().set(driver->getMaxSpeed());
   getNodeFromPath("./PULL_IN").text().set(driver->getPullIn());
   getNodeFromPath("./PULL_OUT").text().set(driver->getPullOut());
+  getNodeFromPath("./INCREMENT").text().set(driver->getIncremental());
   return hasSucceded;
 }
 
@@ -85,6 +87,8 @@ bool StepperDriverIO::createNode(pugi::xml_node *i_parent) {
     append_child(pugi::node_pcdata).set_value("190");
   stepper.append_child("PULL_OUT").
     append_child(pugi::node_pcdata).set_value("190");
+    stepper.append_child("INCREMENTAL").
+    append_child(pugi::node_pcdata).set_value("10");
   return true;
 }
 

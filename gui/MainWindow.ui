@@ -126,6 +126,8 @@
     <addaction name="actionUpload"/>
     <addaction name="separator"/>
     <addaction name="actuateAction"/>
+    <addaction name="separator"/>
+    <addaction name="AddToPreviousAction"/>
    </widget>
    <addaction name="fileMenu"/>
    <addaction name="menuTraceDesign"/>
@@ -188,6 +190,14 @@
   <action name="actionAppend_Trace">
    <property name="text">
     <string>Append Trace</string>
+   </property>
+  </action>
+  <action name="AddToPreviousAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Add next trace to selected</string>
    </property>
   </action>
  </widget>

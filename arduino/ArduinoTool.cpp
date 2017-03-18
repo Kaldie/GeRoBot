@@ -3,6 +3,9 @@
 #include <macroHeader.h>
 #include "./ArduinoTool.h"
 #include <Robot.h>
+#include <StateSequence.h>
+#include <SequenceVector.h>
+#include <JointController.h>
 
 
 /// Empty constructor
@@ -34,7 +37,7 @@ ArduinoTool::ArduinoTool(const Robot::RobotPointer& i_robot,
 
 
 void ArduinoTool::changeState(const bool& i_state) {
-  if (!m_robot)
+  /*  if (!m_robot)
     return;
 
   if (m_pin > 3) {
@@ -48,10 +51,11 @@ void ArduinoTool::changeState(const bool& i_state) {
   }
   PinState primaryState;
   primaryState.update(8 + m_pin, pinState);
+  */
   // get the sequence vector which will set the tool to the state and
   // make sure arduino waits long enough
-  StateSequence stateSequence = createStateSequence(primaryState, getDelay(i_state));
-  m_robot->addToSequence(stateSequence);
+  //  StateSequence stateSequence = createStateSequence(primaryState, getDelay(i_state));
+  // m_robot->addToSequence(stateSequence);
 }
 
 
