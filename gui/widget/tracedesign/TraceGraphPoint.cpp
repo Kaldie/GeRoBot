@@ -168,7 +168,6 @@ void TraceGraphPoint::updateTracePosition(Trace::TracePointer& i_trace,
     LOG_ERROR("unknown PointPosition");
     break;
   }}  // end switch
-
   parentItem()->update();
 }
 
@@ -267,7 +266,6 @@ bool TraceGraphPoint::curveNeedsCorrection
 
 bool TraceGraphPoint::snapPointToOthers(QPointF* i_newPoint) const {
   LOG_DEBUG("snapPointToOthers");
-  LOG_DEBUG("new point is: " << i_newPoint->x() << ", " << i_newPoint->y());
   bool hasSnapped = false;
   QGraphicsScene* aScene = scene();
   if (!aScene) {
@@ -276,18 +274,18 @@ bool TraceGraphPoint::snapPointToOthers(QPointF* i_newPoint) const {
   // create a bounding box rectanle at the scene location of the object
   QRectF sceneRect = boundingRect();
   sceneRect.moveTo(scenePos());
-  sceneRect.adjust(-TraceGraphPoint::m_searchDistance,
-		   -TraceGraphPoint::m_searchDistance,
-		   TraceGraphPoint::m_searchDistance,
-		   TraceGraphPoint::m_searchDistance);
-
+  sceneRect.adjust(-2 * TraceGraphPoint::m_searchDistance,
+		   -2 * TraceGraphPoint::m_searchDistance,
+		   2 * TraceGraphPoint::m_searchDistance,
+		   2 * TraceGraphPoint::m_searchDistance);
+  int distance;
   for (QGraphicsItem* item : scene()->items(sceneRect, Qt::IntersectsItemBoundingRect)) {
     if (item->type() != TraceGraphPoint::Type) {
       LOG_DEBUG("Found an item which is not a point");
       continue;
     }
     LOG_DEBUG("Found a point");
-    int distance = (scenePos() - item->scenePos()).manhattanLength();
+    distance = (scenePos() - item->scenePos()).manhattanLength();
     if (distance == 0) {
       LOG_DEBUG("Found Myself!");
       continue;
@@ -297,7 +295,7 @@ bool TraceGraphPoint::snapPointToOthers(QPointF* i_newPoint) const {
       *i_newPoint = item->scenePos() - m_startPointAtMouseDown;
       LOG_DEBUG("new point is: " << i_newPoint->x() << ", " << i_newPoint->y());
       hasSnapped = true;
-      LOG_DEBUG("Has found a companion!!!");
+      LOG_DEBUG("Found a companion!");
       break;
     }
   }
