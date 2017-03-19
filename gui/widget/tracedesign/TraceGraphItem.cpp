@@ -121,7 +121,6 @@ QVariant TraceGraphItem::itemChange(GraphicsItemChange change, const QVariant &v
    for (auto& childItem : childItems()) {
       TraceGraphPoint* point = dynamic_cast<TraceGraphPoint*>(childItem);
       if (point) {
-         LOG_DEBUG("this");
          point->updatePositionOnScene();
       }
    }

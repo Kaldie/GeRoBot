@@ -10,12 +10,12 @@
 #include "./TraceGraphPoint.h"
 
 bool TraceGraphPoint::m_snapToOthers = false;
-const float TraceGraphPoint::m_searchDistance = 20.0;
+const float TraceGraphPoint::m_searchDistance = 50.0;
 const int TraceGraphPoint::m_size = 5;
 
 TraceGraphPoint::TraceGraphPoint(TraceGraphItem* i_parent,
-				 TraceGraphPoint::PointPosition i_position)
-  : QGraphicsItem(i_parent), 
+         TraceGraphPoint::PointPosition i_position)
+  : QGraphicsItem(i_parent),
     m_positionOnTrace(i_position),
     m_startPointAtMouseDown(QPointF(0.0,0.0)) {
   setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -29,8 +29,8 @@ TraceGraphPoint::TraceGraphPoint(TraceGraphItem* i_parent,
 
 
 void TraceGraphPoint::paint(QPainter *painter,
-			    const QStyleOptionGraphicsItem *option,
-			    QWidget *widget) {
+          const QStyleOptionGraphicsItem *option,
+          QWidget *widget) {
   Q_UNUSED(option);
   Q_UNUSED(widget);
   LOG_DEBUG("Paint an Point");
@@ -70,11 +70,12 @@ void TraceGraphPoint::mousePressEvent(QGraphicsSceneMouseEvent* i_event) {
 
 
 QVariant TraceGraphPoint::itemChange(GraphicsItemChange change,
-		    const QVariant &value) {
+        const QVariant &value) {
   if(change != QGraphicsItem::ItemPositionChange) {
     return QGraphicsItem::itemChange(change, value);
   }
   QPointF point = value.toPointF();
+  LOG_DEBUG("Point from itemChange: " << point.y() << ", " << point.x());
   if (TraceGraphPoint::m_snapToOthers) {
     snapPointToOthers(&point);
   }
@@ -94,6 +95,7 @@ void TraceGraphPoint::updatePositionOnScene(const Trace::TracePointer& i_trace) 
   LOG_DEBUG("Updating the position on the scene of this Point");
   switch (m_positionOnTrace) {
   case TraceGraphPoint::StartPoint : {
+    setPos(QPoint(0,0));
     // No need to change the position, 0,0 is ALWAYS the start point
     break;
   }
@@ -112,7 +114,7 @@ void TraceGraphPoint::updatePositionOnScene(const Trace::TracePointer& i_trace) 
       setPos(Point2D(rotationTrace->getCentrePoint() - i_trace->getStartPoint()));
     } else {
       LOG_ERROR("Could not convert the trace to a rotation" <<
-		" trace while the point was a center point!");
+    " trace while the point was a center point!");
     }
     break;
   }
@@ -131,8 +133,7 @@ void TraceGraphPoint::updateTracePosition(Trace::TracePointer& i_trace,
 
   switch (m_positionOnTrace) {
   case TraceGraphPoint::StartPoint : {
-    LOG_DEBUG("Start Point At MouseDown" << m_startPointAtMouseDown.x()
-              << " , " << m_startPointAtMouseDown.y());
+    LOG_DEBUG("Start Point At MouseDown" << m_startPointAtMouseDown.x() << " , " << m_startPointAtMouseDown.y());
     Point2D newPoint = Point2D(i_newPosition) + m_startPointAtMouseDown;
     correctTracePosition(i_trace, &newPoint);
     i_trace->setStartPoint(newPoint);
@@ -160,7 +161,7 @@ void TraceGraphPoint::updateTracePosition(Trace::TracePointer& i_trace,
       i_newPosition = Point2D(rotationTrace->getCentrePoint() - i_trace->getStartPoint());
     } else {
       LOG_ERROR("Could not convert the trace to a rotation" <<
-		" trace while the point was a center point!");
+    " trace while the point was a center point!");
     }
     break;
   }
@@ -234,7 +235,7 @@ bool TraceGraphPoint::curveNeedsCorrection
     try {
       Arc2D(i_rotationTrace->getStartPoint(),
                i_rotationTrace->getEndPoint(),
-	    i_newPoint, true);
+      i_newPoint, true);
       return false;
     } catch (std::runtime_error) {}
     return true;
@@ -244,7 +245,7 @@ bool TraceGraphPoint::curveNeedsCorrection
     try {
       Arc2D(i_newPoint,
                i_rotationTrace->getEndPoint(),
-	    i_rotationTrace->getCentrePoint(), true);
+      i_rotationTrace->getCentrePoint(), true);
       return false;
     } catch (std::runtime_error) {}
     return true;
@@ -254,7 +255,7 @@ bool TraceGraphPoint::curveNeedsCorrection
     try {
       Arc2D(i_rotationTrace->getStartPoint(),
                i_newPoint,
-	    i_rotationTrace->getCentrePoint(), true);
+      i_rotationTrace->getCentrePoint(), true);
       return false;
     } catch (std::runtime_error) {}
     return true;
@@ -275,9 +276,9 @@ bool TraceGraphPoint::snapPointToOthers(QPointF* i_newPoint) const {
   QRectF sceneRect = boundingRect();
   sceneRect.moveTo(scenePos());
   sceneRect.adjust(-2 * TraceGraphPoint::m_searchDistance,
-		   -2 * TraceGraphPoint::m_searchDistance,
-		   2 * TraceGraphPoint::m_searchDistance,
-		   2 * TraceGraphPoint::m_searchDistance);
+       -2 * TraceGraphPoint::m_searchDistance,
+       2 * TraceGraphPoint::m_searchDistance,
+       2 * TraceGraphPoint::m_searchDistance);
   int distance;
   for (QGraphicsItem* item : scene()->items(sceneRect, Qt::IntersectsItemBoundingRect)) {
     if (item->type() != TraceGraphPoint::Type) {
@@ -285,11 +286,11 @@ bool TraceGraphPoint::snapPointToOthers(QPointF* i_newPoint) const {
       continue;
     }
     LOG_DEBUG("Found a point");
-    distance = (scenePos() - item->scenePos()).manhattanLength();
-    if (distance == 0) {
-      LOG_DEBUG("Found Myself!");
+    if (item == this) {
+      LOG_DEBUG("Found meself!");
       continue;
     }
+    distance = ((m_startPointAtMouseDown + *i_newPoint) - item->scenePos()).manhattanLength();
     if (distance <= TraceGraphPoint::m_searchDistance) {
       LOG_DEBUG("old point is: " << i_newPoint->x() << ", " << i_newPoint->y());
       *i_newPoint = item->scenePos() - m_startPointAtMouseDown;
