@@ -11,6 +11,7 @@
 #include "./TraceDesignWidget.h"
 #include "./TraceInfoWidget.h"
 #include "./TraceGraphItem.h"
+#include "./TraceGraphPoint.h"
 #include "./TraceGraphView.h"
 #include "./RotationTraceGraphItem.h"
 #include "../../MainWindow.h"
@@ -332,4 +333,10 @@ void TraceDesignWidget::updateRobotLocator() {
 void TraceDesignWidget::updateStartAtPrevious(const bool& i_startAtPrevious) {
   LOG_DEBUG("updateStartAtPrevious");
   m_startAtPrevious = i_startAtPrevious;
+}
+
+
+void TraceDesignWidget::updateSnapToTrace(const bool& i_snapToTrace) {
+  LOG_DEBUG("updateSnapToTrace");
+  TraceGraphPoint::updateSnapToOthers(i_snapToTrace);
 }

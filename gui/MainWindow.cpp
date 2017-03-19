@@ -84,8 +84,12 @@ bool MainWindow::initialise() {
   // Make the calculated shizzle shizzle
   connect(actuateAction, SIGNAL(triggered()), this, SLOT(actuateRobot()));
   // connect the state change of the action to the update of the widget
-  connect(AddToPreviousAction, SIGNAL(toggled(bool)),
+  connect(addToPreviousAction, SIGNAL(toggled(bool)),
 	  traceDesignWidget, SLOT(updateStartAtPrevious(const bool&)));
+  // connect the state change of the action to the update of the widget
+  connect(snapToTraceAction, SIGNAL(toggled(bool)),
+	  traceDesignWidget, SLOT(updateSnapToTrace(const bool&)));
+
     
   // On expand addapt size of the columns
   connect(configurationView,

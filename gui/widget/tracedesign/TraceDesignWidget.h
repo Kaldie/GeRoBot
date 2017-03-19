@@ -26,6 +26,7 @@ class TraceDesignWidget: public QWidget, private Ui::TraceDesignWidget {
   GETSET(std::shared_ptr<QTimer>, m_timer, Timer);
   GETSET(std::shared_ptr<SequentialTraceCalculator>, m_calculator, Calculator);
   GETSET(bool, m_startAtPrevious, StartAtPrevious);
+
  public:
     /// Constructor
   explicit TraceDesignWidget(const std::shared_ptr<Robot>& i_robot = nullptr,
@@ -38,7 +39,7 @@ class TraceDesignWidget: public QWidget, private Ui::TraceDesignWidget {
     * clear the widget if all its Traces
     */
    void clearWidget();
-
+ 
  public slots:
    void addTrace(Trace::TracePointer);
    void removeTrace(Trace::TracePointer);
@@ -70,6 +71,12 @@ class TraceDesignWidget: public QWidget, private Ui::TraceDesignWidget {
      * Update the start at previous setting of this widget
      */
     void updateStartAtPrevious(const bool&);
+
+    
+    /**
+     * Update the snap to trace mode for the rest
+     */
+    void updateSnapToTrace(const bool& i_snapToTrace);
     
  private:
 

@@ -7,7 +7,7 @@
 // foward declarations
 class TraceGraphItem;
 class Trace;
-
+class RotationTrace;
 
 class TraceGraphPoint : public QGraphicsItem {
  public:
@@ -17,6 +17,10 @@ class TraceGraphPoint : public QGraphicsItem {
   /// Constructor
   explicit TraceGraphPoint(TraceGraphItem* parent,
 			   TraceGraphPoint::PointPosition i_position);
+
+   enum { Type = UserType + 2};
+   virtual int type() const Q_DECL_OVERRIDE { return Type; }
+
 
   /// Paint the item to the scene
   virtual void paint(QPainter *painter,
@@ -38,6 +42,11 @@ class TraceGraphPoint : public QGraphicsItem {
    */
   bool correctTracePosition(Trace::TracePointer,
                             Point2D* i_possibleNewPoint);
+
+  /**
+   * update the points so that the will or will not snap to other points
+   */
+  static void updateSnapToOthers(const bool&);
  protected:
   /**
    * Be notified that the point has been moved
@@ -57,16 +66,27 @@ class TraceGraphPoint : public QGraphicsItem {
   /// Update the position of the trace point based on the current position of the point
   void updateTracePosition(Trace::TracePointer& i_trace,
                            QPointF& i_newPosition);
+
   /// Method which determines if given the new point do we need to correct it.
-  bool curveNeedsCorrection(const RotationTrace::RotationTracePointer&,
+  bool curveNeedsCorrection(const std::shared_ptr<RotationTrace>&,
                             const Point2D& i_newPosition) const;
+
+  bool snapPointToOthers(QPointF* i_newPoint) const;
+
   /// variable define if this point is on the end or start position of the trace
   PointPosition m_positionOnTrace;
 
   /// variable storing the postion of the trace when the mouse went down first
   QPointF m_startPointAtMouseDown;
+
+  /// variable defining if it should snap to other points in the scene
+  static bool m_snapToOthers;
+
   /// size of the circle
-  static const int size;
+  static const int m_size;
+
+  /// distance to search for different points to snap to
+  static const float m_searchDistance;
 };
 
 #endif  // GUI_WIDGET_TRACEWIDGET_TRACEGRAPHPOINT_H_

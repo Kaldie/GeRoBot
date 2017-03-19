@@ -9,11 +9,15 @@
 #include "./TraceGraphItem.h"
 #include "./TraceGraphPoint.h"
 
-const int TraceGraphPoint::size = 5;
+bool TraceGraphPoint::m_snapToOthers = false;
+const float TraceGraphPoint::m_searchDistance = 20.0;
+const int TraceGraphPoint::m_size = 5;
 
 TraceGraphPoint::TraceGraphPoint(TraceGraphItem* i_parent,
 				 TraceGraphPoint::PointPosition i_position)
-  :QGraphicsItem(i_parent), m_positionOnTrace(i_position) {
+  : QGraphicsItem(i_parent), 
+    m_positionOnTrace(i_position),
+    m_startPointAtMouseDown(QPointF(0.0,0.0)) {
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setFlag(QGraphicsItem::ItemIsMovable);
   setFlag(QGraphicsItem::ItemSendsGeometryChanges);
@@ -38,19 +42,18 @@ void TraceGraphPoint::paint(QPainter *painter,
   QBrush brush = painter->brush();
   brush.setStyle(Qt::SolidPattern);
   painter->setBrush(brush);
-  painter->drawEllipse(-TraceGraphPoint::size * 0.5,
-                       -TraceGraphPoint::size * 0.5,
-                       TraceGraphPoint::size,
-                       TraceGraphPoint::size);
+  painter->drawEllipse(-TraceGraphPoint::m_size * 0.5,
+                       -TraceGraphPoint::m_size * 0.5,
+                       TraceGraphPoint::m_size,
+                       TraceGraphPoint::m_size);
 }
 
 
 QRectF TraceGraphPoint::boundingRect() const {
-  LOG_DEBUG("Create bouding box!");
-   QRectF rect(-TraceGraphPoint::size * 0.5,
-                -TraceGraphPoint::size * 0.5,
-                TraceGraphPoint::size,
-               TraceGraphPoint::size);
+   QRectF rect(-TraceGraphPoint::m_size * 0.5,
+                -TraceGraphPoint::m_size * 0.5,
+                TraceGraphPoint::m_size,
+               TraceGraphPoint::m_size);
    rect.adjust(-2,-2,2,2);
    return rect;
 }
@@ -71,10 +74,13 @@ QVariant TraceGraphPoint::itemChange(GraphicsItemChange change,
   if(change != QGraphicsItem::ItemPositionChange) {
     return QGraphicsItem::itemChange(change, value);
   }
-  Trace::TracePointer trace = static_cast<TraceGraphItem*>(parentItem())->getTracePointer().lock();
   QPointF point = value.toPointF();
+  if (TraceGraphPoint::m_snapToOthers) {
+    snapPointToOthers(&point);
+  }
+  Trace::TracePointer trace = static_cast<TraceGraphItem*>(parentItem())->getTracePointer().lock();
   updateTracePosition(trace, point);
-  return QGraphicsItem::itemChange(change, point);
+  return point;
 }
 
 
@@ -181,7 +187,6 @@ bool TraceGraphPoint::correctTracePosition(Trace::TracePointer trace,
   if (!curveNeedsCorrection(rotationTrace, *i_newPoint)) {
     return false;
   }
-
   LOG_DEBUG("Needing to fix it!");
   // correcting it here
   switch (m_positionOnTrace) {
@@ -257,4 +262,50 @@ bool TraceGraphPoint::curveNeedsCorrection
     break;
   }}
   return true;
+}
+
+
+bool TraceGraphPoint::snapPointToOthers(QPointF* i_newPoint) const {
+  LOG_DEBUG("snapPointToOthers");
+  LOG_DEBUG("new point is: " << i_newPoint->x() << ", " << i_newPoint->y());
+  bool hasSnapped = false;
+  QGraphicsScene* aScene = scene();
+  if (!aScene) {
+    return hasSnapped;
+  }
+  // create a bounding box rectanle at the scene location of the object
+  QRectF sceneRect = boundingRect();
+  sceneRect.moveTo(scenePos());
+  sceneRect.adjust(-TraceGraphPoint::m_searchDistance,
+		   -TraceGraphPoint::m_searchDistance,
+		   TraceGraphPoint::m_searchDistance,
+		   TraceGraphPoint::m_searchDistance);
+
+  for (QGraphicsItem* item : scene()->items(sceneRect, Qt::IntersectsItemBoundingRect)) {
+    if (item->type() != TraceGraphPoint::Type) {
+      LOG_DEBUG("Found an item which is not a point");
+      continue;
+    }
+    LOG_DEBUG("Found a point");
+    int distance = (scenePos() - item->scenePos()).manhattanLength();
+    if (distance == 0) {
+      LOG_DEBUG("Found Myself!");
+      continue;
+    }
+    if (distance <= TraceGraphPoint::m_searchDistance) {
+      LOG_DEBUG("old point is: " << i_newPoint->x() << ", " << i_newPoint->y());
+      *i_newPoint = item->scenePos() - m_startPointAtMouseDown;
+      LOG_DEBUG("new point is: " << i_newPoint->x() << ", " << i_newPoint->y());
+      hasSnapped = true;
+      LOG_DEBUG("Has found a companion!!!");
+      break;
+    }
+  }
+  return hasSnapped;
+
+}
+
+
+void TraceGraphPoint::updateSnapToOthers(const bool& i_snapToOthers) {
+  m_snapToOthers = i_snapToOthers;
 }
