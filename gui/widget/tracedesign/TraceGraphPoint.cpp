@@ -14,9 +14,10 @@ const float TraceGraphPoint::m_searchDistance = 50.0;
 const int TraceGraphPoint::m_size = 5;
 
 TraceGraphPoint::TraceGraphPoint(TraceGraphItem* i_parent,
-         TraceGraphPoint::PointPosition i_position)
+				 TraceGraphPoint::PointPosition i_position)
   : QGraphicsItem(i_parent),
     m_positionOnTrace(i_position),
+    m_isBeingMoved(false),
     m_startPointAtMouseDown(QPointF(0.0,0.0)) {
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setFlag(QGraphicsItem::ItemIsMovable);
@@ -62,10 +63,19 @@ QRectF TraceGraphPoint::boundingRect() const {
 void TraceGraphPoint::mousePressEvent(QGraphicsSceneMouseEvent* i_event) {
   if (i_event->button() == Qt::LeftButton) {
     // record the start position of the "Move"
+    m_isBeingMoved = true;
     m_startPointAtMouseDown = static_cast<TraceGraphItem*>(parentItem())->
       getTracePointer().lock()->getStartPoint();
   }
   return QGraphicsItem::mousePressEvent(i_event);
+}
+
+
+void TraceGraphPoint::mouseReleaseEvent(QGraphicsSceneMouseEvent* i_event) {
+  if (i_event->button() == Qt::LeftButton) {
+    m_isBeingMoved = false;
+  }
+  return QGraphicsItem::mouseReleaseEvent(i_event);
 }
 
 
@@ -74,8 +84,14 @@ QVariant TraceGraphPoint::itemChange(GraphicsItemChange change,
   if(change != QGraphicsItem::ItemPositionChange) {
     return QGraphicsItem::itemChange(change, value);
   }
+  if (!m_isBeingMoved) {
+    LOG_DEBUG("Movement is caused by something else...its their repsonsibility to update stuff");
+    return QGraphicsItem::itemChange(change, value);
+  }
   QPointF point = value.toPointF();
+  LOG_DEBUG("Point is being moved by user!");
   LOG_DEBUG("Point from itemChange: " << point.y() << ", " << point.x());
+  // check if others are near and we need to snap to them
   if (TraceGraphPoint::m_snapToOthers) {
     snapPointToOthers(&point);
   }
@@ -130,14 +146,16 @@ void TraceGraphPoint::updateTracePosition(Trace::TracePointer& i_trace,
   LOG_DEBUG("Update trace position based on the current position of the point in the scene");
   LOG_DEBUG("Current Start point: " << i_trace->getStartPoint().x << " , " << i_trace->getStartPoint().y);
   LOG_DEBUG("Current End point: " << i_trace->getEndPoint().x << " , " << i_trace->getEndPoint().y);
-
+  
   switch (m_positionOnTrace) {
   case TraceGraphPoint::StartPoint : {
     LOG_DEBUG("Start Point At MouseDown" << m_startPointAtMouseDown.x() << " , " << m_startPointAtMouseDown.y());
     Point2D newPoint = Point2D(i_newPosition) + m_startPointAtMouseDown;
     correctTracePosition(i_trace, &newPoint);
     i_trace->setStartPoint(newPoint);
-    parentItem()->setPos(newPoint);
+    TraceGraphItem* traceGraphItem = static_cast<TraceGraphItem*>(parentItem());
+    traceGraphItem->setPos(newPoint);
+    traceGraphItem->updatePointPositions(this);
     i_newPosition = QPointF(0, 0);
     break;
   }
@@ -286,8 +304,8 @@ bool TraceGraphPoint::snapPointToOthers(QPointF* i_newPoint) const {
       continue;
     }
     LOG_DEBUG("Found a point");
-    if (item == this) {
-      LOG_DEBUG("Found meself!");
+    if (parentItem() == item->parentItem()) {
+      LOG_DEBUG("Found me or a sibbling");
       continue;
     }
     distance = ((m_startPointAtMouseDown + *i_newPoint) - item->scenePos()).manhattanLength();

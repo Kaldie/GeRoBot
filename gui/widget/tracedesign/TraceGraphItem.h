@@ -6,7 +6,7 @@
 #include <QList>
 #include <Trace.h>
 
-class TraceGraphEditPoint;
+class TraceGraphPoint;
 class GraphWidget;
 class QGraphicsSceneMouseEvent;
 
@@ -39,6 +39,9 @@ class TraceGraphItem : public QGraphicsObject {
                       QWidget *widget) Q_DECL_OVERRIDE;
    void updatePosition();
 
+   /// update the position of the siblings of the given point
+   void updatePointPositions(TraceGraphPoint* i_point = nullptr) const;
+
  signals:
    void removeThisTrace(Trace::TracePointer);
    void convertThisTrace(Trace::TracePointer, Trace::TraceType);
@@ -46,12 +49,16 @@ class TraceGraphItem : public QGraphicsObject {
 
  protected:
    virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) Q_DECL_OVERRIDE;
+   void mousePressEvent(QGraphicsSceneMouseEvent* i_event) Q_DECL_OVERRIDE;
+   void mouseReleaseEvent(QGraphicsSceneMouseEvent* i_event) Q_DECL_OVERRIDE;
    void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) Q_DECL_OVERRIDE;
 
  private slots:
     void handleTrigger();
 
  private:
+    /// variable indicating the item is being moved by the user
+    bool m_isBeingMoved;
     static const QString RemoveTraceActionText;
     static const QString ConvertToLineActionText;
     static const QString ConvertToCurveActionText;

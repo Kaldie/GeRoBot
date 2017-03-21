@@ -13,7 +13,11 @@ class TraceGraphPoint : public QGraphicsItem {
  public:
   /// Enum defining if this object belongs to the start or the stop of the trace
   enum PointPosition {StartPoint, EndPoint, CenterPoint};
+  
+  /// variable define if this point is on the end or start position of the trace
+  GETSET(PointPosition, m_positionOnTrace, PositionOnTrace);
 
+ public:
   /// Constructor
   explicit TraceGraphPoint(TraceGraphItem* parent,
 			   TraceGraphPoint::PointPosition i_position);
@@ -55,7 +59,9 @@ class TraceGraphPoint : public QGraphicsItem {
   virtual QVariant itemChange(GraphicsItemChange change,
                               const QVariant &value) Q_DECL_OVERRIDE;
 
-  virtual void mousePressEvent(QGraphicsSceneMouseEvent* i_event);
+  virtual void mousePressEvent(QGraphicsSceneMouseEvent* i_event) Q_DECL_OVERRIDE;
+  virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* i_event) Q_DECL_OVERRIDE;
+
  private:
   /// No default constructor
   TraceGraphPoint(){};
@@ -73,8 +79,8 @@ class TraceGraphPoint : public QGraphicsItem {
 
   bool snapPointToOthers(QPointF* i_newPoint) const;
 
-  /// variable define if this point is on the end or start position of the trace
-  PointPosition m_positionOnTrace;
+  /// defines if the point is being moved, otherwise will just set them to the end position
+  bool m_isBeingMoved;
 
   /// variable storing the postion of the trace when the mouse went down first
   QPointF m_startPointAtMouseDown;

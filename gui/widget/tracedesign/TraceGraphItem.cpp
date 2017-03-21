@@ -13,7 +13,9 @@ const QString TraceGraphItem::ConvertToCurveActionText("Convert to Curve");
 const QString TraceGraphItem::ConvertDirection("Alter direction");
 
 TraceGraphItem::TraceGraphItem(Trace::TracePointer i_trace /*= 0*/)
-   : m_trace(i_trace) {
+  : QGraphicsObject(),
+    m_trace(i_trace),
+    m_isBeingMoved(false) {
    setFlag(QGraphicsItem::ItemIsSelectable);
    setFlag(QGraphicsItem::ItemIsMovable);
    setFlag(QGraphicsItem::ItemSendsGeometryChanges);
@@ -98,11 +100,34 @@ QPainterPath TraceGraphItem::shape() const {
 }
 
 
+void TraceGraphItem::mousePressEvent(QGraphicsSceneMouseEvent* i_event) {
+  if (i_event->button() == Qt::LeftButton) {
+    // record the start position of the "Move"
+    LOG_DEBUG("Left Mouse is pressed");
+    m_isBeingMoved = true;
+  }
+  return QGraphicsObject::mousePressEvent(i_event);
+}
+
+
+void TraceGraphItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* i_event) {
+  if (i_event->button() == Qt::LeftButton) {
+    LOG_DEBUG("Left mouse is released");
+    m_isBeingMoved = false;
+  }
+  return QGraphicsObject::mouseReleaseEvent(i_event);
+}
+
 
 QVariant TraceGraphItem::itemChange(GraphicsItemChange change, const QVariant &value) {
    if(change != QGraphicsItem::ItemPositionHasChanged) {
       return QGraphicsItem::itemChange(change, value);
    }
+   // if (!m_isBeingMoved) {
+   //LOG_DEBUG("Something is moving me, but not the user");
+   //return QGraphicsItem::itemChange(change, value);
+   //}
+
    Trace::TracePointer trace(m_trace.lock());
    if (!trace) {
       return QGraphicsItem::itemChange(change, value);
@@ -115,16 +140,11 @@ QVariant TraceGraphItem::itemChange(GraphicsItemChange change, const QVariant &v
       (newStartPoint - trace->getStartPoint());
    LOG_DEBUG("New end pos: " << endPoint.x << ", " << endPoint.y);
 
+   // this is not necessary as the item as is is moved, its rect stays the same relative to its left upper conner
+   // prepareGeometryChange();
    trace->setEndPoint(endPoint);
    trace->setStartPoint(newStartPoint);
-   prepareGeometryChange();
-   for (auto& childItem : childItems()) {
-      TraceGraphPoint* point = dynamic_cast<TraceGraphPoint*>(childItem);
-      if (point) {
-         point->updatePositionOnScene();
-      }
-   }
-   return QGraphicsItem::itemChange(change, value);
+   return value.toPointF();
 }
 
 
@@ -191,4 +211,38 @@ void TraceGraphItem::handleTrigger() {
    } else {
       LOG_ERROR("Action: '" << action->text().toStdString() << "' is not resolved!");
    }
+}
+
+
+void TraceGraphItem::updatePointPositions(TraceGraphPoint* i_point /* = nullptr*/) const {
+  Trace::TracePointer trace = m_trace.lock();
+  if (!trace) {
+    LOG_ERROR("Unknown trace!");
+  }
+  for (QGraphicsItem* child : childItems()) {
+    TraceGraphPoint* point = static_cast<TraceGraphPoint*>(child);
+    if (i_point == point) {
+      continue;
+    }
+    switch (point->getPositionOnTrace()) {
+    case TraceGraphPoint::StartPoint: {
+      point->setPos(QPointF(0.0,0.0));
+      break;
+    }
+    case TraceGraphPoint::EndPoint: {
+      point->setPos(trace->getEndPoint() - trace->getStartPoint());
+      break;
+    }
+    case TraceGraphPoint::CenterPoint: {
+      if (trace->getTraceType() == Trace::Curve) {
+  std::shared_ptr<RotationTrace> rotationTrace = std::static_pointer_cast<RotationTrace>(trace);
+  point->setPos(rotationTrace->getCentrePoint() - trace->getStartPoint());
+  break;
+      }
+    }
+    default: {
+      LOG_ERROR("Unknown TraceGraphPoint type!");
+    }
+    }
+  }
 }
