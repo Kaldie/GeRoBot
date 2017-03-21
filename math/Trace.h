@@ -6,7 +6,12 @@
 #include <Line2D.h>
 
 class Trace {
-  GETSETPROTECTED(traceType, m_traceType, TraceType);
+ public:
+  enum TraceType{Line,
+                 Curve};
+
+
+  GETSETPROTECTED(TraceType, m_traceType, TraceType);
   GETSETPROTECTED(Point2D, m_startPoint, StartPoint);
   GETSETPROTECTED(Point2D, m_endPoint, EndPoint);
  public:
@@ -15,8 +20,6 @@ class Trace {
   typedef std::vector<TracePointer> TracePointerVector;
   typedef std::weak_ptr<Trace> WeakTracePointer;
 
-  enum TraceType{Line,
-                 Curve};
   // constructors
   Trace();
   virtual ~Trace(){};
